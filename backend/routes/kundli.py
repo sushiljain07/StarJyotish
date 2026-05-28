@@ -1,3 +1,64 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from datetime import datetime
+import swisseph as swe
+import pytz
+
+from models.birth_data import BirthInput
+from models.chart_data import (
+    ChartResponse, PlanetData, HouseData, AscendantData,
+    DashaData, MahadashaEntry, AntardashaEntry,
+)
+from services.geocode import geocode_place
+from services.astro_calc import calculate_chart
+from services.dasha import calculate_vimshottari
 
 router = APIRouter()
+
+
+@router.post("/kundli", response_model=ChartResponse)
+def get_kundli(body: BirthInput):
+    # 1. Geocode place
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # 2. Convert local birth time → UTC Julian Day
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+
+    jd_ut = swe.julday(
+        utc_dt.year, utc_dt.month, utc_dt.day,
+        utc_dt.hour + utc_dt.minute / 60.0,
+    )
+
+    # 3. Calculate chart
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+
+    # 4. Calculate dasha
+    dasha_raw = calculate_vimshottari(
+        moon_lon=chart["moon_sidereal_lon"],
+        birth_dt=naive_dt,
+    )
+
+    # 5. Assemble response
+    current_ad = (
+        AntardashaEntry(**dasha_raw["current_antardasha"])
+        if dasha_raw["current_antardasha"] else None
+    )
+
+    return ChartResponse(
+        ascendant=AscendantData(**chart["ascendant"]),
+        planets=[PlanetData(**p) for p in chart["planets"]],
+        houses=[HouseData(**h) for h in chart["houses"]],
+        navamsa_ascendant=AscendantData(**chart["navamsa_ascendant"]),
+        navamsa_planets=[PlanetData(**p) for p in chart["navamsa_planets"]],
+        dasha=DashaData(
+            current_mahadasha=MahadashaEntry(**dasha_raw["current_mahadasha"]),
+            current_antardasha=current_ad,
+            antardashas=[AntardashaEntry(**a) for a in dasha_raw["antardashas"]],
+            full_sequence=[MahadashaEntry(**m) for m in dasha_raw["full_sequence"]],
+        ),
+    )

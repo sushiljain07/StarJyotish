@@ -1,0 +1,34 @@
+{
+  "app_title": "कुंडली",
+  "tagline": "वैदिक जन्म कुंडली कैलकुलेटर",
+  "form_date": "जन्म तिथि",
+  "form_time": "जन्म समय",
+  "form_place": "जन्म स्थान",
+  "form_submit": "कुंडली बनाएं",
+  "tab_birth_chart": "जन्म कुंडली",
+  "tab_navamsa": "नवमांश (D9)",
+  "tab_dasha": "दशा",
+  "tab_planets": "ग्रह",
+  "current_mahadasha": "वर्तमान महादशा",
+  "years_remaining": "वर्ष शेष",
+  "antardasha_heading": "अंतर्दशाएं",
+  "full_sequence": "महादशा क्रम",
+  "planet_table_heading": "ग्रह स्थिति",
+  "col_planet": "ग्रह", "col_sign": "राशि", "col_degree": "अंश",
+  "col_house": "भाव", "col_nakshatra": "नक्षत्र",
+  "col_pada": "पद", "col_retrograde": "व",
+  "loading": "गणना हो रही है...",
+  "error_place_not_found": "स्थान नहीं मिला। पूरा शहर का नाम लिखें।",
+  "error_generic": "कुछ गलत हो गया। फिर कोशिश करें।",
+  "planets": {
+    "Sun": "सूर्य", "Moon": "चंद्र", "Mars": "मंगल", "Mercury": "बुध",
+    "Jupiter": "गुरु", "Venus": "शुक्र", "Saturn": "शनि",
+    "Rahu": "राहु", "Ketu": "केतु"
+  },
+  "signs": {
+    "Aries": "मेष", "Taurus": "वृषभ", "Gemini": "मिथुन",
+    "Cancer": "कर्क", "Leo": "सिंह", "Virgo": "कन्या",
+    "Libra": "तुला", "Scorpio": "वृश्चिक", "Sagittarius": "धनु",
+    "Capricorn": "मकर", "Aquarius": "कुम्भ", "Pisces": "मीन"
+  }
+}

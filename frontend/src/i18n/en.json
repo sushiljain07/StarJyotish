@@ -1,0 +1,34 @@
+{
+  "app_title": "Kundli",
+  "tagline": "Vedic Birth Chart Calculator",
+  "form_date": "Date of Birth",
+  "form_time": "Time of Birth",
+  "form_place": "Place of Birth",
+  "form_submit": "Generate Kundli",
+  "tab_birth_chart": "Birth Chart",
+  "tab_navamsa": "Navamsa (D9)",
+  "tab_dasha": "Dasha",
+  "tab_planets": "Planets",
+  "current_mahadasha": "Current Mahadasha",
+  "years_remaining": "yrs remaining",
+  "antardasha_heading": "Antardashas",
+  "full_sequence": "Full Mahadasha Sequence",
+  "planet_table_heading": "Planetary Positions",
+  "col_planet": "Planet", "col_sign": "Sign", "col_degree": "Degree",
+  "col_house": "House", "col_nakshatra": "Nakshatra",
+  "col_pada": "Pada", "col_retrograde": "R",
+  "loading": "Calculating...",
+  "error_place_not_found": "Place not found. Try a full city name.",
+  "error_generic": "Something went wrong. Please try again.",
+  "planets": {
+    "Sun": "Sun", "Moon": "Moon", "Mars": "Mars", "Mercury": "Mercury",
+    "Jupiter": "Jupiter", "Venus": "Venus", "Saturn": "Saturn",
+    "Rahu": "Rahu", "Ketu": "Ketu"
+  },
+  "signs": {
+    "Aries": "Aries", "Taurus": "Taurus", "Gemini": "Gemini",
+    "Cancer": "Cancer", "Leo": "Leo", "Virgo": "Virgo",
+    "Libra": "Libra", "Scorpio": "Scorpio", "Sagittarius": "Sagittarius",
+    "Capricorn": "Capricorn", "Aquarius": "Aquarius", "Pisces": "Pisces"
+  }
+}

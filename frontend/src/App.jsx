@@ -1,26 +1,34 @@
-import { useState } from 'react'
+// frontend/src/App.jsx
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import LanguageToggle from './components/LanguageToggle'
+import Home from './pages/Home'
+import Result from './pages/Result'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Header() {
+  const { t } = useTranslation()
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Vite + React</h1>
-        <div className="bg-white p-6 rounded shadow-lg">
-          <button 
-            onClick={() => setCount((count) => count + 1)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            count is {count}
-          </button>
-          <p className="mt-4 text-gray-600">
-            Edit <code>src/App.jsx</code> and save to test HMR
-          </p>
-        </div>
-      </div>
-    </div>
+    <header className="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center justify-between shadow-sm">
+      <Link to="/" className="flex items-center gap-2 text-amber-900 font-bold text-xl">
+        🔯 {t('app_title')}
+      </Link>
+      <LanguageToggle />
+    </header>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-amber-50">
+        <Header />
+        <main className="max-w-5xl mx-auto px-4 py-8">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/kundli" element={<Result />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  )
+}

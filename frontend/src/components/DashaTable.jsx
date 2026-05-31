@@ -63,7 +63,7 @@ export default function DashaTable({ dasha }) {
                   >
                     <td className="p-2 border border-amber-200">
                       {isCurrent && '▶ '}
-                      {t(`planets.${a.planet}`, a.planet)}–{t(`planets.${md.planet}`, md.planet)}
+                      {t(`planets.${md.planet}`, md.planet)}–{t(`planets.${a.planet}`, a.planet)}
                     </td>
                     <td className="p-2 border border-amber-200">{a.start}</td>
                     <td className="p-2 border border-amber-200">{a.end}</td>

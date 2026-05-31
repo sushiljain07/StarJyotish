@@ -78,7 +78,7 @@ export default function BirthForm({ onSubmit, loading }) {
       {/* ── Name ── */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Full Name
+          {t('form_name')}
         </label>
         <input
           type="text" required value={name} placeholder="e.g. Arjun Sharma"

@@ -1,6 +1,7 @@
 {
   "app_title": "Kundli",
   "tagline": "Vedic Birth Chart Calculator",
+  "form_name": "Full Name",
   "form_date": "Date of Birth",
   "form_time": "Time of Birth",
   "form_place": "Place of Birth",

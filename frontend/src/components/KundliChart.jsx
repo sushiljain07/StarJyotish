@@ -101,7 +101,9 @@ function getPlanetStatus(p, sun, navamsaPlanets) {
   return sym.join('')
 }
 
-const LINE_H = 21   // vertical spacing between planet rows (px)
+const LINE_H = 21   // vertical spacing — single column
+const ROW_H  = 22   // vertical spacing — 2-column grid
+const OFFSET = 22   // horizontal offset from centre in 2-col mode
 
 export default function KundliChart({
   planets = [],
@@ -171,45 +173,59 @@ export default function KundliChart({
           const isH1   = hIdx === 0
           const hasLag = isH1 && ascendant
 
-          // Total rows: Lagna row (if H1) + planet rows
-          const totalRows = ps.length + (hasLag ? 1 : 0)
-          if (totalRows === 0) return null
-
-          const startY = cy - ((totalRows - 1) * LINE_H) / 2
-          const items  = []
-
+          // Build a flat list of all items to render in this house
+          const allItems = []
           if (hasLag) {
-            const lagDeg = Math.floor(ascendant.degree)
-            items.push(
-              <text key="La" x={cx} y={startY}
-                    textAnchor="middle" fontSize="15"
-                    fill="#FF6B00" fontWeight="bold">
-                <tspan fontSize="11" dy="-3">{lagDeg}</tspan>
-                <tspan dy="3">La</tspan>
-              </text>
-            )
+            allItems.push({ type: 'lag', deg: Math.floor(ascendant.degree) })
           }
+          ps.forEach(p => {
+            allItems.push({
+              type:   'planet',
+              color:  PLANET_COLORS[p.name] ?? '#333',
+              name:   abbr[p.name] ?? p.name.slice(0, 2),
+              deg:    Math.floor(p.degree),
+              status: getPlanetStatus(p, sun, navamsaPlanets),
+            })
+          })
 
-          ps.forEach((p, j) => {
-            const row    = j + (hasLag ? 1 : 0)
-            const yPos   = startY + row * LINE_H
-            const color  = PLANET_COLORS[p.name] ?? '#333'
-            const name   = abbr[p.name] ?? p.name.slice(0, 2)
-            const deg    = Math.floor(p.degree)
-            const status = getPlanetStatus(p, sun, navamsaPlanets)
+          if (allItems.length === 0) return null
 
-            items.push(
-              <text key={p.name} x={cx} y={yPos}
+          // 2-column grid for 3+ items to use horizontal space
+          const useGrid = allItems.length >= 3
+          const rh      = useGrid ? ROW_H : LINE_H
+          const rows    = useGrid ? Math.ceil(allItems.length / 2) : allItems.length
+          const startY  = cy - ((rows - 1) * rh) / 2
+
+          const rendered = allItems.map((item, idx) => {
+            const row = useGrid ? Math.floor(idx / 2) : idx
+            const col = useGrid ? idx % 2 : 0
+            // Last item in an odd-count grid → centre it
+            const isLoneLastRow = useGrid && allItems.length % 2 !== 0 && idx === allItems.length - 1
+            const xPos = isLoneLastRow ? cx : useGrid ? cx + (col === 0 ? -OFFSET : OFFSET) : cx
+            const yPos = startY + row * rh
+
+            if (item.type === 'lag') {
+              return (
+                <text key="La" x={xPos} y={yPos}
+                      textAnchor="middle" fontSize="15"
+                      fill="#FF6B00" fontWeight="bold">
+                  <tspan fontSize="11" dy="-3">{item.deg}</tspan>
+                  <tspan dy="3">La</tspan>
+                </text>
+              )
+            }
+            return (
+              <text key={item.name} x={xPos} y={yPos}
                     textAnchor="middle" fontSize="15"
-                    fill={color} fontWeight="500">
-                <tspan fontSize="11" dy="-3">{deg}</tspan>
-                <tspan dy="3">{name}</tspan>
-                {status && <tspan fontSize="11" dy="-3">{status}</tspan>}
+                    fill={item.color} fontWeight="500">
+                <tspan fontSize="11" dy="-3">{item.deg}</tspan>
+                <tspan dy="3">{item.name}</tspan>
+                {item.status && <tspan fontSize="11" dy="-3">{item.status}</tspan>}
               </text>
             )
           })
 
-          return <g key={`h${hNum}`}>{items}</g>
+          return <g key={`h${hNum}`}>{rendered}</g>
         })}
       </svg>
 

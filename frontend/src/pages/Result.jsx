@@ -46,7 +46,7 @@ export default function Result() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
       <div className="bg-primary text-white">
-        <div className="max-w-lg mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4">
           {/* Top row: place + new chart button */}
           <div className="flex items-center justify-between py-3">
             <div>
@@ -66,19 +66,25 @@ export default function Result() {
       </div>
 
       {/* Summary chips */}
-      <div className="max-w-lg mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full">
         <SummaryChips data={data} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 max-w-lg mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
+        {/* Birth chart tab: side-by-side on desktop */}
         <div className={activeTab === 'birth_chart' ? '' : 'hidden'}>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <KundliChart
               planets={data.planets}
               ascendant={data.ascendant}
               navamsaPlanets={data.navamsa_planets}
               title={t('tab_birth_chart')}
+            />
+            <KundliChart
+              planets={data.navamsa_planets}
+              ascendant={data.navamsa_ascendant}
+              title={t('tab_navamsa')}
             />
           </div>
         </div>

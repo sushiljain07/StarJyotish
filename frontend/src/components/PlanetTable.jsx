@@ -14,7 +14,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
         </div>
       )}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse min-w-[560px]">
+        <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-amber-100 text-indigo-800">
               {['col_planet','col_sign','col_degree','col_house','col_nakshatra','col_pada','col_retrograde']

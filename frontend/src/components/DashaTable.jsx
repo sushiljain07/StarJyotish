@@ -42,7 +42,7 @@ export default function DashaTable({ dasha }) {
       <div>
         <h3 className="font-semibold text-indigo-900 mb-2">{t('antardasha_heading')}</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse min-w-[480px]">
+          <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-primary-light text-indigo-800">
                 <th className="text-left p-2 border border-amber-200">{t('col_planet')}</th>

@@ -55,7 +55,7 @@ export default function Home() {
 
       {/* Form card */}
       <div className="flex-1 px-4 -mt-4">
-        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6">
+        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6 sm:p-8">
           <BirthForm onSubmit={handleSubmit} loading={loading} />
           {error && (
             <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

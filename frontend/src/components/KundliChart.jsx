@@ -129,7 +129,7 @@ export default function KundliChart({
   const sun = planets.find(p => p.name === 'Sun')
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full max-w-sm mx-auto">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full max-w-sm sm:max-w-lg mx-auto">
     <div className="flex flex-col items-center gap-3 w-full">
       <div className="text-sm font-semibold text-indigo-700">{title}</div>
 

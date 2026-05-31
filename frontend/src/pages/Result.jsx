@@ -9,6 +9,22 @@ import ChartReading from '../components/ChartReading'
 import AskChart from '../components/AskChart'
 import NavBar from '../components/NavBar'
 
+function formatDate(dateStr) {
+  // "YYYY-MM-DD" → "DD-MM-YYYY"
+  const [y, m, d] = dateStr.split('-')
+  return `${d}-${m}-${y}`
+}
+
+function formatTime(timeStr) {
+  // "HH:MM" 24hr → "H:MM AM/PM"
+  const [hStr, min] = timeStr.split(':')
+  let h = parseInt(hStr, 10)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  if (h === 0) h = 12
+  else if (h > 12) h -= 12
+  return `${h}:${min} ${ampm}`
+}
+
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
   const md = data.dasha.current_mahadasha
@@ -52,7 +68,7 @@ export default function Result() {
             <div>
               {input.name && <div className="font-bold text-lg leading-tight">{input.name}</div>}
               <div className={`${input.name ? 'text-indigo-200 text-xs' : 'font-bold text-base'} leading-tight`}>{input.place}</div>
-              <div className="text-indigo-200 text-xs">{input.date} · {input.time}</div>
+              <div className="text-indigo-200 text-xs">{formatDate(input.date)} · {formatTime(input.time)}</div>
             </div>
             <button
               onClick={() => navigate('/')}

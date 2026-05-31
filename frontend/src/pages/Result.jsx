@@ -61,7 +61,7 @@ export default function Result() {
             </button>
           </div>
           {/* Desktop nav inline in header */}
-          <NavBar activeTab={activeTab} onTabChange={setActiveTab} />
+          <NavBar activeTab={activeTab} onTabChange={setActiveTab} variant="desktop" />
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function Result() {
       </div>
 
       {/* Mobile bottom nav */}
-      <NavBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <NavBar activeTab={activeTab} onTabChange={setActiveTab} variant="mobile" />
     </div>
   )
 }

@@ -74,3 +74,15 @@ class ReadingSection(_Flexible):
 
 class ReadingResponse(_Flexible):
     sections: list[ReadingSection]
+
+
+class AskRequest(_Flexible):
+    date: str       # "YYYY-MM-DD"
+    time: str       # "HH:MM" (24-hr)
+    place: str
+    question: str
+    language: str = "en"
+
+
+class AskResponse(_Flexible):
+    answer: str

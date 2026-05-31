@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from main import app
 from services.geocode import GeoResult
 from models.chart_data import ReadingRequest, ReadingSection, ReadingResponse
-from services.gemini import get_dignity, parse_sections, build_prompt
+from services.ai import get_dignity, parse_sections, build_prompt
 
 client = TestClient(app)
 
@@ -42,7 +42,10 @@ def test_unknown_planet_returns_empty():
 
 # ── Section parsing ──────────────────────────────────────────────────────────
 
-SAMPLE_RESPONSE = """===Personality & Appearance===
+SAMPLE_RESPONSE = """===Chart Overview===
+Sun in Aries with strong planetary positions.
+
+===Personality & Appearance===
 With Scorpio rising, you carry an air of mystery.
 
 ===Career & Wealth===
@@ -61,7 +64,7 @@ Ketu in 2nd house brings spiritual detachment.
 Jupiter-Venus period is highly auspicious."""
 
 def test_parse_sections_returns_six():
-    assert len(parse_sections(SAMPLE_RESPONSE)) == 6
+    assert len(parse_sections(SAMPLE_RESPONSE)) == 7
 
 def test_parse_sections_content():
     career = next(s for s in parse_sections(SAMPLE_RESPONSE) if s["title"] == "Career & Wealth")

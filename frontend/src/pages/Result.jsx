@@ -75,14 +75,16 @@ export default function Result() {
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
         {/* Birth chart tab: D1 always shown; D9 alongside on desktop */}
         <div className={activeTab === 'birth_chart' ? '' : 'hidden'}>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <KundliChart
-              planets={data.planets}
-              ascendant={data.ascendant}
-              navamsaPlanets={data.navamsa_planets}
-              title={t('tab_birth_chart')}
-            />
-            <div className="hidden sm:block">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
+            <div className="w-full sm:w-[460px]">
+              <KundliChart
+                planets={data.planets}
+                ascendant={data.ascendant}
+                navamsaPlanets={data.navamsa_planets}
+                title={t('tab_birth_chart')}
+              />
+            </div>
+            <div className="hidden sm:block w-[460px]">
               <KundliChart
                 planets={data.navamsa_planets}
                 ascendant={data.navamsa_ascendant}
@@ -90,7 +92,7 @@ export default function Result() {
               />
             </div>
           </div>
-          {/* Mobile: show D9 below with a label */}
+          {/* Mobile: D9 below */}
           <div className="sm:hidden mt-6 flex flex-col items-center">
             <KundliChart
               planets={data.navamsa_planets}

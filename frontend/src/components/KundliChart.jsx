@@ -101,7 +101,7 @@ function getPlanetStatus(p, sun, navamsaPlanets) {
   return sym.join('')
 }
 
-const LINE_H = 18   // vertical spacing between planet rows (px)
+const LINE_H = 21   // vertical spacing between planet rows (px)
 
 export default function KundliChart({
   planets = [],
@@ -129,7 +129,7 @@ export default function KundliChart({
   const sun = planets.find(p => p.name === 'Sun')
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full max-w-sm sm:max-w-lg mx-auto">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
       <div className="text-sm font-semibold text-indigo-700">{title}</div>
 
@@ -157,7 +157,7 @@ export default function KundliChart({
           const [rx, ry] = RASHI_POS[i]
           return (
             <text key={`r${i}`} x={rx} y={ry}
-                  textAnchor="middle" fontSize="13"
+                textAnchor="middle" fontSize="14"
                   fill="#b5451b" fontWeight="bold">
               {h.sign_index + 1}
             </text>
@@ -182,9 +182,9 @@ export default function KundliChart({
             const lagDeg = Math.floor(ascendant.degree)
             items.push(
               <text key="La" x={cx} y={startY}
-                    textAnchor="middle" fontSize="13"
+                    textAnchor="middle" fontSize="15"
                     fill="#FF6B00" fontWeight="bold">
-                <tspan fontSize="9" dy="-3">{lagDeg}</tspan>
+                <tspan fontSize="11" dy="-3">{lagDeg}</tspan>
                 <tspan dy="3">La</tspan>
               </text>
             )
@@ -200,11 +200,11 @@ export default function KundliChart({
 
             items.push(
               <text key={p.name} x={cx} y={yPos}
-                    textAnchor="middle" fontSize="13"
+                    textAnchor="middle" fontSize="15"
                     fill={color} fontWeight="500">
-                <tspan fontSize="9" dy="-3">{deg}</tspan>
+                <tspan fontSize="11" dy="-3">{deg}</tspan>
                 <tspan dy="3">{name}</tspan>
-                {status && <tspan fontSize="9" dy="-3">{status}</tspan>}
+                {status && <tspan fontSize="11" dy="-3">{status}</tspan>}
               </text>
             )
           })

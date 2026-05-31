@@ -23,7 +23,7 @@ function SummaryChips({ data }) {
         </span>
       )}
       <span className="bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">
-        {md.planet} MD
+        Mahadasha: {md.planet}
       </span>
     </div>
   )

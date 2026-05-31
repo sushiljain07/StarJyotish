@@ -5,8 +5,9 @@ import { useTranslation } from 'react-i18next'
 import KundliChart from '../components/KundliChart'
 import DashaTable from '../components/DashaTable'
 import PlanetTable from '../components/PlanetTable'
+import ChartReading from '../components/ChartReading'
 
-const TABS = ['birth_chart', 'navamsa', 'dasha', 'planets']
+const TABS = ['birth_chart', 'navamsa', 'dasha', 'planets', 'reading']
 
 export default function Result() {
   const { t } = useTranslation()
@@ -48,18 +49,28 @@ export default function Result() {
       {/* Tab panels */}
       {activeTab === 'birth_chart' && (
         <div className="flex flex-col items-center">
-          <KundliChart planets={data.planets} title={t('tab_birth_chart')} />
+          <KundliChart
+            planets={data.planets}
+            ascendant={data.ascendant}
+            navamsaPlanets={data.navamsa_planets}
+            title={t('tab_birth_chart')}
+          />
         </div>
       )}
       {activeTab === 'navamsa' && (
         <div className="flex flex-col items-center">
-          <KundliChart planets={data.navamsa_planets} title={t('tab_navamsa')} />
+          <KundliChart
+            planets={data.navamsa_planets}
+            ascendant={data.navamsa_ascendant}
+            title={t('tab_navamsa')}
+          />
         </div>
       )}
       {activeTab === 'dasha' && <DashaTable dasha={data.dasha} />}
       {activeTab === 'planets' && (
         <PlanetTable planets={data.planets} ascendant={data.ascendant} />
       )}
+      {activeTab === 'reading' && <ChartReading input={input} />}
     </div>
   )
 }

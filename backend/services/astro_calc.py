@@ -13,6 +13,9 @@ PLANET_IDS = {
     "Venus":   swe.VENUS,
     "Saturn":  swe.SATURN,
     "Rahu":    swe.MEAN_NODE,   # mean north node; Ketu = Rahu + 180°
+    "Neptune": swe.NEPTUNE,
+    "Uranus":  swe.URANUS,
+    "Pluto":   swe.PLUTO,
 }
 
 SIGNS = [
@@ -110,14 +113,14 @@ def calculate_chart(jd_ut: float, lat: float, lon: float) -> dict[str, Any]:
         nav_house = (nav_info["sign_index"] - nav_asc_sign) % 12 + 1
         navamsa_planets.append({"name": name, **nav_info, "house": nav_house, "retrograde": retrograde})
 
-    # Ketu = Rahu + 180°
+    # Ketu = Rahu + 180° (nodes always move retrograde)
     rahu = next(p for p in planets if p["name"] == "Rahu")
     ketu_lon = (rahu["sign_index"] * 30 + rahu["degree"] + 180) % 360
     ketu_info = _sign_info(ketu_lon)
     planets.append({
         "name": "Ketu", **ketu_info,
         "house": (ketu_info["sign_index"] - asc_sign_idx) % 12 + 1,
-        "retrograde": False,
+        "retrograde": rahu["retrograde"],
     })
 
     rahu_nav = next(p for p in navamsa_planets if p["name"] == "Rahu")
@@ -127,7 +130,7 @@ def calculate_chart(jd_ut: float, lat: float, lon: float) -> dict[str, Any]:
         "sign": SIGNS[ketu_nav_sign], "sign_index": ketu_nav_sign,
         "degree": rahu_nav["degree"], "nakshatra": "", "nakshatra_pada": 1,
         "house": (ketu_nav_sign - nav_asc_sign) % 12 + 1,
-        "retrograde": False,
+        "retrograde": rahu_nav["retrograde"],
     })
 
     moon = next(p for p in planets if p["name"] == "Moon")

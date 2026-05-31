@@ -40,7 +40,7 @@ def test_calculate_chart_structure():
     assert set(result.keys()) >= {"planets", "houses", "ascendant",
                                    "navamsa_planets", "navamsa_ascendant",
                                    "moon_sidereal_lon"}
-    assert len(result["planets"]) == 9    # Sun Moon Mars Mercury Jupiter Venus Saturn Rahu Ketu
+    assert len(result["planets"]) == 12    # Sun Moon Mars Mercury Jupiter Venus Saturn Rahu Ketu + Neptune Uranus Pluto
     assert len(result["houses"]) == 12
 
 
@@ -61,7 +61,8 @@ def test_calculate_chart_contains_all_planets():
     result = calculate_chart(jd, 28.6139, 77.2090)
     names = {p["name"] for p in result["planets"]}
     assert names == {"Sun", "Moon", "Mars", "Mercury", "Jupiter",
-                     "Venus", "Saturn", "Rahu", "Ketu"}
+                     "Venus", "Saturn", "Rahu", "Ketu",
+                     "Neptune", "Uranus", "Pluto"}
 
 
 def test_moon_sidereal_lon_in_range():

@@ -57,3 +57,20 @@ class ChartResponse(_Flexible):
     navamsa_ascendant: AscendantData
     navamsa_planets: list[PlanetData]
     dasha: DashaData
+
+
+class ReadingRequest(_Flexible):
+    date: str       # "YYYY-MM-DD"
+    time: str       # "HH:MM" (24-hr)
+    place: str
+    language: str   # "en" or "hi"
+
+
+class ReadingSection(_Flexible):
+    title: str
+    icon: str
+    content: str
+
+
+class ReadingResponse(_Flexible):
+    sections: list[ReadingSection]

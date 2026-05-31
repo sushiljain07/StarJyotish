@@ -30,7 +30,7 @@ def test_kundli_response_fields():
     assert "houses" in data
     assert "dasha" in data
     assert "navamsa_planets" in data
-    assert len(data["planets"]) == 9
+    assert len(data["planets"]) == 12
     assert len(data["houses"]) == 12
 
 

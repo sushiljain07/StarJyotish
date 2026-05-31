@@ -7,10 +7,12 @@ from models.birth_data import BirthInput
 from models.chart_data import (
     ChartResponse, PlanetData, HouseData, AscendantData,
     DashaData, MahadashaEntry, AntardashaEntry,
+    ReadingRequest, ReadingSection, ReadingResponse,
 )
 from services.geocode import geocode_place
 from services.astro_calc import calculate_chart
 from services.dasha import calculate_vimshottari
+from services.gemini import generate_reading
 
 router = APIRouter()
 
@@ -62,3 +64,30 @@ def get_kundli(body: BirthInput):
             full_sequence=[MahadashaEntry(**m) for m in dasha_raw["full_sequence"]],
         ),
     )
+
+
+@router.post("/kundli/reading", response_model=ReadingResponse)
+def get_reading(body: ReadingRequest):
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+
+    jd_ut = swe.julday(
+        utc_dt.year, utc_dt.month, utc_dt.day,
+        utc_dt.hour + utc_dt.minute / 60.0,
+    )
+
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+    dasha_raw = calculate_vimshottari(
+        moon_lon=chart["moon_sidereal_lon"],
+        birth_dt=naive_dt,
+    )
+
+    sections = generate_reading(chart, dasha_raw, body.language)
+    return ReadingResponse(sections=[ReadingSection(**s) for s in sections])

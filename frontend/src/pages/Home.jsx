@@ -6,7 +6,7 @@ import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
 
 export default function Home() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -29,19 +29,40 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-8">
-      <div className="text-center mb-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* Hero header */}
+      <div className="bg-primary px-6 pt-12 pb-8 text-center">
         <div className="text-5xl mb-3">🔯</div>
-        <h1 className="text-3xl font-bold text-amber-900">{t('app_title')}</h1>
-        <p className="text-amber-700 mt-1">{t('tagline')}</p>
+        <h1 className="text-3xl font-extrabold text-white tracking-tight">{t('app_title')}</h1>
+        <p className="text-indigo-200 mt-1 text-sm">{t('tagline')}</p>
+        {/* Language toggle */}
+        <div className="mt-4 flex justify-center gap-2">
+          {['en', 'hi'].map(lang => (
+            <button
+              key={lang}
+              onClick={() => i18n.changeLanguage(lang)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                i18n.language.startsWith(lang)
+                  ? 'bg-white text-primary'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              {lang === 'en' ? 'EN' : 'हि'}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="bg-white border border-amber-200 rounded-2xl shadow-sm p-6">
-        <BirthForm onSubmit={handleSubmit} loading={loading} />
-        {error && (
-          <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {error}
-          </div>
-        )}
+
+      {/* Form card */}
+      <div className="flex-1 px-4 -mt-4">
+        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6">
+          <BirthForm onSubmit={handleSubmit} loading={loading} />
+          {error && (
+            <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              {error}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

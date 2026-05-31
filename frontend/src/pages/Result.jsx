@@ -50,7 +50,8 @@ export default function Result() {
           {/* Top row: place + new chart button */}
           <div className="flex items-center justify-between py-3">
             <div>
-              <div className="font-bold text-base leading-tight">{input.place}</div>
+              {input.name && <div className="font-bold text-lg leading-tight">{input.name}</div>}
+              <div className={`${input.name ? 'text-indigo-200 text-xs' : 'font-bold text-base'} leading-tight`}>{input.place}</div>
               <div className="text-indigo-200 text-xs">{input.date} · {input.time}</div>
             </div>
             <button

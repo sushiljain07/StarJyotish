@@ -44,6 +44,8 @@ const inputCls = "w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-5
 export default function BirthForm({ onSubmit, loading }) {
   const { t } = useTranslation()
 
+  const [name,   setName]   = useState('')
+
   // Date parts
   const [day,   setDay]   = useState('')
   const [month, setMonth] = useState('')
@@ -67,11 +69,23 @@ export default function BirthForm({ onSubmit, loading }) {
     if (ampm === 'AM' && h === 12) h = 0
     if (ampm === 'PM' && h !== 12) h += 12
     const timeStr = `${String(h).padStart(2,'0')}:${minute}`
-    onSubmit({ date: dateStr, time: timeStr, place })
+    onSubmit({ date: dateStr, time: timeStr, place, name })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+
+      {/* ── Name ── */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">
+          Full Name
+        </label>
+        <input
+          type="text" required value={name} placeholder="e.g. Arjun Sharma"
+          onChange={e => setName(e.target.value)}
+          className={inputCls}
+        />
+      </div>
 
       {/* ── Date ── */}
       <div>

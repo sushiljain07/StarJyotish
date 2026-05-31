@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 
 const NAV_ITEMS = [
   { key: 'birth_chart', icon: '🔯' },
-  { key: 'navamsa',     icon: '⭕' },
   { key: 'dasha',       icon: '📅' },
   { key: 'planets',     icon: '🪐' },
   { key: 'reading',     icon: '✨' },

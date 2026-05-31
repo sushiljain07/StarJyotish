@@ -24,6 +24,7 @@ _OWN_SIGNS: dict[str, list[int]] = {
 }
 
 _SECTION_NAMES = [
+    "Chart Overview",
     "Personality & Appearance",
     "Career & Wealth",
     "Relationships & Marriage",
@@ -32,6 +33,7 @@ _SECTION_NAMES = [
     "Current Period (Dasha)",
 ]
 _SECTION_ICONS = {
+    "Chart Overview":            "📜",
     "Personality & Appearance":  "🧬",
     "Career & Wealth":           "💼",
     "Relationships & Marriage":  "💞",
@@ -42,10 +44,8 @@ _SECTION_ICONS = {
 
 _CLASSICAL = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 
-_GEMINI_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.0-flash:generateContent"
-)
+_GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+_GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
 def get_dignity(planet_name: str, sign_index: int) -> str:
@@ -66,12 +66,19 @@ def build_prompt(chart: dict, dasha: dict, language: str) -> str:
     lang_instruction = "Hindi" if language == "hi" else "English"
     asc = chart["ascendant"]
 
+    moon = next((p for p in chart["planets"] if p["name"] == "Moon"), None)
+    sun  = next((p for p in chart["planets"] if p["name"] == "Sun"), None)
+    moon_sign = f"{moon['sign']} ({moon.get('nakshatra','')} nakshatra)" if moon else "unknown"
+    sun_sign  = sun["sign"] if sun else "unknown"
+
     lines = [
         f"You are an expert Vedic astrologer. Based on the following birth chart data, "
         f"write a warm, insightful reading in {lang_instruction}. "
         f"Keep each section to 3–5 sentences. Be grounded in classical Vedic principles.\n",
         "CHART DATA:",
-        f"- Ascendant: {asc['sign']} ({asc['degree']:.1f}°, {asc['nakshatra']} nakshatra)",
+        f"- Ascendant (Lagna): {asc['sign']} ({asc['degree']:.1f}°, {asc['nakshatra']} nakshatra)",
+        f"- Moon Sign (Rashi): {moon_sign}",
+        f"- Sun Sign: {sun_sign}",
     ]
 
     for p in chart["planets"]:
@@ -96,8 +103,16 @@ def build_prompt(chart: dict, dasha: dict, language: str) -> str:
     section_instructions = "\n".join(
         f"\n==={name}===\n[your text]" for name in _SECTION_NAMES
     )
+    overview_note = (
+        "For the ===Chart Overview=== section, start by clearly stating: "
+        "the Ascendant (Lagna) sign, Moon sign (Rashi), Sun sign, the ruling nakshatra, "
+        f"and the current Dasha period ({md['planet']} Mahadasha"
+        + (f" → {ad['planet']} Antardasha ending {ad['end']}" if ad else f" ending {md['end']}")
+        + "). Then add 1–2 sentences of overall chart temperament."
+    )
     lines.append(
-        f"\nWrite the following 6 sections using exactly these delimiters:\n{section_instructions}"
+        f"\n{overview_note}\n"
+        f"Write the following 7 sections using exactly these delimiters:\n{section_instructions}"
     )
 
     return "\n".join(lines)
@@ -120,26 +135,39 @@ def parse_sections(text: str) -> list[dict]:
 
 def generate_reading(chart: dict, dasha: dict, language: str) -> list[dict]:
     """
-    Call Gemini REST API and return parsed sections.
+    Call Groq REST API and return parsed sections.
     Raises HTTPException(503) on missing key or API errors.
+    Retries up to 3 times on 429 with exponential backoff.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = (os.getenv("GROQ_API_KEY") or "").strip()
     if not api_key:
-        raise HTTPException(status_code=503, detail="GEMINI_API_KEY not configured")
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
 
     prompt = build_prompt(chart, dasha, language)
 
-    try:
-        resp = requests.post(
-            _GEMINI_URL,
-            params={"key": api_key},
-            json={"contents": [{"parts": [{"text": prompt}]}]},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return parse_sections(text)
-    except HTTPException:
-        raise
-    except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"Gemini API error: {exc}") from exc
+    for attempt in range(3):
+        import time
+        try:
+            resp = requests.post(
+                _GROQ_URL,
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={
+                    "model": _GROQ_MODEL,
+                    "messages": [{"role": "user", "content": prompt}],
+                },
+                timeout=30,
+            )
+            if resp.status_code == 429:
+                time.sleep(2 ** attempt)
+                continue
+            resp.raise_for_status()
+            text = resp.json()["choices"][0]["message"]["content"]
+            return parse_sections(text)
+        except HTTPException:
+            raise
+        except Exception as exc:
+            if attempt == 2:
+                raise HTTPException(status_code=503, detail=f"Groq API error: {exc}") from exc
+            time.sleep(2 ** attempt)
+
+    raise HTTPException(status_code=503, detail="Groq API rate limit exceeded. Please try again in a minute.")

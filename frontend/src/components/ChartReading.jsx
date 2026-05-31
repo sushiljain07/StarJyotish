@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const SECTION_ORDER = [
+  'Chart Overview',
   'Personality & Appearance',
   'Career & Wealth',
   'Relationships & Marriage',
@@ -82,15 +83,29 @@ export default function ChartReading({ input }) {
       <h2 className="text-xl font-bold text-amber-900 mb-6 text-center">{t('reading_heading')}</h2>
       <div className="space-y-4">
         {sections.map(section => (
-          <div key={section.title} className="bg-white border border-amber-100 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">{section.icon}</span>
-              <h3 className="font-bold text-purple-700">{section.title}</h3>
-            </div>
-            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-              {section.content || <span className="text-gray-400 italic">—</span>}
-            </p>
-          </div>
+          section.title === 'Chart Overview'
+            ? (
+              <div key={section.title} className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{section.icon}</span>
+                  <h3 className="font-bold text-amber-800 text-base">{section.title}</h3>
+                </div>
+                <p className="text-amber-900 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                  {section.content || <span className="text-gray-400 italic">—</span>}
+                </p>
+              </div>
+            )
+            : (
+              <div key={section.title} className="bg-white border border-amber-100 rounded-xl p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">{section.icon}</span>
+                  <h3 className="font-bold text-purple-700">{section.title}</h3>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                  {section.content || <span className="text-gray-400 italic">—</span>}
+                </p>
+              </div>
+            )
         ))}
       </div>
       <div className="text-center mt-6">

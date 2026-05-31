@@ -62,7 +62,7 @@ def get_dignity(planet_name: str, sign_index: int) -> str:
 
 
 def build_prompt(chart: dict, dasha: dict, language: str) -> str:
-    """Build a structured prompt string for Gemini."""
+    """Build a structured prompt string for the LLM."""
     lang_instruction = "Hindi" if language == "hi" else "English"
     asc = chart["ascendant"]
 
@@ -119,7 +119,7 @@ def build_prompt(chart: dict, dasha: dict, language: str) -> str:
 
 
 def parse_sections(text: str) -> list[dict]:
-    """Parse Gemini response delimited by ===SectionName=== into list of dicts."""
+    """Parse LLM response delimited by ===SectionName=== into list of dicts."""
     sections = []
     for name in _SECTION_NAMES:
         pattern = rf"==={re.escape(name)}===\s*(.*?)(?====|\Z)"
@@ -171,3 +171,57 @@ def generate_reading(chart: dict, dasha: dict, language: str) -> list[dict]:
             time.sleep(2 ** attempt)
 
     raise HTTPException(status_code=503, detail="Groq API rate limit exceeded. Please try again in a minute.")
+
+
+def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
+    """
+    Answer a single Kundli-related question using Groq.
+    Raises HTTPException(503) if key missing or API error.
+    """
+    api_key = (os.getenv("GROQ_API_KEY") or "").strip()
+    if not api_key:
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
+
+    lang_instruction = "Hindi" if language == "hi" else "English"
+    asc = chart["ascendant"]
+    moon = next((p for p in chart["planets"] if p["name"] == "Moon"), None)
+    md = dasha["current_mahadasha"]
+    ad = dasha.get("current_antardasha")
+
+    context_lines = [
+        f"Ascendant: {asc['sign']} ({asc['nakshatra']} nakshatra)",
+        f"Moon sign: {moon['sign']}" if moon else "",
+        f"Current Dasha: {md['planet']} Mahadasha" + (f" → {ad['planet']} Antardasha" if ad else ""),
+    ]
+    for p in chart["planets"]:
+        dignity = get_dignity(p["name"], p["sign_index"])
+        parts = [p["sign"]]
+        if dignity:
+            parts.append(dignity)
+        if p.get("retrograde"):
+            parts.append("retrograde")
+        parts.append(f"house {p['house']}")
+        context_lines.append(f"{p['name']}: {', '.join(parts)}")
+
+    prompt = (
+        f"You are an expert Vedic astrologer. Answer the following question in {lang_instruction} "
+        f"based ONLY on this birth chart. Keep your answer to 3-5 sentences. "
+        f"If the question is not related to this birth chart or Vedic astrology, respond: "
+        f"'I can only answer questions about this birth chart and Vedic astrology.'\n\n"
+        f"CHART DATA:\n" + "\n".join(l for l in context_lines if l) +
+        f"\n\nQUESTION: {question}"
+    )
+
+    try:
+        resp = requests.post(
+            _GROQ_URL,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": _GROQ_MODEL, "messages": [{"role": "user", "content": prompt}]},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Groq API error: {exc}") from exc

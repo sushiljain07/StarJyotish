@@ -20,31 +20,31 @@ export default function DashaTable({ dasha }) {
   return (
     <div className="space-y-6">
       {/* Current MD card */}
-      <div className="bg-amber-50 border border-amber-300 rounded-lg p-4">
-        <div className="text-xs text-amber-600 uppercase tracking-wide mb-1">
+      <div className="bg-primary-light border border-indigo-200 rounded-lg p-4">
+        <div className="text-xs text-indigo-500 uppercase tracking-wide mb-1">
           {t('current_mahadasha')}
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <span className="text-2xl font-bold text-amber-900">
+          <span className="text-2xl font-bold text-indigo-900">
             {t(`planets.${md.planet}`, md.planet)}
           </span>
           <span className="text-sm text-gray-500">
             {md.start} – {md.end} · {md.years}y ·{' '}
-            <span className="text-amber-700">{yrsLeft} {t('years_remaining')}</span>
+            <span className="text-indigo-700">{yrsLeft} {t('years_remaining')}</span>
           </span>
         </div>
         <div className="mt-2 h-2 bg-amber-200 rounded-full">
-          <div className="h-2 bg-amber-700 rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
+          <div className="h-2 bg-primary rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
         </div>
       </div>
 
       {/* Antardashas */}
       <div>
-        <h3 className="font-semibold text-amber-900 mb-2">{t('antardasha_heading')}</h3>
+        <h3 className="font-semibold text-indigo-900 mb-2">{t('antardasha_heading')}</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse min-w-[480px]">
             <thead>
-              <tr className="bg-amber-100 text-amber-800">
+              <tr className="bg-primary-light text-indigo-800">
                 <th className="text-left p-2 border border-amber-200">{t('col_planet')}</th>
                 <th className="text-left p-2 border border-amber-200">Start</th>
                 <th className="text-left p-2 border border-amber-200">End</th>
@@ -58,7 +58,7 @@ export default function DashaTable({ dasha }) {
                 return (
                   <tr
                     key={`${a.planet}-${a.start}`}
-                    className={isCurrent ? 'bg-amber-50 font-semibold'
+                    className={isCurrent ? 'bg-primary-light font-semibold'
                       : isPast ? 'bg-white text-gray-400' : 'bg-white text-gray-500'}
                   >
                     <td className="p-2 border border-amber-200">
@@ -68,9 +68,9 @@ export default function DashaTable({ dasha }) {
                     <td className="p-2 border border-amber-200">{a.start}</td>
                     <td className="p-2 border border-amber-200">{a.end}</td>
                     <td className="p-2 border border-amber-200">
-                      <div className="h-2 bg-amber-100 rounded-full">
+                      <div className="h-2 bg-primary-light rounded-full">
                         <div
-                          className={`h-2 rounded-full ${isCurrent ? 'bg-amber-700' : isPast ? 'bg-amber-400' : 'bg-amber-200'}`}
+                          className={`h-2 rounded-full ${isCurrent ? 'bg-primary' : isPast ? 'bg-amber-400' : 'bg-amber-200'}`}
                           style={{ width: `${pct(a.start, a.end)}%` }}
                         />
                       </div>
@@ -85,7 +85,7 @@ export default function DashaTable({ dasha }) {
 
       {/* Full sequence pills */}
       <div>
-        <h3 className="font-semibold text-amber-900 mb-2">{t('full_sequence')}</h3>
+        <h3 className="font-semibold text-indigo-900 mb-2">{t('full_sequence')}</h3>
         <div className="flex flex-wrap gap-2">
           {full_sequence.map((m) => {
             const isCurrent = m.planet === md.planet && m.start === md.start
@@ -93,7 +93,7 @@ export default function DashaTable({ dasha }) {
               <span
                 key={`${m.planet}-${m.start}`}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  isCurrent ? 'bg-amber-700 text-white font-bold' : 'bg-amber-100 text-amber-700'
+                  isCurrent ? 'bg-primary text-white font-bold' : 'bg-primary-light text-indigo-700'
                 }`}
               >
                 {t(`planets.${m.planet}`, m.planet)} {m.years}y

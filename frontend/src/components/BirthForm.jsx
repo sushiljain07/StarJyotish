@@ -38,8 +38,8 @@ function usePlaceSuggestions(query) {
   return suggestions
 }
 
-const selCls = "flex-1 border border-amber-300 rounded-lg px-2 py-2 bg-white text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
-const inputCls = "w-full border border-amber-300 rounded-lg px-3 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
+const selCls = "flex-1 border border-slate-200 rounded-lg px-2 py-2 bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+const inputCls = "w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary"
 
 export default function BirthForm({ onSubmit, loading }) {
   const { t } = useTranslation()
@@ -75,7 +75,7 @@ export default function BirthForm({ onSubmit, loading }) {
 
       {/* ── Date ── */}
       <div>
-        <label className="block text-sm font-medium text-amber-900 mb-1">
+        <label className="block text-sm font-medium text-slate-700 mb-1">
           {t('form_date')}
         </label>
         <div className="flex gap-2">
@@ -101,7 +101,7 @@ export default function BirthForm({ onSubmit, loading }) {
 
       {/* ── Time ── */}
       <div>
-        <label className="block text-sm font-medium text-amber-900 mb-1">
+        <label className="block text-sm font-medium text-slate-700 mb-1">
           {t('form_time')}
         </label>
         <div className="flex gap-2 items-center">
@@ -109,7 +109,7 @@ export default function BirthForm({ onSubmit, loading }) {
             <option value="">HH</option>
             {HOURS_12.map(h => <option key={h} value={h}>{h}</option>)}
           </select>
-          <span className="text-amber-700 font-bold text-lg">:</span>
+          <span className="text-slate-400 font-bold text-lg">:</span>
           <select value={minute} onChange={e => setMinute(e.target.value)} required className={selCls}>
             <option value="">MM</option>
             {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
@@ -124,7 +124,7 @@ export default function BirthForm({ onSubmit, loading }) {
 
       {/* ── Place ── */}
       <div className="relative">
-        <label className="block text-sm font-medium text-amber-900 mb-1">
+        <label className="block text-sm font-medium text-slate-700 mb-1">
           {t('form_place')}
         </label>
         <input
@@ -134,10 +134,10 @@ export default function BirthForm({ onSubmit, loading }) {
           className={inputCls}
         />
         {showSug && suggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border border-amber-200 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
+          <ul className="absolute z-10 w-full bg-white border border-slate-200 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
             {suggestions.map((s, i) => (
               <li key={i} onMouseDown={() => { setPlace(s); setShowSug(false) }}
-                className="px-3 py-2 text-sm text-gray-700 hover:bg-amber-50 cursor-pointer border-b border-amber-100 last:border-0">
+                className="px-3 py-2 text-sm text-slate-700 hover:bg-primary-light cursor-pointer border-b border-slate-100 last:border-0">
                 {s}
               </li>
             ))}
@@ -146,7 +146,7 @@ export default function BirthForm({ onSubmit, loading }) {
       </div>
 
       <button type="submit" disabled={loading}
-        className="w-full bg-amber-700 hover:bg-amber-800 disabled:bg-amber-300 text-white font-semibold py-2.5 rounded-lg transition">
+        className="w-full bg-primary hover:bg-primary-dark disabled:bg-indigo-300 text-white font-semibold py-2.5 rounded-full transition">
         {loading ? t('loading') : t('form_submit')}
       </button>
     </form>

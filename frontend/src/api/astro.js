@@ -1,6 +1,6 @@
 // frontend/src/api/astro.js
 export async function fetchKundli({ date, time, place }) {
-  const resp = await fetch('/api/kundli', {
+  const resp = await fetch('${API_BASE}/api/kundli', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ date, time, place }),

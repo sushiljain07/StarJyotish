@@ -1,4 +1,4 @@
-# 🔯 Jyotish — Vedic Astrology
+# 🔯 AstroGuru — Vedic Astrology
 
 A modern Vedic birth chart (Kundli) web application powered by Swiss Ephemeris and Groq AI.
 

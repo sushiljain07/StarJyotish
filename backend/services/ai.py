@@ -72,9 +72,13 @@ def build_prompt(chart: dict, dasha: dict, language: str) -> str:
     sun_sign  = sun["sign"] if sun else "unknown"
 
     lines = [
-        f"You are an expert Vedic astrologer. Based on the following birth chart data, "
-        f"write a warm, insightful reading in {lang_instruction}. "
-        f"Keep each section to 3–5 sentences. Be grounded in classical Vedic principles.\n",
+        f"You are a wise, warm Vedic astrologer — like a knowledgeable friend who truly knows this person's chart. "
+        f"Write the reading in {lang_instruction}. "
+        f"Speak directly to the person using 'you' and 'your'. "
+        f"Use plain, natural language. If you mention a Vedic term (like a nakshatra or dasha), give a quick plain-English explanation. "
+        f"Each section must be exactly 4–5 bullet points. "
+        f"Each bullet must start with '- ' and be 1–2 short sentences maximum. "
+        f"No long paragraphs. No walls of text. No formal or academic tone.\n",
         "CHART DATA:",
         f"- Ascendant (Lagna): {asc['sign']} ({asc['degree']:.1f}°, {asc['nakshatra']} nakshatra)",
         f"- Moon Sign (Rashi): {moon_sign}",
@@ -100,36 +104,44 @@ def build_prompt(chart: dict, dasha: dict, language: str) -> str:
     else:
         lines.append(f"- Current Dasha: {md['planet']} Mahadasha (ends {md['end']})")
 
-    section_instructions = "\n".join(
-        f"\n==={name}===\n[your text]" for name in _SECTION_NAMES
-    )
-    overview_note = (
-        "For the ===Chart Overview=== section, start by clearly stating: "
-        "the Ascendant (Lagna) sign, Moon sign (Rashi), Sun sign, the ruling nakshatra, "
-        f"and the current Dasha period ({md['planet']} Mahadasha"
+    section_instructions = (
+        "Return ONLY a valid JSON object (no markdown, no extra text) with this exact structure:\n"
+        "{\n"
+        + ",\n".join(f'  "{name}": ["bullet 1", "bullet 2", "bullet 3", "bullet 4"]' for name in _SECTION_NAMES)
+        + "\n}\n\n"
+        "Rules for every bullet:\n"
+        "- 1–2 short sentences max\n"
+        "- Use 'you' and 'your' — speak directly to the person\n"
+        "- Plain English; if you use a Vedic term, briefly explain it\n"
+        "- Warm, direct, like a knowledgeable friend — not a textbook\n\n"
+        f"For '{_SECTION_NAMES[0]}': first 2 bullets state the Ascendant, Moon sign, Sun sign, "
+        f"nakshatra, and current Dasha ({md['planet']} Mahadasha"
         + (f" → {ad['planet']} Antardasha ending {ad['end']}" if ad else f" ending {md['end']}")
-        + "). Then add 1–2 sentences of overall chart temperament."
+        + "). Last 2 bullets give the overall personality in plain language."
     )
-    lines.append(
-        f"\n{overview_note}\n"
-        f"Write the following 7 sections using exactly these delimiters:\n{section_instructions}"
-    )
+    lines.append(f"\n{section_instructions}")
 
     return "\n".join(lines)
 
 
-def parse_sections(text: str) -> list[dict]:
-    """Parse LLM response delimited by ===SectionName=== into list of dicts."""
+def parse_sections(raw: str) -> list[dict]:
+    """Parse JSON response from LLM into list of section dicts."""
+    import json
+    # Strip markdown code fences if the model wraps in ```json ... ```
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE)
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        # Fallback: return empty sections so the app doesn't crash
+        data = {}
     sections = []
     for name in _SECTION_NAMES:
-        pattern = rf"==={re.escape(name)}===\s*(.*?)(?====|\Z)"
-        match = re.search(pattern, text, re.DOTALL)
-        content = match.group(1).strip() if match else ""
-        sections.append({
-            "title": name,
-            "icon": _SECTION_ICONS[name],
-            "content": content,
-        })
+        bullets = data.get(name, [])
+        # bullets should be a list; if LLM returned a string, split it
+        if isinstance(bullets, str):
+            bullets = [s.strip() for s in re.split(r'(?<=[.!?])\s+', bullets) if s.strip()]
+        content = "\n".join(str(b).strip() for b in bullets if b)
+        sections.append({"title": name, "icon": _SECTION_ICONS[name], "content": content})
     return sections
 
 
@@ -154,6 +166,7 @@ def generate_reading(chart: dict, dasha: dict, language: str) -> list[dict]:
                 json={
                     "model": _GROQ_MODEL,
                     "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
                 },
                 timeout=30,
             )

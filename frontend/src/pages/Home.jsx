@@ -32,7 +32,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Hero header */}
       <div className="bg-primary px-6 pt-12 pb-8 text-center">
-        <div className="text-5xl mb-3">🔯</div>
+        <img src="/astroguru.svg" alt="AstroGuru" className="w-16 h-16 mx-auto mb-3" />
         <h1 className="text-3xl font-extrabold text-white tracking-tight">{t('app_title')}</h1>
         <p className="text-indigo-200 mt-1 text-sm">{t('tagline')}</p>
         {/* Language toggle */}

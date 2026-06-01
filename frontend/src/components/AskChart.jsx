@@ -64,7 +64,7 @@ export default function AskChart({ input }) {
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <div className="text-sm font-semibold text-slate-800">💬 {t('tab_ask')}</div>
-          <div className="text-xs text-slate-400">Ask about your Kundli</div>
+          <div className="text-xs text-slate-400">Ask about your chart</div>
         </div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
           limitReached

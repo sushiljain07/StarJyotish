@@ -11,6 +11,25 @@ const SECTION_ORDER = [
   'Current Period (Dasha)',
 ]
 
+function SectionContent({ content }) {
+  if (!content) return <span className="text-gray-400 italic">—</span>
+  const bullets = content
+    .split('\n')
+    .map(line => line.replace(/^[-•]\s*/, '').trim())
+    .filter(Boolean)
+  if (bullets.length === 0) return <p className="text-sm leading-relaxed">{content}</p>
+  return (
+    <ul className="space-y-2">
+      {bullets.map((bullet, i) => (
+        <li key={i} className="flex gap-2 text-sm leading-relaxed">
+          <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50 translate-y-1" />
+          <span>{bullet}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export default function ChartReading({ input }) {
   const { t, i18n } = useTranslation()
   const [status, setStatus]   = useState('idle')
@@ -90,9 +109,9 @@ export default function ChartReading({ input }) {
                   <span className="text-xl">{section.icon}</span>
                   <h3 className="font-bold text-white text-base">{section.title}</h3>
                 </div>
-                <p className="text-indigo-100 text-sm leading-relaxed whitespace-pre-wrap font-medium">
-                  {section.content || <span className="text-gray-400 italic">—</span>}
-                </p>
+                <div className="text-indigo-100 font-medium">
+                  <SectionContent content={section.content} />
+                </div>
               </div>
             )
             : (
@@ -101,9 +120,9 @@ export default function ChartReading({ input }) {
                   <span className="text-xl">{section.icon}</span>
                   <h3 className="font-bold text-primary">{section.title}</h3>
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-                  {section.content || <span className="text-gray-400 italic">—</span>}
-                </p>
+                <div className="text-gray-700">
+                  <SectionContent content={section.content} />
+                </div>
               </div>
             )
         ))}

@@ -45,8 +45,8 @@ You also need a **free Groq API key** for the AI features:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/astro.git
-cd astro
+git clone https://github.com/sushiljain07/AstroGuru.git
+cd AstroGuru
 ```
 
 ### 2. Backend setup
@@ -141,17 +141,23 @@ astro/
 │   └── .env.example
 └── frontend/
     ├── src/
+    │   ├── App.jsx          # Root component and routing
+    │   ├── main.jsx         # Vite entry point
+    │   ├── index.css        # Global styles
     │   ├── pages/
     │   │   ├── Home.jsx     # Birth details input form
     │   │   └── Result.jsx   # Chart results with tab navigation
     │   ├── components/
-    │   │   ├── KundliChart.jsx   # SVG North Indian chart renderer
-    │   │   ├── DashaTable.jsx    # Mahadasha / Antardasha table
-    │   │   ├── PlanetTable.jsx   # Planetary positions table
-    │   │   ├── ChartReading.jsx  # AI insights display
-    │   │   ├── AskChart.jsx      # 2-question AI chat
-    │   │   └── NavBar.jsx        # Responsive navigation
+    │   │   ├── KundliChart.jsx    # SVG North Indian chart renderer
+    │   │   ├── BirthForm.jsx      # Date/time/place input with dropdowns
+    │   │   ├── DashaTable.jsx     # Mahadasha / Antardasha table
+    │   │   ├── PlanetTable.jsx    # Planetary positions table
+    │   │   ├── ChartReading.jsx   # AI insights display
+    │   │   ├── AskChart.jsx       # 2-question AI chat
+    │   │   ├── NavBar.jsx         # Responsive navigation
+    │   │   └── LanguageToggle.jsx # EN / HI language switcher
     │   ├── i18n/
+    │   │   ├── index.js     # i18next setup
     │   │   ├── en.json      # English translations
     │   │   └── hi.json      # Hindi translations
     │   └── api/

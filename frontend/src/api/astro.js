@@ -1,4 +1,6 @@
 // frontend/src/api/astro.js
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
 export async function fetchKundli({ date, time, place }) {
   const resp = await fetch('${API_BASE}/api/kundli', {
     method: 'POST',

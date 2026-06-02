@@ -1,4 +1,6 @@
 // frontend/src/pages/Result.jsx
+// REPLACE your entire Result.jsx with this file
+
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,15 +10,14 @@ import PlanetTable from '../components/PlanetTable'
 import ChartReading from '../components/ChartReading'
 import AskChart from '../components/AskChart'
 import NavBar from '../components/NavBar'
+import DivisionalCharts from '../components/DivisionalCharts'
 
 function formatDate(dateStr) {
-  // "YYYY-MM-DD" → "DD-MM-YYYY"
   const [y, m, d] = dateStr.split('-')
   return `${d}-${m}-${y}`
 }
 
 function formatTime(timeStr) {
-  // "HH:MM" 24hr → "H:MM AM/PM"
   const [hStr, min] = timeStr.split(':')
   let h = parseInt(hStr, 10)
   const ampm = h >= 12 ? 'PM' : 'AM'
@@ -45,6 +46,16 @@ function SummaryChips({ data }) {
   )
 }
 
+// Tab definitions — added 'divisional' tab
+const TABS = [
+  { id: 'birth_chart', label: '🔯 Birth Chart' },
+  { id: 'divisional',  label: '🪐 Divisional' },
+  { id: 'dasha',       label: '⏳ Dasha' },
+  { id: 'planets',     label: '🌍 Planets' },
+  { id: 'reading',     label: '📖 Reading' },
+  { id: 'ask',         label: '💬 Ask' },
+]
+
 export default function Result() {
   const { t } = useTranslation()
   const { state } = useLocation()
@@ -63,12 +74,15 @@ export default function Result() {
       {/* Header */}
       <div className="bg-primary text-white">
         <div className="max-w-5xl mx-auto px-4">
-          {/* Top row: place + new chart button */}
           <div className="flex items-center justify-between py-3">
             <div>
               {input.name && <div className="font-bold text-lg leading-tight">{input.name}</div>}
-              <div className={`${input.name ? 'text-indigo-200 text-xs' : 'font-bold text-base'} leading-tight`}>{input.place}</div>
-              <div className="text-indigo-200 text-xs">{formatDate(input.date)} · {formatTime(input.time)}</div>
+              <div className={`${input.name ? 'text-indigo-200 text-xs' : 'font-bold text-base'} leading-tight`}>
+                {input.place}
+              </div>
+              <div className="text-indigo-200 text-xs">
+                {formatDate(input.date)} · {formatTime(input.time)}
+              </div>
             </div>
             <button
               onClick={() => navigate('/')}
@@ -77,8 +91,25 @@ export default function Result() {
               ← New chart
             </button>
           </div>
-          {/* Desktop nav inline in header */}
-          <NavBar activeTab={activeTab} onTabChange={setActiveTab} variant="desktop" />
+
+          {/* Tab bar */}
+          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition
+                  ${activeTab === tab.id
+                    ? 'bg-white text-indigo-700'
+                    : 'text-indigo-200 hover:text-white hover:bg-white/10'
+                  }
+                `}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -89,7 +120,8 @@ export default function Result() {
 
       {/* Content */}
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
-        {/* Birth chart tab: D1 always shown; D9 alongside on desktop */}
+
+        {/* Birth Chart Tab */}
         <div className={activeTab === 'birth_chart' ? '' : 'hidden'}>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
             <div className="w-full sm:w-[460px]">
@@ -108,7 +140,6 @@ export default function Result() {
               />
             </div>
           </div>
-          {/* Mobile: D9 below */}
           <div className="sm:hidden mt-6 flex flex-col items-center">
             <KundliChart
               planets={data.navamsa_planets}
@@ -117,22 +148,33 @@ export default function Result() {
             />
           </div>
         </div>
+
+        {/* ── NEW: Divisional Charts Tab ── */}
+        <div className={activeTab === 'divisional' ? '' : 'hidden'}>
+          <DivisionalCharts input={input} />
+        </div>
+
+        {/* Dasha Tab */}
         <div className={activeTab === 'dasha' ? '' : 'hidden'}>
           <DashaTable dasha={data.dasha} />
         </div>
+
+        {/* Planets Tab */}
         <div className={activeTab === 'planets' ? '' : 'hidden'}>
           <PlanetTable planets={data.planets} ascendant={data.ascendant} />
         </div>
+
+        {/* Reading Tab */}
         <div className={activeTab === 'reading' ? '' : 'hidden'}>
           <ChartReading input={input} />
         </div>
+
+        {/* Ask Tab */}
         <div className={activeTab === 'ask' ? '' : 'hidden'}>
           <AskChart input={input} />
         </div>
-      </div>
 
-      {/* Mobile bottom nav */}
-      <NavBar activeTab={activeTab} onTabChange={setActiveTab} variant="mobile" />
+      </div>
     </div>
   )
 }

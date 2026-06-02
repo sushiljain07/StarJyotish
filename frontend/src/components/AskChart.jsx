@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const MAX_QUESTIONS = 2
+const MAX_QUESTIONS = 10
 
 export default function AskChart({ input }) {
   const { t, i18n } = useTranslation()
@@ -82,7 +82,7 @@ export default function AskChart({ input }) {
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
             <div className="text-3xl mb-2">🔯</div>
-            <p className="text-slate-400 text-sm">Ask up to 2 questions about your birth chart</p>
+            <p className="text-slate-400 text-sm">Ask up to 10 questions about your birth chart</p>
             <p className="text-slate-300 text-xs mt-1">e.g. "What does my ascendant say about career?"</p>
           </div>
         )}

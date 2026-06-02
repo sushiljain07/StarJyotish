@@ -94,7 +94,24 @@ def get_reading(body: ReadingRequest):
         birth_dt=naive_dt,
     )
 
-    sections = generate_reading(chart, dasha_raw, body.language)
+    # Pre-calculate all divisional charts for the reading.
+    # D9 is already in chart["navamsa_planets"] from calculate_chart().
+    # D1–D60 coverage per reading section:
+    #   D2  = Wealth/Hora          → Career & Wealth
+    #   D3  = Drekkana             → Personality (siblings/courage context)
+    #   D4  = Chaturthamsha        → general home/property context
+    #   D6  = Shashthamsha         → Health
+    #   D7  = Saptamsha            → Children (available if asked)
+    #   D10 = Dashamsha            → Career & Wealth
+    #   D12 = Dwadashamsha         → general parental/lineage context
+    #   D20 = Vimshamsha           → Spiritual Inclination
+    #   D24 = Chaturvimshamsha     → Spiritual/Education
+    #   D60 = Shashtiamsha         → Spiritual Inclination / past-life karma
+    div_charts = {}
+    for div in (2, 3, 4, 6, 7, 10, 12, 20, 24, 60):
+        div_charts[div] = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, div)
+
+    sections = generate_reading(chart, dasha_raw, body.language, div_charts)
     return ReadingResponse(sections=[ReadingSection(**s) for s in sections])
 
 
@@ -118,31 +135,28 @@ def ask_kundli(body: AskRequest):
         birth_dt=naive_dt,
     )
     
-    # Calculate the relevant divisional chart for the question
     from services.divisional_charts import calculate_divisional_chart
     from services.ai import _detect_division
+
+    # Detect the primary chart for this question
     division = _detect_division(body.question)
-    if division != 1:
-        div_chart = calculate_divisional_chart(jd, geo.lat, geo.lon, division)
-        chart["divisional_chart"] = div_chart
+
+    # Always pre-calculate D10 (career) and D60 (karma) — universally useful.
+    # Also calculate the topic-specific detected chart.
+    always_divs = {10, 60}
+    div_charts: dict = {}
+    for div in always_divs | ({division} if division not in (1, 9) else set()):
+        div_charts[div] = calculate_divisional_chart(jd, geo.lat, geo.lon, div)
+
+    # Expose primary chart under the legacy key for backward compat
+    chart["divisional_chart"] = div_charts.get(division, {})
+    # Expose full set under new key for ask_chart
+    chart["div_charts"] = div_charts
 
     answer = ask_chart(chart, dasha_raw, body.question, body.language)
     return AskResponse(answer=answer)
-    
-# ─── NEW IMPORT — add this at the TOP of kundli.py with other imports ───────
-# from services.divisional_charts import calculate_divisional_chart
-# ────────────────────────────────────────────────────────────────────────────
- 
- 
-# ─── NEW MODEL — add this to backend/models/chart_data.py ───────────────────
-# class DivisionalRequest(BaseModel):
-#     date: str
-#     time: str
-#     place: str
-#     division: int = 1
-# ────────────────────────────────────────────────────────────────────────────
- 
- 
+
+
 @router.post("/kundli/divisional")
 def get_divisional_chart(body: BirthInput, division: int = 1):
     """

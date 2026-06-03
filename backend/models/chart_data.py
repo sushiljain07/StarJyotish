@@ -14,6 +14,8 @@ class PlanetData(_Flexible):
     house: int             # 1–12
     nakshatra: str
     nakshatra_pada: int    # 1–4
+    nakshatra_lord: str = ""
+    nakshatra_degree: float = 0.0
     retrograde: bool
 
 
@@ -43,11 +45,27 @@ class AntardashaEntry(_Flexible):
     end: str
 
 
+class PratyantarEntry(_Flexible):
+    planet: str
+    start: str
+    end: str
+
+
+class SookshmaEntry(_Flexible):
+    planet: str
+    start: str
+    end: str
+
+
 class DashaData(_Flexible):
     current_mahadasha: MahadashaEntry
     current_antardasha: Optional[AntardashaEntry]
-    antardashas: list[AntardashaEntry]   # sub-periods of current MD
-    full_sequence: list[MahadashaEntry]  # all 9 MDs from birth
+    current_pratyantar: Optional[PratyantarEntry] = None
+    current_sookshma: Optional[SookshmaEntry] = None
+    antardashas: list[AntardashaEntry]
+    pratyantars: list[PratyantarEntry] = []
+    sookshmas: list[SookshmaEntry] = []
+    full_sequence: list[MahadashaEntry]
 
 
 class ChartResponse(_Flexible):

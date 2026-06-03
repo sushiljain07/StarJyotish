@@ -110,6 +110,7 @@ export default function KundliChart({
   ascendant = null,
   navamsaPlanets = null,
   title = 'Lagna Chart',
+  transitPlanets = null,
 }) {
   const { i18n } = useTranslation()
   const abbr = i18n.language === 'hi' ? ABBR_HI : ABBR_EN
@@ -126,6 +127,16 @@ export default function KundliChart({
   )
   for (const p of planets) {
     if (byHouse[p.house]) byHouse[p.house].push(p)
+  }
+
+  // Transit planets grouped by house
+  const byHouseTransit = transitPlanets
+    ? Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i + 1, []]))
+    : null
+  if (transitPlanets && byHouseTransit) {
+    for (const p of transitPlanets) {
+      if (byHouseTransit[p.house]) byHouseTransit[p.house].push(p)
+    }
   }
 
   const sun = planets.find(p => p.name === 'Sun')
@@ -187,6 +198,16 @@ export default function KundliChart({
               status: getPlanetStatus(p, sun, navamsaPlanets),
             })
           })
+          // Transit planets (italic, lighter)
+          const tps = byHouseTransit?.[hNum] ?? []
+          tps.forEach(p => {
+            allItems.push({
+              type:  'transit',
+              color: PLANET_COLORS[p.name] ?? '#888',
+              name:  abbr[p.name] ?? p.name.slice(0, 2),
+              deg:   Math.floor(p.degree),
+            })
+          })
 
           if (allItems.length === 0) return null
 
@@ -211,6 +232,16 @@ export default function KundliChart({
                       fill="#FF6B00" fontWeight="bold">
                   <tspan fontSize="11" dy="-3">{item.deg}</tspan>
                   <tspan dy="3">La</tspan>
+                </text>
+              )
+            }
+            if (item.type === 'transit') {
+              return (
+                <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos}
+                      textAnchor="middle" fontSize="13"
+                      fill={item.color} opacity="0.65" fontStyle="italic">
+                  <tspan fontSize="9" dy="-2">{item.deg}</tspan>
+                  <tspan dy="2">T:{item.name}</tspan>
                 </text>
               )
             }

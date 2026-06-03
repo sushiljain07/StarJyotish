@@ -18,6 +18,9 @@ from services.astro_calc import calculate_chart
 from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.ai import generate_reading, ask_chart
+from services.ashtakavarga import calculate_ashtakavarga
+from services.kp_system import enrich_planets_kp
+from services.transit_calc import calculate_transit, calculate_bhava_chalit
 
 router = APIRouter()
 
@@ -153,8 +156,90 @@ def ask_kundli(body: AskRequest):
     # Expose full set under new key for ask_chart
     chart["div_charts"] = div_charts
 
-    answer = ask_chart(chart, dasha_raw, body.question, body.language)
+    transit_data = calculate_transit(jd, geo.lat, geo.lon)
+
+    answer = ask_chart(chart, dasha_raw, body.question, body.language, transit=transit_data)
     return AskResponse(answer=answer)
+
+
+@router.post("/kundli/ashtakavarga")
+def get_ashtakavarga(body: BirthInput):
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
+                       utc_dt.hour + utc_dt.minute / 60.0)
+
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+    return calculate_ashtakavarga(chart["planets"], chart["ascendant"]["sign_index"])
+
+
+@router.post("/kundli/transit")
+def get_transit(body: BirthInput):
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
+                       utc_dt.hour + utc_dt.minute / 60.0)
+
+    return calculate_transit(jd_ut, geo.lat, geo.lon)
+
+
+@router.post("/kundli/bhava-chalit")
+def get_bhava_chalit(body: BirthInput):
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
+                       utc_dt.hour + utc_dt.minute / 60.0)
+
+    return calculate_bhava_chalit(jd_ut, geo.lat, geo.lon)
+
+
+@router.post("/kundli/kp")
+def get_kp_chart(body: BirthInput):
+    try:
+        geo = geocode_place(body.place)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    local_tz = pytz.timezone(geo.timezone)
+    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
+    local_dt = local_tz.localize(naive_dt)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
+                       utc_dt.hour + utc_dt.minute / 60.0)
+
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+    kp_planets = enrich_planets_kp(chart["planets"])
+    asc_lon = chart["ascendant"]["sign_index"] * 30 + chart["ascendant"]["degree"]
+
+    from services.kp_system import get_kp_data
+    asc_kp = get_kp_data(asc_lon)
+
+    return {
+        "ascendant": {**chart["ascendant"], **asc_kp},
+        "planets": kp_planets,
+        "houses": chart["houses"],
+    }
 
 
 @router.post("/kundli/divisional")

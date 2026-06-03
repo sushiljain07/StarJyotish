@@ -31,6 +31,12 @@ NAKSHATRAS = [
     "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
 ]
 
+NAKSHATRA_LORDS = [
+    "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+    "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+    "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+]
+
 # D9 start sign for each of the 12 signs (fire→0, earth→9, air→6, water→3)
 _D9_START = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3]
 
@@ -44,13 +50,17 @@ def _sign_info(lon: float) -> dict[str, Any]:
     degree = lon % 30
     nak_span = 360 / 27
     nak_idx = int(lon / nak_span)
+    nak_idx = min(nak_idx, 26)
     pada = int((lon % nak_span) / (nak_span / 4)) + 1
+    nak_degree = lon % nak_span
     return {
         "sign": SIGNS[sign_idx],
         "sign_index": sign_idx,
         "degree": round(degree, 4),
         "nakshatra": NAKSHATRAS[nak_idx],
         "nakshatra_pada": pada,
+        "nakshatra_lord": NAKSHATRA_LORDS[nak_idx],
+        "nakshatra_degree": round(nak_degree, 4),
     }
 
 

@@ -90,6 +90,16 @@ _SECTION_ICONS = {
 # Stored as ordered list of tuples so iteration order is guaranteed.
 # Longer / more-specific keys first to prevent substring collisions
 # (e.g. "d6" must NOT match inside "d60").
+_TRANSIT_KEYWORDS = [
+    "transit", "gochara", "gochar", "current position", "currently",
+    "right now", "today", "this week", "this month", "this year",
+    "running dasha", "running period", "upcoming", "future",
+    "effect of", "impact of", "influence of", "present",
+    "planetary movement", "moving through", "passing through",
+    "shani", "rahu transit", "jupiter transit", "saturn transit",
+    "what is happening", "what will happen", "prediction for",
+]
+
 _DIVISION_KEYWORDS: list[tuple[str, int]] = [
     # multi-word phrases first
     ("past life",    60),
@@ -782,7 +792,13 @@ def generate_reading(
 # Ask prompt
 # ─────────────────────────────────────────────────────────────────────────────
 
-def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
+def ask_chart(
+    chart: dict,
+    dasha: dict,
+    question: str,
+    language: str,
+    transit: Optional[dict] = None,
+) -> str:
     """
     Answer a kundli question using the full available chart context.
 
@@ -792,6 +808,8 @@ def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
       chart['divisional_chart'] — primary topic-specific chart (auto-detected)
       chart['div_charts']       — dict of all pre-calculated divisional charts
                                   {div_num: {planets: [...], ascendant: {...}}}
+      transit                   — current transit positions from calculate_transit()
+                                  {transit_date, transit_planets, natal_asc_sign_index}
 
     Skill knowledge is loaded from astro-skills/ and cross-references are
     resolved per index.md's "Skill Compatibility" table.
@@ -843,6 +861,17 @@ def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
 
     extra_div_text = "".join(extra_div_parts)
 
+    # ── Transit positions (when question is transit-related) ──────────────
+    transit_text = ""
+    q_lower_transit = question.lower()
+    if transit and any(kw in q_lower_transit for kw in _TRANSIT_KEYWORDS):
+        transit_planets = transit.get("transit_planets", [])
+        if transit_planets:
+            transit_text = _format_planets(
+                transit_planets,
+                f"CURRENT TRANSIT POSITIONS (as of {transit.get('transit_date', 'today')})",
+            )
+
     # ── Skill knowledge ───────────────────────────────────────────────────
     skill_text = _load_skill_content(question)
 
@@ -851,6 +880,8 @@ def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
         _DIVISION_NAMES.get(d, f"D{d}").split(" ")[0]
         for d in sorted(seen_divs)
     )
+    if transit_text:
+        charts_listed += ", Transit"
 
     prompt = (
         f"You are an expert Vedic astrologer. Answer the following question "
@@ -870,6 +901,7 @@ def ask_chart(chart: dict, dasha: dict, question: str, language: str) -> str:
         + d1_text
         + d9_text
         + extra_div_text
+        + transit_text
         + skill_text
         + f"\n\nQUESTION: {question}"
     )

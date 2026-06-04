@@ -6,6 +6,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.kundli import router as kundli_router
+from routers.career_report import router as career_router
 
 app = FastAPI(title="Kundli API", version="1.0.0")
 
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(kundli_router, prefix="/api")
+app.include_router(career_router, prefix="/api")
 
 
 @app.get("/health")

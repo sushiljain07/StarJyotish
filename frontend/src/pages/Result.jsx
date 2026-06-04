@@ -18,6 +18,7 @@ import AshtakavargaTable  from '../components/AshtakavargaTable'
 import SarvatobhadraChakra from '../components/SarvatobhadraChakra'
 import BhavaChality       from '../components/BhavaChality'
 import KundliDownload     from '../components/KundliDownload'
+import CareerReportTab   from '../components/CareerReportTab'
 
 function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-')
@@ -63,6 +64,7 @@ const TABS = [
   { id: 'planets',     label: '🌟 Planets' },
   { id: 'reading',     label: '📖 Reading' },
   { id: 'ask',         label: '💬 Ask' },
+  { id: 'career',      label: '💼 Career' },
   { id: 'download',   label: '⬇️ Download' },
 ]
 
@@ -269,6 +271,11 @@ export default function Result() {
         {/* ── Ask ── */}
         <div className={activeTab === 'ask' ? '' : 'hidden'}>
           <AskChart input={input} />
+        </div>
+
+        {/* ── Career Report ── */}
+        <div className={activeTab === 'career' ? '' : 'hidden'}>
+          <CareerReportTab input={input} />
         </div>
 
         {/* ── Download ── */}

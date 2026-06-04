@@ -13,6 +13,7 @@ class CareerReport(BaseModel):
     d10_analysis: CareerSection
     amatyakaraka: CareerSection
     career_fields: CareerSection
+    student_streams: CareerSection
     yogas_combinations: CareerSection
     dasha_predictions: CareerSection
     remedies: CareerSection

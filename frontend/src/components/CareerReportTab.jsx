@@ -7,6 +7,7 @@ const SECTIONS = [
   { key: 'd10_analysis',       icon: '📊',  style: 'plain'   },
   { key: 'amatyakaraka',       icon: '💫',  style: 'tinted'  },
   { key: 'career_fields',      icon: '💼',  style: 'plain'   },
+  { key: 'student_streams',   icon: '🎓',  style: 'tinted'  },
   { key: 'yogas_combinations', icon: '✨',  style: 'plain'   },
   { key: 'dasha_predictions',  icon: '⏳',  style: 'plain'   },
   { key: 'remedies',           icon: '🙏',  style: 'plain'   },

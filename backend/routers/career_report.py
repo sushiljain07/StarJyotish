@@ -61,6 +61,7 @@ def get_career_report(body: BirthInput):
         d10_analysis=CareerSection(**report_data["d10_analysis"]),
         amatyakaraka=CareerSection(**report_data["amatyakaraka"]),
         career_fields=CareerSection(**report_data["career_fields"]),
+        student_streams=CareerSection(**report_data["student_streams"]),
         yogas_combinations=CareerSection(**report_data["yogas_combinations"]),
         dasha_predictions=CareerSection(**report_data["dasha_predictions"]),
         remedies=CareerSection(**report_data["remedies"]),

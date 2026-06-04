@@ -66,6 +66,19 @@ DIGNITY_SCORE = {
     "neutral": 3, "enemy": 2, "debilitated": 1,
 }
 
+# Academic / study streams by ruling planet
+STUDENT_STREAMS = {
+    "Sun":     ["Government Services (IAS/IPS/IFS)", "Medicine (MBBS)", "Management (MBA/BBA)", "Political Science"],
+    "Moon":    ["Nursing & Paramedics", "Psychology (BA/MA)", "Home Science", "Hospitality Management (BHM)"],
+    "Mars":    ["Engineering (B.Tech / JEE — Mech, Civil, Electrical)", "Military (NDA/CDS)", "Sports Science", "MBBS Surgery"],
+    "Mercury": ["Commerce stream (CA/CMA/CS)", "Computer Science (BCA/MCA/B.Tech CS)", "Mathematics & Statistics", "Economics", "Accountancy (B.Com)"],
+    "Jupiter": ["Law (LLB / CLAT)", "Education (B.Ed/M.Ed)", "Philosophy & Theology", "Economics (Hons)", "Research & Academia"],
+    "Venus":   ["Fine Arts & Design (BFA/NIFT)", "Music & Performing Arts", "Mass Communication & Media (BJMC)", "Fashion Design", "Interior Design"],
+    "Saturn":  ["Architecture (B.Arch)", "Social Work (BSW/MSW)", "Civil / Mining Engineering", "Labour & Industrial Relations"],
+    "Rahu":    ["Computer Science & IT (B.Tech CS / BCA)", "Data Science & AI/ML", "Foreign Languages", "Aviation", "Film & Media Production"],
+    "Ketu":    ["Alternative Medicine (BAMS/BHMS/BUMS)", "Spiritual & Philosophical Studies", "Research & Investigative Sciences", "Astrology & Metaphysics"],
+}
+
 # Career domains by ruling planet
 CAREER_DOMAINS = {
     "Sun":     ["Government", "Administration", "Politics", "Medicine", "Leadership"],
@@ -471,12 +484,22 @@ def identify_career_fields(
                 seen.add(field)
                 ordered_fields.append(field)
 
+    # Student streams from the same key planets
+    stream_seen: set[str] = set()
+    ordered_streams: list[str] = []
+    for name in key_planets:
+        for stream in STUDENT_STREAMS.get(name, []):
+            if stream not in stream_seen:
+                stream_seen.add(stream)
+                ordered_streams.append(stream)
+
     return {
         "tenth_house_planets": [p["name"] for p in planets_in_10th],
         "tenth_lord":          {"planet": lord_10, "sign": p10["sign"] if p10 else "N/A"},
         "amatyakaraka":        ak["name"] if ak else "N/A",
         "planet_field_map":    planet_field_map,
         "suggested_fields":    ordered_fields[:10],
+        "suggested_streams":   ordered_streams[:10],
     }
 
 
@@ -614,6 +637,9 @@ Strength      : {d10_data['strength_note']}
 Key planets    : {', '.join(fields['planet_field_map'].keys())}
 Suggested fields: {', '.join(fields['suggested_fields'][:8])}
 
+═══ STUDENT STUDY STREAMS ═══
+Recommended academic streams: {', '.join(fields['suggested_streams'][:8])}
+
 ═══ CURRENT DASHA ═══
 Mahadasha : {md.get('planet', 'Unknown')} until {md.get('end', 'Unknown')}
 Antardasha: {ad.get('planet', 'N/A')} until {ad.get('end', 'N/A')}
@@ -644,6 +670,10 @@ Return ONLY this JSON (no markdown, no extra keys):
   "career_fields": {{
     "title": "Recommended Career Fields",
     "content": "4–5 sentences: top career domains with reasoning from 10th house, 10th lord, and Amatyakaraka influences."
+  }},
+  "student_streams": {{
+    "title": "Recommended Study Streams for Students",
+    "content": "4–5 sentences: which academic streams suit this chart — e.g. Commerce (CA/MBA/Economics), Science-PCM (Engineering/Maths/Computer Science), Science-PCB (MBBS/Nursing/Pharmacy), Arts/Humanities (Psychology/Fine Arts/Media), Law, or Technology (Data Science/IT/AI). Name specific courses and entrance exams where relevant."
   }},
   "yogas_combinations": {{
     "title": "Special Career Yogas",
@@ -702,7 +732,7 @@ def generate_career_report(chart_data: dict, d10_chart: dict, dasha: dict) -> di
 
     section_keys = [
         "lagna_personality", "job_vs_business", "tenth_house_d1", "d10_analysis",
-        "amatyakaraka", "career_fields", "yogas_combinations",
+        "amatyakaraka", "career_fields", "student_streams", "yogas_combinations",
         "dasha_predictions", "remedies", "conclusion",
     ]
     report: dict = {}

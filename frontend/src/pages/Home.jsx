@@ -1,6 +1,6 @@
 // frontend/src/pages/Home.jsx
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
@@ -50,6 +50,18 @@ export default function Home() {
               {lang === 'en' ? 'EN' : 'हि'}
             </button>
           ))}
+        </div>
+
+        {/* Career Report shortcut */}
+        <div className="mt-5">
+          <Link
+            to="/career-report"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-full border border-white/30 transition no-underline"
+          >
+            <span>💼</span>
+            <span>Career Report</span>
+            <span className="text-indigo-200 text-xs">→</span>
+          </Link>
         </div>
       </div>
 

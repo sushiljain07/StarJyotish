@@ -330,8 +330,9 @@ _GEM_LAGNA_MAP = "gemstones/vedic-gemstones/SKILL.md"
 
 _CLASSICAL = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 
-_GROQ_URL   = "https://api.groq.com/openai/v1/chat/completions"
-_GROQ_MODEL = "llama-3.3-70b-versatile"
+_GROQ_URL      = "https://api.groq.com/openai/v1/chat/completions"
+_GROQ_MODEL    = "llama-3.3-70b-versatile"
+_CLAUDE_MODEL  = "claude-sonnet-4-6"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -741,51 +742,94 @@ def parse_sections(raw: str) -> list[dict]:
     return sections
 
 
-def generate_reading(
-    chart: dict,
-    dasha: dict,
-    language: str,
-    div_charts: Optional[dict] = None,
-) -> list[dict]:
+def _call_claude(messages: list[dict], json_mode: bool = False) -> str:
+    """Call Claude API. Raises ValueError if key missing, or any SDK exception on error."""
+    import anthropic as _anthropic
+    api_key = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
+    if not api_key:
+        raise ValueError("ANTHROPIC_API_KEY not set")
+    client = _anthropic.Anthropic(api_key=api_key)
+    kwargs: dict = {
+        "model": _CLAUDE_MODEL,
+        "max_tokens": 4096,
+        "messages": messages,
+    }
+    if json_mode:
+        # Instruct Claude to return only JSON via output_config
+        kwargs["output_config"] = {"format": {"type": "json_object"}}
+    resp = client.messages.create(**kwargs)
+    for block in resp.content:
+        if block.type == "text":
+            return block.text
+    return ""
+
+
+def _call_groq(
+    messages: list[dict],
+    json_mode: bool = False,
+    retries: int = 3,
+) -> str:
+    """Call Groq/Llama API with retry on 429."""
+    import time
     api_key = (os.getenv("GROQ_API_KEY") or "").strip()
     if not api_key:
         raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
-
-    prompt = build_prompt(chart, dasha, language, div_charts)
-
-    for attempt in range(3):
-        import time
+    payload: dict = {"model": _GROQ_MODEL, "messages": messages}
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+    last_exc: Exception = RuntimeError("no attempts")
+    for attempt in range(retries):
         try:
             resp = requests.post(
                 _GROQ_URL,
                 headers={"Authorization": f"Bearer {api_key}",
                          "Content-Type": "application/json"},
-                json={
-                    "model": _GROQ_MODEL,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "response_format": {"type": "json_object"},
-                },
+                json=payload,
                 timeout=30,
             )
             if resp.status_code == 429:
                 time.sleep(2 ** attempt)
                 continue
             resp.raise_for_status()
-            text = resp.json()["choices"][0]["message"]["content"]
-            return parse_sections(text)
+            return resp.json()["choices"][0]["message"]["content"]
         except HTTPException:
             raise
         except Exception as exc:
-            if attempt == 2:
-                raise HTTPException(
-                    status_code=503, detail=f"Groq API error: {exc}"
-                ) from exc
-            time.sleep(2 ** attempt)
+            last_exc = exc
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+    raise HTTPException(status_code=503, detail=f"Groq API error: {last_exc}") from last_exc
 
-    raise HTTPException(
-        status_code=503,
-        detail="Groq API rate limit exceeded. Please try again in a minute.",
-    )
+
+def _call_llm(messages: list[dict], json_mode: bool = False) -> str:
+    """
+    Primary: Claude (claude-opus-4-8).
+    Fallback: Groq/Llama when ANTHROPIC_API_KEY is missing or Claude returns an error.
+    """
+    try:
+        return _call_claude(messages, json_mode)
+    except ValueError:
+        # Key not configured — silently fall back to Groq
+        pass
+    except Exception as exc:
+        logger.warning("Claude API error (%s), falling back to Groq", exc)
+    return _call_groq(messages, json_mode)
+
+
+def generate_reading(
+    chart: dict,
+    dasha: dict,
+    language: str,
+    div_charts: Optional[dict] = None,
+) -> list[dict]:
+    prompt = build_prompt(chart, dasha, language, div_charts)
+    try:
+        text = _call_llm([{"role": "user", "content": prompt}], json_mode=True)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"LLM error: {exc}") from exc
+    return parse_sections(text)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -814,10 +858,6 @@ def ask_chart(
     Skill knowledge is loaded from astro-skills/ and cross-references are
     resolved per index.md's "Skill Compatibility" table.
     """
-    api_key = (os.getenv("GROQ_API_KEY") or "").strip()
-    if not api_key:
-        raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
-
     lang_instruction = "Hindi" if language == "hi" else "English"
     asc  = chart["ascendant"]
     moon = next((p for p in chart["planets"] if p["name"] == "Moon"), None)
@@ -907,19 +947,8 @@ def ask_chart(
     )
 
     try:
-        resp = requests.post(
-            _GROQ_URL,
-            headers={"Authorization": f"Bearer {api_key}",
-                     "Content-Type": "application/json"},
-            json={"model": _GROQ_MODEL,
-                  "messages": [{"role": "user", "content": prompt}]},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"].strip()
+        return _call_llm([{"role": "user", "content": prompt}]).strip()
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(
-            status_code=503, detail=f"Groq API error: {exc}"
-        ) from exc
+        raise HTTPException(status_code=503, detail=f"LLM error: {exc}") from exc

@@ -1,4 +1,4 @@
-# Bhagyank 5 — Mercury (बुध) | Astro Arun Pandit Notes
+﻿# Bhagyank 5 — Mercury (बुध) |  Notes
 
 ## Ruling Planet
 **Mercury (बुध)** — the fastest-moving planet. In numerology, Mercury represents **intelligence, speed, and change**.

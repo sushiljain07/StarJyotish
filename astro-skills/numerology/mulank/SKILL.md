@@ -1,8 +1,8 @@
----
+﻿---
 name: mulank-numerology
 description: >
   Answer questions about Vedic Numerology (मूलांक / Mulank) — the root number system
-  by Astro Arun Pandit. Covers complete personality traits, strengths, weaknesses, lucky
+  . Covers complete personality traits, strengths, weaknesses, lucky
   colors, and favorable/unfavorable time periods for ALL Mulanks 1 through 9. Use this
   skill whenever the user asks about their birth number, mulank, root number, psychic
   number, numerology reading, lucky colors by birth date, auspicious time periods, or
@@ -10,11 +10,11 @@ description: >
   "born on 15th what is my number", "mulank 3 ki visheshta", "lucky color for number 1",
   "favorable time for psychic number 2", "sun mulank", "moon mulank", "jupiter number",
   "shani mulank", "mangal mulank", or any Hindi/English/Hinglish numerology query
-  referencing birth dates, planetary rulers, or occult guidance from Astro Arun Pandit.
+  referencing birth dates, planetary rulers, or occult guidance from .
 ---
 
 # Mulank Numerology Skill
-**Source:** Advance Numerology Mentorship Program — Astro Arun Pandit (occultgurukul.com)
+**Source:** Advance Numerology Mentorship Program 
 **Languages:** English (Mulank 1–3), Hindi (Mulank 5–9)
 
 ---

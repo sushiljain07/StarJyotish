@@ -1,6 +1,6 @@
-# Karakas — Profession & Industry by Planet
+﻿# Karakas — Profession & Industry by Planet
 
-Source: Astro Arun Pandit — The Career Compass (D10 Bootcamp)
+Source: The Career Compass (D10 Bootcamp)
 
 ---
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: crystals-gemstones
 description: >
   Expert knowledge base on healing crystals and gemstones covering formation, history, chakra healing,
@@ -13,7 +13,7 @@ description: >
 
 # Crystals & Gemstones Knowledge Base
 
-Source: Astro Arun Pandit Pvt. Ltd. — Occult Gurukul Crash Course Notes
+Source: Occult Gurukul — Occult Gurukul Crash Course Notes
 
 ---
 

@@ -1,4 +1,4 @@
-# D7 Saptamsha – Advanced Combinations Reference
+﻿# D7 Saptamsha – Advanced Combinations Reference
 
 ## Table of Contents
 1. Santan Tithi
@@ -209,5 +209,5 @@ the mother's thoughts, emotions, music, prayers, and spiritual practices during 
 
 ---
 
-*This reference is part of the D7 Saptamsha skill by Astro Arun Pandit / Occult Gurukul.*
+*This reference is part of the D7 Saptamsha skill by Occult Gurukul.*
 *Source: D-7 Chart Bootcamp, Day 2 material.*

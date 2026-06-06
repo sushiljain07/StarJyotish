@@ -7,12 +7,19 @@ const SECTIONS = [
   { key: 'd10_analysis',       icon: '📊',  style: 'plain'   },
   { key: 'amatyakaraka',       icon: '💫',  style: 'tinted'  },
   { key: 'career_fields',      icon: '💼',  style: 'plain'   },
-  { key: 'student_streams',   icon: '🎓',  style: 'tinted'  },
+  { key: 'student_streams',    icon: '🎓',  style: 'tinted'  },
   { key: 'yogas_combinations', icon: '✨',  style: 'plain'   },
   { key: 'dasha_predictions',  icon: '⏳',  style: 'plain'   },
+  { key: 'transit_impact',     icon: '🌍',  style: 'tinted'  },
   { key: 'remedies',           icon: '🙏',  style: 'plain'   },
   { key: 'conclusion',         icon: '🔮',  style: 'gradient' },
 ]
+
+const EFFORT_COLOR = {
+  low:    'text-emerald-600 bg-emerald-50',
+  medium: 'text-amber-600 bg-amber-50',
+  high:   'text-rose-600 bg-rose-50',
+}
 
 function SectionContent({ content, light = false }) {
   if (!content) return <span className="text-gray-400 italic">—</span>
@@ -36,6 +43,7 @@ function SectionContent({ content, light = false }) {
 }
 
 function SectionCard({ icon, section, style }) {
+  if (!section?.content) return null
   if (style === 'gradient') return (
     <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl p-5 shadow-md">
       <div className="flex items-center gap-2 mb-3">
@@ -64,12 +72,71 @@ function SectionCard({ icon, section, style }) {
     </div>
   )
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-amber-100">
+    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
+    </div>
+  )
+}
+
+function CareerOptionCard({ opt }) {
+  const [open, setOpen] = useState(false)
+  const effortCls = EFFORT_COLOR[opt.effort_required] ?? EFFORT_COLOR.medium
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full text-left p-4 flex items-start gap-3"
+      >
+        <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-extrabold flex items-center justify-center">
+          {opt.rank}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-slate-800 text-sm">{opt.title}</span>
+            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{opt.field}</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>
+              {opt.effort_required} effort
+            </span>
+          </div>
+          {opt.timeline && (
+            <p className="text-xs text-slate-400 mt-0.5">{opt.timeline}</p>
+          )}
+        </div>
+        <span className={`text-slate-400 text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 pt-0 border-t border-slate-100 space-y-3">
+          {opt.reason && (
+            <div>
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">Why this career?</p>
+              <p className="text-xs text-slate-600 leading-relaxed">{opt.reason}</p>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-4">
+            {opt.key_planets?.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 mb-1">Key Planets</p>
+                <div className="flex gap-1 flex-wrap">
+                  {opt.key_planets.map(p => (
+                    <span key={p} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">{p}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {opt.favorable_dasha && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 mb-1">Best Dasha</p>
+                <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">{opt.favorable_dasha}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -106,8 +173,8 @@ export default function CareerReportTab({ input }) {
       <div className="text-5xl mb-4">💼</div>
       <h2 className="text-xl font-bold text-slate-800 mb-2">Vedic Career Report</h2>
       <p className="text-gray-500 text-sm mb-6 max-w-sm">
-        Deep analysis using D1 + D10 charts, Amatyakaraka, 12 career yogas,
-        job vs business verdict, and Dasha timing.
+        Deep analysis using D1 + D10 charts, Amatyakaraka, career yogas, job vs business verdict,
+        current transits, and 5 ranked career options — powered by your Vedic astrology skill files.
       </p>
       <button
         onClick={generate}
@@ -115,7 +182,7 @@ export default function CareerReportTab({ input }) {
       >
         Generate Career Report
       </button>
-      <p className="text-xs text-gray-400 mt-3">Powered by AI · takes ~15 seconds</p>
+      <p className="text-xs text-gray-400 mt-3">Powered by AI · takes ~20 seconds</p>
     </div>
   )
 
@@ -123,7 +190,7 @@ export default function CareerReportTab({ input }) {
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
       <p className="text-indigo-700 font-semibold">Analysing your career chart…</p>
-      <p className="text-xs text-slate-400 mt-1">D1 + D10 · Amatyakaraka · 12 yogas · AI report</p>
+      <p className="text-xs text-slate-400 mt-1">D1 + D10 · Amatyakaraka · Yogas · Transit · 5 Career Options</p>
       <div className="mt-5 w-52 h-1.5 bg-slate-100 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
@@ -143,19 +210,47 @@ export default function CareerReportTab({ input }) {
     </div>
   )
 
+  const hasOptions       = report?.career_options?.length > 0
+  const hasSingleBest    = !!report?.single_best_career?.content
+
   return (
-    <div className="max-w-2xl mx-auto py-2">
-      <div className="space-y-4">
-        {SECTIONS.map(({ key, icon, style }) => (
-          <SectionCard
-            key={key}
-            icon={icon}
-            section={report[key] ?? { title: key, content: '' }}
-            style={style}
-          />
-        ))}
-      </div>
-      <div className="text-center mt-8">
+    <div className="max-w-2xl mx-auto py-2 space-y-4">
+
+      {/* ── Single Best Career — highlighted banner ── */}
+      {hasSingleBest && (
+        <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 shadow-lg text-white">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl">🏆</span>
+            <h3 className="font-extrabold text-lg">{report.single_best_career.title}</h3>
+          </div>
+          <SectionContent content={report.single_best_career.content} light />
+        </div>
+      )}
+
+      {/* ── 5 Ranked Career Options ── */}
+      {hasOptions && (
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl">🎯</span>
+            <h3 className="font-bold text-slate-800 text-base">Top 5 Career Paths</h3>
+            <span className="text-xs text-slate-400 ml-1">· tap to expand each</span>
+          </div>
+          <div className="space-y-2">
+            {report.career_options.map(opt => (
+              <CareerOptionCard key={opt.rank} opt={opt} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Original narrative sections ── */}
+      {SECTIONS.map(({ key, icon, style }) =>
+        report[key]?.content
+          ? <SectionCard key={key} icon={icon} section={report[key]} style={style} />
+          : null
+      )}
+
+      <div className="text-center mt-6 pb-4">
         <button
           onClick={() => setStatus('idle')}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"

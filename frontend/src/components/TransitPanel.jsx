@@ -1,7 +1,6 @@
 // Transit chart panel: shows current planet positions on natal chart
 import { useState, useEffect } from 'react'
 import KundliChart from './KundliChart'
-import SouthIndiaChart from './SouthIndiaChart'
 
 const PLANET_COLORS = {
   Sun: '#E53E3E', Moon: '#E53E3E', Mars: '#E53E3E', Rahu: '#E53E3E',
@@ -16,8 +15,6 @@ export default function TransitPanel({ input, natalData }) {
   const [transitData, setTransitData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [chartStyle, setChartStyle] = useState('north')
-
   async function loadTransit() {
     setLoading(true)
     setError(null)
@@ -60,20 +57,6 @@ export default function TransitPanel({ input, natalData }) {
         )}
       </div>
 
-      {/* Chart style selector */}
-      <div className="flex gap-2">
-        {[['north','North Indian'], ['south','South Indian']].map(([id, label]) => (
-          <button key={id} onClick={() => setChartStyle(id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition ${
-                    chartStyle === id
-                      ? 'bg-indigo-600 border-indigo-600 text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
-                  }`}>
-            {label}
-          </button>
-        ))}
-      </div>
-
       {loading && (
         <div className="flex justify-center py-16">
           <div className="text-center">
@@ -93,21 +76,12 @@ export default function TransitPanel({ input, natalData }) {
           {/* Chart with transit overlay */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div className="w-full sm:w-[460px]">
-              {chartStyle === 'south' ? (
-                <SouthIndiaChart
-                  planets={natalPlanets}
-                  ascendant={natalAsc}
-                  title="Transit on Natal (South Indian)"
-                  transitPlanets={transitData.transit_planets}
-                />
-              ) : (
-                <KundliChart
-                  planets={natalPlanets}
-                  ascendant={natalAsc}
-                  title="Transit on Natal (North Indian)"
-                  transitPlanets={transitData.transit_planets}
-                />
-              )}
+              <KundliChart
+                planets={natalPlanets}
+                ascendant={natalAsc}
+                title="Transit on Natal (North Indian)"
+                transitPlanets={transitData.transit_planets}
+              />
             </div>
           </div>
 

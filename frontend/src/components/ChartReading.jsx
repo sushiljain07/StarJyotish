@@ -27,12 +27,14 @@ function KundliWheelBg() {
 
 // Section display config — ordered as they appear in the prediction
 const SECTION_CONFIG = [
-  { key: 'identity',      title: 'Your Cosmic Identity',          icon: '🌟' },
-  { key: 'rajyogas',      title: 'The Raj Yogas in Your Chart',   icon: '👑' },
-  { key: 'strengths',     title: 'Your Career Domain & Strengths',icon: '💪' },
-  { key: 'currentperiod', title: 'Your Current Life Period',       icon: '⏳' },
-  { key: 'prediction',    title: 'Your Next 2–3 Years',           icon: '🔮' },
-  { key: 'bridge',        title: 'What Your Full Report Reveals', icon: '🗝️'  },
+  { key: 'identity',       title: 'Your Cosmic Identity',          icon: '🌟' },
+  { key: 'rajyogas',       title: 'The Raj Yogas in Your Chart',   icon: '👑' },
+  { key: 'strengths',      title: 'Your Career Domain & Strengths',icon: '💪' },
+  { key: 'currentperiod',  title: 'Your Current Life Period',       icon: '⏳' },
+  { key: 'prediction',     title: 'Your Next 2–3 Years',           icon: '🔮' },
+  { key: 'health',         title: 'Your Health & Vitality',        icon: '💚' },
+  { key: 'relationships',  title: 'Your Love & Relationships',      icon: '💫' },
+  { key: 'bridge',         title: 'What Your Full Report Reveals', icon: '🗝️'  },
 ]
 
 const BENEFITS = [
@@ -197,8 +199,10 @@ export default function ChartReading({ input, onSwitchToCareer }) {
         const content = predSections[key]
         if (!content) return null
         const isVisible = visible.includes(key)
-        const isRajyoga = key === 'rajyogas'
-        const isBridge  = key === 'bridge'
+        const isRajyoga       = key === 'rajyogas'
+        const isBridge        = key === 'bridge'
+        const isHealth        = key === 'health'
+        const isRelationships = key === 'relationships'
 
         if (isRajyoga) return (
           <div key={key}
@@ -235,6 +239,36 @@ export default function ChartReading({ input, onSwitchToCareer }) {
             </div>
             <p className="text-gray-200 text-sm leading-relaxed"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+          </div>
+        )
+
+        if (isHealth) return (
+          <div key={key}
+               className={`rounded-xl overflow-hidden shadow-sm border border-green-200
+                          transition-all duration-700
+                          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
+            <div className="bg-gradient-to-r from-green-500 to-emerald-400 px-5 py-3 flex items-center gap-2">
+              <span className="text-xl">{icon}</span>
+              <h3 className="font-bold text-white text-base">{title}</h3>
+            </div>
+            <div className="bg-white px-5 py-4">
+              <p className="text-gray-700 text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+            </div>
+          </div>
+        )
+
+        if (isRelationships) return (
+          <div key={key}
+               className={`rounded-xl overflow-hidden shadow-sm border border-rose-200
+                          transition-all duration-700
+                          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
+            <div className="bg-gradient-to-r from-rose-500 to-pink-400 px-5 py-3 flex items-center gap-2">
+              <span className="text-xl">{icon}</span>
+              <h3 className="font-bold text-white text-base">{title}</h3>
+            </div>
+            <div className="bg-white px-5 py-4">
+              <p className="text-gray-700 text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+            </div>
           </div>
         )
 

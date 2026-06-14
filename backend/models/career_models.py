@@ -29,6 +29,7 @@ class CareerReport(BaseModel):
     current_phase: Optional[CareerSection] = None
     academic_path: Optional[CareerSection] = None
     gemstone_recommendation: Optional[CareerSection] = None
+    rudraksha_recommendation: Optional[CareerSection] = None
     empowering_remedies: Optional[CareerSection] = None
     closing_blessing: Optional[CareerSection] = None
 

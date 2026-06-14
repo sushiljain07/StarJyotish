@@ -748,6 +748,7 @@ def _build_career_prompt(
     current_year: int = 2026,
     transit_data: Optional[dict] = None,
     gemstone_context: str = "",
+    language: str = "en",
 ) -> str:
     lagna     = chart_data.get("ascendant", {})
     planets   = chart_data.get("planets", [])
@@ -935,9 +936,21 @@ def _build_career_prompt(
     "title": "Your Vedic Gemstone Recommendation",
     "content": "Using the Vedic gemstone knowledge base in your context, recommend the primary gemstone for {lagna_sign} lagna. State: (1) The gemstone name, which planet it strengthens, and why it specifically helps this chart's career goals. (2) The minimum carat weight and which finger/hand to wear it on. (3) The auspicious day and time to first wear it. (4) The mantra to chant while wearing. Format as clear numbered points. Warm, empowering tone."
   }},
+  "rudraksha_recommendation": {{
+    "title": "Your Recommended Rudraksha",
+    "content": "Using the Rudraksha knowledge base in your context, recommend the best Rudraksha bead for {lagna_sign} lagna and this chart's career goals. State: (1) The specific Mukhi (face/मुखी) Rudraksha recommended — name it clearly (e.g. 5 Mukhi, Panchmukhi) and explain which planet it energises and why this benefits the career planets in this chart. (2) The purification ritual before first wearing — specific steps. (3) The mantra to chant while wearing (give the full mantra text). (4) One key career benefit and one spiritual benefit from wearing it. Format as clear numbered points. Warm, empowering tone."
+  }},
 '''
     else:
         _gemstone_section = ""
+
+    _lang_rule = (
+        "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' string and every 'content' string) "
+        "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown. "
+        "Every word inside the values must be in Hindi — no English words in the output values."
+    ) if language == "hi" else (
+        "LANGUAGE RULE: Write all 'title' and 'content' values in English."
+    )
 
     prompt = f"""You are a compassionate Vedic career astrologer writing a deeply personalized, uplifting career report.
 
@@ -1012,6 +1025,8 @@ CURRENT TRANSITS:
 4. Write as a wise, warm mentor — genuinely excited about this person's future. Personal, warm, not clinical.
 5. NEVER reference dasha periods that ended before {current_year}. NEVER mention past career phases or completed life events.
 6. The closing_blessing must leave the user feeling their BEST years are ahead of them.
+
+{_lang_rule}
 
 ━━━ OUTPUT (STRICT JSON ONLY) ━━━
 Return ONLY a valid JSON object. No text, no markdown, no explanations outside the JSON.
@@ -1135,6 +1150,7 @@ def generate_career_report(
     skills_context: str = "",
     birth_date: Optional[str] = None,
     gemstone_context: str = "",
+    language: str = "en",
 ) -> dict:
     """
     Orchestrate all analysis steps and return a structured career report.
@@ -1197,6 +1213,7 @@ def generate_career_report(
         current_year=current_year,
         transit_data=transit_data,
         gemstone_context=gemstone_context,
+        language=language,
     )
 
     raw = _call_llm(prompt, system=system)
@@ -1208,7 +1225,7 @@ def generate_career_report(
         "career_destiny_brief", "natural_strengths", "best_career_path",
         "job_vs_business_verdict",
         "career_rajyogas", "peak_career_window", "current_phase", "academic_path",
-        "gemstone_recommendation", "empowering_remedies", "closing_blessing",
+        "gemstone_recommendation", "rudraksha_recommendation", "empowering_remedies", "closing_blessing",
         # Legacy sections (kept for backward compatibility)
         "lagna_personality", "job_vs_business", "tenth_house_d1", "d10_analysis",
         "amatyakaraka", "career_fields", "student_streams", "yogas_combinations",

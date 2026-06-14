@@ -13,8 +13,9 @@ const SECTIONS = [
   { key: 'peak_career_window',   icon: '⏳', style: 'plain'    },
   { key: 'current_phase',        icon: '🚀', style: 'plain'    },
   { key: 'academic_path',        icon: '🎓', style: 'tinted'   },
-  { key: 'gemstone_recommendation', icon: '💎', style: 'gem'  },
-  { key: 'empowering_remedies',  icon: '🙏', style: 'plain'    },
+  { key: 'gemstone_recommendation',  icon: '💎', style: 'gem'    },
+  { key: 'rudraksha_recommendation', icon: '🔴', style: 'tinted' },
+  { key: 'empowering_remedies',      icon: '🙏', style: 'plain'  },
   { key: 'closing_blessing',     icon: '🌟', style: 'gradient' },
   // Legacy section keys (shown only if returned by older reports)
   { key: 'lagna_personality',    icon: '🌟', style: 'gradient' },
@@ -56,32 +57,38 @@ function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
 
   if (style === 'gold') return (
-    <div className="bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 rounded-2xl p-6 shadow-lg border-2 border-amber-300">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-amber-200">
+      <div className="bg-gradient-to-r from-amber-500 to-orange-400 px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
       </div>
-      <SectionContent content={section.content} light />
+      <div className="px-5 py-4">
+        <SectionContent content={section.content} />
+      </div>
     </div>
   )
 
   if (style === 'gem') return (
-    <div className="bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-2xl p-6 shadow-lg border-2 border-teal-300">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-teal-200">
+      <div className="bg-gradient-to-r from-teal-500 to-blue-500 px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
       </div>
-      <SectionContent content={section.content} light />
+      <div className="px-5 py-4">
+        <SectionContent content={section.content} />
+      </div>
     </div>
   )
 
   if (style === 'gradient') return (
-    <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl p-5 shadow-md">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-indigo-100">
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-500 px-5 py-3 flex items-center gap-2">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-white text-base">{section.title}</h3>
       </div>
-      <SectionContent content={section.content} light />
+      <div className="px-5 py-4">
+        <SectionContent content={section.content} />
+      </div>
     </div>
   )
 
@@ -107,7 +114,7 @@ function SectionCard({ icon, section, style }) {
 
   // plain (default)
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-amber-100">
+    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary text-base">{section.title}</h3>
@@ -153,11 +160,12 @@ export default function CareerReport() {
     setReport(null)
     setErrorMsg('')
     setSubmittedInput(input)
+    const language = i18n.language?.startsWith('hi') ? 'hi' : 'en'
     try {
       const resp = await fetch('/api/career-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
+        body: JSON.stringify({ date: input.date, time: input.time, place: input.place, language }),
       })
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}))

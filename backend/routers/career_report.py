@@ -71,6 +71,7 @@ def get_career_report(body: BirthInput):
             skills_context=_SKILLS_CONTEXT,
             birth_date=body.date,
             gemstone_context=_GEMSTONE_CONTEXT,
+            language=body.language,
         )
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Career analysis failed: {e}")
@@ -113,6 +114,7 @@ def get_career_report(body: BirthInput):
         current_phase=_section("current_phase"),
         academic_path=_section("academic_path"),
         gemstone_recommendation=_section("gemstone_recommendation"),
+        rudraksha_recommendation=_section("rudraksha_recommendation"),
         empowering_remedies=_section("empowering_remedies"),
         closing_blessing=_section("closing_blessing"),
         # Legacy sections (will be None for new-style reports)

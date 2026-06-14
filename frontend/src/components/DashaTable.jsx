@@ -26,14 +26,12 @@ const LEVEL_COLORS = {
   mahadasha:  { active: 'bg-indigo-600',  light: 'bg-indigo-50',  border: 'border-indigo-200',  text: 'text-indigo-800',  bar: 'bg-indigo-500'  },
   antardasha: { active: 'bg-violet-600',  light: 'bg-violet-50',  border: 'border-violet-200',  text: 'text-violet-800',  bar: 'bg-violet-500'  },
   pratyantar: { active: 'bg-rose-600',    light: 'bg-rose-50',    border: 'border-rose-200',    text: 'text-rose-800',    bar: 'bg-rose-500'    },
-  sookshma:   { active: 'bg-amber-600',   light: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800',   bar: 'bg-amber-500'   },
 }
 
 const TABS = [
   { id: 'mahadasha',  label: 'Mahadasha' },
   { id: 'antardasha', label: 'Antardasha' },
   { id: 'pratyantar', label: 'Pratyantar' },
-  { id: 'sookshma',   label: 'Sookshma' },
 ]
 
 function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
@@ -92,10 +90,8 @@ export default function DashaTable({ dasha }) {
     current_mahadasha: md,
     current_antardasha: ad,
     current_pratyantar: pd,
-    current_sookshma:   sk,
     antardashas,
     pratyantars,
-    sookshmas,
     full_sequence,
   } = dasha
 
@@ -110,7 +106,6 @@ export default function DashaTable({ dasha }) {
         <span className="font-bold text-indigo-900">{md.planet} MD</span>
         {ad && <><span className="text-slate-400">›</span><span className="font-semibold text-violet-700">{ad.planet} AD</span></>}
         {pd && <><span className="text-slate-400">›</span><span className="font-semibold text-rose-700">{pd.planet} PD</span></>}
-        {sk && <><span className="text-slate-400">›</span><span className="font-semibold text-amber-700">{sk.planet} SK</span></>}
         <span className="ml-auto text-xs text-slate-500">{yrsLeft}y left in MD</span>
       </div>
 
@@ -186,25 +181,6 @@ export default function DashaTable({ dasha }) {
             currentStart={pd?.start}
             color={c}
             labelFn={r => `${md.planet}–${ad?.planet}–${r.planet}`}
-          />
-        </div>
-      )}
-
-      {/* ── Sookshma tab ── */}
-      {activeTab === 'sookshma' && (
-        <div className="space-y-3">
-          {pd && (
-            <div className={`${c.light} border ${c.border} rounded-lg px-3 py-2 text-xs ${c.text}`}>
-              Sookshma periods within <strong>{md.planet}–{ad?.planet}–{pd.planet}</strong> Pratyantar
-              ({pd.start} to {pd.end})
-            </div>
-          )}
-          <PeriodTable
-            rows={sookshmas}
-            currentPlanet={sk?.planet}
-            currentStart={sk?.start}
-            color={c}
-            labelFn={r => `${md.planet}–${ad?.planet}–${pd?.planet}–${r.planet}`}
           />
         </div>
       )}

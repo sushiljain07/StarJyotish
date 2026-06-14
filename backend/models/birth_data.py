@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, field_validator
 from datetime import date, time
 
@@ -6,6 +7,8 @@ class BirthInput(BaseModel):
     date: str   # "YYYY-MM-DD"
     time: str   # "HH:MM"
     place: str  # e.g. "New Delhi, India"
+    language: str = "en"
+    question: Optional[str] = None
 
     @field_validator("date")
     @classmethod

@@ -61,6 +61,9 @@ _GEMSTONE_REMEDY_FILES = [
     "gemstones/vedic-gemstones/references/dos-and-donts.md",
     "gemstones/vedic-gemstones/references/procedure-and-mantras.md",
     "career/vedic-career/references/timing-and-remedies.md",
+    "rudraksha/SKILL.md",
+    "rudraksha/references/mantras-and-prayers.md",
+    "rudraksha/references/wearing-and-maintenance.md",
 ]
 
 

@@ -882,7 +882,14 @@ def build_prediction_prompt(
         for y in active_yogas
     ) or "  (identify from planetary dignities and house placements — look for Panch Mahapurusha yogas, Gaja Kesari, Budh Aditya, Chandra Mangal, Neecha Bhanga, Viparita Raj, etc.)"
 
-    lang_note = "Write entirely in Hindi." if language == "hi" else "Write in English."
+    lang_note = (
+        "LANGUAGE RULE — NON-NEGOTIABLE: Write EVERY SINGLE WORD in Hindi (Devanagari script). "
+        "This includes all section content, yoga names (translate them to Hindi), "
+        "timeline descriptions, character descriptions, bullet points, and all closing messages. "
+        "Do NOT write any English words anywhere in your output — pure Hindi only."
+    ) if language == "hi" else (
+        "LANGUAGE RULE: Write entirely in English. Every word must be in English."
+    )
     ad_line = f"\n  Sub-period: {ad.get('planet', '')} (ends {ad.get('end', '')})" if ad else ""
 
     return f"""You are Jyotish Guru — a master Vedic astrologer giving a genuine, warm, and deeply insightful FREE career reading to someone who just shared their birth details for the first time.
@@ -982,6 +989,14 @@ OUTPUT FORMAT — WRAP EACH SECTION IN THESE EXACT TAGS:
 4-5 sentences. Genuine specific positive prediction based on upcoming transits and sub-period ({ad.get('planet', '?')} sub-period, next period: {next_dasha_str}). Structure: what energy is building (specific, based on planets) → what kind of opportunity or recognition is likely → what they should be doing right now to prepare → one genuinely exciting statement about what is possible.
 </prediction>
 
+<health>
+4-5 sentences STRICTLY POSITIVE. Based on Moon sign ({moon_sign}), Sun placement, and ascendant ({asc.get('sign', '?')}): describe what this person's constitution naturally excels at and their inherent vitality strengths. Then give a specific positive prediction about health energy in the next 2 years — when they will feel strongest, most energetic, most vital. NEVER use any negative health words or warnings. Use language like "your constitution is built for...", "your body naturally responds well to...", "the period ahead brings renewed vitality and..." End with one uplifting sentence about the excellent health energy coming in the years ahead.
+</health>
+
+<relationships>
+4-5 sentences STRICTLY POSITIVE. Based on Moon sign and Venus placement: describe what makes this person naturally magnetic and what unique warmth or depth they bring to relationships. Then give a specific positive prediction about relationships and social connections in the next 2 years — when connection energy peaks, what kind of meaningful relationship or deep friendship is entering their life. NEVER use any negative relationship words. Use "your capacity for love...", "the relationships you attract...", "the coming period brings deeply fulfilling connections..." End with a warm, uplifting sentence about the beautiful relationships ahead in their life.
+</relationships>
+
 <bridge>
 3 sentences exactly. "Your chart holds answers to questions your full report will address in complete detail: exactly which career field your chart analysis points to, whether your chart favors building a business or excelling in a career role, and the single most powerful remedy — specific to your chart, not generic advice — that can accelerate everything above. These are not small questions. They are the questions whose answers, once known, change how you make every career decision going forward."
 </bridge>
@@ -994,11 +1009,11 @@ OUTPUT FORMAT — WRAP EACH SECTION IN THESE EXACT TAGS:
 }}
 </teasers>
 
-TOTAL LENGTH: 420-480 words across all 6 sections. Every sentence must feel specific to THIS chart, not a template.
+TOTAL LENGTH: 580-640 words across all 8 sections. Every sentence must feel specific to THIS chart, not a template.
 """
 
 
-_PREDICTION_SECTIONS = ['identity', 'rajyogas', 'strengths', 'currentperiod', 'prediction', 'bridge']
+_PREDICTION_SECTIONS = ['identity', 'rajyogas', 'strengths', 'currentperiod', 'prediction', 'health', 'relationships', 'bridge']
 
 
 def parse_prediction(raw: str) -> tuple[dict, dict]:

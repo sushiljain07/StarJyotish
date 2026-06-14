@@ -19,6 +19,7 @@ from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.ai import generate_reading, ask_chart
 from services.ashtakavarga import calculate_ashtakavarga
+from services.career_analysis import check_special_combinations
 from services.kp_system import enrich_planets_kp
 from services.transit_calc import calculate_transit, calculate_bhava_chalit
 
@@ -114,8 +115,23 @@ def get_reading(body: ReadingRequest):
     for div in (2, 3, 4, 6, 7, 10, 12, 20, 24, 60):
         div_charts[div] = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, div)
 
-    sections = generate_reading(chart, dasha_raw, body.language, div_charts)
-    return ReadingResponse(sections=[ReadingSection(**s) for s in sections])
+    # Compute active rajyogas for the upsell section
+    active_yogas = [
+        {"name": y["yoga"], "description": y["description"]}
+        for y in check_special_combinations(
+            chart["planets"], chart["ascendant"]["sign_index"]
+        )
+        if y["present"]
+    ]
+
+    reading = generate_reading(chart, dasha_raw, body.language, div_charts, active_yogas=active_yogas)
+    return ReadingResponse(
+        sections=[ReadingSection(**s) for s in reading.get("sections", [])],
+        active_yogas=active_yogas,
+        prediction_text=reading.get("prediction_text"),
+        prediction_sections=reading.get("prediction_sections"),
+        teasers=reading.get("teasers"),
+    )
 
 
 @router.post("/kundli/ask", response_model=AskResponse)

@@ -1,18 +1,31 @@
 import { useState } from 'react'
 
+// New v2 section order — warm, aspirational labels
 const SECTIONS = [
-  { key: 'lagna_personality',  icon: '🌟', style: 'gradient' },
-  { key: 'job_vs_business',    icon: '⚖️',  style: 'verdict'  },
-  { key: 'tenth_house_d1',     icon: '🏛️',  style: 'plain'   },
-  { key: 'd10_analysis',       icon: '📊',  style: 'plain'   },
-  { key: 'amatyakaraka',       icon: '💫',  style: 'tinted'  },
-  { key: 'career_fields',      icon: '💼',  style: 'plain'   },
-  { key: 'student_streams',    icon: '🎓',  style: 'tinted'  },
-  { key: 'yogas_combinations', icon: '✨',  style: 'plain'   },
-  { key: 'dasha_predictions',  icon: '⏳',  style: 'plain'   },
-  { key: 'transit_impact',     icon: '🌍',  style: 'tinted'  },
-  { key: 'remedies',           icon: '🙏',  style: 'plain'   },
-  { key: 'conclusion',         icon: '🔮',  style: 'gradient' },
+  { key: 'career_destiny_brief', icon: '✨', style: 'gold'     },
+  { key: 'natural_strengths',    icon: '💪', style: 'gradient' },
+  { key: 'best_career_path',         icon: '🎯', style: 'verdict'  },
+  { key: 'job_vs_business_verdict',  icon: '⚖️',  style: 'verdict'  },
+  { key: 'career_rajyogas',          icon: '👑', style: 'tinted'   },
+  { key: 'peak_career_window',   icon: '⏳', style: 'plain'    },
+  { key: 'current_phase',        icon: '🚀', style: 'plain'    },
+  { key: 'academic_path',        icon: '🎓', style: 'tinted'   },
+  { key: 'gemstone_recommendation', icon: '💎', style: 'gem'  },
+  { key: 'empowering_remedies',  icon: '🙏', style: 'plain'    },
+  { key: 'closing_blessing',     icon: '🌟', style: 'gradient' },
+  // Legacy section keys — shown if returned by older reports
+  { key: 'lagna_personality',    icon: '🌟', style: 'gradient' },
+  { key: 'job_vs_business',      icon: '⚖️',  style: 'verdict'  },
+  { key: 'tenth_house_d1',       icon: '🏛️',  style: 'plain'   },
+  { key: 'd10_analysis',         icon: '📊',  style: 'plain'   },
+  { key: 'amatyakaraka',         icon: '💫',  style: 'tinted'  },
+  { key: 'career_fields',        icon: '💼',  style: 'plain'   },
+  { key: 'student_streams',      icon: '🎓',  style: 'tinted'  },
+  { key: 'yogas_combinations',   icon: '✨',  style: 'plain'   },
+  { key: 'dasha_predictions',    icon: '⏳',  style: 'plain'   },
+  { key: 'transit_impact',       icon: '🌍',  style: 'tinted'  },
+  { key: 'remedies',             icon: '🙏',  style: 'plain'   },
+  { key: 'conclusion',           icon: '🔮',  style: 'gradient'},
 ]
 
 const EFFORT_COLOR = {
@@ -44,6 +57,27 @@ function SectionContent({ content, light = false }) {
 
 function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
+
+  if (style === 'gold') return (
+    <div className="bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 rounded-2xl p-6 shadow-lg border-2 border-amber-300">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">{icon}</span>
+        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+      </div>
+      <SectionContent content={section.content} light />
+    </div>
+  )
+
+  if (style === 'gem') return (
+    <div className="bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-2xl p-6 shadow-lg border-2 border-teal-300">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">{icon}</span>
+        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+      </div>
+      <SectionContent content={section.content} light />
+    </div>
+  )
+
   if (style === 'gradient') return (
     <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl p-5 shadow-md">
       <div className="flex items-center gap-2 mb-3">
@@ -53,6 +87,7 @@ function SectionCard({ icon, section, style }) {
       <SectionContent content={section.content} light />
     </div>
   )
+
   if (style === 'verdict') return (
     <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-amber-400 border border-amber-100">
       <div className="flex items-center gap-2 mb-3">
@@ -62,6 +97,7 @@ function SectionCard({ icon, section, style }) {
       <SectionContent content={section.content} />
     </div>
   )
+
   if (style === 'tinted') return (
     <div className="bg-indigo-50 rounded-xl p-5 shadow-sm border border-indigo-100">
       <div className="flex items-center gap-2 mb-3">
@@ -71,6 +107,7 @@ function SectionCard({ icon, section, style }) {
       <SectionContent content={section.content} />
     </div>
   )
+
   return (
     <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
       <div className="flex items-center gap-2 mb-3">
@@ -91,8 +128,8 @@ function CareerOptionCard({ opt }) {
         onClick={() => setOpen(o => !o)}
         className="w-full text-left p-4 flex items-start gap-3"
       >
-        <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-extrabold flex items-center justify-center">
-          {opt.rank}
+        <div className={`shrink-0 w-8 h-8 rounded-full text-white text-sm font-extrabold flex items-center justify-center ${opt.rank === 1 ? 'bg-amber-500' : 'bg-indigo-600'}`}>
+          {opt.rank === 1 ? '★' : opt.rank}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -173,8 +210,8 @@ export default function CareerReportTab({ input }) {
       <div className="text-5xl mb-4">💼</div>
       <h2 className="text-xl font-bold text-slate-800 mb-2">Vedic Career Report</h2>
       <p className="text-gray-500 text-sm mb-6 max-w-sm">
-        Deep analysis using D1 + D10 charts, Amatyakaraka, career yogas, job vs business verdict,
-        current transits, and 5 ranked career options — powered by your Vedic astrology skill files.
+        Personalized career destiny reading using D1 + D10 charts, Amatyakaraka, career yogas,
+        future dasha timing, and your top career paths — powered by your Vedic astrology skill files.
       </p>
       <button
         onClick={generate}
@@ -189,8 +226,8 @@ export default function CareerReportTab({ input }) {
   if (status === 'loading') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="text-indigo-700 font-semibold">Analysing your career chart…</p>
-      <p className="text-xs text-slate-400 mt-1">D1 + D10 · Amatyakaraka · Yogas · Transit · 5 Career Options</p>
+      <p className="text-indigo-700 font-semibold">Reading your career destiny…</p>
+      <p className="text-xs text-slate-400 mt-1">D1 + D10 · Amatyakaraka · Yogas · Future Dashas · Career Paths</p>
       <div className="mt-5 w-52 h-1.5 bg-slate-100 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
@@ -210,30 +247,18 @@ export default function CareerReportTab({ input }) {
     </div>
   )
 
-  const hasOptions       = report?.career_options?.length > 0
-  const hasSingleBest    = !!report?.single_best_career?.content
+  const hasOptions = report?.career_options?.length > 0
 
   return (
     <div className="max-w-2xl mx-auto py-2 space-y-4">
 
-      {/* ── Single Best Career — highlighted banner ── */}
-      {hasSingleBest && (
-        <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 shadow-lg text-white">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">🏆</span>
-            <h3 className="font-extrabold text-lg">{report.single_best_career.title}</h3>
-          </div>
-          <SectionContent content={report.single_best_career.content} light />
-        </div>
-      )}
-
-      {/* ── 5 Ranked Career Options ── */}
+      {/* ── Career Options — prominently placed after destiny brief ── */}
       {hasOptions && (
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">🎯</span>
-            <h3 className="font-bold text-slate-800 text-base">Top 5 Career Paths</h3>
-            <span className="text-xs text-slate-400 ml-1">· tap to expand each</span>
+            <h3 className="font-bold text-slate-800 text-base">Your Best Career Options</h3>
+            <span className="text-xs text-slate-400 ml-1">· tap to expand</span>
           </div>
           <div className="space-y-2">
             {report.career_options.map(opt => (
@@ -243,7 +268,7 @@ export default function CareerReportTab({ input }) {
         </div>
       )}
 
-      {/* ── Original narrative sections ── */}
+      {/* ── All narrative sections ── */}
       {SECTIONS.map(({ key, icon, style }) =>
         report[key]?.content
           ? <SectionCard key={key} icon={icon} section={report[key]} style={style} />

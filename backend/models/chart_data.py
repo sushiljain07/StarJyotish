@@ -92,6 +92,10 @@ class ReadingSection(_Flexible):
 
 class ReadingResponse(_Flexible):
     sections: list[ReadingSection]
+    active_yogas: list[dict] = []
+    prediction_text: Optional[str] = None
+    prediction_sections: Optional[dict] = None
+    teasers: Optional[dict] = None
 
 
 class AskRequest(_Flexible):

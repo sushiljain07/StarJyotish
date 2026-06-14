@@ -4,17 +4,30 @@ import BirthForm from '../components/BirthForm'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
-  { key: 'lagna_personality',  icon: '🌟', style: 'gradient' },
-  { key: 'job_vs_business',    icon: '⚖️',  style: 'verdict'  },
-  { key: 'tenth_house_d1',     icon: '🏛️',  style: 'plain'   },
-  { key: 'd10_analysis',       icon: '📊',  style: 'plain'   },
-  { key: 'amatyakaraka',       icon: '💫',  style: 'tinted'  },
-  { key: 'career_fields',      icon: '💼',  style: 'plain'   },
-  { key: 'student_streams',   icon: '🎓',  style: 'tinted'  },
-  { key: 'yogas_combinations', icon: '✨',  style: 'plain'   },
-  { key: 'dasha_predictions',  icon: '⏳',  style: 'plain'   },
-  { key: 'remedies',           icon: '🙏',  style: 'plain'   },
-  { key: 'conclusion',         icon: '🔮',  style: 'gradient' },
+  // New v2 sections
+  { key: 'career_destiny_brief', icon: '✨', style: 'gold'     },
+  { key: 'natural_strengths',    icon: '💪', style: 'gradient' },
+  { key: 'best_career_path',         icon: '🎯', style: 'verdict'  },
+  { key: 'job_vs_business_verdict',  icon: '⚖️',  style: 'verdict'  },
+  { key: 'career_rajyogas',          icon: '👑', style: 'tinted'   },
+  { key: 'peak_career_window',   icon: '⏳', style: 'plain'    },
+  { key: 'current_phase',        icon: '🚀', style: 'plain'    },
+  { key: 'academic_path',        icon: '🎓', style: 'tinted'   },
+  { key: 'gemstone_recommendation', icon: '💎', style: 'gem'  },
+  { key: 'empowering_remedies',  icon: '🙏', style: 'plain'    },
+  { key: 'closing_blessing',     icon: '🌟', style: 'gradient' },
+  // Legacy section keys (shown only if returned by older reports)
+  { key: 'lagna_personality',    icon: '🌟', style: 'gradient' },
+  { key: 'job_vs_business',      icon: '⚖️',  style: 'verdict'  },
+  { key: 'tenth_house_d1',       icon: '🏛️',  style: 'plain'   },
+  { key: 'd10_analysis',         icon: '📊',  style: 'plain'   },
+  { key: 'amatyakaraka',         icon: '💫',  style: 'tinted'  },
+  { key: 'career_fields',        icon: '💼',  style: 'plain'   },
+  { key: 'student_streams',      icon: '🎓',  style: 'tinted'  },
+  { key: 'yogas_combinations',   icon: '✨',  style: 'plain'   },
+  { key: 'dasha_predictions',    icon: '⏳',  style: 'plain'   },
+  { key: 'remedies',             icon: '🙏',  style: 'plain'   },
+  { key: 'conclusion',           icon: '🔮',  style: 'gradient'},
 ]
 
 // ── Content renderer (mirrors ChartReading.jsx pattern) ───────────────────────
@@ -40,6 +53,28 @@ function SectionContent({ content, light = false }) {
 
 // ── Section card ─────────────────────────────────────────────────────────────
 function SectionCard({ icon, section, style }) {
+  if (!section?.content) return null
+
+  if (style === 'gold') return (
+    <div className="bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 rounded-2xl p-6 shadow-lg border-2 border-amber-300">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">{icon}</span>
+        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+      </div>
+      <SectionContent content={section.content} light />
+    </div>
+  )
+
+  if (style === 'gem') return (
+    <div className="bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-500 rounded-2xl p-6 shadow-lg border-2 border-teal-300">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">{icon}</span>
+        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+      </div>
+      <SectionContent content={section.content} light />
+    </div>
+  )
+
   if (style === 'gradient') return (
     <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl p-5 shadow-md">
       <div className="flex items-center gap-2 mb-3">
@@ -212,12 +247,11 @@ export default function CareerReport() {
 
             {/* Section cards */}
             <div className="space-y-4">
-              {SECTIONS.map(({ key, icon, style }) => {
-                const section = report[key] ?? { title: key, content: '' }
-                return (
-                  <SectionCard key={key} icon={icon} section={section} style={style} />
-                )
-              })}
+              {SECTIONS.map(({ key, icon, style }) =>
+                report[key]?.content
+                  ? <SectionCard key={key} icon={icon} section={report[key]} style={style} />
+                  : null
+              )}
             </div>
 
             {/* Bottom CTA */}

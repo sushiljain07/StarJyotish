@@ -55,6 +55,30 @@ def load_career_skills() -> str:
     return "\n".join(parts)
 
 
+_GEMSTONE_REMEDY_FILES = [
+    "gemstones/vedic-gemstones/SKILL.md",
+    "gemstones/vedic-gemstones/references/by-ascendant.md",
+    "gemstones/vedic-gemstones/references/dos-and-donts.md",
+    "gemstones/vedic-gemstones/references/procedure-and-mantras.md",
+    "career/vedic-career/references/timing-and-remedies.md",
+]
+
+
+def load_gemstone_remedy_skills() -> str:
+    """Load gemstone and remedy skill files for embedding in career report prompts."""
+    if not _SKILLS_ROOT.exists():
+        return ""
+    parts: list[str] = ["# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n"]
+    for rel in _GEMSTONE_REMEDY_FILES:
+        path = _SKILLS_ROOT / rel
+        if path.exists():
+            parts.append(f"\n{'='*60}")
+            parts.append(f"## {rel}")
+            parts.append("=" * 60)
+            parts.append(path.read_text(encoding="utf-8", errors="ignore"))
+    return "\n".join(parts)
+
+
 def get_system_prompt(skills_context: str) -> str:
     """Full system prompt for Claude — includes all skill files."""
     return f"""You are an expert Vedic astrologer specialised in career analysis using the D10 Bootcamp methodology.

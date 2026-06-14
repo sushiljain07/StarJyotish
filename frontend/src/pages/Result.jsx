@@ -3,15 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import KundliChart        from '../components/KundliChart'
-import SouthIndiaChart    from '../components/SouthIndiaChart'
-import WesternChart       from '../components/WesternChart'
 import DashaTable         from '../components/DashaTable'
 import PlanetTable        from '../components/PlanetTable'
 import ChartReading       from '../components/ChartReading'
 import AskChart           from '../components/AskChart'
 import NavBar             from '../components/NavBar'
 import DivisionalCharts   from '../components/DivisionalCharts'
-import ShodashvargaPanel  from '../components/ShodashvargaPanel'
 import TransitPanel       from '../components/TransitPanel'
 import KPChart            from '../components/KPChart'
 import AshtakavargaTable  from '../components/AshtakavargaTable'
@@ -57,7 +54,6 @@ function SummaryChips({ data }) {
 // ── Main tab list ──
 const TABS = [
   { id: 'birth_chart', label: '🔯 Kundli' },
-  { id: 'shodashvarga', label: '🪐 Shodashvarga' },
   { id: 'divisional',  label: '📊 Divisional' },
   { id: 'transit',     label: '🌍 Transit' },
   { id: 'special',     label: '✨ Special' },
@@ -72,10 +68,8 @@ const TABS = [
 
 // Chart style options
 const CHART_STYLES = [
-  { id: 'north',   label: 'North Indian' },
-  { id: 'south',   label: 'South Indian' },
-  { id: 'western', label: 'Western' },
-  { id: 'kp',      label: 'KP Chart' },
+  { id: 'north', label: 'North Indian' },
+  { id: 'kp',    label: 'KP Chart' },
 ]
 
 // Special sub-tabs
@@ -114,34 +108,6 @@ export default function Result() {
           <div className="w-full sm:w-[460px]">
             <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
                          title={t('tab_navamsa', 'Navamsa (D9)')} />
-          </div>
-        </div>
-      )
-    }
-    if (chartStyle === 'south') {
-      return (
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
-          <div className="w-full sm:w-[460px]">
-            <SouthIndiaChart planets={data.planets} ascendant={data.ascendant}
-                             title="Lagna Chart (South Indian)" />
-          </div>
-          <div className="w-full sm:w-[460px]">
-            <SouthIndiaChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
-                             title="Navamsa D9 (South Indian)" />
-          </div>
-        </div>
-      )
-    }
-    if (chartStyle === 'western') {
-      return (
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
-          <div className="w-full sm:w-[520px]">
-            <WesternChart planets={data.planets} ascendant={data.ascendant}
-                          title="Lagna Chart (Western)" />
-          </div>
-          <div className="w-full sm:w-[520px]">
-            <WesternChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
-                          title="Navamsa D9 (Western)" />
           </div>
         </div>
       )
@@ -215,11 +181,6 @@ export default function Result() {
           {renderBirthChart()}
         </div>
 
-        {/* ── Shodashvarga ── */}
-        <div className={activeTab === 'shodashvarga' ? '' : 'hidden'}>
-          <ShodashvargaPanel input={input} />
-        </div>
-
         {/* ── Divisional Charts ── */}
         <div className={activeTab === 'divisional' ? '' : 'hidden'}>
           <DivisionalCharts input={input} />
@@ -267,7 +228,7 @@ export default function Result() {
 
         {/* ── Reading ── */}
         <div className={activeTab === 'reading' ? '' : 'hidden'}>
-          <ChartReading input={input} />
+          <ChartReading input={input} onSwitchToCareer={() => setActiveTab('career')} />
         </div>
 
         {/* ── Ask ── */}

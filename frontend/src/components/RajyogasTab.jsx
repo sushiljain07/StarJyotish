@@ -499,7 +499,6 @@ export default function RajyogasTab({ input }) {
   }
 
   const present = result.yogas.filter(y => y.present)
-  const absent  = result.yogas.filter(y => !y.present)
 
   return (
     <div className="space-y-6">
@@ -508,45 +507,35 @@ export default function RajyogasTab({ input }) {
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">👑</span>
           <div>
-            <h2 className="font-bold text-lg leading-tight">Rajyoga Report</h2>
+            <h2 className="font-bold text-lg leading-tight">Your Rajyogas</h2>
             <p className="text-indigo-200 text-xs">
-              Classical Vedic yoga analysis — tap any card to see meaning, characteristics &amp; benefits
+              Classical Vedic yogas present in your birth chart — tap any card to see full details
             </p>
           </div>
         </div>
-        <div className="flex gap-4 mt-3">
-          <div className="bg-white/20 rounded-xl px-4 py-2 text-center">
+        <div className="mt-3">
+          <div className="bg-white/20 rounded-xl px-4 py-2 text-center inline-block">
             <div className="text-2xl font-extrabold">{present.length}</div>
-            <div className="text-xs text-indigo-100">Yogas Present</div>
-          </div>
-          <div className="bg-white/10 rounded-xl px-4 py-2 text-center">
-            <div className="text-2xl font-extrabold">{result.total}</div>
-            <div className="text-xs text-indigo-100">Total Checked</div>
+            <div className="text-xs text-indigo-100">Yogas Active in Your Chart</div>
           </div>
         </div>
       </div>
 
       {/* Present yogas — open by default */}
-      {present.length > 0 && (
+      {present.length > 0 ? (
         <div>
           <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide mb-3 px-1">
-            Active Yogas ({present.length})
+            Active Yogas in Your Chart ({present.length})
           </h3>
           <div className="space-y-3">
             {present.map((y, i) => <YogaCard key={i} yoga={y} defaultOpen={true} />)}
           </div>
         </div>
-      )}
-
-      {/* Absent yogas — collapsed by default */}
-      {absent.length > 0 && (
-        <div>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-3 px-1">
-            Not Present ({absent.length})
-          </h3>
-          <div className="space-y-2">
-            {absent.map((y, i) => <YogaCard key={i} yoga={y} defaultOpen={false} />)}
-          </div>
+      ) : (
+        <div className="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
+          <div className="text-3xl mb-2">🌱</div>
+          <p className="text-slate-600 text-sm">No classical Rajyogas detected in this chart.</p>
+          <p className="text-slate-400 text-xs mt-1">This does not limit success — many planetary combinations outside these yogas can bring excellent results.</p>
         </div>
       )}
     </div>

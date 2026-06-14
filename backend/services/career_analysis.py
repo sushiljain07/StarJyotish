@@ -1,7 +1,9 @@
 import os
 import json
+import re
 import time
 import requests
+from datetime import date as _date
 from typing import Optional
 
 from services.ashtakavarga import calculate_ashtakavarga
@@ -654,7 +656,6 @@ def identify_career_fields(
 
 def _extract_json(raw: str) -> dict:
     """Extract JSON from LLM response, handling markdown fences and leading text."""
-    # Strip markdown code fences
     import re
     stripped = re.sub(r"```(?:json)?\s*", "", raw).strip()
     # Try direct parse first
@@ -742,8 +743,11 @@ def _build_career_prompt(
     combinations: list,
     fields: dict,
     dasha: dict,
-    extra: dict,           # pre-computed extra factors (4th_sun, 10th_saturn, first_md)
+    extra: dict,
+    user_age: int = 25,
+    current_year: int = 2026,
     transit_data: Optional[dict] = None,
+    gemstone_context: str = "",
 ) -> str:
     lagna     = chart_data.get("ascendant", {})
     planets   = chart_data.get("planets", [])
@@ -760,8 +764,7 @@ def _build_career_prompt(
         )
 
     # Yoga split
-    active   = [y for y in combinations if y["present"]]
-    inactive = [y for y in combinations if not y["present"]]
+    active = [y for y in combinations if y["present"]]
 
     # AMK
     atma       = ak_data.get("atmakaraka") or {}
@@ -778,10 +781,9 @@ def _build_career_prompt(
     planets_in_10 = [p["name"] for p in planets if p.get("house") == 10]
 
     # Extra pre-computed factors
-    first_md      = extra.get("first_mahadasha", "Unknown")
-    fourth_sun    = extra.get("fourth_from_sun", {})
-    tenth_saturn  = extra.get("tenth_from_saturn", {})
-    moon_p        = _planet_by_name(planets, "Moon")
+    first_md     = extra.get("first_mahadasha", "Unknown")
+    fourth_sun   = extra.get("fourth_from_sun", {})
+    tenth_saturn = extra.get("tenth_from_saturn", {})
 
     def _fmt_sign_factor(f: dict, label: str) -> str:
         if not f.get("found"):
@@ -803,210 +805,324 @@ def _build_career_prompt(
             tlines.append(f"  {p['name']}{retro}: {p.get('sign','?')} H{p.get('house','?')}")
         transit_lines_str = "\n".join(tlines)
 
-    # ── 12-combo rule check (Sections D from career-combinations.md) ──────────
-    # Pre-compute to embed directly so LLM doesn't have to recall them
+    # Placement combination checks
     combos_notes = []
-    sat_p   = _planet_by_name(planets, "Saturn")
-    jup_p   = _planet_by_name(planets, "Jupiter")
-    mars_p  = _planet_by_name(planets, "Mars")
-    merc_p  = _planet_by_name(planets, "Mercury")
-    sun_p   = _planet_by_name(planets, "Sun")
+    sat_p  = _planet_by_name(planets, "Saturn")
+    jup_p  = _planet_by_name(planets, "Jupiter")
+    mars_p = _planet_by_name(planets, "Mars")
+    merc_p = _planet_by_name(planets, "Mercury")
+    sun_p  = _planet_by_name(planets, "Sun")
     if sat_p and sat_p.get("house") == 10:
-        combos_notes.append("Rule D1: Saturn in 10th → choose Jupiter-domain careers (education, law, consulting, finance).")
+        combos_notes.append("Saturn in 10th → choose Jupiter-domain careers (education, law, consulting, finance).")
     if jup_p and jup_p.get("house") == 10:
-        combos_notes.append("Rule D2: Jupiter in 10th → choose Saturn-domain careers (discipline, structure, administration).")
+        combos_notes.append("Jupiter in 10th → choose Saturn-domain careers (discipline, structure, administration).")
     if merc_p and merc_p.get("house") == 6:
-        combos_notes.append("Rule D3: Mercury in 6th → Agriculture or Printing industries suited.")
+        combos_notes.append("Mercury in 6th → Agriculture or Printing industries suited.")
     if mars_p and mars_p.get("house") == 2:
-        combos_notes.append("Rule D4: Mars in 2nd → Moon/Venus careers (beauty, creativity, design, food) suited.")
+        combos_notes.append("Mars in 2nd → Moon/Venus careers (beauty, creativity, design, food) suited.")
     if merc_p and merc_p.get("house") == 10:
-        combos_notes.append("Rule D5: Mercury in 10th → any business; east-facing (Shermukhi) establishment favored.")
+        combos_notes.append("Mercury in 10th → any business; east-facing establishment favored.")
     if sat_p and sat_p.get("house") == 7:
-        combos_notes.append("Rule D6: Saturn in 7th → Iron, Steel, Heavy Machinery industries.")
+        combos_notes.append("Saturn in 7th → Iron, Steel, Heavy Machinery industries.")
     if sat_p and sun_p and sat_p.get("house") == sun_p.get("house"):
-        combos_notes.append("Rule D7: Saturn+Sun conjunct → strong indicator for Law career.")
+        combos_notes.append("Saturn+Sun conjunct → strong indicator for Law career.")
     if mars_p and mars_p.get("house") == 1:
-        combos_notes.append("Rule D8: Mars in 1st → Machinery, construction, iron/wood industries.")
+        combos_notes.append("Mars in 1st → Machinery, construction, iron/wood industries.")
     if not combos_notes:
-        combos_notes.append("None of the 12 specific placement combinations are directly triggered in this chart.")
+        combos_notes.append("No specific placement combinations triggered.")
 
-    prompt = f"""You are analysing this specific birth chart for career. Use ONLY the computed data below.
+    # Filter future-only dashas (end year must be after current_year)
+    future_dashas = []
+    for e in (dasha.get("full_sequence") or []):
+        end_str = str(e.get("end", ""))
+        try:
+            end_year_val = int(end_str[:4])
+        except (ValueError, IndexError):
+            end_year_val = 9999
+        if end_year_val > current_year:
+            future_dashas.append(e)
 
-STRICT RULES:
-1. Each JSON section must cover ONLY its unique topic — NO repeating the same planet or rule in multiple sections.
-2. Apply every rule listed under "RULES TO APPLY" — do NOT skip any.
-3. Use specific planet names, house numbers, dignities, and signs from the chart data.
-4. Career options must be specific job titles (e.g. "Senior Software Engineer at MNC", not just "IT").
-5. Return ONLY a valid JSON object — absolutely no text outside the JSON.
+    future_dasha_lines = "\n".join(
+        f"  {e.get('planet','?')} MD: {e.get('start','?')} – {e.get('end','?')}"
+        for e in future_dashas[:5]
+    ) or "  (future dashas not available)"
+
+    # D10-weighted career mode verdict (D10 carries highest astrological weight)
+    d10_job_score = jvb["d10_lord6"].get("score", 0)
+    d10_biz_score = jvb["d10_lord7"].get("score", 0)
+    if d10_biz_score > d10_job_score:
+        career_mode = "building your own venture / business"
+        career_mode_reason = (
+            f"Your D10 7th lord ({jvb['d10_lord7'].get('planet','?')}) "
+            f"in {jvb['d10_lord7'].get('sign','?')} scores {d10_biz_score} "
+            f"vs 6th lord score {d10_job_score} — "
+            "your chart gives you the drive and discipline to build something of your own."
+        )
+    elif d10_job_score > d10_biz_score:
+        career_mode = "professional employment / structured career"
+        career_mode_reason = (
+            f"Your D10 6th lord ({jvb['d10_lord6'].get('planet','?')}) "
+            f"in {jvb['d10_lord6'].get('sign','?')} scores {d10_job_score} "
+            f"vs 7th lord score {d10_biz_score} — "
+            "your chart gives you exceptional ability to grow and lead within organizations."
+        )
+    else:
+        career_mode = jvb["verdict"]
+        career_mode_reason = jvb["reason"]
+
+    # Short-hand variables for cleaner f-string
+    amaty_name  = amaty.get("name", "N/A")
+    amaty_sign  = amaty.get("sign", "?")
+    amaty_house = amaty.get("house", "?")
+    lagna_sign  = lagna.get("sign", "?")
+    lagna_nak   = lagna.get("nakshatra", "?")
+    md_planet   = md.get("planet", "?")
+    md_end      = md.get("end", "?")
+    ad_planet   = ad.get("planet", "N/A")
+    ad_end      = ad.get("end", "N/A")
+    tenth_lord_placement = next(
+        (p["sign"] + " H" + str(p["house"]) for p in planets if p["name"] == tenth_lord), "N/A"
+    )
+
+    # Active yogas for career report (present only)
+    active_yoga_names = [y["yoga"] for y in active]
+    active_yoga_list  = "\n".join(
+        f"  - {y['yoga']}: {y['description']}" for y in active
+    ) or "  None active"
+
+    # Rajyogas instruction for career report — includes activation procedure
+    if active:
+        _yoga_names_str = ", ".join(active_yoga_names)
+        _rajyoga_instruction = (
+            f"The following Rajyogas are ACTIVE in this chart: {_yoga_names_str}. "
+            "For EACH active yoga listed above, write THREE things: "
+            "(1) State the yoga name boldly and explain in 1 sentence exactly how it manifests in this person's professional life. "
+            "(2) ACTIVATION PROCEDURE — write the specific mantra for the ruling planet of this yoga "
+            "(give the full Sanskrit mantra text, e.g. 'Om Gurave Namah' for Jupiter yogas), "
+            "how many times to chant it, and on which day of the week. "
+            "(3) One simple home ritual to strengthen this yoga (lighting a ghee lamp, offering flowers, fasting — "
+            "be specific to the planet ruling this yoga). "
+            "Format each yoga as: 'Yoga Name: [career meaning]. Activation: [mantra text] — chant [N] times every [day] at [time]. "
+            "Ritual: [specific action].' "
+            "Do NOT mention any absent yogas. End with an empowering statement about their combined yogic potential."
+        )
+    else:
+        _rajyoga_instruction = (
+            "No classical Rajyogas are detected in this chart. Write 2 short encouraging sentences "
+            "about how excellent planetary positions and combinations outside classical yogas still "
+            "bring outstanding career success — and mention one specific strength visible in this chart. "
+            "Then give ONE simple planetary mantra and ritual based on the strongest planet in this chart "
+            "to amplify career success. End with one empowering statement."
+        )
+
+    # Conditional academic section — only for users under 25
+    if user_age < 25:
+        _academic_json = f'''  "academic_path": {{
+    "title": "Your Best Academic Stream",
+    "content": "Based on this chart (10th lord {tenth_lord}, AMK {amaty_name}, age {user_age}), give ONE single best stream to choose after class 10th — either Science, Commerce, or Arts/Humanities. Name the specific subject combination within that stream (e.g., 'Science with Physics, Chemistry, Mathematics — target JEE/NEET' or 'Commerce with Mathematics — target CA Foundation'). Explain in 2–3 sentences WHY this chart strongly favors exactly this stream: which planets and placements point to it. Give ONE specific board exam or entrance exam to start preparing for. Do NOT list alternatives or multiple options. End with: 'This week, [one concrete first step to start].'"
+  }},
+'''
+    else:
+        _academic_json = f'''  "academic_path": {{
+    "title": "Best Courses & Skills to Accelerate Your Career",
+    "content": "Based on AMK {amaty_name}, career mode ({career_mode}), and the dominant planetary energies in this chart: recommend ONE primary course, degree, or professional certification that would most directly accelerate this person's career right now. Name the specific qualification and the type of institution or platform (e.g., 'MBA in Finance from a Tier-1 business school', 'Google Data Analytics Certificate on Coursera', 'CA Final — focus on Direct Tax specialization'). Then give ONE additional skill or certification as a secondary option from a different domain. For each, explain in 1 sentence why it fits this specific chart. End with: 'This week, [one concrete action to begin].'"
+  }},
+'''
+
+    # Gemstone section schema (context is passed via system message, not user prompt)
+    if gemstone_context:
+        _gemstone_section = f'''  "gemstone_recommendation": {{
+    "title": "Your Vedic Gemstone Recommendation",
+    "content": "Using the Vedic gemstone knowledge base in your context, recommend the primary gemstone for {lagna_sign} lagna. State: (1) The gemstone name, which planet it strengthens, and why it specifically helps this chart's career goals. (2) The minimum carat weight and which finger/hand to wear it on. (3) The auspicious day and time to first wear it. (4) The mantra to chant while wearing. Format as clear numbered points. Warm, empowering tone."
+  }},
+'''
+    else:
+        _gemstone_section = ""
+
+    prompt = f"""You are a compassionate Vedic career astrologer writing a deeply personalized, uplifting career report.
+
+AGE & TIME CONTEXT:
+  User's current age: {user_age} years old
+  Current year: {current_year}
+  CRITICAL: Never mention any dasha period, career phase, or life event whose end year is before {current_year}.
+  All predictions MUST start from {current_year} and go FORWARD only.
+  Academic section: {"User is " + str(user_age) + " — give stream/subject advice after class 10th." if user_age < 25 else "User is " + str(user_age) + " — give best course/certification to accelerate career."}
 
 ━━━ CHART DATA ━━━
 
-LAGNA: {lagna.get('sign','?')} | Nakshatra: {lagna.get('nakshatra','?')}
-All Planets (name | sign | house | nakshatra | dignity):
+LAGNA: {lagna_sign} | Nakshatra: {lagna_nak}
+All Planets:
 {chr(10).join(planet_lines)}
 
 Key house lords:
-  10th house = {tenth_sign} | 10th lord = {tenth_lord} placed in {next((p['sign']+' H'+str(p['house']) for p in planets if p['name']==tenth_lord),'N/A')}
+  10th house = {tenth_sign} | 10th lord = {tenth_lord} in {tenth_lord_placement}
   Planets in 10th = {', '.join(planets_in_10) or 'None'}
-  6th lord  = {_house_lord(lagna_idx,6)} | 7th lord = {_house_lord(lagna_idx,7)}
-  2nd lord  = {_house_lord(lagna_idx,2)} | 11th lord = {_house_lord(lagna_idx,11)}
+  6th lord = {_house_lord(lagna_idx,6)} | 7th lord = {_house_lord(lagna_idx,7)}
+  2nd lord = {_house_lord(lagna_idx,2)} | 11th lord = {_house_lord(lagna_idx,11)}
   Lagna lord = {_house_lord(lagna_idx,1)}
 
 AMATYAKARAKA (career soul planet):
-  Degree ranking (highest=Atmakaraka, 2nd=Amatyakaraka):
 {chr(10).join(f"    {i+1}. {r['name']}: {r['degree']:.2f}° in {r['sign']}" for i,r in enumerate(ak_ranking[:7])) if ak_ranking else '  N/A'}
-  Atmakaraka  : {atma.get('name','N/A')} — {atma.get('sign','?')} H{atma.get('house','?')} ({atma.get('degree',0):.1f}°)
-  Amatyakaraka: {amaty.get('name','N/A')} — {amaty.get('sign','?')} H{amaty.get('house','?')} ({amaty.get('degree',0):.1f}°)
+  Atmakaraka  : {atma.get('name','N/A')} in {atma.get('sign','?')} H{atma.get('house','?')}
+  Amatyakaraka: {amaty_name} in {amaty_sign} H{amaty_house} ({amaty.get('degree',0):.1f}°)
 
-FIRST MAHADASHA AT BIRTH (Moon nakshatra lord):
-  Planet = {first_md} | Duration = {_DASHA_YEARS.get(first_md,'?')} years
-  Career Foundation Rule: The {first_md} MD at birth permanently shapes career approach.
-  {first_md} domain = {', '.join(CAREER_DOMAINS.get(first_md, ['Unknown']))}
-
-4TH HOUSE FROM SUN (natural abilities & strengths):
+NATURAL ABILITIES:
   {_fmt_sign_factor(fourth_sun, '4th from Sun')}
-  Rule: The lord of this sign + any planets here reveal the native's strongest natural career abilities.
-
-10TH HOUSE FROM SATURN (karmic career & professional discipline):
   {_fmt_sign_factor(tenth_saturn, '10th from Saturn')}
-  Rule: This sign/lord shows career karma — where sustained effort brings lasting stability.
+  First Mahadasha at birth: {first_md} ({_DASHA_YEARS.get(first_md,'?')} yr) → career style shaped by {', '.join(CAREER_DOMAINS.get(first_md, ['?'])[:3])}
 
-JOB vs BUSINESS (4-method verdict):
-  Method 1 — D1 lord dignity:
-    6th lord ({jvb['lord_6']['planet']}): {jvb['lord_6']['dignity']} score={jvb['lord_6']['score']} in {jvb['lord_6']['sign']} H{jvb['lord_6']['house']}
-    7th lord ({jvb['lord_7']['planet']}): {jvb['lord_7']['dignity']} score={jvb['lord_7']['score']} in {jvb['lord_7']['sign']} H{jvb['lord_7']['house']}
-    10th lord ({jvb['lord_10']['planet']}): {jvb['lord_10']['dignity']} score={jvb['lord_10']['score']}
-  Method 2 — Income house linkage (6th/7th lord in H2/H11, or 2nd/11th lord in H6/H7):
-    {jvb['m2_summary']}
-    → {'favours Job' if len(jvb['m2_job_links']) > len(jvb['m2_biz_links']) else 'favours Business' if len(jvb['m2_biz_links']) > len(jvb['m2_job_links']) else 'no income-house link found'}
-  Method 3 — Sarvashtakvarga bindus (D1):
-    6th house SAV = {jvb['ashtak_h6']} bindus | 7th house SAV = {jvb['ashtak_h7']} bindus
-    → {'H6 > H7: favours Job' if jvb['ashtak_h6'] > jvb['ashtak_h7'] else 'H7 > H6: favours Business' if jvb['ashtak_h7'] > jvb['ashtak_h6'] else 'H6 = H7: tied'}
-  Method 4 — D10 chart (6th lord vs 7th lord in Dasamsa):
-    D10 6th lord = {jvb['d10_lord6'].get('planet','?')} in {jvb['d10_lord6'].get('sign','?')} H{jvb['d10_lord6'].get('house','?')} ({jvb['d10_lord6'].get('dignity','?')}, score {jvb['d10_lord6'].get('score',0)})
-    D10 7th lord = {jvb['d10_lord7'].get('planet','?')} in {jvb['d10_lord7'].get('sign','?')} H{jvb['d10_lord7'].get('house','?')} ({jvb['d10_lord7'].get('dignity','?')}, score {jvb['d10_lord7'].get('score',0)})
-    → {'D10 6th stronger: confirms Job' if jvb['d10_lord6'].get('score',0) > jvb['d10_lord7'].get('score',0) else 'D10 7th stronger: confirms Business' if jvb['d10_lord7'].get('score',0) > jvb['d10_lord6'].get('score',0) else 'D10 tied'}
-  Combined score: Job={jvb['total_job']} vs Business={jvb['total_business']}
-  Final verdict: {jvb['verdict']}
-  Reason: {jvb['reason']}
+CAREER MODE (D10 chart = highest astrological weight):
+  D10 6th lord = {jvb['d10_lord6'].get('planet','?')} score {d10_job_score}
+  D10 7th lord = {jvb['d10_lord7'].get('planet','?')} score {d10_biz_score}
+  Overall combined score: Job={jvb['total_job']} Business={jvb['total_business']}
+  CONCLUSION: {career_mode}
+  Why: {career_mode_reason}
 
 D10 DASAMSA CHART:
   D10 Lagna = {d10_data['lagna']}
   Kendra (1/4/7/10): {', '.join(p['name']+'(H'+str(p['house'])+')' for p in d10_data['kendra_planets']) or 'None'}
   Trine  (1/5/9)   : {', '.join(p['name']+'(H'+str(p['house'])+')' for p in d10_data['trine_planets']) or 'None'}
-  Sun    in D10: {d10_data['sun']}
-  Moon   in D10: {d10_data['moon']}
+  Sun in D10: {d10_data['sun']}
+  Moon in D10: {d10_data['moon']}
   Saturn in D10: {d10_data['saturn']}
   10th lord D10: {d10_data['tenth_lord']}
-  Strength     : {d10_data['strength_note']}
+  Strength: {d10_data['strength_note']}
 
-ACTIVE CAREER YOGAS ({len(active)}):
-{chr(10).join('  [ACTIVE] '+y['yoga']+': '+y['description'] for y in active) or '  None'}
-INACTIVE YOGAS: {', '.join(y['yoga'] for y in inactive) or 'None'}
+ACTIVE CAREER YOGAS (PRESENT IN THIS CHART):
+{active_yoga_list}
 
-12-COMBINATION RULES TRIGGERED:
+PLACEMENT COMBINATIONS TRIGGERED:
 {chr(10).join('  '+c for c in combos_notes)}
 
-CURRENT DASHA:
-  Mahadasha : {md.get('planet','?')} until {md.get('end','?')}
-  Antardasha: {ad.get('planet','N/A')} until {ad.get('end','N/A')}
-  Moon in   : {moon_p.get('sign','?') if moon_p else '?'} H{moon_p.get('house','?') if moon_p else '?'}
+CURRENT DASHA (running now):
+  Mahadasha : {md_planet} until {md_end}
+  Antardasha: {ad_planet} until {ad_end}
 
-UPCOMING DASHAS (next after current):
-{chr(10).join('  '+str(e.get('planet','?'))+' MD: '+str(e.get('start','?'))+' – '+str(e.get('end','?')) for e in (dasha.get('full_sequence') or [])[:6]) if dasha.get('full_sequence') else '  (not available)'}
+FUTURE DASHAS (from {current_year} onward — use ONLY these for all predictions):
+{future_dasha_lines}
 
-CURRENT TRANSITS (natal house placement):
-{transit_lines_str or '  (transit data not available)'}
+CURRENT TRANSITS:
+{transit_lines_str or '  (not available)'}
 
-━━━ RULES TO APPLY (cite each one) ━━━
+━━━ TONE RULES (MANDATORY — violating any of these is a failure) ━━━
+1. Start EVERY section with what the person IS GOOD AT — strengths come FIRST.
+2. FORBIDDEN words/phrases (never use in output): "debilitated", "enemy sign", "afflicted", "weak", "challenging placement", "poses challenges", "difficult", "malefic influence"
+   Use instead: "developing strength", "resilience-building placement", "on a growth journey", "building power", "transformative phase"
+3. End every section (except closing_blessing) with ONE specific, actionable sentence the user can do THIS WEEK.
+4. Write as a wise, warm mentor — genuinely excited about this person's future. Personal, warm, not clinical.
+5. NEVER reference dasha periods that ended before {current_year}. NEVER mention past career phases or completed life events.
+6. The closing_blessing must leave the user feeling their BEST years are ahead of them.
 
-R1 [AMK Rule]      — The Amatyakaraka {amaty.get('name','?')} in {amaty.get('sign','?')} H{amaty.get('house','?')} = primary career field. Apply AMK table from skill.
-R2 [1st MD Rule]   — {first_md} was the first MD at birth → permanently sets career foundation style.
-R3 [4th from Sun]  — {_fmt_sign_factor(fourth_sun, '4th from Sun')} → natural abilities.
-R4 [10th from Sat] — {_fmt_sign_factor(tenth_saturn, '10th from Saturn')} → karmic career stability.
-R5 [Job/Business]  — Verdict: {jvb['verdict']} (apply all 4 methods; cite 6th/7th lord scores).
-R6 [D10 Sun]       — {d10_data['sun']} → Sun in D10 kendra = government/high-status career; other = challenge.
-R7 [D10 Saturn]    — {d10_data['saturn']} → Saturn strong in D10 = support from subordinates/institutions.
-R8 [D10 10th lord] — {d10_data['tenth_lord']} → apply the 12-house D10 placement meanings from skill.
-R9 [Active Yogas]  — {', '.join(y['yoga'] for y in active) or 'None'} — describe each yoga's career impact.
-R10[12 Combos]     — {'; '.join(combos_notes)}
-R11[Dasha Timing]  — Current {md.get('planet','?')}/{ad.get('planet','?')} MD/AD: is this lord connected to 10th/6th/7th/11th house?
-R12[Transit]       — Apply transit Jupiter/Saturn/Rahu-Ketu to current career opportunities.
-
-━━━ OUTPUT (JSON ONLY) ━━━
-Each section must ONLY cover its stated topic. If a planet or rule is covered in section A, do NOT repeat it in section B.
+━━━ OUTPUT (STRICT JSON ONLY) ━━━
+Return ONLY a valid JSON object. No text, no markdown, no explanations outside the JSON.
+Sections must appear in this EXACT order.
 
 {{
-  "lagna_personality": {{
-    "title": "Lagna & Professional Personality",
-    "content": "ONLY about Lagna sign character, lagna lord placement + dignity, and how this shapes work style. Do NOT mention 10th house or AMK here. 3–4 sentences."
+  "career_destiny_brief": {{
+    "title": "Your Career Destiny in Brief",
+    "content": "2–3 sentences. Positive, exciting opening that names their AMK planet ({amaty_name}) and their core career potential. This is the very first thing they read — make them feel deeply seen, understood, and hopeful about their future. Mention their primary career direction with energy and warmth."
   }},
-  "job_vs_business": {{
-    "title": "Job vs Business — 4-Method Analysis",
-    "content": "ONLY about 6th lord vs 7th lord (cite actual scores), 10th lord position as tiebreaker, Method 2 (connection to 2nd/11th), and final verdict. 4–5 sentences. Do NOT discuss career fields here."
+  "natural_strengths": {{
+    "title": "Your Natural Strengths & Professional Personality",
+    "content": "4–5 sentences. Based on Lagna ({lagna_sign}), AMK ({amaty_name} in {amaty_sign} H{amaty_house}), 4th from Sun, and active yogas. Describe: how they naturally work, what they excel at instinctively, what makes colleagues and clients value them. Strengths first. End with: 'This week, [one specific small action to activate these strengths].'"
   }},
-  "tenth_house_d1": {{
-    "title": "10th House Analysis (D1 Chart)",
-    "content": "ONLY about 10th house sign, occupants, 10th lord placement in D1, and its dignity. Apply R6-style analysis. Do NOT mention D10 or AMK here. 3–4 sentences."
+  "best_career_path": {{
+    "title": "Your Ideal Career Field",
+    "content": "5–6 sentences. Give ONE primary career recommendation with a deep explanation of WHY it fits this specific person (cite AMK {amaty_name}, 10th lord {tenth_lord}, D10 strength, active yogas). Career mode confirmed by D10: {career_mode}. Then: 'If you are drawn to [a meaningfully different domain] instead, you would also thrive as [specific alternative role].' State at most 2 alternatives — each must be from a genuinely different field than the primary. Frame alternatives warmly, never as a ranked list. End with: 'This week, [one concrete action toward your primary path].'"
   }},
-  "d10_analysis": {{
-    "title": "D10 Dasamsa Chart Insights",
-    "content": "ONLY D10 factors: kendra/trine planets, Sun/Moon/Saturn in D10 (apply R6+R7), 10th lord in D10 (apply R8 — state which of the 12 houses and its meaning). Do NOT repeat D1 analysis. 4–5 sentences."
+  "job_vs_business_verdict": {{
+    "title": "Job vs Business — What Your Chart Says",
+    "content": "Give a CLEAR, DEFINITIVE verdict first: either 'Your chart strongly favors [employment/building your own venture]' or 'Your chart is balanced between both paths.' The verdict is: {career_mode}. Then explain WHY in 3-4 sentences — cite the D10 6th lord score ({d10_job_score}) vs 7th lord score ({d10_biz_score}), what this means about their natural working style, and what specific type of role or venture structure will serve them best. Be warm and direct — this is one of the most important questions in career astrology and they deserve a real answer. End with: 'This week, [one concrete action aligned with this verdict].'"
   }},
-  "amatyakaraka": {{
-    "title": "Amatyakaraka — Career Soul Planet",
-    "content": "ONLY about AMK planet (R1): which planet, degree, sign, house, dignity, and its specific career domain from the AMK table. How AK and AMK interact. Do NOT discuss 10th house. 3–4 sentences."
+  "career_rajyogas": {{
+    "title": "Rajyogas Blessing Your Career",
+    "content": "{_rajyoga_instruction}"
   }},
-  "career_fields": {{
-    "title": "Natural Abilities & Career Fields (4th from Sun / 10th from Saturn / Moon)",
-    "content": "Apply R3 (4th from Sun = natural abilities), R4 (10th from Saturn = karmic career), and Moon sign = emotional career fit. State what each rule reveals specifically. List the top 3–4 career domains this combination points to. Do NOT repeat AMK or 10th lord analysis. 4–5 sentences."
+  "peak_career_window": {{
+    "title": "Your Peak Career Window",
+    "content": "4–5 sentences. Using ONLY the future dashas listed above (from {current_year} onward): identify the single best upcoming dasha period for peak career success. Open with: 'Between [YEAR]–[YEAR], you will enter your most powerful career phase...' Explain WHY that dasha planet connects to career houses in this chart. Then mention what the current {md_planet} dasha is building toward. NEVER reference any dasha that ended before {current_year}. End with: 'This week, [one action to prepare for this window].'"
   }},
-  "student_streams": {{
-    "title": "Recommended Academic Streams",
-    "content": "Based on the overall chart (10th lord, AMK, strongest planet), name 2–3 specific academic streams with course names and entrance exams (JEE/NEET/CA/CLAT/UPSC/MBA-CAT etc). Do NOT repeat career field analysis. 3–4 sentences."
+  "current_phase": {{
+    "title": "What To Do Right Now",
+    "content": "4–5 sentences. Based on current {md_planet}/{ad_planet} dasha and transits: give 3–4 specific, actionable steps for the next 12 months. Frame every step as an OPPORTUNITY. Use 'This is an excellent time to...' or 'Your chart now favors...' language. End with an encouraging sentence about the momentum building right now."
   }},
-  "yogas_combinations": {{
-    "title": "Active Career Yogas & Planetary Combinations",
-    "content": "Apply R9 (active yogas) and R10 (12-combo rules). For each active yoga, state its NAME and specific career impact for this chart. Cite triggered 12-combo rules. Do NOT discuss job/business verdict or 10th house separately. 4–5 sentences."
+{_academic_json}{_gemstone_section}  "empowering_remedies": {{
+    "title": "Empowering Remedies",
+    "content": "Exactly 3 remedies drawn from the Vedic remedy knowledge base. Each must: (a) be easy to do at home, (b) start with 'To amplify your [Planet Name]...' — NEVER 'to fix your weak [Planet]'. No charity or donation suggestions. Prefer mantra, color therapy, fasting, or meditation remedies matched to the key career planets in this chart. Format: 'Remedy 1: [action + timing + why it helps]. Remedy 2: [action + timing + why it helps]. Remedy 3: [action + timing + why it helps].'"
   }},
-  "dasha_predictions": {{
-    "title": "Dasha Timeline & Career Predictions",
-    "content": "Apply R2 (1st MD foundation: {first_md} shaped early career as X), then R11 (current {md.get('planet','?')}/{ad.get('planet','?')} MD/AD — is this lord connected to career houses? What does it activate?), then state the single best upcoming dasha period for peak career success and the approximate year. 4–5 sentences. Do NOT repeat yoga or field analysis."
-  }},
-  "transit_impact": {{
-    "title": "Current Transit Impact (R12)",
-    "content": "Apply R12: Where is transit Jupiter? Transit Saturn (Sadesati check)? Rahu/Ketu axis over which natal houses? What does this mean for career in the next 12 months? 3–4 sentences. ONLY transit analysis here."
-  }},
-  "remedies": {{
-    "title": "Vedic Remedies for Career Growth",
-    "content": "Identify the 2 career planets that need strengthening (weak dignity or afflicted). For each: gemstone, mantra, day, deity, and specific charity. Do NOT repeat any rule analysis. 4 sentences max."
-  }},
-  "conclusion": {{
-    "title": "Overall Career Destiny",
-    "content": "3-sentence synthesis ONLY (no rule repetition): (1) What this chart's career destiny is in one sentence. (2) The single peak career window (year range). (3) The one strongest professional asset this person has."
+  "closing_blessing": {{
+    "title": "Your Bright Future Ahead",
+    "content": "3–4 sentences. Uplifting closing paragraph. Summarize their unique professional gifts, remind them of their peak career window by year range, and send them off feeling that their absolute best years are ahead of them. Warm and personal, like a mentor who deeply believes in their potential. No new astrological analysis — pure encouragement, hope, and blessing."
   }},
   "career_options": [
     {{
       "rank": 1,
-      "title": "Specific Job Title",
-      "field": "Broad Field",
-      "reason": "Cite the specific rules (R1–R12) and planets/houses that confirm this. 2–3 sentences.",
+      "title": "Primary: [Specific Job Title at Specific Type of Organization]",
+      "field": "[Broad Career Field]",
+      "reason": "2–3 sentences citing AMK {amaty_name}, 10th lord {tenth_lord}, D10 factors, and active yogas that confirm this path. Positive, specific language. No negative terms.",
       "key_planets": ["Planet1", "Planet2"],
-      "favorable_dasha": "Planet Name MD",
+      "favorable_dasha": "[Best upcoming future dasha planet] MD",
       "effort_required": "low|medium|high",
-      "timeline": "Best during YYYY–YYYY"
+      "timeline": "Best during YYYY–YYYY (must be {current_year} or later)"
     }},
-    {{"rank": 2, "title": "", "field": "", "reason": "", "key_planets": [], "favorable_dasha": "", "effort_required": "medium", "timeline": ""}},
-    {{"rank": 3, "title": "", "field": "", "reason": "", "key_planets": [], "favorable_dasha": "", "effort_required": "medium", "timeline": ""}},
-    {{"rank": 4, "title": "", "field": "", "reason": "", "key_planets": [], "favorable_dasha": "", "effort_required": "medium", "timeline": ""}},
-    {{"rank": 5, "title": "", "field": "", "reason": "", "key_planets": [], "favorable_dasha": "", "effort_required": "medium", "timeline": ""}}
-  ],
-  "single_best_career": {{
-    "title": "Best Career Recommendation",
-    "content": "The single career path confirmed by the MOST rules (cite rule numbers). State: specific role title, why AMK + 10th lord + D10 + any yogas all confirm it, best dasha period to pursue it, and one immediate action step. 4–5 sentences."
-  }}
+    {{
+      "rank": 2,
+      "title": "Alternative: [Specific Title in a Meaningfully Different Field from Rank 1]",
+      "field": "[Different Field — not a variation of Rank 1]",
+      "reason": "2 sentences explaining why this genuinely different path also resonates with their chart.",
+      "key_planets": ["Planet1"],
+      "favorable_dasha": "[Future dasha planet] MD",
+      "effort_required": "medium",
+      "timeline": "YYYY–YYYY"
+    }},
+    {{
+      "rank": 3,
+      "title": "Alternative: [Specific Title in Yet Another Different Field]",
+      "field": "[Another Different Field — not a variation of Rank 1 or 2]",
+      "reason": "2 sentences. Must be a genuinely different domain, not a variation of the primary.",
+      "key_planets": ["Planet1"],
+      "favorable_dasha": "[Future dasha planet] MD",
+      "effort_required": "medium",
+      "timeline": "YYYY–YYYY"
+    }}
+  ]
 }}"""
     return prompt
+
+
+def _filter_report_language(report: dict) -> dict:
+    """Replace negative astrological terms in LLM output with empowering equivalents."""
+    _replacements = [
+        (r"\bdebilitated\b",          "in a transformative placement"),
+        (r"\bin (?:an? )?enemy sign\b", "in a resilience-building sign"),
+        (r"\benemy sign\b",            "resilience-building sign"),
+        (r"\bafflicted\b",             "on a powerful growth journey"),
+        (r"\bweak\b",                  "developing its strength"),
+        (r"\bchallenging placement\b", "unique growth placement"),
+        (r"\bposes challenges\b",      "creates unique opportunities"),
+        (r"\bmalefic\b",               "dynamic"),
+        (r"\bdebility\b",              "transformative phase"),
+        (r"\bdifficult placement\b",   "growth-oriented placement"),
+    ]
+
+    def _clean(text: str) -> str:
+        for pattern, repl in _replacements:
+            text = re.sub(pattern, repl, text, flags=re.IGNORECASE)
+        return text
+
+    for key, val in report.items():
+        if isinstance(val, dict):
+            if "content" in val:
+                val["content"] = _clean(val["content"])
+            if "title" in val:
+                val["title"] = _clean(val["title"])
+        elif isinstance(val, list):
+            for item in val:
+                if isinstance(item, dict):
+                    for k, v in item.items():
+                        if isinstance(v, str):
+                            item[k] = _clean(v)
+    return report
 
 
 # ── Main Entry Point ──────────────────────────────────────────────────────────
@@ -1017,6 +1133,8 @@ def generate_career_report(
     dasha: dict,
     transit_data: Optional[dict] = None,
     skills_context: str = "",
+    birth_date: Optional[str] = None,
+    gemstone_context: str = "",
 ) -> dict:
     """
     Orchestrate all analysis steps and return a structured career report.
@@ -1026,6 +1144,19 @@ def generate_career_report(
     planets   = chart_data.get("planets", [])
     lagna_idx = chart_data.get("ascendant", {}).get("sign_index", 0)
 
+    # Compute user age and current year from birth date
+    today        = _date.today()
+    current_year = today.year
+    user_age     = 25  # sensible default when birth_date unavailable
+    if birth_date:
+        try:
+            birth    = _date.fromisoformat(birth_date)
+            user_age = today.year - birth.year - (
+                (today.month, today.day) < (birth.month, birth.day)
+            )
+        except (ValueError, TypeError):
+            pass
+
     ak_data      = calculate_amatyakaraka(planets)
     jvb          = determine_job_vs_business(planets, lagna_idx, d10_chart=d10_chart)
     combinations = check_special_combinations(planets, lagna_idx)
@@ -1034,17 +1165,24 @@ def generate_career_report(
 
     # ── Pre-compute D10 Bootcamp extra factors ────────────────────────────────
     extra = {
-        "first_mahadasha":  _get_first_mahadasha(chart_data),
-        "fourth_from_sun":  _sign_from_planet("Sun",    4,  planets, lagna_idx),
+        "first_mahadasha":   _get_first_mahadasha(chart_data),
+        "fourth_from_sun":   _sign_from_planet("Sun",    4,  planets, lagna_idx),
         "tenth_from_saturn": _sign_from_planet("Saturn", 10, planets, lagna_idx),
     }
 
-    # ── Build system prompt (full for Claude, compact for Groq) ──────────────
+    # ── Build system prompt ────────────────────────────────────────────────────
     if skills_context:
         from services.skill_loader import get_system_prompt
         system = get_system_prompt(skills_context)
     else:
         system = "You are an expert Vedic career astrologer. Respond ONLY with valid JSON."
+
+    # Append gemstone/remedy knowledge to system message (NOT the user prompt).
+    # This keeps the user prompt small enough for Groq's payload limit.
+    # Groq fallback in _call_llm() ignores the system param and uses GROQ_SYSTEM_PROMPT,
+    # so gemstone_recommendation simply won't be generated on Groq — acceptable degradation.
+    if gemstone_context:
+        system = system + "\n\n# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n" + gemstone_context
 
     prompt = _build_career_prompt(
         chart_data=chart_data,
@@ -1055,13 +1193,23 @@ def generate_career_report(
         fields=fields,
         dasha=dasha,
         extra=extra,
+        user_age=user_age,
+        current_year=current_year,
         transit_data=transit_data,
+        gemstone_context=gemstone_context,
     )
 
     raw = _call_llm(prompt, system=system)
+    raw = _filter_report_language(raw)
 
-    # ── Parse narrative sections ──────────────────────────────────────────────
+    # ── Parse all sections ────────────────────────────────────────────────────
     section_keys = [
+        # New v2 sections
+        "career_destiny_brief", "natural_strengths", "best_career_path",
+        "job_vs_business_verdict",
+        "career_rajyogas", "peak_career_window", "current_phase", "academic_path",
+        "gemstone_recommendation", "empowering_remedies", "closing_blessing",
+        # Legacy sections (kept for backward compatibility)
         "lagna_personality", "job_vs_business", "tenth_house_d1", "d10_analysis",
         "amatyakaraka", "career_fields", "student_streams", "yogas_combinations",
         "dasha_predictions", "remedies", "conclusion", "transit_impact",
@@ -1069,23 +1217,20 @@ def generate_career_report(
     ]
     report: dict = {}
     for key in section_keys:
-        section = raw.get(key, {})
-        if isinstance(section, dict):
+        section = raw.get(key)
+        if isinstance(section, dict) and section.get("content"):
             report[key] = {
                 "title":   section.get("title", key.replace("_", " ").title()),
-                "content": section.get("content", "Analysis not available."),
+                "content": section["content"],
             }
         else:
-            report[key] = {
-                "title":   key.replace("_", " ").title(),
-                "content": str(section) if section else "Analysis not available.",
-            }
+            report[key] = None
 
-    # ── Parse career_options ──────────────────────────────────────────────────
-    raw_options = raw.get("career_options", [])
+    # ── Parse career_options (max 3) ──────────────────────────────────────────
+    raw_options    = raw.get("career_options", [])
     parsed_options = []
     if isinstance(raw_options, list):
-        for opt in raw_options[:5]:
+        for opt in raw_options[:3]:
             if isinstance(opt, dict):
                 parsed_options.append({
                     "rank":            opt.get("rank", len(parsed_options) + 1),

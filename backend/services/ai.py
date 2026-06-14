@@ -816,20 +816,250 @@ def _call_llm(messages: list[dict], json_mode: bool = False) -> str:
     return _call_groq(messages, json_mode)
 
 
+_PREDICTION_BANNED = [
+    "debilitated", "weak", "enemy sign", "afflicted", "challenging",
+    "malefic", "difficult placement", "combust", "fallen", "neecha",
+    "6th house", "8th house", "12th house", "bad", "struggle",
+    "obstacle", "problem", "inauspicious",
+]
+
+
+def clean_prediction(text: str) -> str:
+    """Remove any sentence containing banned jargon / negative terms."""
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    cleaned = [
+        s for s in sentences
+        if not any(w.lower() in s.lower() for w in _PREDICTION_BANNED)
+    ]
+    return ' '.join(cleaned)
+
+
+def build_prediction_prompt(
+    chart: dict,
+    dasha: dict,
+    language: str,
+    active_yogas: Optional[list] = None,
+) -> str:
+    """Build the Jyotish Guru genuine-value free prediction prompt."""
+    asc = chart["ascendant"]
+    planets = chart["planets"]
+    active_yogas = active_yogas or []
+    current_year = 2026
+
+    moon = next((p for p in planets if p["name"] == "Moon"), None)
+    sun  = next((p for p in planets if p["name"] == "Sun"), None)
+    moon_sign = (
+        f"{moon['sign']} ({moon.get('nakshatra', '')} nakshatra)" if moon else "unknown"
+    )
+    sun_sign = sun["sign"] if sun else "unknown"
+
+    planet_lines = []
+    for p in planets:
+        dignity = get_dignity(p["name"], p["sign_index"])
+        retro = " (R)" if p.get("retrograde") else ""
+        line = f"  {p['name']}{retro}: {p['sign']} H{p['house']}"
+        if dignity:
+            line += f" — {dignity}"
+        planet_lines.append(line)
+
+    md = dasha.get("current_mahadasha") or {}
+    ad = dasha.get("current_antardasha") or {}
+    full_seq = dasha.get("full_sequence") or []
+
+    next_dasha_str = "an upcoming powerful period"
+    for entry in full_seq:
+        start_str = str(entry.get("start", ""))
+        try:
+            start_year = int(start_str[:4])
+        except (ValueError, IndexError):
+            start_year = 0
+        if start_year > current_year and entry.get("planet") != md.get("planet"):
+            next_dasha_str = f"{entry['planet']} period beginning {start_str[:7]}"
+            break
+
+    yoga_summary = "\n".join(
+        f"  - {y['name']}: {y.get('description', '')}"
+        for y in active_yogas
+    ) or "  (identify from planetary dignities and house placements — look for Panch Mahapurusha yogas, Gaja Kesari, Budh Aditya, Chandra Mangal, Neecha Bhanga, Viparita Raj, etc.)"
+
+    lang_note = "Write entirely in Hindi." if language == "hi" else "Write in English."
+    ad_line = f"\n  Sub-period: {ad.get('planet', '')} (ends {ad.get('end', '')})" if ad else ""
+
+    return f"""You are Jyotish Guru — a master Vedic astrologer giving a genuine, warm, and deeply insightful FREE career reading to someone who just shared their birth details for the first time.
+
+Your job is to give REAL VALUE — actual chart findings, real yoga names, genuine predictions — so the person feels: "This is accurate. This person truly knows my chart. I need the full report."
+
+{lang_note}
+
+═══════════════════════════════════
+CHART DATA (use this as your basis):
+═══════════════════════════════════
+  Ascendant (Lagna): {asc.get('sign', '?')} ({asc.get('degree', 0):.1f}°, {asc.get('nakshatra', '')} nakshatra)
+  Moon Sign: {moon_sign}
+  Sun Sign : {sun_sign}
+
+Planets:
+{chr(10).join(planet_lines)}
+
+  Current life period: {md.get('planet', '?')} (ends {md.get('end', '?')}){ad_line}
+  Upcoming period: {next_dasha_str}
+
+Raj Yogas detected:
+{yoga_summary}
+
+═══════════════════════════════════
+ABSOLUTE RULES — NEVER BREAK:
+═══════════════════════════════════
+✗ NEVER say: "10th lord", "D10", "Mahadasha" (say "life period" instead), "debilitated", "enemy sign", "afflicted", "combust", "neecha", or any house number
+✓ Translate Sanskrit → plain English on first use. Format:
+  "Gaja Kesari Yoga — what Vedic astrologers call the Wisdom-Power Combination — is present in your chart."
+✓ Speak directly: YOU, YOUR, YOU ARE — every 2 sentences minimum
+✓ Warm mentor tone — like someone who deeply believes in this person
+
+GIVE FREE (real diagnosis, real findings):
+✓ Name REAL Raj Yogas by Sanskrit name + plain translation + what they actually produce
+✓ Give REAL career direction based on dominant planet
+✓ Name the current life period lord — say something genuinely positive about it
+✓ Give a genuine specific positive prediction for the next 2-3 years
+
+KEEP LOCKED (the treatment plan = paid report):
+✗ No gemstone, mantra, activation ritual, or remedy details
+✗ No Mahadasha dates or action plan for each period
+✗ No Job vs Business answer — save for paid report
+✗ No D10 / Dasamsa analysis — save for paid report
+
+═══════════════════════════════════
+RAJ YOGA MEANINGS (use these translations and real meanings):
+═══════════════════════════════════
+Gaja Kesari Yoga → "the Wisdom-Power Combination"
+  Meaning: people with this yoga are remembered; build reputations that outlast titles; both respected for intelligence AND genuinely liked — opens doors that talent alone cannot.
+
+Sasa Yoga (Saturn) → "the Authority Yoga"
+  Meaning: genuine authority that cannot be faked; people follow because they trust the judgment, not just the position; powerful for management, administration, law, engineering.
+
+Hamsa Yoga (Jupiter) → "the Guru Yoga"
+  Meaning: natural teacher and advisor; people come for wisdom before the title is officially earned; favors education, law, medicine, consulting, advisory roles.
+
+Ruchaka Yoga (Mars) → "the Warrior's Yoga"
+  Meaning: extraordinary drive; pushes through obstacles that stop others; natural instinct for competition; found in athletes, military, surgeons, entrepreneurs who win by force of will.
+
+Malavya Yoga (Venus) → "the Grace Yoga"
+  Meaning: magnetic personal charm, refined aesthetic sense; creates beauty and harmony in any field; success in creative fields, luxury, hospitality, arts, any career where human connection matters.
+
+Budh Aditya Yoga → "the Sharp Mind Yoga"
+  Meaning: both intelligent AND articulate — thinks clearly AND expresses in ways that persuade; favors communication, strategy, law, writing, teaching, any field where words are currency.
+
+Chandra Mangal Yoga → "the Wealth Activator Yoga"
+  Meaning: powerful financial instinct; drive to build and accumulate; money flows more naturally; strong in roles combining emotion with action — sales, entrepreneurship, real estate.
+
+Neecha Bhanga Raj Yoga → "the Phoenix Yoga"
+  Meaning: transforms apparent disadvantage into unexpected strength; those counted out early who rose further than anyone predicted; setbacks become launchpads.
+
+Viparita Raj Yoga → "the Hidden Victory Yoga"
+  Meaning: produces success through circumstances that look like loss to others; greatest career breakthroughs often come AFTER a setback or change in direction.
+
+═══════════════════════════════════
+OUTPUT FORMAT — WRAP EACH SECTION IN THESE EXACT TAGS:
+═══════════════════════════════════
+
+<identity>
+4-5 sentences. Open by naming their Lagna sign and what it specifically means for professional personality (be precise — not generic). Example for Aries rising: "You were born under Aries rising — the Lagna of pioneers, initiators, and people who are meant to START things, not maintain them. Your professional energy is fastest at the beginning of projects, in new ventures, in roles where someone needs to take the first bold step." Then 1-2 sentences about their Moon sign and what emotional energy drives their work and ambition. End with exactly: "That quiet inner sense that you are meant for something significant — that is not ego. That is your chart speaking."
+</identity>
+
+<rajyogas>
+8-10 sentences — THE CENTERPIECE OF THE READING. Open: "After carefully reading your birth chart, I found [NUMBER] significant Raj Yogas — powerful planetary combinations that Vedic astrology associates with above-average career success, recognition, and influence." Then for EACH yoga present: "[Sanskrit Name] — what masters call [Plain Translation] — is present in your chart. [2-3 sentences of its REAL career meaning — specific, vivid, not generic.]" After naming all yogas: "Having [NUMBER] of these yogas in a single chart is genuinely uncommon. Most people have one, if any. The fact that yours has [NUMBER] tells me this chart belongs to someone with real potential for above-average career achievement — not someday, but within the arc of the years ahead." End with the activation hook: "Here is what most people never learn: every Raj Yoga has a dormant state and an active state. The activation requires a specific combination of gemstone, mantra, timing, and in some cases a simple ritual — all precisely calibrated to YOUR chart, not a generic prescription. Your full CareerJyotish Report contains the exact activation protocol for each of your Raj Yogas — what to do, what to wear, what to chant, and when to begin. This is the section that changes things."
+</rajyogas>
+
+<strengths>
+4-5 sentences. Based on the dominant planet (strongest dignity or career karaka position): name the planet and its natural career domain in plain language. Example: "Your chart is strongly influenced by Saturn — the planet of discipline, systems, and long-term building. This makes you naturally suited to careers that reward patience, structure, and reliability: engineering, law, administration, finance, or any field where serious people do serious work." Then add 1-2 sentences about a specific hidden professional strength from this planet's placement (translate to plain language — no house numbers).
+</strengths>
+
+<currentperiod>
+3-4 sentences. Name the current life period lord ({md.get('planet', '?')}). Give a genuinely positive reading of what this period is building toward. Do NOT give dates or action plan. Example: "You are currently in your Saturn life period — a time when the universe is asking you to build foundations that will last. The work you do now — quietly, seriously, without immediate applause — is exactly what this period is designed to produce."
+</currentperiod>
+
+<prediction>
+4-5 sentences. Genuine specific positive prediction based on upcoming transits and sub-period ({ad.get('planet', '?')} sub-period, next period: {next_dasha_str}). Structure: what energy is building (specific, based on planets) → what kind of opportunity or recognition is likely → what they should be doing right now to prepare → one genuinely exciting statement about what is possible.
+</prediction>
+
+<bridge>
+3 sentences exactly. "Your chart holds answers to questions your full report will address in complete detail: exactly which career field your chart analysis points to, whether your chart favors building a business or excelling in a career role, and the single most powerful remedy — specific to your chart, not generic advice — that can accelerate everything above. These are not small questions. They are the questions whose answers, once known, change how you make every career decision going forward."
+</bridge>
+
+<teasers>
+{{
+  "teaser1": "Activation Ritual for Your [Yoga Name/s — use plain translation]",
+  "teaser2": "Your Peak Career Window: [year range from period analysis]",
+  "teaser3": "Job or Business? What Your Chart Actually Says"
+}}
+</teasers>
+
+TOTAL LENGTH: 420-480 words across all 6 sections. Every sentence must feel specific to THIS chart, not a template.
+"""
+
+
+_PREDICTION_SECTIONS = ['identity', 'rajyogas', 'strengths', 'currentperiod', 'prediction', 'bridge']
+
+
+def parse_prediction(raw: str) -> tuple[dict, dict]:
+    """Parse the prediction response into (sections_dict, teasers_dict)."""
+    import json as _json
+
+    # Extract teasers
+    teasers: dict = {}
+    teaser_match = re.search(r'<teasers>(.*?)</teasers>', raw, re.DOTALL)
+    if teaser_match:
+        try:
+            teasers = _json.loads(teaser_match.group(1).strip())
+        except Exception:
+            pass
+
+    # Extract named sections
+    sections: dict = {}
+    for name in _PREDICTION_SECTIONS:
+        m = re.search(rf'<{name}>(.*?)</{name}>', raw, re.DOTALL)
+        if m:
+            sections[name] = clean_prediction(m.group(1).strip())
+
+    # Fallback: paragraph split if no tags found
+    if not sections:
+        cleaned = clean_prediction(raw)
+        paras = [p.strip() for p in re.split(r'\n{2,}', cleaned) if p.strip()]
+        for i, name in enumerate(_PREDICTION_SECTIONS):
+            if i < len(paras):
+                sections[name] = paras[i]
+
+    return sections, teasers
+
+
 def generate_reading(
     chart: dict,
     dasha: dict,
     language: str,
     div_charts: Optional[dict] = None,
-) -> list[dict]:
-    prompt = build_prompt(chart, dasha, language, div_charts)
+    active_yogas: Optional[list] = None,
+) -> dict:
+    """
+    Generate the free Jyotish Guru prediction.
+    Returns dict with keys: sections, prediction_text, prediction_sections, teasers.
+    """
+    prompt = build_prediction_prompt(chart, dasha, language, active_yogas)
     try:
-        text = _call_llm([{"role": "user", "content": prompt}], json_mode=True)
+        raw = _call_llm([{"role": "user", "content": prompt}], json_mode=False)
     except HTTPException:
         raise
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"LLM error: {exc}") from exc
-    return parse_sections(text)
+
+    pred_sections, teasers = parse_prediction(raw)
+    prediction_text = "\n\n".join(pred_sections.values())
+
+    return {
+        "sections": [],
+        "prediction_text": prediction_text,
+        "prediction_sections": pred_sections,
+        "teasers": teasers,
+    }
 
 
 # ─────────────────────────────────────────────────────────────────────────────

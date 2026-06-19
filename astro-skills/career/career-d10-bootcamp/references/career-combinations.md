@@ -1,6 +1,6 @@
-# Career Combinations — Specific Planetary Yogas
+﻿# Career Combinations — Specific Planetary Yogas
 
-Source: Astro Arun Pandit — The Career Compass (D10 Bootcamp)
+Source: The Career Compass (D10 Bootcamp)
 
 ---
 

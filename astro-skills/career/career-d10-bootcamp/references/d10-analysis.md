@@ -1,6 +1,6 @@
-# D10 Chart (Dashamsha) — Complete Analysis Guide
+﻿# D10 Chart (Dashamsha) — Complete Analysis Guide
 
-Source: Astro Arun Pandit — The Career Compass (D10 Bootcamp)
+Source: The Career Compass (D10 Bootcamp)
 
 ---
 

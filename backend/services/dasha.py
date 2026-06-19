@@ -92,9 +92,77 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
             current_ad = ad
             break
 
+    # ── Pratyantar Dashas (sub-sub-dasha) within current AD ──────────────
+    pratyantars: list[dict[str, Any]] = []
+    current_pd: dict[str, Any] | None = None
+
+    if current_ad:
+        ad_planet = current_ad["planet"]
+        ad_idx    = DASHA_ORDER.index(ad_planet)
+        pd_start  = datetime.strptime(current_ad["start"], "%Y-%m-%d")
+
+        for i in range(9):
+            pd_planet = DASHA_ORDER[(ad_idx + i) % 9]
+            pd_years  = (
+                DASHA_YEARS[md_planet]
+                * DASHA_YEARS[ad_planet]
+                * DASHA_YEARS[pd_planet]
+            ) / (TOTAL_YEARS ** 2)
+            pd_end = _add_years(pd_start, pd_years)
+            pratyantars.append({
+                "planet": pd_planet,
+                "start":  pd_start.strftime("%Y-%m-%d"),
+                "end":    pd_end.strftime("%Y-%m-%d"),
+            })
+            pd_start = pd_end
+
+        for pd in pratyantars:
+            s = datetime.strptime(pd["start"], "%Y-%m-%d")
+            e = datetime.strptime(pd["end"], "%Y-%m-%d")
+            if s <= today <= e:
+                current_pd = pd
+                break
+
+    # ── Sookshma Dashas (sub-sub-sub-dasha) within current PD ───────────
+    sookshmas: list[dict[str, Any]] = []
+    current_sookshma: dict[str, Any] | None = None
+
+    if current_pd and current_ad:
+        pd_planet  = current_pd["planet"]
+        pd_idx     = DASHA_ORDER.index(pd_planet)
+        sk_start   = datetime.strptime(current_pd["start"], "%Y-%m-%d")
+        ad_planet  = current_ad["planet"]
+
+        for i in range(9):
+            sk_planet = DASHA_ORDER[(pd_idx + i) % 9]
+            sk_years  = (
+                DASHA_YEARS[md_planet]
+                * DASHA_YEARS[ad_planet]
+                * DASHA_YEARS[pd_planet]
+                * DASHA_YEARS[sk_planet]
+            ) / (TOTAL_YEARS ** 3)
+            sk_end = _add_years(sk_start, sk_years)
+            sookshmas.append({
+                "planet": sk_planet,
+                "start":  sk_start.strftime("%Y-%m-%d"),
+                "end":    sk_end.strftime("%Y-%m-%d"),
+            })
+            sk_start = sk_end
+
+        for sk in sookshmas:
+            s = datetime.strptime(sk["start"], "%Y-%m-%d")
+            e = datetime.strptime(sk["end"], "%Y-%m-%d")
+            if s <= today <= e:
+                current_sookshma = sk
+                break
+
     return {
-        "full_sequence": full_sequence,
-        "current_mahadasha": current_md,
+        "full_sequence":      full_sequence,
+        "current_mahadasha":  current_md,
         "current_antardasha": current_ad,
-        "antardashas": antardashas,
+        "antardashas":        antardashas,
+        "current_pratyantar": current_pd,
+        "pratyantars":        pratyantars,
+        "current_sookshma":   current_sookshma,
+        "sookshmas":          sookshmas,
     }

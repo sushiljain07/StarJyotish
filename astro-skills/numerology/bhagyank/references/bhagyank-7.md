@@ -1,4 +1,4 @@
-# Bhagyank 7 — Ketu (केतु) | Astro Arun Pandit Notes
+﻿# Bhagyank 7 — Ketu (केतु) |  Notes
 
 ## Ruling Planet
 **Ketu (केतु)** — a semi-planet (अर्ध-ग्रह). Bhagyank 7 represents **spirituality and intuition**.

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const NAV_ITEMS = [
@@ -31,6 +32,15 @@ export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
                 </span>
               </button>
             ))}
+            <Link
+              to="/career-report"
+              className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 no-underline"
+            >
+              <span className="text-lg leading-none">💼</span>
+              <span className="text-[10px] font-medium leading-none truncate text-slate-400">
+                Career
+              </span>
+            </Link>
           </div>
         </nav>
       )}
@@ -52,6 +62,13 @@ export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
               <span>{t(`tab_${key}`)}</span>
             </button>
           ))}
+          <Link
+            to="/career-report"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t transition-colors text-indigo-200 hover:text-white hover:bg-white/10 no-underline"
+          >
+            <span>💼</span>
+            <span>Career</span>
+          </Link>
         </div>
       )}
     </>

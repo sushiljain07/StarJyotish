@@ -1,8 +1,8 @@
----
+﻿---
 name: nakshatra-personality
 description: >
   Provide detailed Vedic astrology Nakshatra (lunar mansion) personality readings based on
-  Astro Arun Pandit's Jyotish notes. Use this skill whenever a user asks about their Nakshatra,
+  the course Jyotish notes. Use this skill whenever a user asks about their Nakshatra,
   birth star, lunar mansion, or wants personality traits based on their moon sign position.
   Trigger for questions like: "What is my Nakshatra?", "Tell me about Ashwini nakshatra",
   "What are the traits of someone born in Rohini?", "My nakshatra is Punarvasu", "What career
@@ -14,7 +14,7 @@ description: >
 ---
 
 # Nakshatra Personality Skill
-*Based on Astro Arun Pandit's Jyotish (Vedic Astrology) Notes — Nakshatra Vyaktitva Lakshan*
+*Based on the course Jyotish (Vedic Astrology) Notes — Nakshatra Vyaktitva Lakshan*
 
 ## What are Nakshatras?
 Nakshatras are the 27 lunar mansions of Vedic astrology, each spanning 13°20' of the zodiac. In Vedic astrology, the **Moon's position at birth** determines a person's Nakshatra. Each Nakshatra has:

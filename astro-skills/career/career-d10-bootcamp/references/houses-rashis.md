@@ -1,6 +1,6 @@
-# Houses & Rashis — Career Astrology Reference
+﻿# Houses & Rashis — Career Astrology Reference
 
-Source: Astro Arun Pandit — The Career Compass (D10 Bootcamp)
+Source: The Career Compass (D10 Bootcamp)
 
 ---
 

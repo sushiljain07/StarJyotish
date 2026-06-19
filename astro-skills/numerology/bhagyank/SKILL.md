@@ -1,8 +1,8 @@
----
+﻿---
 name: bhagyank-numerology
 description: >
   Provide detailed Bhagyank (Destiny Number / भाग्यांक) readings and interpretations
-  based on Astro Arun Pandit's Vedic Numerology Mentorship system. Use this skill
+  based on the course Vedic Numerology Mentorship system. Use this skill
   whenever a user asks about their Bhagyank, destiny number, lucky number, or wants
   to know what their birth date sum reveals about their personality, career, love life,
   health, or life path. Also trigger when users ask about numerology for numbers 5, 6,
@@ -10,7 +10,7 @@ description: >
   Covers Bhagyank 5 (Mercury/Budh), 6 (Venus/Shukra), and 7 (Ketu).
 ---
 
-# Bhagyank Numerology — Astro Arun Pandit System
+# Bhagyank Numerology System
 
 ## What is Bhagyank?
 Bhagyank (भाग्यांक) is the **Destiny Number** in Vedic Numerology. It is calculated by adding all the digits of a person's **full date of birth** (DD + MM + YYYY) until a single digit is obtained.

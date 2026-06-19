@@ -1,10 +1,10 @@
----
+﻿---
 name: career-astrology-d10
 description: >
-  Analyze career, profession, and livelihood using Vedic astrology with the D10 (Dashamsha) chart methodology taught by Astro Arun Pandit. Use this skill whenever the user asks about career prospects, job changes, promotions, professional setbacks, ideal career fields, business vs. job, career timing, or asks to analyze a birth chart for professional life. Also trigger for questions about which planets govern which careers, what Amatyakaraka means, how to read the 10th house, and any question about Vedic career astrology, even if phrased casually like "what career suits my kundli", "will I get a promotion", "should I change jobs", "which field is good for me astrologically", or "read my D10 chart".
+  Analyze career, profession, and livelihood using Vedic astrology with the D10 (Dashamsha) chart methodology taught . Use this skill whenever the user asks about career prospects, job changes, promotions, professional setbacks, ideal career fields, business vs. job, career timing, or asks to analyze a birth chart for professional life. Also trigger for questions about which planets govern which careers, what Amatyakaraka means, how to read the 10th house, and any question about Vedic career astrology, even if phrased casually like "what career suits my kundli", "will I get a promotion", "should I change jobs", "which field is good for me astrologically", or "read my D10 chart".
 ---
 
-# Career Astrology — D10 Bootcamp (Astro Arun Pandit Method)
+# Career Astrology — D10 Bootcamp 
 
 ## Overview
 

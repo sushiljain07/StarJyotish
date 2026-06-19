@@ -1,4 +1,4 @@
----
+﻿---
 name: child-astrology
 description: >
   Vedic astrology skill for child birth prediction, progeny analysis, and parenting insights
@@ -13,7 +13,7 @@ description: >
   prapti", "Jupiter in 5th house", or "what does Saturn in 5th house mean for children".
 ---
 
-# Child Astrology — Vedic Framework (Astro Arun Pandit Bootcamp)
+# Child Astrology — Vedic Framework ( Bootcamp)
 
 > *"A child is not just born — it is invoked through Karma, Kalachakra & Cosmic Consent."*
 
@@ -368,4 +368,4 @@ The **11th house activation** during Dasha/Transit often triggers conception or 
 
 ---
 
-*Source: Stars of Innocence — Child Astrology Bootcamp (Day 1 & Day 2) by Astro Arun Pandit / Occult Gurukul*
+*Source: Stars of Innocence — Child Astrology Bootcamp (Day 1 & Day 2) by Occult Gurukul*

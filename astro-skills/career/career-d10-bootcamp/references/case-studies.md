@@ -1,6 +1,6 @@
-# Case Studies — Career Astrology D10
+﻿# Case Studies — Career Astrology D10
 
-Source: Astro Arun Pandit — The Career Compass (D10 Bootcamp)
+Source: The Career Compass (D10 Bootcamp)
 
 ---
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: vedic-career-astrology
 description: >
   Analyze career prospects, timing, and guidance using Vedic astrology techniques from the D-1 (natal) and D-10 (Dasamsa) charts. Use this skill whenever a user asks about career direction (job vs business), career timing (first job, promotions, job switches, career breaks), planetary influences on profession, Ashtakvarga career analysis, specific career combinations for sports/medicine/real estate/astrology, remedies for career challenges, or wants to interpret planetary dashas and transits for professional life. Trigger this skill even for casual phrasings like "what career suits me astrologically", "when will I get promoted", "should I do job or business", "which planet is affecting my career", "what does my D10 chart say", or "why do I keep switching jobs". Always use this skill when the user provides birth details (DOB, TOB, POB) alongside career-related questions.
@@ -6,7 +6,7 @@ description: >
 
 # Vedic Career Astrology (D-10 Analysis)
 
-This skill covers career analysis using Vedic astrology principles — from basic chart reading to timing predictions. Content sourced from Astro Arun Pandit's career astrology course notes.
+This skill covers career analysis using Vedic astrology principles — from basic chart reading to timing predictions. Content sourced from the course career astrology course notes.
 
 > **For detailed reference tables and combinations**, read the relevant section in `references/career-combinations.md` and `references/timing-and-remedies.md`.
 

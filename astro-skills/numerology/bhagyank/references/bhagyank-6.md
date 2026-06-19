@@ -1,4 +1,4 @@
-# Bhagyank 6 — Venus (शुक्र) | Astro Arun Pandit Notes
+﻿# Bhagyank 6 — Venus (शुक्र) |  Notes
 
 ## Ruling Planet
 **Venus (शुक्र)** — In numerology, Venus represents **luxury and beauty**.

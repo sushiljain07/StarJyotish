@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
+import { API_BASE } from '../api/config'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -162,7 +163,7 @@ export default function CareerReport() {
     setSubmittedInput(input)
     const language = i18n.language?.startsWith('hi') ? 'hi' : 'en'
     try {
-      const resp = await fetch('/api/career-report', {
+      const resp = await fetch(`${API_BASE}/api/career-report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place, language }),

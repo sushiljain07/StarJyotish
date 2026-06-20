@@ -1,5 +1,6 @@
 // Ashtakavarga table: Bhinnashtakavarga + Sarvashtakavarga
 import { useState } from 'react'
+import { API_BASE } from '../api/config'
 
 const SIGN_ABBR = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
 const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
@@ -42,7 +43,7 @@ export default function AshtakavargaTable({ input }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/kundli/ashtakavarga', {
+      const res = await fetch(`${API_BASE}/api/kundli/ashtakavarga`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),

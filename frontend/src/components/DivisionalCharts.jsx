@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import KundliChart from './KundliChart'
+import { API_BASE } from '../api/config'
 
 // All divisional charts info
 const DIVISIONS = [
@@ -36,7 +37,7 @@ export default function DivisionalCharts({ input }) {
     setError(null)
     setSelectedD(division)
     try {
-      const res = await fetch(`/api/kundli/divisional?division=${division}`, {
+      const res = await fetch(`${API_BASE}/api/kundli/divisional?division=${division}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

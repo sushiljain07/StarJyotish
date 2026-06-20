@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { API_BASE } from '../api/config'
 
 // New v2 section order — warm, aspirational labels
 const SECTIONS = [
@@ -198,7 +199,7 @@ export default function CareerReportTab({ input }) {
     setErrorMsg('')
     const language = i18n.language?.startsWith('hi') ? 'hi' : 'en'
     try {
-      const resp = await fetch('/api/career-report', {
+      const resp = await fetch(`${API_BASE}/api/career-report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place, language }),

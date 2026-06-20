@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { API_BASE } from '../api/config'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -83,7 +84,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
 
     try {
       const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
-      const res = await fetch('/api/kundli/reading', {
+      const res = await fetch(`${API_BASE}/api/kundli/reading`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...input, language: lang }),

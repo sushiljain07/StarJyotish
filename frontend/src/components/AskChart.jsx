@@ -1,6 +1,7 @@
 // frontend/src/components/AskChart.jsx
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { API_BASE } from '../api/config'
 
 const MAX_QUESTIONS = 10
 
@@ -31,7 +32,7 @@ export default function AskChart({ input }) {
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/kundli/ask', {
+      const res = await fetch(`${API_BASE}/api/kundli/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...input, question, language: lang }),

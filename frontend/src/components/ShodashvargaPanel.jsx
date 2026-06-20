@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import KundliChart from './KundliChart'
 import SouthIndiaChart from './SouthIndiaChart'
+import { API_BASE } from '../api/config'
 
 const SHODASHVARGA = [
   { d: 1,  name: 'D1',  title: 'Rashi',           desc: 'Body, overall life' },
@@ -37,7 +38,7 @@ export default function ShodashvargaPanel({ input }) {
     setLoad(true)
     setError(null)
     try {
-      const res = await fetch(`/api/kundli/divisional?division=${division}`, {
+      const res = await fetch(`${API_BASE}/api/kundli/divisional?division=${division}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),

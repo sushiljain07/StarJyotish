@@ -1,6 +1,7 @@
 // Transit chart panel: shows current planet positions on natal chart
 import { useState, useEffect } from 'react'
 import KundliChart from './KundliChart'
+import { API_BASE } from '../api/config'
 
 const PLANET_COLORS = {
   Sun: '#E53E3E', Moon: '#E53E3E', Mars: '#E53E3E', Rahu: '#E53E3E',
@@ -19,7 +20,7 @@ export default function TransitPanel({ input, natalData }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/kundli/transit', {
+      const res = await fetch(`${API_BASE}/api/kundli/transit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),

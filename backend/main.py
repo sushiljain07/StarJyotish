@@ -13,12 +13,15 @@ app = FastAPI(title="Kundli API", version="1.0.0")
 
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    os.getenv("FRONTEND_URL", ""),  # set this in Render backend env vars
+    "http://localhost:3000",
 ]
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+if frontend_url:
+    ALLOWED_ORIGINS.append(frontend_url)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

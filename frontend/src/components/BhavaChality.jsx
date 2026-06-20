@@ -1,6 +1,7 @@
 // Bhava Chalit: equal 30°-wide houses centred on the ascendant degree
 // Shows where planets shift between Rashi (whole-sign) and Bhava houses
 import { useState } from 'react'
+import { API_BASE } from '../api/config'
 
 const PLANET_COLORS = {
   Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Mercury: '#16A34A',
@@ -19,7 +20,7 @@ export default function BhavaChality({ input }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/kundli/bhava-chalit', {
+      const res = await fetch(`${API_BASE}/api/kundli/bhava-chalit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),

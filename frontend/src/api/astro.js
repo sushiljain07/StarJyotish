@@ -1,6 +1,7 @@
+import { API_BASE } from './config'
 
-async function postJson(url, body) {
-  const resp = await fetch(url, {
+async function postJson(path, body) {
+  const resp = await fetch(`${API_BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

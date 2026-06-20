@@ -81,12 +81,18 @@ export default function KundliDownload({ data, input }) {
     style.textContent = `
       @media print {
         @page { margin: 10mm; size: A4 portrait; }
+        html, body {
+          height: auto !important;
+          overflow: visible !important;
+        }
         body > * { visibility: hidden !important; }
         #kundli-print-area,
         #kundli-print-area * { visibility: visible !important; }
         #kundli-print-area {
-          position: fixed; top: 0; left: 0;
+          position: absolute; top: 0; left: 0;
           width: 100%; background: white;
+          height: auto !important;
+          overflow: visible !important;
         }
         .no-print { display: none !important; }
       }

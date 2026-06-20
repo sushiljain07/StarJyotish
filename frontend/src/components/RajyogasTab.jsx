@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE } from '../api/config'
 
 const YOGA_ICONS = {
   'Raja Yoga':                  '👑',
@@ -437,7 +438,7 @@ export default function RajyogasTab({ input }) {
     setStatus('loading')
     setErrorMsg('')
     try {
-      const res = await fetch('/api/rajyogas', {
+      const res = await fetch(`${API_BASE}/api/rajyogas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input),

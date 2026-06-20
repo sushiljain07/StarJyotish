@@ -53,7 +53,7 @@ function SummaryChips({ data }) {
 
 // ── Main tab list ──
 const TABS = [
-  { id: 'birth_chart', label: '🔯 Kundli' },
+  { id: 'birth_chart', label: 'Kundli', icon: '/astroguru.svg' },
   { id: 'divisional',  label: '📊 Divisional' },
   { id: 'transit',     label: '🌍 Transit' },
   { id: 'special',     label: '✨ Special' },
@@ -143,11 +143,12 @@ export default function Result() {
           <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
             {TABS.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className={`whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition ${
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition inline-flex items-center gap-1 ${
                         activeTab === tab.id
                           ? 'bg-white text-indigo-700'
                           : 'text-indigo-200 hover:text-white hover:bg-white/10'
                       }`}>
+                {tab.icon && <img src={tab.icon} alt="" className="w-3.5 h-3.5 object-contain" />}
                 {tab.label}
               </button>
             ))}

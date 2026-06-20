@@ -1,6 +1,7 @@
 // KP (Krishnamurti Paddhati) chart display
 // Shows planet → Sign → House → Star (nakshatra lord) → Sub → Sub-sub
 import { useState } from 'react'
+import { API_BASE } from '../api/config'
 
 const PLANET_COLORS = {
   Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#E53E3E', Rahu: '#8B0000',
@@ -34,7 +35,7 @@ export default function KPChart({ input }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/kundli/kp', {
+      const res = await fetch(`${API_BASE}/api/kundli/kp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
@@ -69,7 +70,7 @@ export default function KPChart({ input }) {
       {loading && (
         <div className="flex justify-center py-12">
           <div className="text-center">
-            <div className="text-3xl animate-spin mb-2">🔯</div>
+            <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto animate-spin mb-2" />
             <p className="text-slate-500 text-sm">Calculating KP chart…</p>
           </div>
         </div>

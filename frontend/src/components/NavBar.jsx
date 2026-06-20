@@ -2,12 +2,20 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const NAV_ITEMS = [
-  { key: 'birth_chart', icon: '🔯' },
+  { key: 'birth_chart', icon: '/astroguru.svg' },
   { key: 'dasha',       icon: '📅' },
   { key: 'planets',     icon: '🪐' },
   { key: 'reading',     icon: '✨' },
   { key: 'ask',         icon: '💬' },
 ]
+
+// Some nav icons are image paths (new custom logo), others are emoji — render accordingly
+function NavIcon({ icon, className }) {
+  if (icon.startsWith('/')) {
+    return <img src={icon} alt="" className={className} />
+  }
+  return <span className={className}>{icon}</span>
+}
 
 export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
   const { t } = useTranslation()
@@ -24,7 +32,7 @@ export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
                 onClick={() => onTabChange(key)}
                 className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
               >
-                <span className="text-lg leading-none">{icon}</span>
+                <NavIcon icon={icon} className="text-lg leading-none w-[1.125rem] h-[1.125rem] object-contain" />
                 <span className={`text-[10px] font-medium leading-none truncate ${
                   activeTab === key ? 'text-primary' : 'text-slate-400'
                 }`}>
@@ -58,7 +66,7 @@ export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
                   : 'text-indigo-200 hover:text-white hover:bg-white/10'
               }`}
             >
-              <span>{icon}</span>
+              <NavIcon icon={icon} className="w-4 h-4 object-contain" />
               <span>{t(`tab_${key}`)}</span>
             </button>
           ))}

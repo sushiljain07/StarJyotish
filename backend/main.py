@@ -15,7 +15,7 @@ ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
-frontend_url = os.getenv("FRONTEND_URL", "").strip()
+frontend_url = os.getenv("FRONTEND_URL", "").strip().rstrip("/")
 if frontend_url:
     ALLOWED_ORIGINS.append(frontend_url)
 

@@ -1,15 +1,6 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 
-const NAV_ITEMS = [
-  { key: 'birth_chart', icon: '/astroguru.svg' },
-  { key: 'dasha',       icon: '📅' },
-  { key: 'planets',     icon: '🪐' },
-  { key: 'reading',     icon: '✨' },
-  { key: 'ask',         icon: '💬' },
-]
-
-// Some nav icons are image paths (new custom logo), others are emoji — render accordingly
+// Renders either an <img> (icon paths start with "/") or an emoji <span>.
 function NavIcon({ icon, className }) {
   if (icon.startsWith('/')) {
     return <img src={icon} alt="" className={className} />
@@ -17,68 +8,85 @@ function NavIcon({ icon, className }) {
   return <span className={className}>{icon}</span>
 }
 
-export default function NavBar({ activeTab, onTabChange, variant = 'both' }) {
-  const { t } = useTranslation()
+// Mobile-only bottom nav. Shows `tabs` flagged `primary: true` directly,
+// plus a "More" button that opens a sheet listing the rest. Desktop nav
+// is handled separately by Result.jsx's own horizontal tab bar — this
+// component renders nothing above the `sm` breakpoint.
+export default function NavBar({ tabs, activeTab, onTabChange }) {
+  const [showMore, setShowMore] = useState(false)
+
+  const primaryTabs = tabs.filter(t => t.primary)
+  const moreTabs = tabs.filter(t => !t.primary)
+  const isMoreActive = moreTabs.some(t => t.id === activeTab)
+
+  function selectTab(id) {
+    onTabChange(id)
+    setShowMore(false)
+  }
 
   return (
     <>
-      {/* Mobile: fixed bottom nav */}
-      {variant !== 'desktop' && (
-        <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 pb-safe">
-          <div className="flex justify-around items-center py-2">
-            {NAV_ITEMS.map(({ key, icon }) => (
+      {/* "More" sheet */}
+      {showMore && (
+        <>
+          <div
+            className="sm:hidden fixed inset-0 bg-black/40 z-40"
+            onClick={() => setShowMore(false)}
+          />
+          <div className="sm:hidden fixed bottom-16 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-lg p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] grid grid-cols-4 gap-1">
+            {moreTabs.map(tab => (
               <button
-                key={key}
-                onClick={() => onTabChange(key)}
-                className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
+                key={tab.id}
+                onClick={() => selectTab(tab.id)}
+                className={`flex flex-col items-center gap-1 px-1 py-3 rounded-xl text-xs font-medium transition ${
+                  activeTab === tab.id ? 'bg-indigo-50 text-primary' : 'text-slate-600 hover:bg-slate-50'
+                }`}
               >
-                <NavIcon icon={icon} className="text-lg leading-none w-[1.125rem] h-[1.125rem] object-contain" />
-                <span className={`text-[10px] font-medium leading-none truncate ${
-                  activeTab === key ? 'text-primary' : 'text-slate-400'
-                }`}>
-                  {t(`tab_${key}`)}
-                </span>
+                <NavIcon icon={tab.icon} className="text-xl leading-none w-5 h-5 object-contain" />
+                <span className="truncate w-full text-center text-[11px]">{tab.label}</span>
               </button>
             ))}
-            <Link
-              to="/career-report"
-              className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 no-underline"
-            >
-              <span className="text-lg leading-none">💼</span>
-              <span className="text-[10px] font-medium leading-none truncate text-slate-400">
-                Career
-              </span>
-            </Link>
           </div>
-        </nav>
+        </>
       )}
 
-      {/* Desktop: inline top nav (rendered inside header by Result.jsx) */}
-      {variant !== 'mobile' && (
-        <div className="hidden sm:flex gap-1">
-          {NAV_ITEMS.map(({ key, icon }) => (
+      {/* Bottom nav bar */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 pb-safe">
+        <div className="flex justify-around items-center py-2">
+          {primaryTabs.map(tab => (
             <button
-              key={key}
-              onClick={() => onTabChange(key)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t transition-colors ${
-                activeTab === key
-                  ? 'bg-white/20 text-white border-b-2 border-white'
-                  : 'text-indigo-200 hover:text-white hover:bg-white/10'
-              }`}
+              key={tab.id}
+              onClick={() => selectTab(tab.id)}
+              className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
             >
-              <NavIcon icon={icon} className="w-4 h-4 object-contain" />
-              <span>{t(`tab_${key}`)}</span>
+              <NavIcon
+                icon={tab.icon}
+                className="text-lg leading-none w-[1.125rem] h-[1.125rem] object-contain"
+              />
+              <span className={`text-[10px] font-medium leading-none truncate ${
+                activeTab === tab.id ? 'text-primary' : 'text-slate-400'
+              }`}>
+                {tab.label}
+              </span>
             </button>
           ))}
-          <Link
-            to="/career-report"
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t transition-colors text-indigo-200 hover:text-white hover:bg-white/10 no-underline"
+          <button
+            onClick={() => setShowMore(v => !v)}
+            className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
           >
-            <span>💼</span>
-            <span>Career</span>
-          </Link>
+            <span className={`text-lg leading-none ${
+              isMoreActive || showMore ? 'text-primary' : 'text-slate-400'
+            }`}>
+              ⋯
+            </span>
+            <span className={`text-[10px] font-medium leading-none truncate ${
+              isMoreActive || showMore ? 'text-primary' : 'text-slate-400'
+            }`}>
+              More
+            </span>
+          </button>
         </div>
-      )}
+      </nav>
     </>
   )
 }

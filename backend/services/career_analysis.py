@@ -671,10 +671,13 @@ def _extract_json(raw: str) -> dict:
     raise ValueError(f"No valid JSON found in response (first 300 chars): {raw[:300]}")
 
 
-def _call_llm(prompt: str, system: str = "") -> dict:
+def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> dict:
     """
     Always try Claude first. Only fall back to Groq on network/API-level errors.
-    Groq receives a compact system prompt to avoid 413 Payload Too Large errors.
+    Groq receives a compact system prompt (GROQ_SYSTEM_PROMPT) to avoid 413
+    Payload Too Large errors — `groq_extra` is a small, separately-bounded
+    supplement (e.g. a single ascendant's gemstone excerpt, not the full
+    ~45K-char bundle Claude gets) appended on top of it.
     """
     anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
     if anthropic_key:
@@ -706,6 +709,13 @@ def _call_llm(prompt: str, system: str = "") -> dict:
         raise RuntimeError("No LLM API key available (set ANTHROPIC_API_KEY or GROQ_API_KEY).")
 
     from services.skill_loader import GROQ_SYSTEM_PROMPT
+    groq_system = GROQ_SYSTEM_PROMPT
+    if groq_extra:
+        groq_system = (
+            groq_system
+            + "\n\n## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT\n"
+            + groq_extra
+        )
     for attempt in range(3):
         try:
             resp = requests.post(
@@ -715,7 +725,7 @@ def _call_llm(prompt: str, system: str = "") -> dict:
                 json={
                     "model": "llama-3.3-70b-versatile",
                     "messages": [
-                        {"role": "system", "content": GROQ_SYSTEM_PROMPT},
+                        {"role": "system", "content": groq_system},
                         {"role": "user",   "content": prompt},
                     ],
                     "response_format": {"type": "json_object"},
@@ -1195,10 +1205,18 @@ def generate_career_report(
 
     # Append gemstone/remedy knowledge to system message (NOT the user prompt).
     # This keeps the user prompt small enough for Groq's payload limit.
-    # Groq fallback in _call_llm() ignores the system param and uses GROQ_SYSTEM_PROMPT,
-    # so gemstone_recommendation simply won't be generated on Groq — acceptable degradation.
+    # Groq fallback in _call_llm() ignores this full system param and uses
+    # GROQ_SYSTEM_PROMPT instead, but does get a small per-ascendant gemstone
+    # excerpt via groq_extra below — full gemstone_recommendation depth still
+    # only happens on Claude, but Groq is no longer completely ungrounded.
     if gemstone_context:
         system = system + "\n\n# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n" + gemstone_context
+
+    groq_gemstone_excerpt = ""
+    if gemstone_context:
+        from services.skill_loader import get_gemstone_excerpt_for_ascendant
+        ascendant_sign = chart_data.get("ascendant", {}).get("sign", "")
+        groq_gemstone_excerpt = get_gemstone_excerpt_for_ascendant(ascendant_sign)
 
     prompt = _build_career_prompt(
         chart_data=chart_data,
@@ -1216,7 +1234,7 @@ def generate_career_report(
         language=language,
     )
 
-    raw = _call_llm(prompt, system=system)
+    raw = _call_llm(prompt, system=system, groq_extra=groq_gemstone_excerpt)
     raw = _filter_report_language(raw)
 
     # ── Parse all sections ────────────────────────────────────────────────────

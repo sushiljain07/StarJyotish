@@ -55,6 +55,48 @@ def load_career_skills() -> str:
     return "\n".join(parts)
 
 
+def get_kundli_interpretation_tables(max_chars: int = 2500) -> str:
+    """
+    Return ONLY the factual interpretive reference tables from vedic-kundli/SKILL.md
+    (house significations, planet dignities, nakshatra lords, sade sati phases) —
+    deliberately excludes "Step 4 — Remedies Reference", since the free Reading
+    prompt explicitly keeps remedy/gemstone/mantra content locked behind the paid
+    Career Report (see the "KEEP LOCKED" rules in build_prediction_prompt).
+    Small and bounded enough to safely share with both Claude and Groq, since the
+    Reading tab — unlike Career Report — sends the same prompt to both providers.
+    """
+    path = _SKILLS_ROOT / "vedic-kundli/SKILL.md"
+    if not path.exists():
+        return ""
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    start = text.find("## Step 3")
+    end = text.find("## Step 4")
+    if start == -1:
+        return ""
+    section = text[start:end if end != -1 else start + max_chars]
+    return section[:max_chars].strip()
+
+
+def get_gemstone_excerpt_for_ascendant(sign: str, max_chars: int = 1200) -> str:
+    """
+    Return just the by-ascendant.md section for ONE specific ascendant sign —
+    small and targeted enough to safely include in Groq's compact career-report
+    system prompt, unlike the full ~45K-char gemstone/remedy bundle reserved for
+    Claude's system prompt.
+    """
+    path = _SKILLS_ROOT / "gemstones/vedic-gemstones/references/by-ascendant.md"
+    if not sign or not path.exists():
+        return ""
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    marker = f"## {sign} ("
+    start = text.find(marker)
+    if start == -1:
+        return ""
+    end = text.find("\n## ", start + 1)
+    section = text[start:end if end != -1 else None]
+    return section[:max_chars].strip()
+
+
 _GEMSTONE_REMEDY_FILES = [
     "gemstones/vedic-gemstones/SKILL.md",
     "gemstones/vedic-gemstones/references/by-ascendant.md",

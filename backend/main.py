@@ -11,12 +11,16 @@ from routers.rajyogas import router as rajyogas_router
 
 app = FastAPI(title="Kundli API", version="1.0.0")
 
+import re
+
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
-frontend_url = os.getenv("FRONTEND_URL", "").strip()
+frontend_url = os.getenv("FRONTEND_URL", "").strip().rstrip("/")
+frontend_url = re.sub(r"^https?://", "", frontend_url, flags=re.IGNORECASE)
 if frontend_url:
+    frontend_url = f"https://{frontend_url}"
     ALLOWED_ORIGINS.append(frontend_url)
 
 app.add_middleware(

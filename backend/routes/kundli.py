@@ -9,7 +9,7 @@ import pytz
 from models.birth_data import BirthInput
 from models.chart_data import (
     ChartResponse, PlanetData, HouseData, AscendantData,
-    DashaData, MahadashaEntry, AntardashaEntry,
+    DashaData, MahadashaEntry, AntardashaEntry, PratyantarEntry, SookshmaEntry,
     ReadingRequest, ReadingSection, ReadingResponse,
     AskRequest, AskResponse,
 )
@@ -59,6 +59,14 @@ def get_kundli(body: BirthInput):
         AntardashaEntry(**dasha_raw["current_antardasha"])
         if dasha_raw["current_antardasha"] else None
     )
+    current_pd = (
+        PratyantarEntry(**dasha_raw["current_pratyantar"])
+        if dasha_raw["current_pratyantar"] else None
+    )
+    current_sk = (
+        SookshmaEntry(**dasha_raw["current_sookshma"])
+        if dasha_raw["current_sookshma"] else None
+    )
 
     return ChartResponse(
         ascendant=AscendantData(**chart["ascendant"]),
@@ -69,7 +77,11 @@ def get_kundli(body: BirthInput):
         dasha=DashaData(
             current_mahadasha=MahadashaEntry(**dasha_raw["current_mahadasha"]),
             current_antardasha=current_ad,
+            current_pratyantar=current_pd,
+            current_sookshma=current_sk,
             antardashas=[AntardashaEntry(**a) for a in dasha_raw["antardashas"]],
+            pratyantars=[PratyantarEntry(**p) for p in dasha_raw["pratyantars"]],
+            sookshmas=[SookshmaEntry(**s) for s in dasha_raw["sookshmas"]],
             full_sequence=[MahadashaEntry(**m) for m in dasha_raw["full_sequence"]],
         ),
     )

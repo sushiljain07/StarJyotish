@@ -52,18 +52,21 @@ function SummaryChips({ data }) {
 }
 
 // ── Main tab list ──
+// `primary: true` tabs appear directly in the mobile bottom nav (in this
+// array's order); the rest live behind its "More" sheet. Desktop's
+// horizontal tab bar shows all of them in this order, unaffected by the flag.
 const TABS = [
-  { id: 'birth_chart', label: 'Kundli', icon: '/astroguru.svg' },
-  { id: 'divisional',  label: '📊 Divisional' },
-  { id: 'transit',     label: '🌍 Transit' },
-  { id: 'special',     label: '✨ Special' },
-  { id: 'dasha',       label: '⏳ Dasha' },
-  { id: 'planets',     label: '🌟 Planets' },
-  { id: 'reading',     label: '📖 Reading' },
-  { id: 'ask',         label: '💬 Ask' },
-  { id: 'rajyogas',    label: '👑 Rajyogas' },
-  { id: 'career',      label: '💼 Career' },
-  { id: 'download',   label: '⬇️ Download' },
+  { id: 'birth_chart', label: 'Kundli',     icon: '/astroguru.svg', primary: true },
+  { id: 'divisional',  label: 'Divisional',  icon: '📊' },
+  { id: 'transit',     label: 'Transit',     icon: '🌍' },
+  { id: 'special',     label: 'Special',     icon: '✨' },
+  { id: 'dasha',       label: 'Dasha',       icon: '⏳', primary: true },
+  { id: 'planets',     label: 'Planets',     icon: '🌟' },
+  { id: 'reading',     label: 'Reading',     icon: '📖', primary: true },
+  { id: 'ask',         label: 'Ask',         icon: '💬', primary: true },
+  { id: 'rajyogas',    label: 'Rajyogas',    icon: '👑' },
+  { id: 'career',      label: 'Career',      icon: '💼' },
+  { id: 'download',    label: 'Download',    icon: '⬇️' },
 ]
 
 // Chart style options
@@ -139,8 +142,8 @@ export default function Result() {
             </button>
           </div>
 
-          {/* Tab bar */}
-          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
+          {/* Tab bar — desktop only; mobile uses the bottom nav instead */}
+          <div className="hidden sm:flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
             {TABS.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                       className={`whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition inline-flex items-center gap-1 ${
@@ -148,7 +151,9 @@ export default function Result() {
                           ? 'bg-white text-indigo-700'
                           : 'text-indigo-200 hover:text-white hover:bg-white/10'
                       }`}>
-                {tab.icon && <img src={tab.icon} alt="" className="w-3.5 h-3.5 object-contain" />}
+                {tab.icon.startsWith('/')
+                  ? <img src={tab.icon} alt="" className="w-3.5 h-3.5 object-contain" />
+                  : <span>{tab.icon}</span>}
                 {tab.label}
               </button>
             ))}
@@ -253,6 +258,8 @@ export default function Result() {
         </div>
 
       </div>
+
+      <NavBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   )
 }

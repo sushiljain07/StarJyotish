@@ -194,6 +194,7 @@ _DIVISION_NAMES = {
 # ── Skill file keyword map ────────────────────────────────────────────────────
 # Ordered list of (keyword, relative_path).  Longest / most-specific first.
 _GEM_REFS = "gemstones/vedic-gemstones/references"
+_MARRIAGE_REFS = "marriage/references"
 _SKILL_MAP: list[tuple[str, str]] = [
     # ── Gemstones: specific stones (multi-word before single-word) ────────
     ("yellow sapphire",  f"{_GEM_REFS}/yellow-sapphire.md"),
@@ -220,6 +221,11 @@ _SKILL_MAP: list[tuple[str, str]] = [
     ("ruby",             f"{_GEM_REFS}/ruby.md"),
     ("opal",             f"{_GEM_REFS}/opal.md"),
     # ── General gemstone / crystal ────────────────────────────────────────
+    # (more specific multi-word keywords first — first match wins, so a
+    # general single-word keyword later in this block must not shadow them)
+    ("complete gemstone",       "gemstones/vedic-gemstones-complete/SKILL.md"),
+    ("all 9 gemstones",         "gemstones/vedic-gemstones-complete/SKILL.md"),
+    ("navratna complete",       "gemstones/vedic-gemstones-complete/SKILL.md"),
     ("navratna",         "gemstones/vedic-gemstones/SKILL.md"),
     ("ratna",            "gemstones/vedic-gemstones/SKILL.md"),
     ("gemstone",         "gemstones/vedic-gemstones/SKILL.md"),
@@ -242,12 +248,21 @@ _SKILL_MAP: list[tuple[str, str]] = [
     ("job",              "career/career-d10-bootcamp/SKILL.md"),
     ("work",             "career/career-d10-bootcamp/SKILL.md"),
     # ── Children / Progeny ───────────────────────────────────────────────
+    ("panchak",          "children/d7-progeny/references/panchak-gandmool.md"),
+    ("gandmool",         "children/d7-progeny/references/panchak-gandmool.md"),
     ("progeny",          "children/d7-progeny/SKILL.md"),
     ("fertility",        "children/d7-progeny/SKILL.md"),
     ("conception",       "children/d7-progeny/SKILL.md"),
     ("children",         "children/child-astrology/SKILL.md"),
     ("child",            "children/child-astrology/SKILL.md"),
     # ── Marriage ─────────────────────────────────────────────────────────
+    # (specific reference-file keywords first — see ordering note above)
+    ("marriage timing",  f"{_MARRIAGE_REFS}/timing-techniques.md"),
+    ("when will i get married", f"{_MARRIAGE_REFS}/timing-techniques.md"),
+    ("when will i marry", f"{_MARRIAGE_REFS}/timing-techniques.md"),
+    ("quality of marriage", f"{_MARRIAGE_REFS}/quality-of-marriage.md"),
+    ("happy marriage",    f"{_MARRIAGE_REFS}/quality-of-marriage.md"),
+    ("darakaraka",         f"{_MARRIAGE_REFS}/darakaraka.md"),
     ("marriage",         "marriage/SKILL.md"),
     ("spouse",           "marriage/SKILL.md"),
     ("partner",          "marriage/SKILL.md"),
@@ -269,6 +284,10 @@ _SKILL_MAP: list[tuple[str, str]] = [
     ("numerology",       "numerology/mulank/SKILL.md"),
     # ── Other topics ─────────────────────────────────────────────────────
     ("nakshatra",        "nakshatra/SKILL.md"),
+    ("rudraksha gift",   "rudraksha/references/gifting.md"),
+    ("gift rudraksha",   "rudraksha/references/gifting.md"),
+    ("purify rudraksha", "rudraksha/references/purification-rituals.md"),
+    ("rudraksha purification", "rudraksha/references/purification-rituals.md"),
     ("rudraksha",        "rudraksha/SKILL.md"),
     ("past life",        "vedic-kundli/SKILL.md"),
     ("education",        "houses/astrology-12-houses/SKILL.md"),
@@ -290,6 +309,15 @@ _SKILL_MAP: list[tuple[str, str]] = [
 # When BOTH keywords appear in the question, load the secondary skill
 # in addition to the primary match from _SKILL_MAP.
 _SKILL_CROSS_REFS: list[tuple[str, str, str]] = [
+    # rudraksha sub-topics (more robust than exact-phrase keywords above,
+    # since "purify my rudraksha" etc. won't literally contain "purify rudraksha")
+    ("rudraksha", "gift",    "rudraksha/references/gifting.md"),
+    ("rudraksha", "purify",  "rudraksha/references/purification-rituals.md"),
+    ("rudraksha", "purification", "rudraksha/references/purification-rituals.md"),
+    # marriage sub-topics
+    ("marriage",  "quality", "marriage/references/quality-of-marriage.md"),
+    ("marriage",  "happy",   "marriage/references/quality-of-marriage.md"),
+    ("marriage",  "timing",  "marriage/references/timing-techniques.md"),
     # marriage combos
     ("marriage",  "venus",   "planets/venus/SKILL.md"),
     ("marriage",  "saturn",  "planets/saturn/SKILL.md"),
@@ -803,17 +831,27 @@ def _call_groq(
 
 def _call_llm(messages: list[dict], json_mode: bool = False) -> str:
     """
-    Primary: Claude (claude-opus-4-8).
+    Primary: Claude (claude-sonnet-4-6).
     Fallback: Groq/Llama when ANTHROPIC_API_KEY is missing or Claude returns an error.
     """
+    claude_reason = None
     try:
         return _call_claude(messages, json_mode)
-    except ValueError:
-        # Key not configured — silently fall back to Groq
-        pass
+    except ValueError as exc:
+        claude_reason = str(exc)  # e.g. "ANTHROPIC_API_KEY not set"
     except Exception as exc:
+        claude_reason = f"{type(exc).__name__}: {exc}"
         logger.warning("Claude API error (%s), falling back to Groq", exc)
-    return _call_groq(messages, json_mode)
+
+    try:
+        return _call_groq(messages, json_mode)
+    except HTTPException as exc:
+        # Both providers failed — show why each one failed, not just the fallback's
+        # error, so a misconfigured primary key doesn't get masked by Groq's message.
+        raise HTTPException(
+            status_code=503,
+            detail=f"AI unavailable — Claude: {claude_reason}; Groq: {exc.detail}",
+        ) from exc
 
 
 _PREDICTION_BANNED = [
@@ -882,6 +920,17 @@ def build_prediction_prompt(
         for y in active_yogas
     ) or "  (identify from planetary dignities and house placements — look for Panch Mahapurusha yogas, Gaja Kesari, Budh Aditya, Chandra Mangal, Neecha Bhanga, Viparita Raj, etc.)"
 
+    # Small, remedy-free reference excerpt (house meanings, planet dignities,
+    # nakshatra lords) for interpretive accuracy. Deliberately excludes the
+    # remedies section below it — see "KEEP LOCKED" rules further down.
+    from services.skill_loader import get_kundli_interpretation_tables
+    reference_tables = get_kundli_interpretation_tables()
+    reference_block = (
+        f"\n═══════════════════════════════════\n"
+        f"REFERENCE (for interpretive accuracy — do not quote verbatim, do not mention remedies):\n"
+        f"═══════════════════════════════════\n{reference_tables}\n"
+    ) if reference_tables else ""
+
     lang_note = (
         "LANGUAGE RULE — NON-NEGOTIABLE: Write EVERY SINGLE WORD in Hindi (Devanagari script). "
         "This includes all section content, yoga names (translate them to Hindi), "
@@ -913,7 +962,7 @@ Planets:
 
 Raj Yogas detected:
 {yoga_summary}
-
+{reference_block}
 ═══════════════════════════════════
 ABSOLUTE RULES — NEVER BREAK:
 ═══════════════════════════════════

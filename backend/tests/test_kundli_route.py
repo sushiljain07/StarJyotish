@@ -39,6 +39,19 @@ def test_kundli_invalid_date_returns_422():
     assert resp.status_code == 422
 
 
+def test_kundli_pratyantar_present():
+    """Regression test: the route used to build DashaData without forwarding
+    current_pratyantar/pratyantars (and current_sookshma/sookshmas), so the API
+    always returned them empty even though services/dasha.py computed real data."""
+    with patch("routes.kundli.geocode_place", return_value=_mock_geo()):
+        resp = client.post("/api/kundli", json=VALID_BODY)
+    dasha = resp.json()["dasha"]
+    assert dasha["current_pratyantar"] is not None
+    assert len(dasha["pratyantars"]) == 9
+    assert dasha["current_sookshma"] is not None
+    assert len(dasha["sookshmas"]) == 9
+
+
 def test_kundli_place_not_found_returns_400():
     with patch("routes.kundli.geocode_place", side_effect=ValueError("Place not found")):
         resp = client.post("/api/kundli", json=VALID_BODY)

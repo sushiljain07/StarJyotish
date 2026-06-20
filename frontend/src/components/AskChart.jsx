@@ -82,7 +82,7 @@ export default function AskChart({ input }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
-            <div className="text-3xl mb-2">🔯</div>
+            <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
             <p className="text-slate-400 text-sm">Ask up to 10 questions about your birth chart</p>
             <p className="text-slate-300 text-xs mt-1">e.g. "What does my ascendant say about career?"</p>
           </div>

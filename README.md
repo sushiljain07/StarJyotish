@@ -1,28 +1,41 @@
-# 🔯 AstroGuru — Vedic Astrology
+# <img src="frontend/public/astroguru.svg" width="24" height="24" alt="" valign="middle" /> AstroGuru — Vedic Astrology
 
-A modern Vedic birth chart (Kundli) web application powered by Swiss Ephemeris and Groq AI.
+A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. Stateless — no database, authentication, or payments yet (see [Roadmap](#roadmap)).
 
 ## Features
 
-- **North Indian Lagna (D1) & Navamsa (D9) charts** — SVG rendered, side-by-side on desktop
+**Charts & calculations**
+- **North Indian chart style** — SVG rendered, with a KP Chart toggle alongside it
+- **Full Shodashvarga** — all 16 divisional charts (D1 Lagna, D9 Navamsa, D10 Dashamsha, …, D60)
+- **KP (Krishnamurti Paddhati)** — sub-lord / cuspal-interlink chart
+- **Bhava Chalit** chart and **Sarvatobhadra Chakra**
+- **Ashtakavarga** — Bhinnashtakavarga + Sarvashtakavarga tables
+- **Transit chart** — current planetary positions over the natal chart
 - **Vimshottari Dasha** — Mahadasha / Antardasha with progress timeline
+- **Rajyoga detection** — special planetary combinations with descriptions
 - **Planetary positions** — sign, house, nakshatra, pada, retrograde, dignity
-- **AI Insights** — personalised Vedic reading powered by Groq (llama-3.3-70b)
-- **Ask the Chart** — 2 Groq-powered questions per chart
+
+**AI**
+- **AI Vedic reading** — Claude (Sonnet) as primary LLM, with automatic fallback to Groq/Llama if no Anthropic key is set or the call fails. Prompts are grounded in a local `astro-skills/` reference library (career, gemstones, marriage, nakshatra, rudraksha, etc.)
+- **Ask the Chart** — up to 10 AI-powered Q&A per chart
+- **Vedic Career Report** — separate report flow analysing career/business direction from D10, Dasha, and Rajyoga data, in English or Hindi
+
+**Other**
 - **English / Hindi** language toggle
-- **Responsive design** — desktop browser + mobile-ready (bottom nav)
+- **Download as PDF** — print-to-PDF of the chart summary
+- **Responsive design** — desktop browser + mobile bottom nav
 - **Place autocomplete** via OpenStreetMap Nominatim (no API key needed)
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18, Vite 5, Tailwind CSS 3, react-i18next |
+| Frontend | React 18, Vite 5, Tailwind CSS 3, react-i18next, react-router-dom |
 | Backend | FastAPI, pyswisseph (Swiss Ephemeris) |
-| AI / LLM | Groq REST API (`llama-3.3-70b-versatile`) |
+| AI / LLM | Claude (`claude-sonnet-4-6`) primary, Groq (`llama-3.3-70b-versatile`) fallback |
 | Geocoding | OpenStreetMap Nominatim — free, no key needed |
 | Ayanamsa | Lahiri |
-| House system | Whole sign |
+| House system | Whole sign (KP module additionally computes sub-lords on the same base chart) |
 
 ---
 
@@ -35,8 +48,9 @@ A modern Vedic birth chart (Kundli) web application powered by Swiss Ephemeris a
 | npm | 9+ | comes with Node.js |
 | Git | any | https://git-scm.com |
 
-You also need a **free Groq API key** for the AI features:
-👉 https://console.groq.com → Sign up → API Keys → Create key
+For the AI features (Reading, Ask, Career Report) you need at least one of:
+- **Anthropic API key** (primary) — https://console.anthropic.com
+- **Groq API key** (fallback, free) — https://console.groq.com
 
 ---
 
@@ -64,12 +78,7 @@ pip install -r requirements.txt
 
 # Configure environment variables
 cp .env.example .env
-# Open .env in your editor and add your Groq API key
-```
-
-Edit `backend/.env`:
-```
-GROQ_API_KEY=gsk_your_key_here
+# Open .env and add your Anthropic and/or Groq API key
 ```
 
 Start the backend:
@@ -77,7 +86,7 @@ Start the backend:
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-The API will be available at **http://localhost:8000**  
+The API will be available at **http://localhost:8000**
 Interactive docs: **http://localhost:8000/docs**
 
 ### 3. Frontend setup
@@ -94,17 +103,27 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173** in your browser.
+Open **http://localhost:5173** in your browser. The dev server proxies `/api` to `http://localhost:8000` automatically (see `vite.config.js`) — no frontend env var needed for local development.
 
 ---
 
 ## Environment Variables
 
+### Backend (`backend/.env`)
+
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GROQ_API_KEY` | Yes (for AI features) | Groq API key from https://console.groq.com |
+| `ANTHROPIC_API_KEY` | Recommended | Primary LLM for Reading, Ask, and Career Report |
+| `GROQ_API_KEY` | Optional | Fallback LLM, used if Anthropic is unset or errors |
+| `FRONTEND_URL` | Production only | Deployed frontend origin, added to the CORS allow-list |
 
-The app works without a Groq key — charts, dashas, and planet tables are fully functional. Only the **Insights** and **Ask** tabs require the key.
+Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with **no API key at all** — only Reading, Ask, and Career Report need an LLM key.
+
+### Frontend (build-time)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_API_URL` | Production only | Backend base URL, e.g. `https://your-backend.up.railway.app`. Leave unset for local dev (uses the Vite proxy instead) |
 
 ---
 
@@ -116,7 +135,7 @@ source .venv/bin/activate   # if not already active
 pytest tests/ -v
 ```
 
-Expected: all tests pass.
+Most tests pass without any API key configured. A handful of AI-dependent tests in `test_ask.py` require a working `GROQ_API_KEY`/`ANTHROPIC_API_KEY` to pass, and a few in `test_reading.py` are currently out of sync with the reading response shape — worth a look before relying on `pytest tests/` as a full regression gate.
 
 ---
 
@@ -125,61 +144,81 @@ Expected: all tests pass.
 ```
 astro/
 ├── backend/
-│   ├── main.py              # FastAPI app entry point
+│   ├── main.py                    # FastAPI app entry point, CORS, router mounting
+│   ├── Dockerfile                 # for Railway/container deploys (pyswisseph needs a C compiler)
 │   ├── routes/
-│   │   └── kundli.py        # API routes (/api/kundli, /reading, /ask)
+│   │   └── kundli.py              # /api/kundli, /reading, /ask, /ashtakavarga,
+│   │                               #   /transit, /bhava-chalit, /kp, /divisional
+│   ├── routers/
+│   │   ├── career_report.py       # /api/career-report
+│   │   └── rajyogas.py            # /api/rajyogas
 │   ├── services/
-│   │   ├── astro_calc.py    # Swiss Ephemeris chart calculation
-│   │   ├── dasha.py         # Vimshottari Dasha calculation
-│   │   ├── geocode.py       # Place → lat/lon/timezone via Nominatim
-│   │   └── ai.py            # Groq LLM integration (insights + ask)
-│   ├── models/
-│   │   ├── birth_data.py    # Input models
-│   │   └── chart_data.py    # Response models
-│   ├── tests/               # pytest test suite
+│   │   ├── astro_calc.py          # Swiss Ephemeris chart calculation (Lahiri, whole-sign)
+│   │   ├── divisional_charts.py   # D1–D60 divisional chart calculation
+│   │   ├── dasha.py               # Vimshottari Dasha calculation
+│   │   ├── ashtakavarga.py        # Ashtakavarga calculation
+│   │   ├── kp_system.py           # KP sub-lord / cuspal-interlink calculation
+│   │   ├── transit_calc.py        # Current transit calculation
+│   │   ├── career_analysis.py     # Vedic career report analysis
+│   │   ├── geocode.py             # Place → lat/lon/timezone via Nominatim
+│   │   ├── skill_loader.py        # Loads astro-skills/ reference files into prompts
+│   │   └── ai.py                  # Claude (primary) / Groq (fallback) LLM integration
+│   ├── models/                    # birth_data.py, career_models.py, chart_data.py
+│   ├── tests/                     # pytest suite
 │   ├── requirements.txt
 │   └── .env.example
-└── frontend/
-    ├── src/
-    │   ├── App.jsx          # Root component and routing
-    │   ├── main.jsx         # Vite entry point
-    │   ├── index.css        # Global styles
-    │   ├── pages/
-    │   │   ├── Home.jsx     # Birth details input form
-    │   │   └── Result.jsx   # Chart results with tab navigation
-    │   ├── components/
-    │   │   ├── KundliChart.jsx    # SVG North Indian chart renderer
-    │   │   ├── BirthForm.jsx      # Date/time/place input with dropdowns
-    │   │   ├── DashaTable.jsx     # Mahadasha / Antardasha table
-    │   │   ├── PlanetTable.jsx    # Planetary positions table
-    │   │   ├── ChartReading.jsx   # AI insights display
-    │   │   ├── AskChart.jsx       # 2-question AI chat
-    │   │   ├── NavBar.jsx         # Responsive navigation
-    │   │   └── LanguageToggle.jsx # EN / HI language switcher
-    │   ├── i18n/
-    │   │   ├── index.js     # i18next setup
-    │   │   ├── en.json      # English translations
-    │   │   └── hi.json      # Hindi translations
-    │   └── api/
-    │       └── astro.js     # API client
-    ├── package.json
-    └── tailwind.config.js
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx                # routes: / , /kundli , /career-report
+│   │   ├── pages/
+│   │   │   ├── Home.jsx           # birth details input
+│   │   │   ├── Result.jsx         # chart results, tab navigation
+│   │   │   └── CareerReport.jsx   # standalone career report flow
+│   │   ├── components/
+│   │   │   ├── KundliChart.jsx                         # North Indian SVG chart renderer
+│   │   │   ├── DivisionalCharts.jsx                     # all 16 divisional charts (D1–D60)
+│   │   │   ├── KPChart.jsx, BhavaChality.jsx, SarvatobhadraChakra.jsx
+│   │   │   ├── AshtakavargaTable.jsx, TransitPanel.jsx, DashaTable.jsx, PlanetTable.jsx
+│   │   │   ├── RajyogasTab.jsx, CareerReportTab.jsx
+│   │   │   ├── ChartReading.jsx, AskChart.jsx           # AI reading + Q&A
+│   │   │   ├── KundliDownload.jsx                       # print-to-PDF summary
+│   │   │   ├── BirthForm.jsx, NavBar.jsx, LanguageToggle.jsx
+│   │   ├── api/
+│   │   │   ├── astro.js           # API client
+│   │   │   └── config.js          # API_BASE, reads VITE_API_URL
+│   │   └── i18n/                  # i18next setup, en.json, hi.json
+│   ├── public/astroguru.svg       # app icon / favicon
+│   ├── package.json
+│   └── vite.config.js             # dev proxy: /api → localhost:8000
+│
+└── astro-skills/                  # reference library (career, gemstones, marriage,
+                                    #   nakshatra, rudraksha, etc.) loaded into AI prompts
 ```
 
 ---
 
-## Planned Features
+## Deployment
 
-- Planetary yoga detection and interpretations
-- Ashtakavarga strength tables
-- More divisional charts (D10, D7, etc.)
-- Configurable LLM provider (Groq / OpenAI / Gemini)
-- PDF export
-- Saved charts
+The app deploys as two independent pieces — see `backend/Dockerfile` and `frontend/src/api/config.js`:
+
+- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `ANTHROPIC_API_KEY` / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS.
+- **Frontend → Vercel** (or any static host). Set the root directory to `frontend`, build command `npm run build`, output `dist`. Set `VITE_API_URL` to the backend's public URL.
+
+Locally, both pieces talk to each other automatically via the Vite dev proxy — no env vars needed.
+
+---
+
+## Roadmap
+
+- Mobile layout fixes for components still using fixed pixel widths (`DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx`)
+- Postgres persistence + OTP login (currently fully stateless)
+- Razorpay payments
+- WhatsApp intake via Meta Cloud API
+- Server-side PDF generation (current PDF export is browser print-to-PDF only)
 
 ---
 
 ## License
 
-MIT
-
+No license file is currently included in this repository — treat as proprietary/all-rights-reserved until one is added.

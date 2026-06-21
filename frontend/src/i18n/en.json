@@ -35,6 +35,7 @@
   "reading_desc": "Get a personalised AI-powered Vedic insight based on your exact planetary positions.",
   "error_place_not_found": "Place not found. Try a full city name.",
   "error_generic": "Something went wrong. Please try again.",
+  "disclaimer": "Predictions are based on Vedic astrology principles and are intended for guidance, self-reflection, and entertainment purposes only. They are not a substitute for professional medical, legal, financial, or psychological advice, and outcomes are not guaranteed.",
   "planets": {
     "Sun": "Sun", "Moon": "Moon", "Mars": "Mars", "Mercury": "Mercury",
     "Jupiter": "Jupiter", "Venus": "Venus", "Saturn": "Saturn",

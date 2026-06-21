@@ -387,7 +387,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
             <p className="text-white text-sm mb-3">
               📲 Want a reminder when your peak career window opens? Enter your WhatsApp number for a free timing alert.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="tel"
                 value={waNumber}
@@ -398,7 +398,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
               />
               <button
                 onClick={handleWaSubmit}
-                className="px-4 py-2 rounded-lg font-semibold text-sm shrink-0"
+                className="px-4 py-2 rounded-lg font-semibold text-sm shrink-0 w-full sm:w-auto"
                 style={{ background: '#D4AF37', color: '#1A0A3B' }}>
                 Notify Me →
               </button>
@@ -422,6 +422,11 @@ export default function ChartReading({ input, onSwitchToCareer }) {
           ↺ Regenerate Prediction
         </button>
       </div>
+
+      {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
+      <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-2">
+        {t('disclaimer')}
+      </p>
 
       {/* ── EXIT INTENT POPUP ─────────────────────────────────────────────── */}
       {showExitPopup && (

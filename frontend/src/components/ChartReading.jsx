@@ -53,6 +53,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   const [predSections, setPredSections] = useState({})
   const [teasers, setTeasers]         = useState(null)
   const [errorMsg, setErrorMsg]       = useState('')
+  const [provider, setProvider]       = useState(null)
 
   // Staggered visibility per section
   const [visible, setVisible]         = useState([])
@@ -98,6 +99,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
       const secs = data.prediction_sections || {}
       setPredSections(secs)
       setTeasers(data.teasers || null)
+      setProvider(data.llm_provider || null)
       setStatus('done')
 
       // Stagger each section's fade-in, 380ms apart
@@ -150,15 +152,15 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   if (status === 'idle') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">🔮</div>
-      <h2 className="text-xl font-bold text-slate-800 mb-2">Free Career Prediction</h2>
+      <h2 className="text-xl font-bold text-slate-800 mb-2">{t('reading_idle_heading')}</h2>
       <p className="text-gray-500 text-sm mb-6 max-w-sm">
-        Discover the Raj Yogas in your birth chart and what the next 2–3 years hold for your career — completely free.
+        {t('reading_idle_body')}
       </p>
       <button onClick={generate}
         className="px-8 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-full transition shadow-md">
         Reveal My Prediction
       </button>
-      <p className="text-xs text-gray-400 mt-3">Powered by Jyotish Guru AI</p>
+      <p className="text-xs text-gray-400 mt-3">{t('reading_powered_by_generic')}</p>
     </div>
   )
 
@@ -424,6 +426,11 @@ export default function ChartReading({ input, onSwitchToCareer }) {
       </div>
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
+      {provider && (
+        <p className="text-center text-[11px] text-slate-400 pb-1">
+          {t('reading_powered_by', { provider })}
+        </p>
+      )}
       <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-2">
         {t('disclaimer')}
       </p>

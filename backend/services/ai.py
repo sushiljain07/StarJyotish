@@ -829,14 +829,18 @@ def _call_groq(
     raise HTTPException(status_code=503, detail=f"Groq API error: {last_exc}") from last_exc
 
 
-def _call_llm(messages: list[dict], json_mode: bool = False) -> str:
+def _call_llm(messages: list[dict], json_mode: bool = False) -> tuple[str, str]:
     """
     Primary: Claude (claude-sonnet-4-6).
     Fallback: Groq/Llama when ANTHROPIC_API_KEY is missing or Claude returns an error.
+    Returns (text, provider_label) — provider_label reflects whichever one
+    actually served this specific request, since the fallback can kick in
+    silently and a hardcoded "Powered by Claude" in the UI would be wrong
+    whenever that happens.
     """
     claude_reason = None
     try:
-        return _call_claude(messages, json_mode)
+        return _call_claude(messages, json_mode), "Claude"
     except ValueError as exc:
         claude_reason = str(exc)  # e.g. "ANTHROPIC_API_KEY not set"
     except Exception as exc:
@@ -844,7 +848,7 @@ def _call_llm(messages: list[dict], json_mode: bool = False) -> str:
         logger.warning("Claude API error (%s), falling back to Groq", exc)
 
     try:
-        return _call_groq(messages, json_mode)
+        return _call_groq(messages, json_mode), "Groq · Llama"
     except HTTPException as exc:
         # Both providers failed — show why each one failed, not just the fallback's
         # error, so a misconfigured primary key doesn't get masked by Groq's message.
@@ -1124,7 +1128,7 @@ def generate_reading(
     """
     prompt = build_prediction_prompt(chart, dasha, language, active_yogas, focus_topic)
     try:
-        raw = _call_llm([{"role": "user", "content": prompt}], json_mode=False)
+        raw, provider = _call_llm([{"role": "user", "content": prompt}], json_mode=False)
     except HTTPException:
         raise
     except Exception as exc:
@@ -1138,6 +1142,7 @@ def generate_reading(
         "prediction_text": prediction_text,
         "prediction_sections": pred_sections,
         "teasers": teasers,
+        "llm_provider": provider,
     }
 
 
@@ -1151,9 +1156,11 @@ def ask_chart(
     question: str,
     language: str,
     transit: Optional[dict] = None,
-) -> str:
+) -> tuple[str, str]:
     """
     Answer a kundli question using the full available chart context.
+    Returns (answer, provider_label) — see _call_llm for why the provider
+    needs to be tracked per-request rather than assumed.
 
     Chart data passed in (from the route):
       chart['planets']          — D1 placements
@@ -1256,7 +1263,8 @@ def ask_chart(
     )
 
     try:
-        return _call_llm([{"role": "user", "content": prompt}]).strip()
+        answer, provider = _call_llm([{"role": "user", "content": prompt}])
+        return answer.strip(), provider
     except HTTPException:
         raise
     except Exception as exc:

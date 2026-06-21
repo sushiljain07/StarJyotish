@@ -932,13 +932,15 @@ def _extract_json(raw: str) -> dict:
     raise ValueError(f"No valid JSON found in response (first 300 chars): {raw[:300]}")
 
 
-def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> dict:
+def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict, str]:
     """
     Always try Claude first. Only fall back to Groq on network/API-level errors.
     Groq receives a compact system prompt (GROQ_SYSTEM_PROMPT) to avoid 413
     Payload Too Large errors — `groq_extra` is a small, separately-bounded
     supplement (e.g. a single ascendant's gemstone excerpt, not the full
     ~45K-char bundle Claude gets) appended on top of it.
+    Returns (parsed_json, provider_label) — provider_label reflects whichever
+    one actually served this request, since the fallback can kick in silently.
     """
     anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
     if anthropic_key:
@@ -953,7 +955,7 @@ def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> dict:
             create_kwargs["system"] = system
         try:
             msg = client.messages.create(**create_kwargs)
-            return _extract_json(msg.content[0].text)
+            return _extract_json(msg.content[0].text), "Claude"
         except _anthropic.APIStatusError as e:
             # Rate limit or server error → try Groq
             print(f"[career] Claude API error ({e.status_code}), falling back to Groq.")
@@ -997,7 +999,7 @@ def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> dict:
                 time.sleep(2 ** attempt)
                 continue
             resp.raise_for_status()
-            return json.loads(resp.json()["choices"][0]["message"]["content"])
+            return json.loads(resp.json()["choices"][0]["message"]["content"]), "Groq · Llama"
         except Exception:
             if attempt == 2:
                 raise
@@ -1495,7 +1497,7 @@ def generate_career_report(
         language=language,
     )
 
-    raw = _call_llm(prompt, system=system, groq_extra=groq_gemstone_excerpt)
+    raw, provider = _call_llm(prompt, system=system, groq_extra=groq_gemstone_excerpt)
     raw = _filter_report_language(raw)
 
     # ── Parse all sections ────────────────────────────────────────────────────
@@ -1539,5 +1541,6 @@ def generate_career_report(
                     "timeline":        opt.get("timeline", ""),
                 })
     report["career_options"] = parsed_options
+    report["llm_provider"] = provider
 
     return report

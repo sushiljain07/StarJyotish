@@ -137,14 +137,14 @@ def get_reading(body: ReadingRequest):
         if y["present"]
     ]
 
-    reading = generate_reading(chart, dasha_raw, body.language, div_charts,
-                                active_yogas=active_yogas, focus_topic=body.topic)
+    reading = generate_reading(chart, dasha_raw, body.language, div_charts, active_yogas=active_yogas)
     return ReadingResponse(
         sections=[ReadingSection(**s) for s in reading.get("sections", [])],
         active_yogas=active_yogas,
         prediction_text=reading.get("prediction_text"),
         prediction_sections=reading.get("prediction_sections"),
         teasers=reading.get("teasers"),
+        llm_provider=reading.get("llm_provider", ""),
     )
 
 
@@ -188,8 +188,8 @@ def ask_kundli(body: AskRequest):
 
     transit_data = calculate_transit(jd, geo.lat, geo.lon)
 
-    answer = ask_chart(chart, dasha_raw, body.question, body.language, transit=transit_data)
-    return AskResponse(answer=answer)
+    answer, provider = ask_chart(chart, dasha_raw, body.question, body.language, transit=transit_data)
+    return AskResponse(answer=answer, llm_provider=provider)
 
 
 @router.post("/kundli/ashtakavarga")

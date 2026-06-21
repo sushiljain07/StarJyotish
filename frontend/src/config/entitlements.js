@@ -50,7 +50,14 @@ export function isPaywallEnabled() {
 // The one function every gated component calls. Swap the body for a real
 // check (e.g. an API call backed by Phase 3/4) when that infra exists.
 export function hasPremiumAccess() {
-  if (!PAYWALL_ENABLED) return true
-  if (isDevUnlocked()) return true
-  return false // no real paid users exist yet
+  // Locking disabled for now — until real accounts/subscriptions exist
+  // (Master Plan Phase 3/4/7), showing a lock nobody can actually unlock
+  // doesn't make sense. The dev-unlock mechanism above is left in place,
+  // unused, so re-enabling this later is a one-line change, not a rebuild.
+  return true
+
+  // Original gated logic — restore this when real payments/accounts exist:
+  // if (!PAYWALL_ENABLED) return true
+  // if (isDevUnlocked()) return true
+  // return false
 }

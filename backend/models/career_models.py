@@ -19,6 +19,7 @@ class CareerOption(BaseModel):
 
 
 class CareerReport(BaseModel):
+    llm_provider: str = ""
     # ── New v2 sections (primary report flow) ─────────────────────────────────
     career_destiny_brief: Optional[CareerSection] = None
     natural_strengths: Optional[CareerSection] = None

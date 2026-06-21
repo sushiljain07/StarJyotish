@@ -104,6 +104,7 @@ def get_career_report(body: BirthInput):
             continue
 
     return CareerReport(
+        llm_provider=report_data.get("llm_provider", ""),
         # New v2 sections
         career_destiny_brief=_section("career_destiny_brief"),
         natural_strengths=_section("natural_strengths"),

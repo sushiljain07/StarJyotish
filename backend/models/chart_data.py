@@ -99,6 +99,7 @@ class ReadingResponse(_Flexible):
     prediction_text: Optional[str] = None
     prediction_sections: Optional[dict] = None
     teasers: Optional[dict] = None
+    llm_provider: str = ""
 
 
 class AskRequest(_Flexible):
@@ -111,3 +112,4 @@ class AskRequest(_Flexible):
 
 class AskResponse(_Flexible):
     answer: str
+    llm_provider: str = ""

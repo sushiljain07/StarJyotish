@@ -17,9 +17,9 @@ import BhavaChality       from '../components/BhavaChality'
 import KundliDownload     from '../components/KundliDownload'
 import CareerReportTab   from '../components/CareerReportTab'
 import RajyogasTab       from '../components/RajyogasTab'
+import TopicInsightTab   from '../components/TopicInsightTab'
 
 import { formatDate, formatTime } from '../utils/format'
-import { hasPremiumAccess } from '../config/entitlements'
 import { getTopic } from '../config/topics'
 
 function SummaryChips({ data }) {
@@ -42,46 +42,121 @@ function SummaryChips({ data }) {
   )
 }
 
-// ── Main tab list ──
-// `primary: true` tabs appear directly in the mobile bottom nav (in this
-// array's order); the rest live behind its "More" sheet. Desktop's
-// horizontal tab bar shows all of them in this order, unaffected by the flag.
-const TABS = [
-  { id: 'birth_chart', label: 'Kundli',     icon: '/astroguru.svg', primary: true },
-  { id: 'divisional',  label: 'Divisional',  icon: '📊' },
-  { id: 'transit',     label: 'Transit',     icon: '🌍' },
-  { id: 'special',     label: 'Special',     icon: '✨' },
-  { id: 'dasha',       label: 'Dasha',       icon: '⏳', primary: true },
-  { id: 'planets',     label: 'Planets',     icon: '🌟' },
-  { id: 'reading',     label: 'Reading',     icon: '📖', primary: true },
-  { id: 'ask',         label: 'Ask',         icon: '💬', primary: true },
-  { id: 'rajyogas',    label: 'Rajyogas',    icon: '👑', premium: true },
-  { id: 'career',      label: 'Career',      icon: '💼', premium: true },
-  { id: 'download',    label: 'Download',    icon: '⬇️' },
-]
+// ── Top-level structure ──────────────────────────────────────────────────
+// 4 main tabs — Kundli (everyday essentials), Advanced (specialist
+// techniques most casual users won't recognize), Insights (Reading +
+// whatever's relevant to the chosen topic), Ask (standalone, always).
+// All 4 fit the mobile bottom nav directly; no overflow/"More" sheet needed.
 
-// Chart style options
+function mainTabs(t) {
+  return [
+    { id: 'kundli',   label: t('nav_kundli'),   icon: '/astroguru.svg' },
+    { id: 'advanced', label: t('nav_advanced'), icon: '🔬' },
+    { id: 'insights', label: t('tab_reading'),  icon: '📖' },
+    { id: 'ask',      label: t('tab_ask'),      icon: '💬' },
+  ]
+}
+
+// Kundli — the things any visitor immediately recognizes and wants on day
+// one. Same regardless of topic.
+function kundliSubtabs(t) {
+  return [
+    { id: 'birth_chart', label: t('tab_birth_chart') },
+    { id: 'divisional',  label: t('nav_divisional') },
+    { id: 'planets',     label: t('tab_planets') },
+    { id: 'dasha',       label: t('tab_dasha') },
+    { id: 'transit',     label: t('nav_transit') },
+    { id: 'download',    label: t('nav_download') },
+  ]
+}
+
+// Advanced — specialist Vedic techniques most casual users won't know what
+// to do with on day one; given their own home rather than cluttering Kundli.
+function advancedSubtabs(t) {
+  return [
+    { id: 'bhava',         label: t('nav_bhava') },
+    { id: 'ashtakavarga',  label: t('nav_ashtakavarga') },
+    { id: 'sarvatobhadra', label: t('nav_sarvatobhadra') },
+  ]
+}
+
+// Insights' sub-tabs depend on topic: Career gets Rajyogas + the Career
+// Report alongside Reading (they serve different purposes); every other
+// topic gets Reading + its one dedicated snapshot page; no topic at all
+// gets just Reading.
+function insightSubtabs(t, topicId) {
+  const reading = { id: 'reading', label: t('nav_reading') }
+  if (topicId === 'career') {
+    return [reading, { id: 'rajyogas', label: t('nav_rajyogas') }, { id: 'career', label: t('nav_career') }]
+  }
+  if (topicId === 'health' || topicId === 'relationship' || topicId === 'finance') {
+    return [reading, { id: topicId, label: t(`nav_${topicId}`) }]
+  }
+  return [reading]
+}
+
 const CHART_STYLES = [
-  { id: 'north', label: 'North Indian' },
-  { id: 'kp',    label: 'KP Chart' },
+  { id: 'north', label: 'North' },
+  { id: 'kp',    label: 'KP' },
 ]
 
-// Special sub-tabs
-const SPECIAL_TABS = [
-  { id: 'bhava',       label: 'Bhava Chalit' },
-  { id: 'ashtaka',     label: 'Ashtakavarga' },
-  { id: 'sarvatobhadra', label: 'Sarvatobhadra' },
-]
+const ACCENT_CLASSES = {
+  indigo: 'bg-indigo-600 border-indigo-600 text-white shadow-sm',
+  rose:   'bg-rose-600 border-rose-600 text-white shadow-sm',
+  teal:   'bg-teal-600 border-teal-600 text-white shadow-sm',
+}
+
+// Navigation pills — bold, filled, used for "which view am I looking at."
+function SubTabBar({ subtabs, active, onChange, accent = 'indigo' }) {
+  return (
+    <div className="flex gap-2 mb-4 flex-wrap">
+      {subtabs.map(s => (
+        <button key={s.id} onClick={() => onChange(s.id)}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition ${
+                  active === s.id
+                    ? ACCENT_CLASSES[accent]
+                    : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
+                }`}>
+          {s.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// Deliberately distinct from SubTabBar — a small labeled segmented control
+// for "how should the current view render," not "which view." No filled
+// pills, no border-per-option; one bordered container split into segments.
+function SegmentedToggle({ label, options, active, onChange }) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <span className="text-xs text-slate-400">{label}</span>
+      <div className="inline-flex border border-slate-200 rounded-lg overflow-hidden">
+        {options.map(o => (
+          <button key={o.id} onClick={() => onChange(o.id)}
+                  className={`text-xs px-3 py-1 transition ${
+                    active === o.id
+                      ? 'bg-slate-100 text-slate-800 font-medium'
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function Result() {
   const { t } = useTranslation()
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  const [activeTab, setActiveTab] = useState('birth_chart')
+  const [activeMain, setActiveMain] = useState('kundli')
+  const [activeKundliSub, setActiveKundliSub] = useState('birth_chart')
+  const [activeAdvancedSub, setActiveAdvancedSub] = useState('bhava')
+  const [activeInsightSub, setActiveInsightSub] = useState('reading')
   const [chartStyle, setChartStyle] = useState('north')
-  const [specialTab, setSpecialTab] = useState('bhava')
-  const [transitData, setTransitData] = useState(null)
 
   if (!state?.data) {
     navigate('/')
@@ -90,8 +165,12 @@ export default function Result() {
 
   const { data, input } = state
   const topic = getTopic(input.topic)
-  const locked = !hasPremiumAccess()
-  const tabs = TABS.map(tab => tab.premium ? { ...tab, locked } : tab)
+  const topicId = topic?.id ?? null
+
+  const MAIN_TABS = mainTabs(t)
+  const KUNDLI_SUBTABS = kundliSubtabs(t)
+  const ADVANCED_SUBTABS = advancedSubtabs(t)
+  const INSIGHT_SUBTABS = insightSubtabs(t, topicId)
 
   function renderBirthChart() {
     if (chartStyle === 'north') {
@@ -141,20 +220,19 @@ export default function Result() {
             </button>
           </div>
 
-          {/* Tab bar — desktop only; mobile uses the bottom nav instead */}
-          <div className="hidden sm:flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
-            {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className={`whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition inline-flex items-center gap-1 ${
-                        activeTab === tab.id
+          {/* Main tab bar — desktop only; mobile uses the bottom nav instead */}
+          <div className="hidden sm:flex gap-1">
+            {MAIN_TABS.map(tab => (
+              <button key={tab.id} onClick={() => setActiveMain(tab.id)}
+                      className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition inline-flex items-center gap-1.5 ${
+                        activeMain === tab.id
                           ? 'bg-white text-indigo-700'
                           : 'text-indigo-200 hover:text-white hover:bg-white/10'
                       }`}>
                 {tab.icon.startsWith('/')
-                  ? <img src={tab.icon} alt="" className="w-3.5 h-3.5 object-contain" />
+                  ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
                   : <span>{tab.icon}</span>}
                 {tab.label}
-                {tab.locked && <span className="text-[10px] opacity-70">🔒</span>}
               </button>
             ))}
           </div>
@@ -169,97 +247,86 @@ export default function Result() {
       {/* Content */}
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
 
-        {/* ── Kundli / Birth Chart ── */}
-        <div className={activeTab === 'birth_chart' ? '' : 'hidden'}>
-          {/* Chart style picker */}
-          <div className="flex gap-2 mb-4 flex-wrap">
-            {CHART_STYLES.map(s => (
-              <button key={s.id} onClick={() => setChartStyle(s.id)}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition ${
-                        chartStyle === s.id
-                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
-                      }`}>
-                {s.label}
-              </button>
-            ))}
+        {/* ══════════════ KUNDLI ══════════════ */}
+        <div className={activeMain === 'kundli' ? '' : 'hidden'}>
+          <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
+
+          <div className={activeKundliSub === 'birth_chart' ? '' : 'hidden'}>
+            <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} />
+            {renderBirthChart()}
           </div>
-          {renderBirthChart()}
-        </div>
 
-        {/* ── Divisional Charts ── */}
-        <div className={activeTab === 'divisional' ? '' : 'hidden'}>
-          <DivisionalCharts input={input} defaultDivision={topic?.division} />
-        </div>
-
-        {/* ── Transit ── */}
-        <div className={activeTab === 'transit' ? '' : 'hidden'}>
-          <TransitPanel input={input} natalData={data} />
-        </div>
-
-        {/* ── Special features ── */}
-        <div className={activeTab === 'special' ? '' : 'hidden'}>
-          {/* Special sub-tabs */}
-          <div className="flex gap-2 mb-4 flex-wrap">
-            {SPECIAL_TABS.map(s => (
-              <button key={s.id} onClick={() => setSpecialTab(s.id)}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition ${
-                        specialTab === s.id
-                          ? 'bg-rose-600 border-rose-600 text-white shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-rose-400'
-                      }`}>
-                {s.label}
-              </button>
-            ))}
+          <div className={activeKundliSub === 'divisional' ? '' : 'hidden'}>
+            <DivisionalCharts input={input} defaultDivision={topic?.division} />
           </div>
-          {specialTab === 'bhava'       && <BhavaChality input={input} />}
-          {specialTab === 'ashtaka'     && <AshtakavargaTable input={input} />}
-          {specialTab === 'sarvatobhadra' && (
-            <SarvatobhadraChakra
-              natalPlanets={data.planets}
-              transitPlanets={transitData?.transit_planets ?? []}
-            />
+
+          <div className={activeKundliSub === 'planets' ? '' : 'hidden'}>
+            <PlanetTable planets={data.planets} ascendant={data.ascendant} />
+          </div>
+
+          <div className={activeKundliSub === 'dasha' ? '' : 'hidden'}>
+            <DashaTable dasha={data.dasha} />
+          </div>
+
+          <div className={activeKundliSub === 'transit' ? '' : 'hidden'}>
+            <TransitPanel input={input} natalData={data} />
+          </div>
+
+          <div className={activeKundliSub === 'download' ? '' : 'hidden'}>
+            <KundliDownload data={data} input={input} />
+          </div>
+        </div>
+
+        {/* ══════════════ ADVANCED ══════════════ */}
+        <div className={activeMain === 'advanced' ? '' : 'hidden'}>
+          <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="teal" />
+
+          <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
+            <BhavaChality input={input} />
+          </div>
+
+          <div className={activeAdvancedSub === 'ashtakavarga' ? '' : 'hidden'}>
+            <AshtakavargaTable input={input} />
+          </div>
+
+          <div className={activeAdvancedSub === 'sarvatobhadra' ? '' : 'hidden'}>
+            {/* Note: pre-existing gap, not introduced here — natal-only view
+                until something actually feeds live transit data in. */}
+            <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
+          </div>
+        </div>
+
+        {/* ══════════════ INSIGHTS ══════════════ */}
+        <div className={activeMain === 'insights' ? '' : 'hidden'}>
+          <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="rose" />
+
+          <div className={activeInsightSub === 'reading' ? '' : 'hidden'}>
+            <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />
+          </div>
+
+          <div className={activeInsightSub === 'rajyogas' ? '' : 'hidden'}>
+            <RajyogasTab input={input} />
+          </div>
+
+          <div className={activeInsightSub === 'career' ? '' : 'hidden'}>
+            <CareerReportTab input={input} />
+          </div>
+
+          {(topicId === 'health' || topicId === 'relationship' || topicId === 'finance') && (
+            <div className={activeInsightSub === topicId ? '' : 'hidden'}>
+              <TopicInsightTab topic={topicId} data={data} />
+            </div>
           )}
         </div>
 
-        {/* ── Dasha ── */}
-        <div className={activeTab === 'dasha' ? '' : 'hidden'}>
-          <DashaTable dasha={data.dasha} />
-        </div>
-
-        {/* ── Planets ── */}
-        <div className={activeTab === 'planets' ? '' : 'hidden'}>
-          <PlanetTable planets={data.planets} ascendant={data.ascendant} />
-        </div>
-
-        {/* ── Reading ── */}
-        <div className={activeTab === 'reading' ? '' : 'hidden'}>
-          <ChartReading input={input} onSwitchToCareer={() => setActiveTab('career')} />
-        </div>
-
-        {/* ── Ask ── */}
-        <div className={activeTab === 'ask' ? '' : 'hidden'}>
+        {/* ══════════════ ASK ══════════════ */}
+        <div className={activeMain === 'ask' ? '' : 'hidden'}>
           <AskChart input={input} />
-        </div>
-
-        {/* ── Rajyogas ── */}
-        <div className={activeTab === 'rajyogas' ? '' : 'hidden'}>
-          <RajyogasTab input={input} />
-        </div>
-
-        {/* ── Career Report ── */}
-        <div className={activeTab === 'career' ? '' : 'hidden'}>
-          <CareerReportTab input={input} />
-        </div>
-
-        {/* ── Download ── */}
-        <div className={activeTab === 'download' ? '' : 'hidden'}>
-          <KundliDownload data={data} input={input} />
         </div>
 
       </div>
 
-      <NavBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={setActiveMain} />
     </div>
   )
 }

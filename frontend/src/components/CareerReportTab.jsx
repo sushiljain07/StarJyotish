@@ -247,7 +247,7 @@ export default function CareerReportTab({ input }) {
       >
         Generate Career Report
       </button>
-      <p className="text-xs text-gray-400 mt-3">Powered by AI · takes ~20 seconds</p>
+      <p className="text-xs text-gray-400 mt-3">{t('reading_powered_by_generic')} · takes ~20 seconds</p>
     </div>
   )
 
@@ -313,6 +313,11 @@ export default function CareerReportTab({ input }) {
       </div>
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
+      {report?.llm_provider && (
+        <p className="text-center text-[11px] text-slate-400 pb-1">
+          {t('reading_powered_by', { provider: report.llm_provider })}
+        </p>
+      )}
       <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-4">
         {t('disclaimer')}
       </p>

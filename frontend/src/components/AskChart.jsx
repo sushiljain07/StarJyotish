@@ -12,6 +12,7 @@ export default function AskChart({ input }) {
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading]       = useState(false)
   const [errorMsg, setErrorMsg]     = useState('')
+  const [provider, setProvider]     = useState(null)
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function AskChart({ input }) {
       }
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', text: data.answer }])
+      setProvider(data.llm_provider || null)
       setCount(prev => prev + 1)
     } catch (e) {
       setErrorMsg(e.message || t('ask_error'))
@@ -140,6 +142,9 @@ export default function AskChart({ input }) {
             {t('ask_send')}
           </button>
         </div>
+        <p className="text-[11px] text-slate-400 text-center mt-2">
+          {provider ? t('reading_powered_by', { provider }) : t('reading_powered_by_generic')}
+        </p>
       </div>
     </div>
   )

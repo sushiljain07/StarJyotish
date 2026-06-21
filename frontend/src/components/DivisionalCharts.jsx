@@ -1,7 +1,7 @@
 // frontend/src/components/DivisionalCharts.jsx
 // Save this as a NEW file in: frontend/src/components/DivisionalCharts.jsx
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import KundliChart from './KundliChart'
 import { API_BASE } from '../api/config'
 
@@ -26,8 +26,8 @@ const DIVISIONS = [
   { d: 60, name: 'D60', title: 'Shashtiamsha',     desc: 'Past-life karma' },
 ]
 
-export default function DivisionalCharts({ input }) {
-  const [selectedD, setSelectedD] = useState(null)
+export default function DivisionalCharts({ input, defaultDivision }) {
+  const [selectedD, setSelectedD] = useState(defaultDivision ?? null)
   const [chartData, setChartData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -54,6 +54,13 @@ export default function DivisionalCharts({ input }) {
     }
     setLoading(false)
   }
+
+  // Auto-load the topic-relevant chart on first render — selectedD alone
+  // only highlights the pill; the actual data still needs fetching.
+  useEffect(() => {
+    if (defaultDivision) fetchDivisional(defaultDivision)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const selected = DIVISIONS.find(d => d.d === selectedD)
 

@@ -137,7 +137,8 @@ def get_reading(body: ReadingRequest):
         if y["present"]
     ]
 
-    reading = generate_reading(chart, dasha_raw, body.language, div_charts, active_yogas=active_yogas)
+    reading = generate_reading(chart, dasha_raw, body.language, div_charts,
+                                active_yogas=active_yogas, focus_topic=body.topic)
     return ReadingResponse(
         sections=[ReadingSection(**s) for s in reading.get("sections", [])],
         active_yogas=active_yogas,

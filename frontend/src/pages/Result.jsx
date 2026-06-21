@@ -20,6 +20,7 @@ import RajyogasTab       from '../components/RajyogasTab'
 
 import { formatDate, formatTime } from '../utils/format'
 import { hasPremiumAccess } from '../config/entitlements'
+import { getTopic } from '../config/topics'
 
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
@@ -88,6 +89,7 @@ export default function Result() {
   }
 
   const { data, input } = state
+  const topic = getTopic(input.topic)
   const locked = !hasPremiumAccess()
   const tabs = TABS.map(tab => tab.premium ? { ...tab, locked } : tab)
 
@@ -127,6 +129,11 @@ export default function Result() {
               <div className="text-indigo-200 text-xs">
                 {formatDate(input.date)} · {formatTime(input.time)}
               </div>
+              {topic && (
+                <div className="mt-1 inline-flex items-center gap-1 bg-white/15 rounded-full px-2 py-0.5 text-[11px] text-indigo-100">
+                  {topic.icon} {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+                </div>
+              )}
             </div>
             <button onClick={() => navigate('/')}
                     className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-full transition">
@@ -182,7 +189,7 @@ export default function Result() {
 
         {/* ── Divisional Charts ── */}
         <div className={activeTab === 'divisional' ? '' : 'hidden'}>
-          <DivisionalCharts input={input} />
+          <DivisionalCharts input={input} defaultDivision={topic?.division} />
         </div>
 
         {/* ── Transit ── */}

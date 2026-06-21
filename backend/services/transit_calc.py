@@ -3,6 +3,7 @@ Calculate current transit planetary positions relative to a natal chart.
 """
 from datetime import datetime, timezone
 from typing import Any
+import pytz
 import swisseph as swe
 
 from services.astro_calc import (
@@ -10,12 +11,16 @@ from services.astro_calc import (
     _sidereal, _sign_info,
 )
 
+IST = pytz.timezone("Asia/Kolkata")
+
 
 def calculate_transit(natal_jd: float, lat: float, lon: float) -> dict[str, Any]:
     """
     Return current transit planet positions placed in natal chart houses.
     `lat`, `lon` are birth coordinates used to derive the natal ascendant.
     """
+    # The astronomical calculation must stay in UTC — only the *display*
+    # string below is converted, so this is unaffected by timezone choice.
     now = datetime.now(timezone.utc)
     transit_jd = swe.julday(
         now.year, now.month, now.day,
@@ -56,7 +61,7 @@ def calculate_transit(natal_jd: float, lat: float, lon: float) -> dict[str, Any]
     })
 
     return {
-        "transit_date": now.strftime("%Y-%m-%d %H:%M UTC"),
+        "transit_date": now.astimezone(IST).strftime("%d-%m-%Y %H:%M IST"),
         "transit_planets": transit_planets,
         "natal_asc_sign_index": asc_sign_idx,
     }

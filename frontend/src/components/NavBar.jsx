@@ -38,11 +38,14 @@ export default function NavBar({ tabs, activeTab, onTabChange }) {
               <button
                 key={tab.id}
                 onClick={() => selectTab(tab.id)}
-                className={`flex flex-col items-center gap-1 px-1 py-3 rounded-xl text-xs font-medium transition ${
+                className={`relative flex flex-col items-center gap-1 px-1 py-3 rounded-xl text-xs font-medium transition ${
                   activeTab === tab.id ? 'bg-indigo-50 text-primary' : 'text-slate-600 hover:bg-slate-50'
                 }`}
               >
                 <NavIcon icon={tab.icon} className="text-xl leading-none w-5 h-5 object-contain" />
+                {tab.locked && (
+                  <span className="absolute top-1 right-2 text-[10px]">🔒</span>
+                )}
                 <span className="truncate w-full text-center text-[11px]">{tab.label}</span>
               </button>
             ))}
@@ -57,12 +60,15 @@ export default function NavBar({ tabs, activeTab, onTabChange }) {
             <button
               key={tab.id}
               onClick={() => selectTab(tab.id)}
-              className="flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
+              className="relative flex flex-col items-center gap-0.5 px-2 py-1 min-w-0"
             >
               <NavIcon
                 icon={tab.icon}
                 className="text-lg leading-none w-[1.125rem] h-[1.125rem] object-contain"
               />
+              {tab.locked && (
+                <span className="absolute -top-0.5 right-1 text-[9px]">🔒</span>
+              )}
               <span className={`text-[10px] font-medium leading-none truncate ${
                 activeTab === tab.id ? 'text-primary' : 'text-slate-400'
               }`}>

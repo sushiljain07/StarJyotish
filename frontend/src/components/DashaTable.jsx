@@ -1,6 +1,7 @@
 // frontend/src/components/DashaTable.jsx
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatDate } from '../utils/format'
 
 function pct(start, end) {
   const now = Date.now()
@@ -62,8 +63,8 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
                   {isCurrent && <span className="mr-1">▶</span>}
                   {labelFn(r)}
                 </td>
-                <td className="p-2 border border-slate-100">{r.start}</td>
-                <td className="p-2 border border-slate-100">{r.end}</td>
+                <td className="p-2 border border-slate-100">{formatDate(r.start)}</td>
+                <td className="p-2 border border-slate-100">{formatDate(r.end)}</td>
                 <td className="p-2 border border-slate-100">{durationLabel(r.start, r.end)}</td>
                 <td className="p-2 border border-slate-100">
                   <div className="h-2 bg-slate-100 rounded-full">
@@ -130,7 +131,7 @@ export default function DashaTable({ dasha }) {
             <div className={`text-xs ${c.text} uppercase tracking-wide mb-1`}>Current Mahadasha</div>
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-2xl font-bold text-indigo-900">{md.planet}</span>
-              <span className="text-sm text-slate-500">{md.start} – {md.end} · {md.years}y</span>
+              <span className="text-sm text-slate-500">{formatDate(md.start)} – {formatDate(md.end)} · {md.years}y</span>
             </div>
             <div className="mt-2 h-2 bg-indigo-100 rounded-full">
               <div className="h-2 bg-indigo-500 rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
@@ -172,7 +173,7 @@ export default function DashaTable({ dasha }) {
           {ad && (
             <div className={`${c.light} border ${c.border} rounded-lg px-3 py-2 text-xs ${c.text}`}>
               Pratyantar periods within <strong>{md.planet}–{ad.planet}</strong> Antardasha
-              ({ad.start} to {ad.end})
+              ({formatDate(ad.start)} to {formatDate(ad.end)})
             </div>
           )}
           <PeriodTable

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { API_BASE } from '../api/config'
+import { hasPremiumAccess } from '../config/entitlements'
+import PaywallCard from './PaywallCard'
 
 const YOGA_ICONS = {
   'Raja Yoga':                  '👑',
@@ -433,6 +435,21 @@ export default function RajyogasTab({ input }) {
   const [status, setStatus]     = useState('idle')
   const [result, setResult]     = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+
+  if (!hasPremiumAccess()) {
+    return (
+      <PaywallCard
+        icon="👑"
+        title="The Complete Raj Yoga Reference"
+        body="Your free Reading already named the Raj Yogas the AI noticed in your chart. This tab is the full technical breakdown — every one of the 19 classical combinations checked against your exact planetary positions, not a narrative summary."
+        bullets={[
+          'All 19 yogas — present AND absent, with the exact reasoning for each',
+          'Precise planetary/house justification, not a generated paraphrase',
+          'See exactly which yogas you\u2019re missing and why',
+        ]}
+      />
+    )
+  }
 
   async function load() {
     setStatus('loading')

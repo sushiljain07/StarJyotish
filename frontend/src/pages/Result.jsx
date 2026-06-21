@@ -18,18 +18,8 @@ import KundliDownload     from '../components/KundliDownload'
 import CareerReportTab   from '../components/CareerReportTab'
 import RajyogasTab       from '../components/RajyogasTab'
 
-function formatDate(dateStr) {
-  const [y, m, d] = dateStr.split('-')
-  return `${d}-${m}-${y}`
-}
-function formatTime(timeStr) {
-  const [hStr, min] = timeStr.split(':')
-  let h = parseInt(hStr, 10)
-  const ampm = h >= 12 ? 'PM' : 'AM'
-  if (h === 0) h = 12
-  else if (h > 12) h -= 12
-  return `${h}:${min} ${ampm}`
-}
+import { formatDate, formatTime } from '../utils/format'
+import { hasPremiumAccess } from '../config/entitlements'
 
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
@@ -64,8 +54,8 @@ const TABS = [
   { id: 'planets',     label: 'Planets',     icon: '🌟' },
   { id: 'reading',     label: 'Reading',     icon: '📖', primary: true },
   { id: 'ask',         label: 'Ask',         icon: '💬', primary: true },
-  { id: 'rajyogas',    label: 'Rajyogas',    icon: '👑' },
-  { id: 'career',      label: 'Career',      icon: '💼' },
+  { id: 'rajyogas',    label: 'Rajyogas',    icon: '👑', premium: true },
+  { id: 'career',      label: 'Career',      icon: '💼', premium: true },
   { id: 'download',    label: 'Download',    icon: '⬇️' },
 ]
 
@@ -98,6 +88,8 @@ export default function Result() {
   }
 
   const { data, input } = state
+  const locked = !hasPremiumAccess()
+  const tabs = TABS.map(tab => tab.premium ? { ...tab, locked } : tab)
 
   function renderBirthChart() {
     if (chartStyle === 'north') {
@@ -144,7 +136,7 @@ export default function Result() {
 
           {/* Tab bar — desktop only; mobile uses the bottom nav instead */}
           <div className="hidden sm:flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
-            {TABS.map(tab => (
+            {tabs.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                       className={`whitespace-nowrap px-3 py-1.5 rounded-t-lg text-xs font-medium transition inline-flex items-center gap-1 ${
                         activeTab === tab.id
@@ -155,6 +147,7 @@ export default function Result() {
                   ? <img src={tab.icon} alt="" className="w-3.5 h-3.5 object-contain" />
                   : <span>{tab.icon}</span>}
                 {tab.label}
+                {tab.locked && <span className="text-[10px] opacity-70">🔒</span>}
               </button>
             ))}
           </div>
@@ -259,7 +252,7 @@ export default function Result() {
 
       </div>
 
-      <NavBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <NavBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   )
 }

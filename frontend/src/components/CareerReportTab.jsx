@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
+import { hasPremiumAccess } from '../config/entitlements'
+import PaywallCard from './PaywallCard'
 
 // New v2 section order — warm, aspirational labels
 const SECTIONS = [
@@ -192,6 +194,21 @@ export default function CareerReportTab({ input }) {
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+
+  if (!hasPremiumAccess()) {
+    return (
+      <PaywallCard
+        icon="💼"
+        title="Your Full Career Report"
+        body="Your exact career field, whether your chart favors a job or business, your peak career window, and the precise activation protocol for every Raj Yoga in your chart — gemstone, mantra, timing, and ritual, calibrated to you."
+        bullets={[
+          'Your best career options, ranked for your specific chart',
+          'Activation protocol for every Raj Yoga you carry',
+          'Delivered as a report you can keep and revisit',
+        ]}
+      />
+    )
+  }
 
   async function generate() {
     setStatus('loading')

@@ -1,19 +1,29 @@
 // frontend/src/pages/Home.jsx
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
+import { getTopic } from '../config/topics'
 
 export default function Home() {
   const { t, i18n } = useTranslation()
+  const { state } = useLocation()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  async function handleSubmit(input) {
+  const topicId = state?.topic ?? null
+  const topic = getTopic(topicId)
+
+  async function handleSubmit(formInput) {
     setLoading(true)
     setError(null)
+    // Merge the incoming topic onto the input object — this is what makes
+    // it flow through to the backend's free-Reading prompt later (see
+    // ChartReading.jsx, which spreads `input` straight into its request
+    // body) without needing a second, separate piece of state.
+    const input = topicId ? { ...formInput, topic: topicId } : formInput
     try {
       const data = await fetchKundli(input)
       navigate('/kundli', { state: { data, input } })
@@ -56,6 +66,16 @@ export default function Home() {
       {/* Form card */}
       <div className="flex-1 px-4 -mt-4">
         <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6 sm:p-8">
+          {topic && (
+            <div className="mb-4 flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2 text-xs">
+              <span className="text-indigo-700 font-medium">
+                {topic.icon} {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+              </span>
+              <button onClick={() => navigate('/')} className="text-indigo-500 underline shrink-0 ml-2">
+                {t('change_focus')}
+              </button>
+            </div>
+          )}
           <BirthForm onSubmit={handleSubmit} loading={loading} />
           {error && (
             <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

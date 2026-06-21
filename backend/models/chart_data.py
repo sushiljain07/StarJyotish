@@ -82,6 +82,9 @@ class ReadingRequest(_Flexible):
     time: str       # "HH:MM" (24-hr)
     place: str
     language: str   # "en" or "hi"
+    topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' —
+                                  # set when the user arrived via a landing-page topic
+                                  # card; see services/ai.py build_prediction_prompt().
 
 
 class ReadingSection(_Flexible):

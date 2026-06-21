@@ -9,6 +9,9 @@ class BirthInput(BaseModel):
     place: str  # e.g. "New Delhi, India"
     language: str = "en"
     question: Optional[str] = None
+    topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' — set when the
+                                  # user arrived via a landing-page topic card; see services/ai.py's
+                                  # build_prediction_prompt() for how it's used.
 
     @field_validator("date")
     @classmethod

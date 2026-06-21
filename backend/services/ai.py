@@ -877,6 +877,7 @@ def build_prediction_prompt(
     dasha: dict,
     language: str,
     active_yogas: Optional[list] = None,
+    focus_topic: Optional[str] = None,
 ) -> str:
     """Build the Jyotish Guru genuine-value free prediction prompt."""
     asc = chart["ascendant"]
@@ -941,12 +942,25 @@ def build_prediction_prompt(
     )
     ad_line = f"\n  Sub-period: {ad.get('planet', '')} (ends {ad.get('end', '')})" if ad else ""
 
+    _TOPIC_FOCUS = {
+        "career":       "career, profession, business, and professional growth",
+        "relationship": "marriage, partnership, and relationship compatibility",
+        "health":       "health, vitality, and general wellbeing",
+        "finance":      "wealth, financial stability, and prosperity",
+    }
+    topic_note = (
+        f"\nFOCUS: This person came here specifically with {_TOPIC_FOCUS[focus_topic]} on their mind. "
+        f"Give that area noticeably more depth and concrete detail than the others — lead with it where "
+        f"natural — but still cover every section; don't drop or shortchange the rest of the reading.\n"
+        if focus_topic in _TOPIC_FOCUS else ""
+    )
+
     return f"""You are Jyotish Guru — a master Vedic astrologer giving a genuine, warm, and deeply insightful FREE career reading to someone who just shared their birth details for the first time.
 
 Your job is to give REAL VALUE — actual chart findings, real yoga names, genuine predictions — so the person feels: "This is accurate. This person truly knows my chart. I need the full report."
 
 {lang_note}
-
+{topic_note}
 ═══════════════════════════════════
 CHART DATA (use this as your basis):
 ═══════════════════════════════════
@@ -1102,12 +1116,13 @@ def generate_reading(
     language: str,
     div_charts: Optional[dict] = None,
     active_yogas: Optional[list] = None,
+    focus_topic: Optional[str] = None,
 ) -> dict:
     """
     Generate the free Jyotish Guru prediction.
     Returns dict with keys: sections, prediction_text, prediction_sections, teasers.
     """
-    prompt = build_prediction_prompt(chart, dasha, language, active_yogas)
+    prompt = build_prediction_prompt(chart, dasha, language, active_yogas, focus_topic)
     try:
         raw = _call_llm([{"role": "user", "content": prompt}], json_mode=False)
     except HTTPException:

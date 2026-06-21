@@ -1,5 +1,6 @@
 // frontend/src/components/KundliDownload.jsx
 import KundliChart from './KundliChart'
+import { formatDate as fmtDate, formatTime as fmtTime } from '../utils/format'
 
 // ── Basic prediction lookup tables ───────────────────────────────────────────
 
@@ -61,13 +62,6 @@ function getDignity(name, signIndex) {
 }
 
 const DIGNITY_COLOR = { 'Exalted':'#16a34a', 'Debilitated':'#dc2626', 'Own Sign':'#2563eb' }
-
-function fmtDate(s) { const [y,m,d]=s.split('-'); return `${d}-${m}-${y}` }
-function fmtTime(s) {
-  const [hStr,min]=s.split(':'); let h=parseInt(hStr,10)
-  const ap=h>=12?'PM':'AM'; if(h===0)h=12; else if(h>12)h-=12
-  return `${h}:${min} ${ap}`
-}
 
 export default function KundliDownload({ data, input }) {
   const { planets, ascendant, navamsa_planets, navamsa_ascendant, dasha } = data
@@ -144,7 +138,7 @@ export default function KundliDownload({ data, input }) {
               Nakshatra: {ascendant.nakshatra}
             </span>
             <span className="bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">
-              Mahadasha: {md.planet} · ends {md.end}
+              Mahadasha: {md.planet} · ends {fmtDate(md.end)}
             </span>
           </div>
         </div>
@@ -229,27 +223,27 @@ export default function KundliDownload({ data, input }) {
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-2">
               <div className="text-xs text-indigo-400 uppercase font-medium">Mahadasha</div>
               <div className="text-sm font-bold text-indigo-900">{md.planet}</div>
-              <div className="text-xs text-slate-500">{md.start} – {md.end} ({md.years}y)</div>
+              <div className="text-xs text-slate-500">{fmtDate(md.start)} – {fmtDate(md.end)} ({md.years}y)</div>
             </div>
             {ad && (
               <div className="bg-violet-50 border border-violet-200 rounded-lg px-3 py-2">
                 <div className="text-xs text-violet-400 uppercase font-medium">Antardasha</div>
                 <div className="text-sm font-bold text-violet-900">{ad.planet}</div>
-                <div className="text-xs text-slate-500">{ad.start} – {ad.end}</div>
+                <div className="text-xs text-slate-500">{fmtDate(ad.start)} – {fmtDate(ad.end)}</div>
               </div>
             )}
             {dasha.current_pratyantar && (
               <div className="bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
                 <div className="text-xs text-rose-400 uppercase font-medium">Pratyantar</div>
                 <div className="text-sm font-bold text-rose-900">{dasha.current_pratyantar.planet}</div>
-                <div className="text-xs text-slate-500">{dasha.current_pratyantar.start} – {dasha.current_pratyantar.end}</div>
+                <div className="text-xs text-slate-500">{fmtDate(dasha.current_pratyantar.start)} – {fmtDate(dasha.current_pratyantar.end)}</div>
               </div>
             )}
             {dasha.current_sookshma && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                 <div className="text-xs text-amber-500 uppercase font-medium">Sookshma</div>
                 <div className="text-sm font-bold text-amber-900">{dasha.current_sookshma.planet}</div>
-                <div className="text-xs text-slate-500">{dasha.current_sookshma.start} – {dasha.current_sookshma.end}</div>
+                <div className="text-xs text-slate-500">{fmtDate(dasha.current_sookshma.start)} – {fmtDate(dasha.current_sookshma.end)}</div>
               </div>
             )}
           </div>

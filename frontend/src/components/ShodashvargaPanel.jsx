@@ -118,7 +118,7 @@ export default function ShodashvargaPanel({ input }) {
 
       {/* Selected chart info */}
       {selected && (
-        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+        <div className="flex items-center gap-3 flex-wrap bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
           <span className="text-amber-700 font-bold text-sm">{selected.name} — {selected.title}</span>
           <span className="text-amber-600 text-xs">{selected.desc}</span>
           {chartData && compareD === null && (

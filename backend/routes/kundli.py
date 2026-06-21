@@ -19,7 +19,7 @@ from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.ai import generate_reading, ask_chart
 from services.ashtakavarga import calculate_ashtakavarga
-from services.career_analysis import check_special_combinations
+from services.career_analysis import check_all_yogas
 from services.kp_system import enrich_planets_kp
 from services.transit_calc import calculate_transit, calculate_bhava_chalit
 
@@ -127,10 +127,11 @@ def get_reading(body: ReadingRequest):
     for div in (2, 3, 4, 6, 7, 10, 12, 20, 24, 60):
         div_charts[div] = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, div)
 
-    # Compute active rajyogas for the upsell section
+    # Compute active rajyogas for the upsell section — uses the same
+    # check_all_yogas() the Rajyogas tab uses, so both surfaces agree.
     active_yogas = [
         {"name": y["yoga"], "description": y["description"]}
-        for y in check_special_combinations(
+        for y in check_all_yogas(
             chart["planets"], chart["ascendant"]["sign_index"]
         )
         if y["present"]

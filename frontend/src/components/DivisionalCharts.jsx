@@ -97,7 +97,7 @@ export default function DivisionalCharts({ input }) {
 
       {/* Selected chart info banner */}
       {selected && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 flex items-center gap-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 flex items-center gap-3 flex-wrap">
           <span className="text-amber-700 font-bold text-sm">{selected.name} — {selected.title}</span>
           <span className="text-amber-600 text-xs">{selected.desc}</span>
         </div>

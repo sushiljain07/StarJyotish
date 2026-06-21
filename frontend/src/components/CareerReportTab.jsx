@@ -188,7 +188,7 @@ function CareerOptionCard({ opt }) {
 }
 
 export default function CareerReportTab({ input }) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
@@ -286,7 +286,7 @@ export default function CareerReportTab({ input }) {
           : null
       )}
 
-      <div className="text-center mt-6 pb-4">
+      <div className="text-center mt-6 pb-2">
         <button
           onClick={() => setStatus('idle')}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
@@ -294,6 +294,11 @@ export default function CareerReportTab({ input }) {
           ↺ Regenerate Report
         </button>
       </div>
+
+      {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
+      <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-4">
+        {t('disclaimer')}
+      </p>
     </div>
   )
 }

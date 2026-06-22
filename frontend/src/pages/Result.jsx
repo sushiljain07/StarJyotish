@@ -18,6 +18,7 @@ import KundliDownload     from '../components/KundliDownload'
 import CareerReportTab   from '../components/CareerReportTab'
 import RajyogasTab       from '../components/RajyogasTab'
 import TopicInsightTab   from '../components/TopicInsightTab'
+import TopicReportTab    from '../components/TopicReportTab'
 import SegmentedToggle   from '../components/SegmentedToggle'
 
 import { formatDate, formatTime } from '../utils/format'
@@ -303,7 +304,13 @@ export default function Result() {
             <CareerReportTab input={input} />
           </div>
 
-          {(topicId === 'health' || topicId === 'relationship' || topicId === 'finance') && (
+          {topicId === 'relationship' && (
+            <div className={activeInsightSub === topicId ? '' : 'hidden'}>
+              <TopicReportTab topic={topicId} input={input} />
+            </div>
+          )}
+
+          {(topicId === 'health' || topicId === 'finance') && (
             <div className={activeInsightSub === topicId ? '' : 'hidden'}>
               <TopicInsightTab topic={topicId} data={data} />
             </div>

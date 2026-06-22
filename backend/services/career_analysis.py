@@ -9,66 +9,21 @@ from typing import Optional
 from services.ashtakavarga import calculate_ashtakavarga
 
 # ── Vedic Astrology Constants ─────────────────────────────────────────────────
-
-SIGNS = [
-    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
-]
-
-# Sign index (0–11) → ruling planet
-SIGN_LORDS = {
-    0: "Mars", 1: "Venus", 2: "Mercury", 3: "Moon", 4: "Sun", 5: "Mercury",
-    6: "Venus", 7: "Mars", 8: "Jupiter", 9: "Saturn", 10: "Saturn", 11: "Jupiter",
-}
-
-# Exaltation sign index for each planet
-EXALTATION = {
-    "Sun": 0, "Moon": 1, "Mars": 9, "Mercury": 5,
-    "Jupiter": 3, "Venus": 11, "Saturn": 6, "Rahu": 1, "Ketu": 7,
-}
-
-# Debilitation sign index for each planet
-DEBILITATION = {
-    "Sun": 6, "Moon": 7, "Mars": 3, "Mercury": 11,
-    "Jupiter": 9, "Venus": 5, "Saturn": 0, "Rahu": 7, "Ketu": 1,
-}
-
-# Own signs (list of sign indices) for each planet
-OWN_SIGNS = {
-    "Sun": [4], "Moon": [3], "Mars": [0, 7], "Mercury": [2, 5],
-    "Jupiter": [8, 11], "Venus": [1, 6], "Saturn": [9, 10],
-    "Rahu": [], "Ketu": [],
-}
-
-# Natural friendship table (Parashari system)
-NATURAL_FRIENDS = {
-    "Sun":     {"Moon", "Mars", "Jupiter"},
-    "Moon":    {"Sun", "Mercury"},
-    "Mars":    {"Sun", "Moon", "Jupiter"},
-    "Mercury": {"Sun", "Venus"},
-    "Jupiter": {"Sun", "Moon", "Mars"},
-    "Venus":   {"Mercury", "Saturn"},
-    "Saturn":  {"Mercury", "Venus"},
-    "Rahu":    {"Mercury", "Saturn", "Venus"},
-    "Ketu":    {"Mars", "Sun"},
-}
-
-NATURAL_ENEMIES = {
-    "Sun":     {"Venus", "Saturn"},
-    "Moon":    {"Rahu", "Ketu"},
-    "Mars":    {"Mercury"},
-    "Mercury": {"Moon"},
-    "Jupiter": {"Mercury", "Venus"},
-    "Venus":   {"Sun", "Moon"},
-    "Saturn":  {"Sun", "Moon", "Mars"},
-    "Rahu":    {"Sun", "Moon"},
-    "Ketu":    {"Moon", "Venus"},
-}
-
-DIGNITY_SCORE = {
-    "exalted": 6, "own": 5, "friendly": 4,
-    "neutral": 3, "enemy": 2, "debilitated": 1,
-}
+# Generic constants (SIGNS, SIGN_LORDS, dignity tables, dasha order) now live
+# in astro_utils.py, shared with relationship/health/wealth analysis — only
+# career-specific lookup tables (below) stay in this file.
+from services.astro_utils import (
+    SIGNS, SIGN_LORDS, EXALTATION, DEBILITATION, OWN_SIGNS,
+    NATURAL_FRIENDS, NATURAL_ENEMIES, DIGNITY_SCORE,
+    DASHA_ORDER as _DASHA_ORDER, DASHA_YEARS as _DASHA_YEARS,
+    planet_by_name as _planet_by_name,
+    house_sign as _house_sign,
+    house_lord as _house_lord,
+    get_planet_dignity,
+    calculate_amatyakaraka,
+    sign_from_planet as _sign_from_planet,
+    get_first_mahadasha as _get_first_mahadasha,
+)
 
 # Academic / study streams by ruling planet
 STUDENT_STREAMS = {
@@ -97,114 +52,6 @@ CAREER_DOMAINS = {
 }
 
 # ── Utility Helpers ───────────────────────────────────────────────────────────
-
-def _planet_by_name(planets: list, name: str) -> Optional[dict]:
-    for p in planets:
-        if p.get("name") == name:
-            return p
-    return None
-
-
-def _house_sign(lagna_sign_idx: int, house: int) -> int:
-    """Sign index of house N in whole-sign system."""
-    return (lagna_sign_idx + house - 1) % 12
-
-
-def _house_lord(lagna_sign_idx: int, house: int) -> str:
-    """Ruling planet of house N."""
-    return SIGN_LORDS[_house_sign(lagna_sign_idx, house)]
-
-
-# Vimshottari dasha order (Ketu starts at nakshatra index 0 = Ashwini)
-_DASHA_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"]
-_DASHA_YEARS = {"Ketu": 7, "Venus": 20, "Sun": 6, "Moon": 10,
-                "Mars": 7, "Rahu": 18, "Jupiter": 16, "Saturn": 19, "Mercury": 17}
-
-
-def _get_first_mahadasha(chart_data: dict) -> str:
-    """Return the Vimshottari MD planet that was active at birth (Moon nakshatra lord)."""
-    moon_lon = chart_data.get("moon_sidereal_lon")
-    if moon_lon is None:
-        moon_p = _planet_by_name(chart_data.get("planets", []), "Moon")
-        if moon_p:
-            moon_lon = moon_p.get("sign_index", 0) * 30 + moon_p.get("degree", 0)
-    if moon_lon is None:
-        return "Unknown"
-    nak_idx = int(float(moon_lon) / (360 / 27))
-    return _DASHA_ORDER[nak_idx % 9]
-
-
-def _sign_from_planet(planet_name: str, n: int, planets: list, lagna_idx: int) -> dict:
-    """
-    Return info about the Nth sign counted from a planet's sign.
-    Used for: 4th from Sun (natural abilities), 10th from Saturn (karmic career).
-    """
-    p = _planet_by_name(planets, planet_name)
-    if not p:
-        return {"planet": planet_name, "sign": "N/A", "lord": "N/A",
-                "house": "N/A", "occupants": [], "found": False}
-    planet_sign_idx = p.get("sign_index", 0)
-    target_sign_idx = (planet_sign_idx + n - 1) % 12
-    target_sign     = SIGNS[target_sign_idx]
-    target_lord     = SIGN_LORDS[target_sign_idx]
-    # house number from lagna
-    target_house    = (target_sign_idx - lagna_idx) % 12 + 1
-    occupants       = [pl["name"] for pl in planets if pl.get("house") == target_house]
-    lord_dignity    = get_planet_dignity(target_lord,
-                         _planet_by_name(planets, target_lord).get("sign_index", 0)
-                         if _planet_by_name(planets, target_lord) else 0)
-    return {
-        "planet": planet_name,
-        "from_sign": p.get("sign", "N/A"),
-        "n": n,
-        "sign": target_sign,
-        "lord": target_lord,
-        "lord_dignity": lord_dignity,
-        "house": target_house,
-        "occupants": occupants,
-        "found": True,
-    }
-
-
-# ── 1. Planet Dignity ─────────────────────────────────────────────────────────
-
-def get_planet_dignity(planet_name: str, sign_idx: int) -> str:
-    """Return dignity string for a planet in the given sign index."""
-    if EXALTATION.get(planet_name) == sign_idx:
-        return "exalted"
-    if DEBILITATION.get(planet_name) == sign_idx:
-        return "debilitated"
-    if sign_idx in OWN_SIGNS.get(planet_name, []):
-        return "own"
-    sign_lord = SIGN_LORDS[sign_idx]
-    if sign_lord in NATURAL_FRIENDS.get(planet_name, set()):
-        return "friendly"
-    if sign_lord in NATURAL_ENEMIES.get(planet_name, set()):
-        return "enemy"
-    return "neutral"
-
-
-# ── 2. Amatyakaraka Calculation ───────────────────────────────────────────────
-
-def calculate_amatyakaraka(planets: list) -> dict:
-    """
-    Jaimini Chara Karaka system: rank 7 classical planets by their
-    within-sign degree (highest = Atmakaraka, 2nd = Amatyakaraka).
-    """
-    classical = [
-        p for p in planets
-        if p.get("name") in {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
-    ]
-    ranked = sorted(classical, key=lambda p: p.get("degree", 0), reverse=True)
-    return {
-        "atmakaraka":  ranked[0] if len(ranked) > 0 else None,
-        "amatyakaraka": ranked[1] if len(ranked) > 1 else None,
-        "ranked_karakas": [
-            {"name": p["name"], "sign": p["sign"], "degree": round(p.get("degree", 0), 2)}
-            for p in ranked
-        ],
-    }
-
 
 # ── 3. Job vs Business ────────────────────────────────────────────────────────
 
@@ -915,95 +762,22 @@ def identify_career_fields(
 
 # ── LLM Integration ───────────────────────────────────────────────────────────
 
-def _extract_json(raw: str) -> dict:
-    """Extract JSON from LLM response, handling markdown fences and leading text."""
-    import re
-    stripped = re.sub(r"```(?:json)?\s*", "", raw).strip()
-    # Try direct parse first
-    try:
-        return json.loads(stripped)
-    except json.JSONDecodeError:
-        pass
-    # Find outermost { ... }
-    start = stripped.find("{")
-    end   = stripped.rfind("}") + 1
-    if start != -1 and end > start:
-        return json.loads(stripped[start:end])
-    raise ValueError(f"No valid JSON found in response (first 300 chars): {raw[:300]}")
+# _extract_json and _call_llm moved to report_utils.py (shared with
+# relationship/health/wealth analysis) — thin wrapper below preserves the
+# exact original call signature and behavior so nothing else in this file
+# needs to change.
+from services.report_utils import extract_json as _extract_json
+from services.report_utils import call_llm as _report_call_llm
 
 
 def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict, str]:
-    """
-    Always try Claude first. Only fall back to Groq on network/API-level errors.
-    Groq receives a compact system prompt (GROQ_SYSTEM_PROMPT) to avoid 413
-    Payload Too Large errors — `groq_extra` is a small, separately-bounded
-    supplement (e.g. a single ascendant's gemstone excerpt, not the full
-    ~45K-char bundle Claude gets) appended on top of it.
-    Returns (parsed_json, provider_label) — provider_label reflects whichever
-    one actually served this request, since the fallback can kick in silently.
-    """
-    anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-    if anthropic_key:
-        import anthropic as _anthropic
-        client = _anthropic.Anthropic(api_key=anthropic_key)
-        create_kwargs: dict = dict(
-            model="claude-sonnet-4-6",
-            max_tokens=7000,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if system:
-            create_kwargs["system"] = system
-        try:
-            msg = client.messages.create(**create_kwargs)
-            return _extract_json(msg.content[0].text), "Claude"
-        except _anthropic.APIStatusError as e:
-            # Rate limit or server error → try Groq
-            print(f"[career] Claude API error ({e.status_code}), falling back to Groq.")
-        except _anthropic.APIConnectionError:
-            print("[career] Claude connection error, falling back to Groq.")
-        except json.JSONDecodeError as e:
-            # Claude returned bad JSON — re-raise, don't waste Groq quota
-            raise RuntimeError(f"Claude returned non-JSON: {e}") from e
-        except Exception as e:
-            print(f"[career] Claude unexpected error ({type(e).__name__}: {e}), falling back to Groq.")
-
-    groq_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not groq_key:
-        raise RuntimeError("No LLM API key available (set ANTHROPIC_API_KEY or GROQ_API_KEY).")
-
     from services.skill_loader import GROQ_SYSTEM_PROMPT
-    groq_system = GROQ_SYSTEM_PROMPT
-    if groq_extra:
-        groq_system = (
-            groq_system
-            + "\n\n## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT\n"
-            + groq_extra
-        )
-    for attempt in range(3):
-        try:
-            resp = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {groq_key}",
-                         "Content-Type": "application/json"},
-                json={
-                    "model": "llama-3.3-70b-versatile",
-                    "messages": [
-                        {"role": "system", "content": groq_system},
-                        {"role": "user",   "content": prompt},
-                    ],
-                    "response_format": {"type": "json_object"},
-                },
-                timeout=90,
-            )
-            if resp.status_code == 429:
-                time.sleep(2 ** attempt)
-                continue
-            resp.raise_for_status()
-            return json.loads(resp.json()["choices"][0]["message"]["content"]), "Groq · Llama"
-        except Exception:
-            if attempt == 2:
-                raise
-    raise RuntimeError("Groq API failed after retries")
+    return _report_call_llm(
+        prompt, system=system, groq_extra=groq_extra,
+        groq_system_prompt=GROQ_SYSTEM_PROMPT,
+        groq_extra_header="## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT",
+        log_prefix="career",
+    )
 
 
 # ── Prompt Builder ────────────────────────────────────────────────────────────
@@ -1378,39 +1152,9 @@ Sections must appear in this EXACT order.
     return prompt
 
 
-def _filter_report_language(report: dict) -> dict:
-    """Replace negative astrological terms in LLM output with empowering equivalents."""
-    _replacements = [
-        (r"\bdebilitated\b",          "in a transformative placement"),
-        (r"\bin (?:an? )?enemy sign\b", "in a resilience-building sign"),
-        (r"\benemy sign\b",            "resilience-building sign"),
-        (r"\bafflicted\b",             "on a powerful growth journey"),
-        (r"\bweak\b",                  "developing its strength"),
-        (r"\bchallenging placement\b", "unique growth placement"),
-        (r"\bposes challenges\b",      "creates unique opportunities"),
-        (r"\bmalefic\b",               "dynamic"),
-        (r"\bdebility\b",              "transformative phase"),
-        (r"\bdifficult placement\b",   "growth-oriented placement"),
-    ]
-
-    def _clean(text: str) -> str:
-        for pattern, repl in _replacements:
-            text = re.sub(pattern, repl, text, flags=re.IGNORECASE)
-        return text
-
-    for key, val in report.items():
-        if isinstance(val, dict):
-            if "content" in val:
-                val["content"] = _clean(val["content"])
-            if "title" in val:
-                val["title"] = _clean(val["title"])
-        elif isinstance(val, list):
-            for item in val:
-                if isinstance(item, dict):
-                    for k, v in item.items():
-                        if isinstance(v, str):
-                            item[k] = _clean(v)
-    return report
+# _filter_report_language moved to report_utils.py verbatim (shared with
+# relationship/health/wealth — the forbidden-word list is topic-agnostic).
+from services.report_utils import filter_report_language as _filter_report_language
 
 
 # ── Main Entry Point ──────────────────────────────────────────────────────────

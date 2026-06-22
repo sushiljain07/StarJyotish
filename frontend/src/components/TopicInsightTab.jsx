@@ -45,11 +45,11 @@ export default function TopicInsightTab({ topic, data }) {
   }
 
   return (
-    <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+    <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-sm border border-line p-6">
       <div className="text-3xl mb-2">{meta.icon}</div>
-      <h3 className="text-lg font-bold text-slate-800 mb-3">{t(`topic_${topic}_heading`)}</h3>
-      <p className="text-sm text-slate-600 leading-relaxed">{body}</p>
-      <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-400">
+      <h3 className="text-lg font-bold text-ink mb-3">{t(`topic_${topic}_heading`)}</h3>
+      <p className="text-sm text-ink-muted leading-relaxed">{body}</p>
+      <div className="mt-5 pt-4 border-t border-line text-xs text-ink-faint">
         {t('topic_coming_soon')}
       </div>
     </div>

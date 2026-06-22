@@ -152,15 +152,15 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   if (status === 'idle') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">🔮</div>
-      <h2 className="text-xl font-bold text-slate-800 mb-2">{t('reading_idle_heading')}</h2>
-      <p className="text-gray-500 text-sm mb-6 max-w-sm">
+      <h2 className="text-xl font-bold text-ink mb-2">{t('reading_idle_heading')}</h2>
+      <p className="text-ink-muted text-sm mb-6 max-w-sm">
         {t('reading_idle_body')}
       </p>
       <button onClick={generate}
-        className="px-8 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-full transition shadow-md">
+        className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
         Reveal My Prediction
       </button>
-      <p className="text-xs text-gray-400 mt-3">{t('reading_powered_by_generic')}</p>
+      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
     </div>
   )
 
@@ -168,12 +168,12 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   if (status === 'loading') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="font-medium" style={{ color: '#7C3AED' }}>Reading your birth chart…</p>
-      <div className="mt-4 w-48 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+      <p className="font-medium text-primary-dark">Reading your birth chart…</p>
+      <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full animate-pulse"
              style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
       </div>
-      <p className="text-xs text-gray-400 mt-3">Identifying Raj Yogas in your chart…</p>
+      <p className="text-xs text-ink-faint mt-3">Identifying Raj Yogas in your chart…</p>
     </div>
   )
 
@@ -183,7 +183,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-red-600 font-medium mb-4">{errorMsg}</p>
       <button onClick={() => setStatus('idle')}
-        className="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-full text-sm transition">
+        className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition">
         Try Again
       </button>
     </div>
@@ -254,8 +254,8 @@ export default function ChartReading({ input, onSwitchToCareer }) {
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
-            <div className="bg-white px-5 py-4">
-              <p className="text-gray-700 text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+            <div className="bg-parchment-card px-5 py-4">
+              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -269,8 +269,8 @@ export default function ChartReading({ input, onSwitchToCareer }) {
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
-            <div className="bg-white px-5 py-4">
-              <p className="text-gray-700 text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+            <div className="bg-parchment-card px-5 py-4">
+              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -278,14 +278,14 @@ export default function ChartReading({ input, onSwitchToCareer }) {
         // Default section style
         return (
           <div key={key}
-               className={`rounded-xl p-5 bg-white border border-amber-100 shadow-sm
+               className={`rounded-xl p-5 bg-parchment-card border border-primary/30 shadow-sm
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-primary text-base">{title}</h3>
             </div>
-            <p className="text-gray-700 text-sm leading-relaxed"
+            <p className="text-ink text-sm leading-relaxed"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
           </div>
         )
@@ -296,7 +296,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
                       ${showTeasers ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         {showTeasers && (
           <>
-            <p className="text-center text-xs text-gray-400 mb-3 font-medium uppercase tracking-wider">
+            <p className="text-center text-xs text-ink-faint mb-3 font-medium uppercase tracking-wider">
               Locked in Your Full Report
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -427,11 +427,11 @@ export default function ChartReading({ input, onSwitchToCareer }) {
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {provider && (
-        <p className="text-center text-[11px] text-slate-400 pb-1">
+        <p className="text-center text-[11px] text-ink-faint pb-1">
           {t('reading_powered_by', { provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-2">
+      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-2">
         {t('disclaimer')}
       </p>
 

@@ -7,10 +7,10 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
   return (
     <div className="max-w-md mx-auto py-10 px-6 text-center">
       <div className="text-4xl mb-3">{icon}</div>
-      <h3 className="text-lg font-bold text-slate-800 mb-2">{title}</h3>
-      <p className="text-sm text-slate-500 leading-relaxed mb-4">{body}</p>
+      <h3 className="text-lg font-bold text-ink mb-2">{title}</h3>
+      <p className="text-sm text-ink-muted leading-relaxed mb-4">{body}</p>
       {bullets.length > 0 && (
-        <ul className="text-sm text-slate-600 text-left space-y-1.5 mb-6 inline-block">
+        <ul className="text-sm text-ink text-left space-y-1.5 mb-6 inline-block">
           {bullets.map((b, i) => (
             <li key={i} className="flex gap-2">
               <span className="text-emerald-500 shrink-0">✓</span>{b}
@@ -23,7 +23,7 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
         // Phase 4) exists. There's nowhere real to send someone yet — swap
         // in a payment link or a WhatsApp/contact link when ready.
         onClick={() => alert('Checkout is coming soon — your full report will unlock right here.')}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow transition"
+        className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-6 py-2.5 rounded-full shadow transition"
       >
         Unlock Full Report
       </button>

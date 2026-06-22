@@ -35,17 +35,17 @@ const SECTIONS = [
 
 const EFFORT_COLOR = {
   low:    'text-emerald-600 bg-emerald-50',
-  medium: 'text-amber-600 bg-amber-50',
-  high:   'text-rose-600 bg-rose-50',
+  medium: 'text-primary-dark bg-primary-light',
+  high:   'text-vermillion bg-vermillion-light',
 }
 
 function SectionContent({ content, light = false }) {
-  if (!content) return <span className="text-gray-400 italic">—</span>
+  if (!content) return <span className="text-ink-faint italic">—</span>
   const bullets = content
     .split('\n')
     .map(l => l.replace(/^[-•]\s*/, '').trim())
     .filter(Boolean)
-  const cls = light ? 'text-indigo-100' : 'text-gray-700'
+  const cls = light ? 'text-primary-light' : 'text-ink'
   if (bullets.length <= 1)
     return <p className={`text-sm leading-relaxed ${cls}`}>{content}</p>
   return (
@@ -64,10 +64,10 @@ function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
 
   if (style === 'gold') return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-amber-200">
-      <div className="bg-gradient-to-r from-amber-500 to-orange-400 px-5 py-3.5 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-primary/30">
+      <div className="bg-gradient-to-r from-primary to-primary-dark px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
-        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+        <h3 className="font-extrabold text-night text-lg leading-tight">{section.title}</h3>
       </div>
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
@@ -76,8 +76,8 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'gem') return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-teal-200">
-      <div className="bg-gradient-to-r from-teal-500 to-blue-500 px-5 py-3.5 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-mauve/30">
+      <div className="bg-gradient-to-r from-sage to-mauve px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
       </div>
@@ -88,10 +88,10 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'gradient') return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-indigo-100">
-      <div className="bg-gradient-to-r from-indigo-600 to-violet-500 px-5 py-3 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-xl shadow-sm overflow-hidden border border-primary/30">
+      <div className="bg-night px-5 py-3 flex items-center gap-2">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-white text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-light text-base">{section.title}</h3>
       </div>
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
@@ -100,27 +100,27 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'verdict') return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-amber-400 border border-amber-100">
+    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border-l-4 border-vermillion border border-vermillion/20">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-amber-700 text-base">{section.title}</h3>
+        <h3 className="font-bold text-vermillion text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
   )
 
   if (style === 'tinted') return (
-    <div className="bg-indigo-50 rounded-xl p-5 shadow-sm border border-indigo-100">
+    <div className="bg-primary-light rounded-xl p-5 shadow-sm border border-primary/30">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-indigo-700 text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-dark text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
   )
 
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary text-base">{section.title}</h3>
@@ -134,52 +134,52 @@ function CareerOptionCard({ opt }) {
   const [open, setOpen] = useState(false)
   const effortCls = EFFORT_COLOR[opt.effort_required] ?? EFFORT_COLOR.medium
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-parchment-card rounded-xl border border-line shadow-sm overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full text-left p-4 flex items-start gap-3"
       >
-        <div className={`shrink-0 w-8 h-8 rounded-full text-white text-sm font-extrabold flex items-center justify-center ${opt.rank === 1 ? 'bg-amber-500' : 'bg-indigo-600'}`}>
+        <div className={`shrink-0 w-8 h-8 rounded-full text-night text-sm font-extrabold flex items-center justify-center ${opt.rank === 1 ? 'bg-primary-dark' : 'bg-primary'}`}>
           {opt.rank === 1 ? '★' : opt.rank}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-slate-800 text-sm">{opt.title}</span>
-            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{opt.field}</span>
+            <span className="font-bold text-ink text-sm">{opt.title}</span>
+            <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{opt.field}</span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>
               {opt.effort_required} effort
             </span>
           </div>
           {opt.timeline && (
-            <p className="text-xs text-slate-400 mt-0.5">{opt.timeline}</p>
+            <p className="text-xs text-ink-faint mt-0.5">{opt.timeline}</p>
           )}
         </div>
-        <span className={`text-slate-400 text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+        <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
 
       {open && (
-        <div className="px-4 pb-4 pt-0 border-t border-slate-100 space-y-3">
+        <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">
           {opt.reason && (
             <div>
-              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">Why this career?</p>
-              <p className="text-xs text-slate-600 leading-relaxed">{opt.reason}</p>
+              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">Why this career?</p>
+              <p className="text-xs text-ink-muted leading-relaxed">{opt.reason}</p>
             </div>
           )}
           <div className="flex flex-wrap gap-4">
             {opt.key_planets?.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-slate-500 mb-1">Key Planets</p>
+                <p className="text-xs font-semibold text-ink-muted mb-1">Key Planets</p>
                 <div className="flex gap-1 flex-wrap">
                   {opt.key_planets.map(p => (
-                    <span key={p} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">{p}</span>
+                    <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{p}</span>
                   ))}
                 </div>
               </div>
             )}
             {opt.favorable_dasha && (
               <div>
-                <p className="text-xs font-semibold text-slate-500 mb-1">Best Dasha</p>
-                <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">{opt.favorable_dasha}</span>
+                <p className="text-xs font-semibold text-ink-muted mb-1">Best Dasha</p>
+                <span className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{opt.favorable_dasha}</span>
               </div>
             )}
           </div>
@@ -236,27 +236,27 @@ export default function CareerReportTab({ input }) {
   if (status === 'idle') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">💼</div>
-      <h2 className="text-xl font-bold text-slate-800 mb-2">Vedic Career Report</h2>
-      <p className="text-gray-500 text-sm mb-6 max-w-sm">
+      <h2 className="text-xl font-bold text-ink mb-2">Vedic Career Report</h2>
+      <p className="text-ink-muted text-sm mb-6 max-w-sm">
         Personalized career destiny reading using D1 + D10 charts, Amatyakaraka, career yogas,
         future dasha timing, and your top career paths — powered by your Vedic astrology skill files.
       </p>
       <button
         onClick={generate}
-        className="px-8 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-full transition shadow-md"
+        className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"
       >
         Generate Career Report
       </button>
-      <p className="text-xs text-gray-400 mt-3">{t('reading_powered_by_generic')} · takes ~20 seconds</p>
+      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')} · takes ~20 seconds</p>
     </div>
   )
 
   if (status === 'loading') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="text-indigo-700 font-semibold">Reading your career destiny…</p>
-      <p className="text-xs text-slate-400 mt-1">D1 + D10 · Amatyakaraka · Yogas · Future Dashas · Career Paths</p>
-      <div className="mt-5 w-52 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      <p className="text-primary-dark font-semibold">Reading your career destiny…</p>
+      <p className="text-xs text-ink-faint mt-1">D1 + D10 · Amatyakaraka · Yogas · Future Dashas · Career Paths</p>
+      <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
     </div>
@@ -268,7 +268,7 @@ export default function CareerReportTab({ input }) {
       <p className="text-red-600 font-medium mb-4">{errorMsg}</p>
       <button
         onClick={() => setStatus('idle')}
-        className="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-full text-sm transition"
+        className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
       >
         Try Again
       </button>
@@ -282,11 +282,11 @@ export default function CareerReportTab({ input }) {
 
       {/* ── Career Options — prominently placed after destiny brief ── */}
       {hasOptions && (
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+        <div className="bg-parchment-card rounded-xl border border-line shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">🎯</span>
-            <h3 className="font-bold text-slate-800 text-base">Your Best Career Options</h3>
-            <span className="text-xs text-slate-400 ml-1">· tap to expand</span>
+            <h3 className="font-bold text-ink text-base">Your Best Career Options</h3>
+            <span className="text-xs text-ink-faint ml-1">· tap to expand</span>
           </div>
           <div className="space-y-2">
             {report.career_options.map(opt => (
@@ -314,11 +314,11 @@ export default function CareerReportTab({ input }) {
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {report?.llm_provider && (
-        <p className="text-center text-[11px] text-slate-400 pb-1">
+        <p className="text-center text-[11px] text-ink-faint pb-1">
           {t('reading_powered_by', { provider: report.llm_provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-slate-400 leading-relaxed px-4 pb-4">
+      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-4">
         {t('disclaimer')}
       </p>
     </div>

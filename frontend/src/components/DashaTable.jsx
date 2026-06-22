@@ -24,9 +24,9 @@ function durationLabel(start, end) {
 }
 
 const LEVEL_COLORS = {
-  mahadasha:  { active: 'bg-indigo-600',  light: 'bg-indigo-50',  border: 'border-indigo-200',  text: 'text-indigo-800',  bar: 'bg-indigo-500'  },
-  antardasha: { active: 'bg-violet-600',  light: 'bg-violet-50',  border: 'border-violet-200',  text: 'text-violet-800',  bar: 'bg-violet-500'  },
-  pratyantar: { active: 'bg-rose-600',    light: 'bg-rose-50',    border: 'border-rose-200',    text: 'text-rose-800',    bar: 'bg-rose-500'    },
+  mahadasha:  { active: 'bg-primary',    activeText: 'text-night', light: 'bg-primary-light',    border: 'border-primary/30',    text: 'text-primary-dark', bar: 'bg-primary'    },
+  antardasha: { active: 'bg-mauve',      activeText: 'text-white',  light: 'bg-mauve-light',      border: 'border-mauve/30',      text: 'text-mauve',        bar: 'bg-mauve'      },
+  pratyantar: { active: 'bg-vermillion', activeText: 'text-white',  light: 'bg-vermillion-light', border: 'border-vermillion/30', text: 'text-vermillion',   bar: 'bg-vermillion' },
 }
 
 const TABS = [
@@ -37,18 +37,18 @@ const TABS = [
 
 function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
   if (!rows || rows.length === 0)
-    return <p className="text-sm text-slate-400 italic">No data available.</p>
+    return <p className="text-sm text-ink-faint italic">No data available.</p>
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className={`${color.light} ${color.text}`}>
-            <th className="text-left p-2 border border-slate-200">Period</th>
-            <th className="text-left p-2 border border-slate-200">Start</th>
-            <th className="text-left p-2 border border-slate-200">End</th>
-            <th className="text-left p-2 border border-slate-200">Duration</th>
-            <th className="p-2 border border-slate-200 w-24">Progress</th>
+            <th className="text-left p-2 border border-line">Period</th>
+            <th className="text-left p-2 border border-line">Start</th>
+            <th className="text-left p-2 border border-line">End</th>
+            <th className="text-left p-2 border border-line">Duration</th>
+            <th className="p-2 border border-line w-24">Progress</th>
           </tr>
         </thead>
         <tbody>
@@ -58,17 +58,17 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
             return (
               <tr key={i}
                   className={isCurrent ? `${color.light} font-semibold`
-                    : isPast ? 'bg-white text-slate-400' : 'bg-white text-slate-600'}>
-                <td className="p-2 border border-slate-100">
+                    : isPast ? 'bg-parchment-card text-ink-faint' : 'bg-parchment-card text-ink-muted'}>
+                <td className="p-2 border border-line">
                   {isCurrent && <span className="mr-1">▶</span>}
                   {labelFn(r)}
                 </td>
-                <td className="p-2 border border-slate-100">{formatDate(r.start)}</td>
-                <td className="p-2 border border-slate-100">{formatDate(r.end)}</td>
-                <td className="p-2 border border-slate-100">{durationLabel(r.start, r.end)}</td>
-                <td className="p-2 border border-slate-100">
-                  <div className="h-2 bg-slate-100 rounded-full">
-                    <div className={`h-2 rounded-full ${isCurrent ? color.bar : isPast ? 'bg-slate-300' : 'bg-slate-200'}`}
+                <td className="p-2 border border-line">{formatDate(r.start)}</td>
+                <td className="p-2 border border-line">{formatDate(r.end)}</td>
+                <td className="p-2 border border-line">{durationLabel(r.start, r.end)}</td>
+                <td className="p-2 border border-line">
+                  <div className="h-2 bg-night/10 rounded-full">
+                    <div className={`h-2 rounded-full ${isCurrent ? color.bar : isPast ? 'bg-ink-faint/50' : 'bg-ink-faint/25'}`}
                          style={{ width: `${pct(r.start, r.end)}%` }} />
                   </div>
                 </td>
@@ -103,11 +103,11 @@ export default function DashaTable({ dasha }) {
     <div className="space-y-4">
 
       {/* Current chain banner */}
-      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
-        <span className="font-bold text-indigo-900">{md.planet} MD</span>
-        {ad && <><span className="text-slate-400">›</span><span className="font-semibold text-violet-700">{ad.planet} AD</span></>}
-        {pd && <><span className="text-slate-400">›</span><span className="font-semibold text-rose-700">{pd.planet} PD</span></>}
-        <span className="ml-auto text-xs text-slate-500">{yrsLeft}y left in MD</span>
+      <div className="bg-primary-light border border-primary/30 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
+        <span className="font-bold text-primary-dark">{md.planet} MD</span>
+        {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{ad.planet} AD</span></>}
+        {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{pd.planet} PD</span></>}
+        <span className="ml-auto text-xs text-ink-muted">{yrsLeft}y left in MD</span>
       </div>
 
       {/* Sub-tabs */}
@@ -116,8 +116,8 @@ export default function DashaTable({ dasha }) {
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                     activeTab === tab.id
-                      ? `${LEVEL_COLORS[tab.id].active} text-white border-transparent shadow-sm`
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
+                      ? `${LEVEL_COLORS[tab.id].active} ${LEVEL_COLORS[tab.id].activeText} border-transparent shadow-sm`
+                      : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'
                   }`}>
             {tab.label}
           </button>
@@ -130,22 +130,22 @@ export default function DashaTable({ dasha }) {
           <div className={`${c.light} border ${c.border} rounded-lg p-4`}>
             <div className={`text-xs ${c.text} uppercase tracking-wide mb-1`}>Current Mahadasha</div>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-2xl font-bold text-indigo-900">{md.planet}</span>
-              <span className="text-sm text-slate-500">{formatDate(md.start)} – {formatDate(md.end)} · {md.years}y</span>
+              <span className="text-2xl font-bold text-primary-dark">{md.planet}</span>
+              <span className="text-sm text-ink-muted">{formatDate(md.start)} – {formatDate(md.end)} · {md.years}y</span>
             </div>
-            <div className="mt-2 h-2 bg-indigo-100 rounded-full">
-              <div className="h-2 bg-indigo-500 rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
+            <div className="mt-2 h-2 bg-primary-light rounded-full">
+              <div className="h-2 bg-primary rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
             </div>
           </div>
           <div>
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Full Dasha Sequence</h3>
+            <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">Full Dasha Sequence</h3>
             <div className="flex flex-wrap gap-2">
               {full_sequence.map((m, i) => {
                 const isCurr = m.planet === md.planet && m.start === md.start
                 return (
                   <span key={i}
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          isCurr ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700'
+                          isCurr ? 'bg-primary text-night' : 'bg-primary-light text-primary-dark'
                         }`}>
                     {m.planet} · {m.years}y
                   </span>

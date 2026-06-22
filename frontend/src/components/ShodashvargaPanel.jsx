@@ -75,9 +75,9 @@ export default function ShodashvargaPanel({ input }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-        <h2 className="text-indigo-800 font-bold text-base">Shodashvarga — 16 Divisional Charts</h2>
-        <p className="text-indigo-600 text-xs mt-1">
+      <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
+        <h2 className="text-primary-dark font-bold text-base">Shodashvarga — 16 Divisional Charts</h2>
+        <p className="text-primary-dark text-xs mt-1">
           The 16 primary divisional charts used in Jyotish. Click any chart to view it.
           Use Compare to view two side-by-side.
         </p>
@@ -85,13 +85,13 @@ export default function ShodashvargaPanel({ input }) {
 
       {/* Chart style */}
       <div className="flex gap-2 items-center">
-        <span className="text-xs text-slate-500">Style:</span>
+        <span className="text-xs text-ink-muted">Style:</span>
         {[['north','North Indian'], ['south','South Indian']].map(([id, label]) => (
           <button key={id} onClick={() => setChartStyle(id)}
                   className={`text-xs px-3 py-1 rounded-lg border transition ${
                     chartStyle === id
-                      ? 'bg-indigo-600 border-indigo-600 text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
+                      ? 'bg-primary border-primary text-night'
+                      : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
                   }`}>
             {label}
           </button>
@@ -105,11 +105,11 @@ export default function ShodashvargaPanel({ input }) {
                   onClick={() => selectPrimary(d)}
                   className={`flex flex-col items-center p-2 rounded-xl border text-center transition ${
                     selectedD === d
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50'
+                      ? 'bg-primary border-primary text-night shadow-md'
+                      : 'bg-parchment-card border-line text-ink hover:border-primary/50 hover:bg-primary-light'
                   }`}>
             <span className="font-bold text-sm">{name}</span>
-            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-indigo-200' : 'text-slate-400'}`}>
+            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-primary-light' : 'text-ink-faint'}`}>
               {title}
             </span>
           </button>
@@ -118,12 +118,12 @@ export default function ShodashvargaPanel({ input }) {
 
       {/* Selected chart info */}
       {selected && (
-        <div className="flex items-center gap-3 flex-wrap bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
-          <span className="text-amber-700 font-bold text-sm">{selected.name} — {selected.title}</span>
-          <span className="text-amber-600 text-xs">{selected.desc}</span>
+        <div className="flex items-center gap-3 flex-wrap bg-vermillion-light border border-vermillion/30 rounded-lg px-4 py-2">
+          <span className="text-vermillion font-bold text-sm">{selected.name} — {selected.title}</span>
+          <span className="text-vermillion text-xs">{selected.desc}</span>
           {chartData && compareD === null && (
             <button onClick={() => selectCompare(selectedD === 9 ? 1 : 9)}
-                    className="ml-auto text-xs text-indigo-600 border border-indigo-300 px-2 py-1 rounded-lg hover:bg-indigo-50">
+                    className="ml-auto text-xs text-primary-dark border border-primary/40 px-2 py-1 rounded-lg hover:bg-primary-light">
               Compare with D{selectedD === 9 ? 1 : 9}
             </button>
           )}
@@ -142,7 +142,7 @@ export default function ShodashvargaPanel({ input }) {
               <div className="flex justify-center py-16">
                 <div className="text-center">
                   <div className="text-3xl animate-spin mb-2">🪐</div>
-                  <p className="text-slate-500 text-sm">Calculating {selected?.name}…</p>
+                  <p className="text-ink-muted text-sm">Calculating {selected?.name}…</p>
                 </div>
               </div>
             ) : (
@@ -157,7 +157,7 @@ export default function ShodashvargaPanel({ input }) {
                 <div className="flex justify-center py-16">
                   <div className="text-center">
                     <div className="text-3xl animate-spin mb-2">🪐</div>
-                    <p className="text-slate-500 text-sm">Calculating {compared?.name}…</p>
+                    <p className="text-ink-muted text-sm">Calculating {compared?.name}…</p>
                   </div>
                 </div>
               ) : (
@@ -165,7 +165,7 @@ export default function ShodashvargaPanel({ input }) {
                   <ChartView data={compareData}
                              title={`${compared?.name} — ${compared?.title}`} />
                   <button onClick={() => { setCompareD(null); setCompareData(null) }}
-                          className="mt-2 text-xs text-slate-500 hover:text-red-500">
+                          className="mt-2 text-xs text-ink-muted hover:text-red-500">
                     ✕ Close comparison
                   </button>
                 </div>
@@ -177,7 +177,7 @@ export default function ShodashvargaPanel({ input }) {
 
       {/* Empty state */}
       {!loading && !chartData && (
-        <div className="text-center py-12 text-slate-400">
+        <div className="text-center py-12 text-ink-faint">
           <img src="/astroguru.svg" alt="" className="w-10 h-10 mx-auto mb-3 opacity-60" />
           <p className="text-sm">Select any of the 16 divisional charts above</p>
         </div>

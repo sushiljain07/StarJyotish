@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
+import TopicIcon from '../components/TopicIcon'
 
 export default function Home() {
   const { t, i18n } = useTranslation()
@@ -44,12 +45,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-parchment flex flex-col">
       {/* Hero header */}
-      <div className="bg-primary px-6 pt-12 pb-8 text-center">
+      <div className="bg-night px-6 pt-12 pb-8 text-center">
         <img src="/astroguru.svg" alt="AstroGuru" className="w-16 h-16 mx-auto mb-3" />
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">{t('app_title')}</h1>
-        <p className="text-indigo-200 mt-1 text-sm">{t('tagline')}</p>
+        <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
+        <p className="text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
         {/* Language toggle */}
         <div className="mt-4 flex justify-center gap-2">
           {['en', 'hi'].map(lang => (
@@ -58,8 +59,8 @@ export default function Home() {
               onClick={() => i18n.changeLanguage(lang)}
               className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
                 i18n.language.startsWith(lang)
-                  ? 'bg-white text-primary'
-                  : 'bg-white/20 text-white hover:bg-white/30'
+                  ? 'bg-primary text-night'
+                  : 'bg-white/10 text-ink-onnight hover:bg-white/20'
               }`}
             >
               {lang === 'en' ? 'EN' : 'हि'}
@@ -70,23 +71,23 @@ export default function Home() {
 
       {/* Form card */}
       <div className="flex-1 px-4 -mt-4">
-        <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6 sm:p-8">
+        <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
           {topic && (
-            <div className="mb-4 flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2 text-xs">
-              <span className="text-indigo-700 font-medium">
-                {topic.icon} {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+            <div className="mb-4 flex items-center justify-between bg-primary-light border border-primary/30 rounded-lg px-3 py-2 text-xs">
+              <span className="text-primary-dark font-medium flex items-center gap-1.5">
+                <TopicIcon id={topic.id} className="w-3.5 h-3.5" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
               </span>
-              <button onClick={() => navigate('/')} className="text-indigo-500 underline shrink-0 ml-2">
+              <button onClick={() => navigate('/')} className="text-primary-dark underline shrink-0 ml-2">
                 {t('change_focus')}
               </button>
             </div>
           )}
           {presetQuestion && (
-            <div className="mb-4 flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 text-xs">
-              <span className="text-amber-700 font-medium truncate">
+            <div className="mb-4 flex items-center justify-between bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2 text-xs">
+              <span className="text-vermillion font-medium truncate">
                 💬 {t('home_asking_label')}: “{presetQuestion}”
               </span>
-              <button onClick={() => navigate('/')} className="text-amber-600 underline shrink-0 ml-2">
+              <button onClick={() => navigate('/')} className="text-vermillion underline shrink-0 ml-2">
                 {t('change_focus')}
               </button>
             </div>

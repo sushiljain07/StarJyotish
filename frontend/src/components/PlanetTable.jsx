@@ -1,6 +1,7 @@
 // Enhanced planet table with nakshatra lord, degree within nakshatra, and KP data
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import SegmentedToggle from './SegmentedToggle'
 
 const PLANET_COLORS = {
   Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Mercury: '#16A34A',
@@ -58,36 +59,29 @@ export default function PlanetTable({ planets = [], ascendant }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-indigo-900">{t('planet_table_heading')}</h3>
-        <div className="flex gap-1">
-          {[['basic','Basic'], ['nakshatra','Nakshatra'], ['full','Full']].map(([id, label]) => (
-            <button key={id} onClick={() => setMode(id)}
-                    className={`text-xs px-2 py-1 rounded-lg border transition ${
-                      mode === id
-                        ? 'bg-indigo-600 border-indigo-600 text-white'
-                        : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
-                    }`}>
-              {label}
-            </button>
-          ))}
-        </div>
+        <h3 className="font-semibold text-primary-dark">{t('planet_table_heading')}</h3>
+        <SegmentedToggle
+          options={[['basic','Basic'], ['nakshatra','Nakshatra'], ['full','Full']].map(([id, label]) => ({ id, label }))}
+          active={mode}
+          onChange={setMode}
+        />
       </div>
 
       {ascendant && (
-        <div className="text-sm text-indigo-800 bg-indigo-50 border border-slate-200 rounded-lg p-3">
+        <div className="text-sm text-primary-dark bg-primary-light border border-line rounded-lg p-3">
           <span className="font-semibold">Ascendant (Lagna): </span>
           <span>{ascendant.sign} {formatDeg(ascendant.degree)}</span>
-          <span className="text-indigo-500 ml-2">· {ascendant.nakshatra}</span>
+          <span className="text-primary-dark ml-2">· {ascendant.nakshatra}</span>
           {ascendant.nakshatra_lord && (
             <span className="ml-2">Lord: <LordBadge lord={ascendant.nakshatra_lord} /></span>
           )}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <div className="overflow-x-auto rounded-xl border border-line">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-amber-50 text-indigo-800">
+            <tr className="bg-primary-light text-primary-dark">
               <th className="p-2.5 border-b text-left">Planet</th>
               <th className="p-2.5 border-b text-left">Sign</th>
               <th className="p-2.5 border-b text-right">Degree</th>
@@ -120,7 +114,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
             {planets.map((p, i) => {
               const dignity = getDignity(p.name, p.sign_index)
               return (
-                <tr key={p.name} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                <tr key={p.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                   <td className="p-2.5 border-b font-bold"
                       style={{ color: PLANET_COLORS[p.name] ?? '#333' }}>
                     {t(`planets.${p.name}`, p.name)}
@@ -136,13 +130,13 @@ export default function PlanetTable({ planets = [], ascendant }) {
                   <td className="p-2.5 border-b text-right tabular-nums font-mono text-xs">
                     {formatDeg(p.degree)}
                   </td>
-                  <td className="p-2.5 border-b text-center font-bold text-indigo-700">{p.house}</td>
+                  <td className="p-2.5 border-b text-center font-bold text-primary-dark">{p.house}</td>
 
                   {(mode === 'nakshatra' || mode === 'full') && (
                     <>
-                      <td className="p-2.5 border-b text-slate-700">{p.nakshatra}</td>
-                      <td className="p-2.5 border-b text-center text-slate-600">{p.nakshatra_pada}</td>
-                      <td className="p-2.5 border-b text-right tabular-nums font-mono text-xs text-slate-500">
+                      <td className="p-2.5 border-b text-ink">{p.nakshatra}</td>
+                      <td className="p-2.5 border-b text-center text-ink-muted">{p.nakshatra_pada}</td>
+                      <td className="p-2.5 border-b text-right tabular-nums font-mono text-xs text-ink-muted">
                         {p.nakshatra_degree != null ? formatNakDeg(p.nakshatra_degree) : '–'}
                       </td>
                       <td className="p-2.5 border-b text-center">
@@ -153,8 +147,8 @@ export default function PlanetTable({ planets = [], ascendant }) {
 
                   {mode === 'basic' && (
                     <>
-                      <td className="p-2.5 border-b text-slate-700">{p.nakshatra}</td>
-                      <td className="p-2.5 border-b text-center text-slate-600">{p.nakshatra_pada}</td>
+                      <td className="p-2.5 border-b text-ink">{p.nakshatra}</td>
+                      <td className="p-2.5 border-b text-center text-ink-muted">{p.nakshatra_pada}</td>
                     </>
                   )}
 
@@ -162,13 +156,13 @@ export default function PlanetTable({ planets = [], ascendant }) {
                     <td className="p-2.5 border-b text-center text-xs">
                       {dignity
                         ? <span className="font-semibold" style={{ color: dignity.color }}>{dignity.label}</span>
-                        : <span className="text-slate-400">—</span>
+                        : <span className="text-ink-faint">—</span>
                       }
                     </td>
                   )}
 
                   <td className="p-2.5 border-b text-center">
-                    {p.retrograde && <span className="text-amber-600 font-bold">R</span>}
+                    {p.retrograde && <span className="text-vermillion font-bold">R</span>}
                   </td>
                 </tr>
               )
@@ -177,7 +171,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
         </table>
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400 px-1">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-faint px-1">
         <span>R = Retrograde</span>
         <span>Exl = Exalted · Deb = Debilitated · Own = Own Sign</span>
         <span>Nakshatra° = degree within nakshatra (0–13°20')</span>

@@ -106,9 +106,9 @@ export default function WesternChart({
   const viewH = 520
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full">
+    <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-2 w-full">
-        <div className="text-sm font-semibold text-indigo-700">{title}</div>
+        <div className="text-sm font-semibold text-primary-dark">{title}</div>
         <svg width="100%" viewBox={`0 0 ${CX * 2} ${viewH}`}
              style={{ maxWidth: 520 }} className="font-sans">
 
@@ -227,7 +227,7 @@ export default function WesternChart({
 
         </svg>
 
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-400">
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-faint">
           <span>AC = Ascendant · DC = Descendant · MC = Midheaven · IC = Imum Coeli</span>
         </div>
       </div>

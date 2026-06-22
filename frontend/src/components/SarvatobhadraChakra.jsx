@@ -159,9 +159,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
 
   return (
     <div className="space-y-4">
-      <div className="bg-rose-50 border border-rose-100 rounded-xl p-4">
-        <h2 className="text-rose-800 font-bold text-base">Sarvatobhadra Chakra</h2>
-        <p className="text-rose-600 text-xs mt-1">
+      <div className="bg-mauve-light border border-mauve/30 rounded-xl p-4">
+        <h2 className="text-mauve font-bold text-base">Sarvatobhadra Chakra</h2>
+        <p className="text-mauve text-xs mt-1">
           9×9 grid used for transit analysis. Outer ring = 28 Nakshatras, inner ring = 12 Signs.
           Green = transit planet, yellow = natal planet.
         </p>
@@ -276,9 +276,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 text-xs text-slate-600 px-1">
+      <div className="flex flex-wrap gap-3 text-xs text-ink-muted px-1">
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-indigo-500"></span> Transit planet (circle)
+          <span className="inline-block w-3 h-3 rounded-full bg-primary"></span> Transit planet (circle)
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded bg-amber-400 opacity-70"></span> Natal planet (square)
@@ -293,14 +293,14 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
 
       {/* Planet nakshatra positions */}
       {(transitPlanets.length > 0 || natalPlanets.length > 0) && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="px-4 py-3 bg-slate-50 border-b">
-            <h3 className="font-semibold text-slate-700 text-sm">Planet Nakshatra Positions</h3>
+        <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+          <div className="px-4 py-3 bg-night/[0.03] border-b">
+            <h3 className="font-semibold text-ink text-sm">Planet Nakshatra Positions</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-slate-50">
+                <tr className="bg-night/[0.03]">
                   <th className="p-2 text-left border-b">Planet</th>
                   <th className="p-2 text-left border-b">Natal Nakshatra</th>
                   <th className="p-2 text-left border-b">Transit Nakshatra</th>
@@ -310,13 +310,13 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 {natalPlanets.map((np, i) => {
                   const tp = transitPlanets.find(p => p.name === np.name)
                   return (
-                    <tr key={np.name} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                    <tr key={np.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                       <td className="p-2 border-b font-bold"
                           style={{ color: PLANET_COLORS[np.name] ?? '#333' }}>
                         {np.name}
                       </td>
                       <td className="p-2 border-b">{np.nakshatra} (H{np.house})</td>
-                      <td className="p-2 border-b text-indigo-700">
+                      <td className="p-2 border-b text-primary-dark">
                         {tp ? `${tp.nakshatra} (H${tp.house})` : '–'}
                       </td>
                     </tr>

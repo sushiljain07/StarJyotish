@@ -9,6 +9,9 @@ import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import LandingStickyHeader from '../components/LandingStickyHeader'
 import TopicIcon from '../components/TopicIcon'
+import TabIcon from '../components/TabIcon'
+import CelestialBackdrop from '../components/CelestialBackdrop'
+import SectionDivider from '../components/SectionDivider'
 
 // Capability badges shown in the hero. These are claims AstroGuru can
 // actually back up today (real Swiss Ephemeris calculations, real
@@ -21,23 +24,12 @@ const BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_b
 // sage, Insights = mauve, Ask = vermillion), so returning users recognize
 // the colors instead of learning a new palette just for the landing page.
 const INSIDE_ACCENTS = {
-  kundli:   'border-primary',
-  advanced: 'border-sage',
-  insights: 'border-mauve',
-  ask:      'border-vermillion',
+  kundli:   { border: 'border-primary',   chip: 'bg-primary-light text-primary-dark' },
+  advanced: { border: 'border-sage',      chip: 'bg-sage-light text-sage' },
+  insights: { border: 'border-mauve',     chip: 'bg-mauve-light text-mauve' },
+  ask:      { border: 'border-vermillion', chip: 'bg-vermillion-light text-vermillion' },
 }
 const INSIDE_ITEMS = ['kundli', 'advanced', 'insights', 'ask']
-
-// A sparse, hand-placed scatter of stars behind the hero headline — the
-// page's one deliberate signature flourish (see the design critique this
-// followed). Kept tiny and low-opacity so it reads as atmosphere, not
-// decoration competing with the text.
-const STARS = [
-  { top: '10%', left: '12%', size: 3 }, { top: '22%', left: '85%', size: 2 },
-  { top: '8%',  left: '60%', size: 2 }, { top: '32%', left: '8%',  size: 2 },
-  { top: '15%', left: '38%', size: 2 }, { top: '38%', left: '92%', size: 3 },
-  { top: '28%', left: '70%', size: 2 },
-]
 
 const FAQ_IDS = [1, 2, 3, 4, 5]
 
@@ -57,7 +49,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-screen bg-parchment overflow-x-hidden">
       <LandingStickyHeader
         visible={heroPassed}
         currentLanguage={i18n.language}
@@ -67,14 +59,7 @@ export default function Landing() {
 
       {/* ───────────────────── Hero ───────────────────── */}
       <div className="relative overflow-hidden bg-night px-6 pt-14 pb-12 text-center">
-        {STARS.map((s, i) => (
-          <span
-            key={i}
-            className="absolute rounded-full bg-primary-light/70"
-            style={{ top: s.top, left: s.left, width: s.size, height: s.size }}
-            aria-hidden="true"
-          />
-        ))}
+        <CelestialBackdrop className="text-primary opacity-40" />
         <img src="/astroguru.svg" alt="AstroGuru" className="relative w-16 h-16 mx-auto mb-2" />
         <div className="relative text-primary font-semibold text-xs tracking-[0.15em] uppercase mb-3">
           {t('app_title')}
@@ -127,21 +112,23 @@ export default function Landing() {
       {/* Sentinel — once this scrolls out of view, the sticky header appears */}
       <div ref={heroSentinelRef} />
 
-      {/* ───────────────── AI persona spotlight ───────────────── */}
-      <section className="px-4 pt-12 pb-10">
-        <Reveal className="max-w-3xl mx-auto text-center mb-8">
-          <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-2">
-            {t('landing_ai_eyebrow')}
-          </p>
-          <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink">{t('landing_ai_heading')}</h2>
-          <p className="text-ink-muted text-sm mt-2 max-w-md mx-auto">{t('landing_ai_subhead')}</p>
-        </Reveal>
-        <Reveal delay={100}>
-          <AskPersonaCard
-            onAskQuestion={question => goToForm(null, { presetQuestion: question })}
-            onAskOwn={() => goToForm(null, { landToAsk: true })}
-          />
-        </Reveal>
+      {/* ───────────────── AI persona spotlight — asymmetric on desktop ───────────────── */}
+      <section className="px-4 py-12 overflow-hidden">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <Reveal className="text-center lg:text-left">
+            <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-2">
+              {t('landing_ai_eyebrow')}
+            </p>
+            <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink">{t('landing_ai_heading')}</h2>
+            <p className="text-ink-muted text-sm mt-2 max-w-md mx-auto lg:mx-0">{t('landing_ai_subhead')}</p>
+          </Reveal>
+          <Reveal delay={100}>
+            <AskPersonaCard
+              onAskQuestion={question => goToForm(null, { presetQuestion: question })}
+              onAskOwn={() => goToForm(null, { landToAsk: true })}
+            />
+          </Reveal>
+        </div>
       </section>
 
       {/* ───────────────────── Topic cards ───────────────────── */}
@@ -175,16 +162,24 @@ export default function Landing() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ───────────────────── How it works ───────────────────── */}
       <section className="px-4 py-10">
         <div className="max-w-3xl mx-auto">
           <Reveal as="h2" className="text-center font-serif font-semibold text-2xl text-ink mb-8">
             {t('landing_steps_heading')}
           </Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-y-8 gap-x-6">
+            {/* Connecting line — only meaningful once the 3 steps sit in a
+                row; hidden on mobile where they stack vertically instead. */}
+            <div
+              className="hidden sm:block absolute top-5 left-[16.6%] right-[16.6%] border-t border-dashed border-primary/30"
+              aria-hidden="true"
+            />
             {[1, 2, 3].map((n, i) => (
-              <Reveal key={n} delay={i * 100} className="text-center">
-                <div className="w-10 h-10 rounded-full bg-primary-light text-primary-dark font-bold flex items-center justify-center mx-auto mb-3">
+              <Reveal key={n} delay={i * 100} className="relative text-center">
+                <div className="w-10 h-10 rounded-full bg-primary-light text-primary-dark font-bold flex items-center justify-center mx-auto mb-3 ring-4 ring-parchment">
                   {n}
                 </div>
                 <h3 className="font-semibold text-ink text-sm mb-1">{t(`landing_step${n}_title`)}</h3>
@@ -194,6 +189,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* ───────────────────── What's inside ───────────────────── */}
       <section className="px-4 py-10">
@@ -207,9 +204,16 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {INSIDE_ITEMS.map((id, i) => (
               <Reveal key={id} delay={i * 80}>
-                <div className={`bg-parchment-card rounded-lg border-l-4 ${INSIDE_ACCENTS[id]} p-5 shadow-sm`}>
-                  <h3 className="font-bold text-sm text-ink mb-1">{t(`landing_inside_${id}_label`)}</h3>
-                  <p className="text-xs leading-relaxed text-ink-muted">{t(`landing_inside_${id}_body`)}</p>
+                <div className={`bg-parchment-card rounded-lg border-l-4 ${INSIDE_ACCENTS[id].border} p-5 shadow-sm flex gap-3 items-start`}>
+                  <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${INSIDE_ACCENTS[id].chip}`}>
+                    {id === 'kundli'
+                      ? <img src="/astroguru.svg" alt="" className="w-5 h-5" />
+                      : <TabIcon id={id} className="w-5 h-5" />}
+                  </span>
+                  <span>
+                    <h3 className="font-bold text-sm text-ink mb-1">{t(`landing_inside_${id}_label`)}</h3>
+                    <p className="text-xs leading-relaxed text-ink-muted">{t(`landing_inside_${id}_body`)}</p>
+                  </span>
                 </div>
               </Reveal>
             ))}
@@ -227,6 +231,8 @@ export default function Landing() {
           </div>
         </div>
       </Reveal>
+
+      <SectionDivider />
 
       {/* ───────────────────── FAQ ───────────────────── */}
       <section className="px-4 py-10">
@@ -247,14 +253,7 @@ export default function Landing() {
 
       {/* ───────────────────── Final CTA ───────────────────── */}
       <Reveal as="div" className="relative overflow-hidden bg-night px-6 py-12 text-center">
-        {STARS.slice(0, 4).map((s, i) => (
-          <span
-            key={i}
-            className="absolute rounded-full bg-primary-light/60"
-            style={{ top: s.top, left: s.left, width: s.size, height: s.size }}
-            aria-hidden="true"
-          />
-        ))}
+        <CelestialBackdrop className="text-primary opacity-30" />
         <h2 className="relative font-serif font-semibold text-2xl sm:text-3xl text-primary-light">
           {t('landing_final_cta_heading')}
         </h2>

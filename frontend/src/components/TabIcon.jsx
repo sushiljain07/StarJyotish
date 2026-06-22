@@ -3,9 +3,17 @@
 // Replaces the emoji used for the Advanced/Insights/Ask main tabs (🔬 📖 💬)
 // in mainTabs() (Result.jsx) — these render in both the desktop tab bar and
 // the bottom NavBar, making them the single most-repeated visual element in
-// the app. The Kundli tab keeps using the actual /astroguru.svg logo, so
-// there's no entry for it here.
+// the app. The in-app Kundli tab keeps using the actual /astroguru.svg logo
+// (kept here only for the landing page's "what's inside" grid, which has no
+// equivalent logo slot of its own).
 const ICONS = {
+  kundli: (
+    <>
+      <polygon points="12 2 22 12 12 22 2 12" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+    </>
+  ),
   advanced: (
     <>
       <polygon points="12 2.5 20.5 7 12 11.5 3.5 7" />

@@ -6,6 +6,7 @@ import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
+import CelestialBackdrop from '../components/CelestialBackdrop'
 
 export default function Home() {
   const { t, i18n } = useTranslation()
@@ -47,12 +48,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
       {/* Hero header */}
-      <div className="bg-night px-6 pt-12 pb-8 text-center">
-        <img src="/astroguru.svg" alt="AstroGuru" className="w-16 h-16 mx-auto mb-3" />
-        <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
-        <p className="text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
+      <div className="relative overflow-hidden bg-night px-6 pt-12 pb-8 text-center">
+        <CelestialBackdrop className="text-primary opacity-30" />
+        <img src="/astroguru.svg" alt="AstroGuru" className="relative w-16 h-16 mx-auto mb-3" />
+        <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
+        <p className="relative text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
         {/* Language toggle */}
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="relative mt-4 flex justify-center gap-2">
           {['en', 'hi'].map(lang => (
             <button
               key={lang}

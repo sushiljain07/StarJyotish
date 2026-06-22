@@ -34,17 +34,17 @@ const SECTIONS = [
 
 // ── Content renderer (mirrors ChartReading.jsx pattern) ───────────────────────
 function SectionContent({ content, light = false }) {
-  if (!content) return <span className="text-gray-400 italic">—</span>
+  if (!content) return <span className="text-ink-faint italic">—</span>
   const bullets = content
     .split('\n')
     .map(line => line.replace(/^[-•]\s*/, '').trim())
     .filter(Boolean)
   if (bullets.length <= 1)
-    return <p className={`text-sm leading-relaxed ${light ? 'text-indigo-100' : 'text-gray-700'}`}>{content}</p>
+    return <p className={`text-sm leading-relaxed ${light ? 'text-primary-light' : 'text-ink'}`}>{content}</p>
   return (
     <ul className="space-y-2">
       {bullets.map((b, i) => (
-        <li key={i} className={`flex gap-2 text-sm leading-relaxed ${light ? 'text-indigo-100' : 'text-gray-700'}`}>
+        <li key={i} className={`flex gap-2 text-sm leading-relaxed ${light ? 'text-primary-light' : 'text-ink'}`}>
           <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50" />
           <span>{b}</span>
         </li>
@@ -58,10 +58,10 @@ function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
 
   if (style === 'gold') return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-amber-200">
-      <div className="bg-gradient-to-r from-amber-500 to-orange-400 px-5 py-3.5 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-primary/30">
+      <div className="bg-gradient-to-r from-primary to-primary-dark px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
-        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+        <h3 className="font-extrabold text-night text-lg leading-tight">{section.title}</h3>
       </div>
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
@@ -70,8 +70,8 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'gem') return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-teal-200">
-      <div className="bg-gradient-to-r from-teal-500 to-blue-500 px-5 py-3.5 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-mauve/30">
+      <div className="bg-gradient-to-r from-sage to-mauve px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
       </div>
@@ -82,10 +82,10 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'gradient') return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-indigo-100">
-      <div className="bg-gradient-to-r from-indigo-600 to-violet-500 px-5 py-3 flex items-center gap-2">
+    <div className="bg-parchment-card rounded-xl shadow-sm overflow-hidden border border-primary/30">
+      <div className="bg-night px-5 py-3 flex items-center gap-2">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-white text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-light text-base">{section.title}</h3>
       </div>
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
@@ -94,20 +94,20 @@ function SectionCard({ icon, section, style }) {
   )
 
   if (style === 'verdict') return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-amber-400 border border-amber-100">
+    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border-l-4 border-vermillion border border-vermillion/20">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-amber-700 text-base">{section.title}</h3>
+        <h3 className="font-bold text-vermillion text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
   )
 
   if (style === 'tinted') return (
-    <div className="bg-indigo-50 rounded-xl p-5 shadow-sm border border-indigo-100">
+    <div className="bg-primary-light rounded-xl p-5 shadow-sm border border-primary/30">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-indigo-700 text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-dark text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
@@ -115,7 +115,7 @@ function SectionCard({ icon, section, style }) {
 
   // plain (default)
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary text-base">{section.title}</h3>
@@ -136,11 +136,11 @@ function LoadingCard() {
   ]
   const [step] = useState(() => steps[Math.floor(Math.random() * steps.length)])
   return (
-    <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-10 flex flex-col items-center text-center">
+    <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-10 flex flex-col items-center text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="text-indigo-700 font-semibold">Analysing your career chart…</p>
-      <p className="text-xs text-slate-400 mt-1">{step}</p>
-      <div className="mt-5 w-52 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      <p className="text-primary-dark font-semibold">Analysing your career chart…</p>
+      <p className="text-xs text-ink-faint mt-1">{step}</p>
+      <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
     </div>
@@ -187,13 +187,13 @@ export default function CareerReport() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-parchment flex flex-col">
 
       {/* ── Hero header ── */}
-      <div className="bg-primary px-6 pt-12 pb-8 text-center">
+      <div className="bg-night px-6 pt-12 pb-8 text-center">
         <div className="text-4xl mb-3">💼</div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">Career Report</h1>
-        <p className="text-indigo-200 mt-1 text-sm">Vedic Career &amp; Vocation Analysis</p>
+        <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">Career Report</h1>
+        <p className="text-ink-onnight mt-1 text-sm">Vedic Career &amp; Vocation Analysis</p>
         <div className="mt-4 flex justify-center gap-2">
           {['en', 'hi'].map(lang => (
             <button
@@ -201,8 +201,8 @@ export default function CareerReport() {
               onClick={() => i18n.changeLanguage(lang)}
               className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
                 i18n.language.startsWith(lang)
-                  ? 'bg-white text-primary'
-                  : 'bg-white/20 text-white hover:bg-white/30'
+                  ? 'bg-primary text-night'
+                  : 'bg-white/10 text-ink-onnight hover:bg-white/20'
               }`}
             >
               {lang === 'en' ? 'EN' : 'हि'}
@@ -216,7 +216,7 @@ export default function CareerReport() {
 
         {/* Form (idle + error) */}
         {(status === 'idle' || status === 'error') && (
-          <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-md p-6 sm:p-8">
+          <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
             <BirthForm onSubmit={handleSubmit} loading={false} />
             {status === 'error' && (
               <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
@@ -234,16 +234,16 @@ export default function CareerReport() {
           <div className="max-w-2xl mx-auto pt-2">
 
             {/* Info bar */}
-            <div className="flex items-center justify-between bg-white rounded-xl px-4 py-3 mb-5 shadow-sm border border-slate-200">
-              <div className="text-sm text-slate-600 truncate pr-4">
+            <div className="flex items-center justify-between bg-parchment-card rounded-xl px-4 py-3 mb-5 shadow-sm border border-line">
+              <div className="text-sm text-ink-muted truncate pr-4">
                 {submittedInput?.name && (
                   <>
-                    <span className="font-semibold text-slate-800">{submittedInput.name}</span>
-                    <span className="mx-1.5 text-slate-300">·</span>
+                    <span className="font-semibold text-ink">{submittedInput.name}</span>
+                    <span className="mx-1.5 text-ink-faint">·</span>
                   </>
                 )}
                 <span>{submittedInput?.place}</span>
-                <span className="mx-1.5 text-slate-300">·</span>
+                <span className="mx-1.5 text-ink-faint">·</span>
                 <span>{submittedInput?.date}</span>
               </div>
               <button
@@ -267,7 +267,7 @@ export default function CareerReport() {
             <div className="text-center mt-8">
               <button
                 onClick={reset}
-                className="px-8 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-full text-sm font-semibold transition shadow-md"
+                className="px-8 py-2.5 bg-primary hover:bg-primary-dark text-night rounded-full text-sm font-semibold transition shadow-md"
               >
                 Analyse Another Chart
               </button>

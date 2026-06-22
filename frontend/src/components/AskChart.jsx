@@ -74,19 +74,19 @@ export default function AskChart({ input, initialQuestion = null }) {
   }
 
   return (
-    <div className="flex flex-col h-[60vh] min-h-[400px] bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="flex flex-col h-[60vh] min-h-[400px] bg-parchment-card rounded-xl shadow-sm border border-line overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+      <div className="px-4 py-3 border-b border-line flex items-center justify-between bg-night/[0.03]">
         <div>
-          <div className="text-sm font-semibold text-slate-800">💬 {t('tab_ask')}</div>
-          <div className="text-xs text-slate-400">{t('ask_subtitle')}</div>
+          <div className="text-sm font-semibold text-ink">💬 {t('tab_ask')}</div>
+          <div className="text-xs text-ink-faint">{t('ask_subtitle')}</div>
         </div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
           limitReached
             ? 'bg-red-50 text-red-500'
             : remaining === 1
-            ? 'bg-amber-50 text-amber-600'
-            : 'bg-primary-light text-indigo-600'
+            ? 'bg-vermillion-light text-vermillion'
+            : 'bg-primary-light text-primary-dark'
         }`}>
           {limitReached ? t('ask_zero_left') : t('ask_questions_remaining', { count: remaining })}
         </span>
@@ -97,16 +97,16 @@ export default function AskChart({ input, initialQuestion = null }) {
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
             <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
-            <p className="text-slate-400 text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
-            <p className="text-slate-300 text-xs mt-1">{t('ask_empty_example')}</p>
+            <p className="text-ink-faint text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
+            <p className="text-ink-faint/70 text-xs mt-1">{t('ask_empty_example')}</p>
           </div>
         )}
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
               msg.role === 'user'
-                ? 'bg-primary text-white rounded-br-sm'
-                : 'bg-slate-100 text-slate-800 rounded-bl-sm'
+                ? 'bg-primary text-night rounded-br-sm'
+                : 'bg-night/[0.04] text-ink rounded-bl-sm'
             }`}>
               {msg.text}
             </div>
@@ -114,11 +114,11 @@ export default function AskChart({ input, initialQuestion = null }) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-100 rounded-2xl rounded-bl-sm px-4 py-2.5">
+            <div className="bg-night/[0.04] rounded-2xl rounded-bl-sm px-4 py-2.5">
               <div className="flex gap-1 items-center">
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay:'0ms'}}/>
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay:'150ms'}}/>
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay:'300ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'0ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'150ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'300ms'}}/>
               </div>
             </div>
           </div>
@@ -128,14 +128,14 @@ export default function AskChart({ input, initialQuestion = null }) {
         )}
         {limitReached && (
           <div className="text-center py-3">
-            <p className="text-xs text-slate-400">{t('ask_limit_reached', { count: MAX_QUESTIONS })}</p>
+            <p className="text-xs text-ink-faint">{t('ask_limit_reached', { count: MAX_QUESTIONS })}</p>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
       {/* Input */}
-      <div className="px-3 py-3 border-t border-slate-100 bg-slate-50">
+      <div className="px-3 py-3 border-t border-line bg-night/[0.03]">
         <div className="flex gap-2 items-end">
           <textarea
             value={inputValue}
@@ -144,17 +144,17 @@ export default function AskChart({ input, initialQuestion = null }) {
             disabled={limitReached || loading}
             placeholder={limitReached ? t('ask_limit_reached', { count: MAX_QUESTIONS }) : t('ask_placeholder')}
             rows={1}
-            className="flex-1 resize-none border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-slate-100 disabled:text-slate-400"
+            className="flex-1 resize-none border border-line rounded-xl px-3 py-2 text-sm bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-night/5 disabled:text-ink-faint"
           />
           <button
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || limitReached || loading}
-            className="bg-primary hover:bg-primary-dark disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-xl px-4 py-2 text-sm font-semibold transition flex-shrink-0"
+            className="bg-primary hover:bg-primary-dark disabled:bg-night/10 text-night disabled:text-ink-faint rounded-xl px-4 py-2 text-sm font-semibold transition flex-shrink-0"
           >
             {t('ask_send')}
           </button>
         </div>
-        <p className="text-[11px] text-slate-400 text-center mt-2">
+        <p className="text-[11px] text-ink-faint text-center mt-2">
           {provider ? t('reading_powered_by', { provider }) : t('reading_powered_by_generic')}
         </p>
       </div>

@@ -18,24 +18,27 @@ import KundliDownload     from '../components/KundliDownload'
 import CareerReportTab   from '../components/CareerReportTab'
 import RajyogasTab       from '../components/RajyogasTab'
 import TopicInsightTab   from '../components/TopicInsightTab'
+import SegmentedToggle   from '../components/SegmentedToggle'
 
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
+import TopicIcon from '../components/TopicIcon'
+import TabIcon from '../components/TabIcon'
 
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
   const md = data.dasha.current_mahadasha
   return (
-    <div className="flex flex-wrap gap-2 px-4 py-2 bg-white border-b border-slate-100">
-      <span className="bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">
+    <div className="flex flex-wrap gap-2 px-4 py-2 bg-parchment-card border-b border-line">
+      <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
         Lagna: {data.ascendant.sign}
       </span>
       {moon && (
-        <span className="bg-pink-50 text-pink-700 text-xs font-semibold px-3 py-1 rounded-full">
+        <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
           Rashi: {moon.sign}
         </span>
       )}
-      <span className="bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">
+      <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
         Mahadasha: {md.planet}
       </span>
     </div>
@@ -51,9 +54,9 @@ function SummaryChips({ data }) {
 function mainTabs(t) {
   return [
     { id: 'kundli',   label: t('nav_kundli'),   icon: '/astroguru.svg' },
-    { id: 'advanced', label: t('nav_advanced'), icon: '🔬' },
-    { id: 'insights', label: t('tab_reading'),  icon: '📖' },
-    { id: 'ask',      label: t('tab_ask'),      icon: '💬' },
+    { id: 'advanced', label: t('nav_advanced'), icon: 'advanced' },
+    { id: 'insights', label: t('tab_reading'),  icon: 'insights' },
+    { id: 'ask',      label: t('tab_ask'),      icon: 'ask' },
   ]
 }
 
@@ -101,13 +104,13 @@ const CHART_STYLES = [
 ]
 
 const ACCENT_CLASSES = {
-  indigo: 'bg-indigo-600 border-indigo-600 text-white shadow-sm',
-  rose:   'bg-rose-600 border-rose-600 text-white shadow-sm',
-  teal:   'bg-teal-600 border-teal-600 text-white shadow-sm',
+  primary: 'bg-primary border-primary text-night shadow-sm',
+  mauve:   'bg-mauve border-mauve text-white shadow-sm',
+  sage:    'bg-sage border-sage text-white shadow-sm',
 }
 
 // Navigation pills — bold, filled, used for "which view am I looking at."
-function SubTabBar({ subtabs, active, onChange, accent = 'indigo' }) {
+function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
   return (
     <div className="flex gap-2 mb-4 flex-wrap">
       {subtabs.map(s => (
@@ -115,7 +118,7 @@ function SubTabBar({ subtabs, active, onChange, accent = 'indigo' }) {
                 className={`text-xs px-3 py-1.5 rounded-lg border transition ${
                   active === s.id
                     ? ACCENT_CLASSES[accent]
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400'
+                    : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
                 }`}>
           {s.label}
         </button>
@@ -125,27 +128,9 @@ function SubTabBar({ subtabs, active, onChange, accent = 'indigo' }) {
 }
 
 // Deliberately distinct from SubTabBar — a small labeled segmented control
-// for "how should the current view render," not "which view." No filled
-// pills, no border-per-option; one bordered container split into segments.
-function SegmentedToggle({ label, options, active, onChange }) {
-  return (
-    <div className="flex items-center justify-between mb-4">
-      <span className="text-xs text-slate-400">{label}</span>
-      <div className="inline-flex border border-slate-200 rounded-lg overflow-hidden">
-        {options.map(o => (
-          <button key={o.id} onClick={() => onChange(o.id)}
-                  className={`text-xs px-3 py-1 transition ${
-                    active === o.id
-                      ? 'bg-slate-100 text-slate-800 font-medium'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}>
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
+// for "how should the current view render," not "which view." Shares
+// SubTabBar's filled-pill look (see SegmentedToggle.jsx for why), just with
+// fewer, denser options.
 
 export default function Result() {
   const { t } = useTranslation()
@@ -201,27 +186,27 @@ export default function Result() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-parchment flex flex-col">
       {/* Header */}
-      <div className="bg-primary text-white">
+      <div className="bg-night text-primary-light">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             <div>
               {input.name && <div className="font-bold text-lg leading-tight">{input.name}</div>}
-              <div className={`${input.name ? 'text-indigo-200 text-xs' : 'font-bold text-base'} leading-tight`}>
+              <div className={`${input.name ? 'text-ink-onnight text-xs' : 'font-bold text-base'} leading-tight`}>
                 {input.place}
               </div>
-              <div className="text-indigo-200 text-xs">
+              <div className="text-ink-onnight text-xs">
                 {formatDate(input.date)} · {formatTime(input.time)}
               </div>
               {topic && (
-                <div className="mt-1 inline-flex items-center gap-1 bg-white/15 rounded-full px-2 py-0.5 text-[11px] text-indigo-100">
-                  {topic.icon} {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+                <div className="mt-1 inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5 text-[11px] text-primary-light">
+                  <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
                 </div>
               )}
             </div>
             <button onClick={() => navigate('/')}
-                    className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-full transition">
+                    className="bg-primary/15 hover:bg-primary/25 text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition">
               ← New chart
             </button>
           </div>
@@ -232,12 +217,12 @@ export default function Result() {
               <button key={tab.id} onClick={() => setActiveMain(tab.id)}
                       className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition inline-flex items-center gap-1.5 ${
                         activeMain === tab.id
-                          ? 'bg-white text-indigo-700'
-                          : 'text-indigo-200 hover:text-white hover:bg-white/10'
+                          ? 'bg-parchment-card text-primary-dark'
+                          : 'text-ink-onnight hover:text-primary-light hover:bg-white/10'
                       }`}>
                 {tab.icon.startsWith('/')
                   ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
-                  : <span>{tab.icon}</span>}
+                  : <TabIcon id={tab.icon} className="w-4 h-4" />}
                 {tab.label}
               </button>
             ))}
@@ -258,7 +243,7 @@ export default function Result() {
           <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
 
           <div className={activeKundliSub === 'birth_chart' ? '' : 'hidden'}>
-            <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} />
+            <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
           </div>
 
@@ -285,7 +270,7 @@ export default function Result() {
 
         {/* ══════════════ ADVANCED ══════════════ */}
         <div className={activeMain === 'advanced' ? '' : 'hidden'}>
-          <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="teal" />
+          <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
           <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
             <BhavaChality input={input} />
@@ -304,7 +289,7 @@ export default function Result() {
 
         {/* ══════════════ INSIGHTS ══════════════ */}
         <div className={activeMain === 'insights' ? '' : 'hidden'}>
-          <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="rose" />
+          <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
 
           <div className={activeInsightSub === 'reading' ? '' : 'hidden'}>
             <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />

@@ -7,7 +7,7 @@
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
   body {
-    @apply bg-slate-50 text-slate-800;
+    @apply bg-parchment text-ink;
   }
 }
 
@@ -23,4 +23,22 @@
 }
 .prediction-fade {
   animation: fadeSlideIn 0.6s ease forwards;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes wheelSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .celestial-spin {
+    animation: wheelSpin 140s linear infinite;
+  }
+
+  @keyframes starTwinkle {
+    0%, 100% { opacity: var(--star-max, 0.9); }
+    50%      { opacity: var(--star-min, 0.25); }
+  }
+  .star-twinkle {
+    animation: starTwinkle var(--star-dur, 3s) ease-in-out infinite;
+  }
 }

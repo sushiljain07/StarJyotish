@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { API_BASE } from '../api/config'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
@@ -353,8 +353,8 @@ function YogaCard({ yoga, defaultOpen }) {
   return (
     <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
       isPresent
-        ? 'bg-white border-emerald-200 border-l-4 border-l-emerald-500'
-        : 'bg-slate-50 border-slate-200'
+        ? 'bg-parchment-card border-emerald-200 border-l-4 border-l-emerald-500'
+        : 'bg-night/[0.03] border-line'
     }`}>
       {/* Header row */}
       <button
@@ -364,46 +364,46 @@ function YogaCard({ yoga, defaultOpen }) {
         <span className={`text-2xl mt-0.5 ${isPresent ? '' : 'opacity-40'}`}>{icon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className={`font-bold text-sm ${isPresent ? 'text-slate-800' : 'text-slate-500'}`}>
+            <h3 className={`font-bold text-sm ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
               {yoga.yoga}
             </h3>
             {isPresent
               ? <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Present</span>
-              : <span className="text-xs font-medium bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">Not present</span>
+              : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">Not present</span>
             }
           </div>
-          <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-slate-600' : 'text-slate-400'}`}>
+          <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-ink-muted' : 'text-ink-faint'}`}>
             {yoga.description}
           </p>
         </div>
-        <span className={`text-slate-400 text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>
+        <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>
 
       {/* Expandable details */}
       {open && info && (
-        <div className={`px-4 pb-4 pt-0 border-t ${isPresent ? 'border-emerald-100' : 'border-slate-200'}`}>
+        <div className={`px-4 pb-4 pt-0 border-t ${isPresent ? 'border-emerald-100' : 'border-line'}`}>
           {/* Meaning */}
           <div className="mt-3">
-            <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-primary-dark' : 'text-ink-faint'}`}>
               What is this yoga?
             </p>
-            <p className={`text-xs leading-relaxed ${isPresent ? 'text-slate-700' : 'text-slate-500'}`}>
+            <p className={`text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
               {info.meaning}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3 mt-3">
             {/* Characteristics */}
-            <div className={`rounded-lg p-3 ${isPresent ? 'bg-indigo-50' : 'bg-slate-100'}`}>
-              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-indigo-700' : 'text-slate-500'}`}>
+            <div className={`rounded-lg p-3 ${isPresent ? 'bg-primary-light' : 'bg-night/10'}`}>
+              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-primary-dark' : 'text-ink-muted'}`}>
                 Characteristics
               </p>
               <ul className="space-y-1">
                 {info.characteristics.map((c, i) => (
-                  <li key={i} className={`flex gap-1.5 text-xs leading-relaxed ${isPresent ? 'text-slate-700' : 'text-slate-500'}`}>
-                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-indigo-400' : 'bg-slate-400'}`} />
+                  <li key={i} className={`flex gap-1.5 text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
+                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-primary' : 'bg-ink-faint'}`} />
                     {c}
                   </li>
                 ))}
@@ -411,14 +411,14 @@ function YogaCard({ yoga, defaultOpen }) {
             </div>
 
             {/* Benefits */}
-            <div className={`rounded-lg p-3 ${isPresent ? 'bg-emerald-50' : 'bg-slate-100'}`}>
-              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-emerald-700' : 'text-slate-500'}`}>
+            <div className={`rounded-lg p-3 ${isPresent ? 'bg-emerald-50' : 'bg-night/10'}`}>
+              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-emerald-700' : 'text-ink-muted'}`}>
                 Benefits
               </p>
               <ul className="space-y-1">
                 {info.benefits.map((b, i) => (
-                  <li key={i} className={`flex gap-1.5 text-xs leading-relaxed ${isPresent ? 'text-slate-700' : 'text-slate-500'}`}>
-                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-emerald-400' : 'bg-slate-400'}`} />
+                  <li key={i} className={`flex gap-1.5 text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
+                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-emerald-400' : 'bg-ink-faint'}`} />
                     {b}
                   </li>
                 ))}
@@ -435,6 +435,14 @@ export default function RajyogasTab({ input }) {
   const [status, setStatus]     = useState('idle')
   const [result, setResult]     = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Pure rule-based yoga detection (services/career_analysis.check_all_yogas),
+  // not an LLM call — auto-load like every other non-LLM tab, instead of
+  // gating behind a click. `load` is defined further down but hoisted, since
+  // it's a function declaration, not a const/arrow function.
+  useEffect(() => {
+    if (hasPremiumAccess()) load()
+  }, [])
 
   if (!hasPremiumAccess()) {
     return (
@@ -473,35 +481,17 @@ export default function RajyogasTab({ input }) {
     }
   }
 
-  if (status === 'idle') {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <div className="text-5xl">👑</div>
-        <h2 className="text-xl font-bold text-slate-800">Rajyoga Analysis</h2>
-        <p className="text-sm text-slate-500 text-center max-w-sm">
-          Discover all classical Rajyogas, Dhana Yogas, Mahapurusha Yogas and
-          more present in your birth chart — with detailed meanings and benefits.
-        </p>
-        <button
-          onClick={load}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow transition text-sm">
-          Analyse Rajyogas
-        </button>
-      </div>
-    )
-  }
-
-  if (status === 'loading') {
+  if (status === 'loading' || status === 'idle') {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="flex gap-1.5">
           {[0, 1, 2].map(i => (
             <span key={i}
-              className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-bounce"
+              className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce"
               style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>
-        <p className="text-sm text-slate-500">Scanning your chart for yogas…</p>
+        <p className="text-sm text-ink-muted">Scanning your chart for yogas…</p>
       </div>
     )
   }
@@ -511,7 +501,7 @@ export default function RajyogasTab({ input }) {
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="text-3xl">⚠️</div>
         <p className="text-sm text-red-600">{errorMsg}</p>
-        <button onClick={load} className="text-sm text-indigo-600 underline">Try again</button>
+        <button onClick={load} className="text-sm text-primary-dark underline">Try again</button>
       </div>
     )
   }
@@ -521,20 +511,20 @@ export default function RajyogasTab({ input }) {
   return (
     <div className="space-y-6">
       {/* Summary banner */}
-      <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl p-5 text-white shadow-md">
+      <div className="bg-night rounded-2xl p-5 text-primary-light shadow-md">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">👑</span>
           <div>
             <h2 className="font-bold text-lg leading-tight">Your Rajyogas</h2>
-            <p className="text-indigo-200 text-xs">
+            <p className="text-ink-onnight text-xs">
               Classical Vedic yogas present in your birth chart — tap any card to see full details
             </p>
           </div>
         </div>
         <div className="mt-3">
-          <div className="bg-white/20 rounded-xl px-4 py-2 text-center inline-block">
-            <div className="text-2xl font-extrabold">{present.length}</div>
-            <div className="text-xs text-indigo-100">Yogas Active in Your Chart</div>
+          <div className="bg-primary/15 rounded-xl px-4 py-2 text-center inline-block">
+            <div className="text-2xl font-extrabold text-primary-light">{present.length}</div>
+            <div className="text-xs text-primary-light">Yogas Active in Your Chart</div>
           </div>
         </div>
       </div>
@@ -550,10 +540,10 @@ export default function RajyogasTab({ input }) {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl p-6 text-center border border-slate-100 shadow-sm">
+        <div className="bg-parchment-card rounded-xl p-6 text-center border border-line shadow-sm">
           <div className="text-3xl mb-2">🌱</div>
-          <p className="text-slate-600 text-sm">No classical Rajyogas detected in this chart.</p>
-          <p className="text-slate-400 text-xs mt-1">This does not limit success — many planetary combinations outside these yogas can bring excellent results.</p>
+          <p className="text-ink-muted text-sm">No classical Rajyogas detected in this chart.</p>
+          <p className="text-ink-faint text-xs mt-1">This does not limit success — many planetary combinations outside these yogas can bring excellent results.</p>
         </div>
       )}
     </div>

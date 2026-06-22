@@ -10,7 +10,7 @@ export default function FAQAccordion({ items }) {
   const [openId, setOpenId] = useState(null)
 
   return (
-    <div className="divide-y divide-slate-100 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div className="divide-y divide-line bg-parchment-card rounded-2xl border border-line shadow-sm overflow-hidden">
       {items.map((item, i) => {
         const isOpen = openId === i
         return (
@@ -18,11 +18,11 @@ export default function FAQAccordion({ items }) {
             <button
               onClick={() => setOpenId(isOpen ? null : i)}
               aria-expanded={isOpen}
-              className="w-full flex items-center justify-between gap-3 text-left px-5 py-4 hover:bg-slate-50 transition"
+              className="w-full flex items-center justify-between gap-3 text-left px-5 py-4 hover:bg-primary-light/40 transition"
             >
-              <span className="text-sm font-semibold text-slate-800">{item.question}</span>
+              <span className="text-sm font-semibold text-ink">{item.question}</span>
               <span
-                className={`shrink-0 text-slate-400 transition-transform duration-300 ${
+                className={`shrink-0 text-primary-dark transition-transform duration-300 ${
                   isOpen ? 'rotate-45' : ''
                 }`}
                 aria-hidden="true"
@@ -35,7 +35,7 @@ export default function FAQAccordion({ items }) {
                 isOpen ? 'max-h-64' : 'max-h-0'
               }`}
             >
-              <p className="px-5 pb-4 text-sm text-slate-500 leading-relaxed">{item.answer}</p>
+              <p className="px-5 pb-4 text-sm text-ink-muted leading-relaxed">{item.answer}</p>
             </div>
           </div>
         )

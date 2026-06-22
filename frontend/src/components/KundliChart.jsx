@@ -142,9 +142,9 @@ export default function KundliChart({
   const sun = planets.find(p => p.name === 'Sun')
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-2 w-full">
+    <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-indigo-700">{title}</div>
+      <div className="text-sm font-semibold text-primary-dark">{title}</div>
 
       <svg
         width="100%"
@@ -261,7 +261,7 @@ export default function KundliChart({
       </svg>
 
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-500 px-2">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-ink-muted px-2">
         <span>* Retrograde</span>
         <span>^ Combust</span>
         <span>↑ Exalted</span>

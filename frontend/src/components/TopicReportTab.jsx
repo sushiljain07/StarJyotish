@@ -13,12 +13,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
+import SegmentedToggle from './SegmentedToggle'
 
 const TOPIC_CONFIG = {
   relationship: {
     icon: '💕',
     endpoint: '/api/relationship-report',
     loadingSubtext: 'D9 · 7th House · Darakaraka · Marriage Timing',
+    // The single biggest accuracy failure this report can make is
+    // confidently predicting a future marriage to someone already married —
+    // this one extra question is what lets the backend tell the difference.
+    requiresMaritalStatus: true,
     sections: [
       { key: 'relationship_destiny_brief',   icon: '✨', style: 'gold'     },
       { key: 'natural_relationship_style',   icon: '💞', style: 'gradient' },
@@ -31,6 +36,26 @@ const TOPIC_CONFIG = {
       { key: 'rudraksha_recommendation',     icon: '🔴', style: 'tinted'   },
       { key: 'empowering_remedies',          icon: '🙏', style: 'plain'    },
       { key: 'closing_blessing',             icon: '🌟', style: 'gradient' },
+    ],
+  },
+  // Backend endpoint/files use the more descriptive "wealth" naming, but the
+  // topic id here must stay 'finance' — matching config/topics.js, which
+  // already pairs this topic with division: 2 (D2 Hora) elsewhere in the app.
+  finance: {
+    icon: '💰',
+    endpoint: '/api/wealth-report',
+    loadingSubtext: '2nd & 11th House · D2 Hora · Future Dashas',
+    sections: [
+      { key: 'wealth_destiny_brief',  icon: '✨', style: 'gold'     },
+      { key: 'natural_wealth_style',  icon: '📈', style: 'gradient' },
+      { key: 'primary_income_path',   icon: '🎯', style: 'verdict'  },
+      { key: 'wealth_blessings',      icon: '👑', style: 'tinted'   },
+      { key: 'wealth_timing_window',  icon: '⏳', style: 'plain'    },
+      { key: 'current_phase',         icon: '🚀', style: 'plain'    },
+      { key: 'gemstone_recommendation',  icon: '💎', style: 'gem'    },
+      { key: 'rudraksha_recommendation', icon: '🔴', style: 'tinted' },
+      { key: 'empowering_remedies',   icon: '🙏', style: 'plain'    },
+      { key: 'closing_blessing',      icon: '🌟', style: 'gradient' },
     ],
   },
 }
@@ -170,9 +195,16 @@ export default function TopicReportTab({ topic, input }) {
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [maritalStatus, setMaritalStatus] = useState('unmarried')
 
   const cfg = TOPIC_CONFIG[topic]
   if (!cfg) return null
+
+  const maritalStatusOptions = [
+    { id: 'unmarried',        label: t('relationship_marital_status_unmarried') },
+    { id: 'married',          label: t('relationship_marital_status_married') },
+    { id: 'divorced_widowed', label: t('relationship_marital_status_divorced_widowed') },
+  ]
 
   async function generate() {
     setStatus('loading')
@@ -183,7 +215,10 @@ export default function TopicReportTab({ topic, input }) {
       const resp = await fetch(`${API_BASE}${cfg.endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place, language }),
+        body: JSON.stringify({
+          date: input.date, time: input.time, place: input.place, language,
+          ...(cfg.requiresMaritalStatus ? { marital_status: maritalStatus } : {}),
+        }),
       })
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}))
@@ -202,6 +237,17 @@ export default function TopicReportTab({ topic, input }) {
       <div className="text-5xl mb-4">{cfg.icon}</div>
       <h2 className="text-xl font-bold text-ink mb-2">{t(`topic_report_${topic}_idle_heading`)}</h2>
       <p className="text-ink-muted text-sm mb-6 max-w-sm">{t(`topic_report_${topic}_idle_body`)}</p>
+      {cfg.requiresMaritalStatus && (
+        <div className="mb-6">
+          <p className="text-xs font-medium text-ink-muted mb-2">{t('relationship_marital_status_question')}</p>
+          <SegmentedToggle
+            options={maritalStatusOptions}
+            active={maritalStatus}
+            onChange={setMaritalStatus}
+            className="justify-center"
+          />
+        </div>
+      )}
       <button
         onClick={generate}
         className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"

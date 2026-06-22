@@ -304,13 +304,13 @@ export default function Result() {
             <CareerReportTab input={input} />
           </div>
 
-          {topicId === 'relationship' && (
+          {(topicId === 'relationship' || topicId === 'finance') && (
             <div className={activeInsightSub === topicId ? '' : 'hidden'}>
               <TopicReportTab topic={topicId} input={input} />
             </div>
           )}
 
-          {(topicId === 'health' || topicId === 'finance') && (
+          {topicId === 'health' && (
             <div className={activeInsightSub === topicId ? '' : 'hidden'}>
               <TopicInsightTab topic={topicId} data={data} />
             </div>

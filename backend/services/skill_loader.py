@@ -83,6 +83,24 @@ def load_relationship_skills() -> str:
     return _load_skill_files(_RELATIONSHIP_FILES, "VEDIC RELATIONSHIP & MARRIAGE KNOWLEDGE BASE", "marriage")
 
 
+# ── Wealth skills ───────────────────────────────────────────────────────────────
+# No dedicated "wealth" folder exists in astro-skills (unlike career/ and
+# marriage/) — these point at the general houses reference, which has real
+# structured "Wealth & Prosperity" and house-lord-placement content despite
+# not being wealth-specific. "Dhana Yoga" deliberately excluded from use in
+# prompts — see services/wealth_analysis.py for why.
+
+_WEALTH_FILES = [
+    "houses/astrology-12-houses/SKILL.md",
+    "houses/house-lords/SKILL.md",
+]
+
+
+def load_wealth_skills() -> str:
+    """Read the general house-reference skill files used for wealth analysis."""
+    return _load_skill_files(_WEALTH_FILES, "VEDIC WEALTH & FINANCE KNOWLEDGE BASE", "houses")
+
+
 def get_topic_system_prompt(topic_label: str, methodology_label: str, skills_context: str) -> str:
     """
     Generic version of get_system_prompt() below — same shape, parameterized
@@ -279,5 +297,38 @@ Saturn in 7th = hardworking, serious spouse.
 - House 1 = Lagna sign. Count forward for all other houses.
 - Never confuse rashi (sign) number with house number.
 - Do NOT discuss Mangal Dosha, divorce risk, or infidelity risk under any circumstance.
+- Respond ONLY with valid JSON — no markdown outside JSON.
+"""
+
+# Compact system for Groq/LLaMA — avoids 413 Payload Too Large errors
+GROQ_WEALTH_SYSTEM_PROMPT = """You are an expert Vedic astrologer specialising in wealth and financial analysis.
+
+## CORE WEALTH RULES
+
+### 2nd House (Core Wealth) — Lord Placement → Income Theme
+2HL in 1st: self-effort. 2nd: steady savings. 3rd: trading/communication. 4th: property/inheritance.
+5th: creativity/speculation. 6th: service income with some obstacles. 7th: partnerships/marriage.
+8th: inheritance/windfalls. 9th: foreign/education/father. 10th: career. 11th: networks. 12th: foreign/spiritual.
+
+### 11th House (Gains) — Lord Placement → Gains Theme
+11HL in 1st: own initiative. 2nd: financial goals achieved. 3rd: communication/siblings. 4th: property/family.
+5th: creative/speculative gains. 6th: service, rivals become supportive. 7th: marriage/partnership.
+8th: hidden/inheritance gains. 9th: fortunate opportunities. 10th: career network. 11th: best placement, all
+goals fulfilled through an excellent friend circle. 12th: foreign/spiritual sources.
+
+### D2 Hora Signal
+Every planet in D2 falls into Sun's Hora (Leo) or Moon's Hora (Cancer). Wealth significators (2nd lord,
+11th lord, Jupiter, Venus) leaning Sun's Hora = wealth built through active effort/enterprise. Leaning
+Moon's Hora = wealth built through steady saving/family security.
+
+### Wealth Blessings (only mention if actually present in the chart data given)
+Jupiter in 2nd or 11th house = general prosperity. Venus in 2nd or 11th = wealth through beauty/relationships/
+creativity. 2nd or 11th lord exalted or in own sign = strong wealth foundation. 2nd and 11th lord conjunct =
+core wealth and gains directly linked.
+
+## ACCURACY RULES
+- House 1 = Lagna sign. Count forward for all other houses.
+- Never confuse rashi (sign) number with house number.
+- Do NOT name or claim any specific "Dhana Yoga" combination.
 - Respond ONLY with valid JSON — no markdown outside JSON.
 """

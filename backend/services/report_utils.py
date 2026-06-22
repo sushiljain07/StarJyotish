@@ -7,6 +7,7 @@ here is career-specific.
 import json
 import os
 import time
+import requests
 from typing import Optional
 
 
@@ -45,8 +46,36 @@ def call_llm(
     Returns (parsed_json, provider_label) — provider_label reflects whichever
     one actually served this request, since the fallback can kick in silently.
     """
-    anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-    if anthropic_key:
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    anthropic_key  = os.getenv("ANTHROPIC_API_KEY", "").strip()
+
+    if openrouter_key:
+        try:
+            or_messages = ([{"role": "system", "content": system}] if system else []) + \
+                          [{"role": "user", "content": prompt}]
+            resp = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {openrouter_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://astroguru.app"),
+                    "X-Title": os.getenv("OPENROUTER_SITE_NAME", "AstroGuru"),
+                },
+                json={
+                    "model": "anthropic/claude-sonnet-4.6",
+                    "max_tokens": 7000,
+                    "messages": or_messages,
+                },
+                timeout=90,
+            )
+            resp.raise_for_status()
+            text = resp.json()["choices"][0]["message"]["content"]
+            return extract_json(text), "Claude"
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Claude (via OpenRouter) returned non-JSON: {e}") from e
+        except Exception as e:
+            print(f"[{log_prefix}] Claude via OpenRouter error ({type(e).__name__}: {e}), falling back to Groq.")
+    elif anthropic_key:
         import anthropic as _anthropic
         client = _anthropic.Anthropic(api_key=anthropic_key)
         create_kwargs: dict = dict(
@@ -70,9 +99,8 @@ def call_llm(
 
     groq_key = os.getenv("GROQ_API_KEY", "").strip()
     if not groq_key:
-        raise RuntimeError("No LLM API key available (set ANTHROPIC_API_KEY or GROQ_API_KEY).")
+        raise RuntimeError("No LLM API key available (set OPENROUTER_API_KEY, ANTHROPIC_API_KEY, or GROQ_API_KEY).")
 
-    import requests
     groq_system = groq_system_prompt
     if groq_extra:
         groq_system = groq_system + f"\n\n{groq_extra_header}\n" + groq_extra

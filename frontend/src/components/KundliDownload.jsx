@@ -117,7 +117,7 @@ export default function KundliDownload({ data, input }) {
       <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 space-y-5">
 
         {/* Header */}
-        <div className="text-center border-b border-line pb-4">
+        <div className="text-center border-b border-line pb-4 print:break-inside-avoid-page">
           <div className="text-lg font-bold text-primary-dark tracking-wide">✦ AstroGuru Kundli ✦</div>
           {input.name && (
             <div className="text-2xl font-semibold text-ink mt-1">{input.name}</div>
@@ -146,7 +146,7 @@ export default function KundliDownload({ data, input }) {
         {/* Charts — Lagna + Navamsa */}
         <div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0">
+            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 Lagna Chart (D1)
               </p>
@@ -157,7 +157,7 @@ export default function KundliDownload({ data, input }) {
                 title="Lagna Chart"
               />
             </div>
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0">
+            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 Navamsa Chart (D9)
               </p>
@@ -172,12 +172,12 @@ export default function KundliDownload({ data, input }) {
 
         {/* Planet table */}
         <div>
-          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">
+          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2 print:break-after-avoid-page">
             Planetary Positions
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
-              <thead>
+              <thead className="print:table-header-group">
                 <tr className="bg-primary-light text-primary-dark">
                   {['Planet','Sign','Deg°','House','Nakshatra','Pada','Dignity','R'].map(h => (
                     <th key={h} className={`p-1.5 border border-primary/30 ${h==='R'||h==='Pada'||h==='House'?'text-center':'text-left'}`}>
@@ -190,7 +190,7 @@ export default function KundliDownload({ data, input }) {
                 {planets.map((p, i) => {
                   const dignity = getDignity(p.name, p.sign_index)
                   return (
-                    <tr key={p.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
+                    <tr key={p.name} className={`print:break-inside-avoid-page ${i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}`}>
                       <td className="p-1.5 border border-line font-semibold text-ink">{p.name}</td>
                       <td className="p-1.5 border border-line text-ink-muted">{p.sign}</td>
                       <td className="p-1.5 border border-line text-ink-muted">{p.degree.toFixed(1)}</td>
@@ -214,33 +214,33 @@ export default function KundliDownload({ data, input }) {
 
         {/* Dasha system */}
         <div>
-          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">
+          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2 print:break-after-avoid-page">
             Vimshottari Dasha
           </h3>
 
           {/* Current dasha chain */}
           <div className="flex flex-wrap gap-2 mb-3">
-            <div className="bg-primary-light border border-primary/30 rounded-lg px-3 py-2">
+            <div className="bg-primary-light border border-primary/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
               <div className="text-xs text-primary-dark/70 uppercase font-medium">Mahadasha</div>
               <div className="text-sm font-bold text-primary-dark">{md.planet}</div>
               <div className="text-xs text-ink-muted">{fmtDate(md.start)} – {fmtDate(md.end)} ({md.years}y)</div>
             </div>
             {ad && (
-              <div className="bg-mauve-light border border-mauve/30 rounded-lg px-3 py-2">
+              <div className="bg-mauve-light border border-mauve/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
                 <div className="text-xs text-mauve/70 uppercase font-medium">Antardasha</div>
                 <div className="text-sm font-bold text-mauve">{ad.planet}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(ad.start)} – {fmtDate(ad.end)}</div>
               </div>
             )}
             {dasha.current_pratyantar && (
-              <div className="bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2">
+              <div className="bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
                 <div className="text-xs text-vermillion/70 uppercase font-medium">Pratyantar</div>
                 <div className="text-sm font-bold text-vermillion">{dasha.current_pratyantar.planet}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_pratyantar.start)} – {fmtDate(dasha.current_pratyantar.end)}</div>
               </div>
             )}
             {dasha.current_sookshma && (
-              <div className="bg-sage-light border border-sage/30 rounded-lg px-3 py-2">
+              <div className="bg-sage-light border border-sage/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
                 <div className="text-xs text-sage/70 uppercase font-medium">Sookshma</div>
                 <div className="text-sm font-bold text-sage">{dasha.current_sookshma.planet}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_sookshma.start)} – {fmtDate(dasha.current_sookshma.end)}</div>
@@ -249,7 +249,7 @@ export default function KundliDownload({ data, input }) {
           </div>
 
           {/* Full sequence pills */}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 print:break-inside-avoid-page">
             {dasha.full_sequence.map((entry, i) => (
               <span key={i}
                     className={`text-xs px-2 py-0.5 rounded border ${
@@ -265,12 +265,12 @@ export default function KundliDownload({ data, input }) {
 
         {/* Basic predictions & personality */}
         <div>
-          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-3">
+          <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-3 print:break-after-avoid-page">
             Basic Predictions &amp; Personality
           </h3>
           <div className="space-y-3">
 
-            <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3">
+            <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3 print:break-inside-avoid-page">
               <div className="text-xs font-bold text-primary-dark uppercase mb-1">
                 Lagna ({ascendant.sign}) — Personality
               </div>
@@ -280,7 +280,7 @@ export default function KundliDownload({ data, input }) {
             </div>
 
             {moon && (
-              <div className="bg-mauve-light border-l-4 border-mauve rounded-r-lg p-3">
+              <div className="bg-mauve-light border-l-4 border-mauve rounded-r-lg p-3 print:break-inside-avoid-page">
                 <div className="text-xs font-bold text-mauve uppercase mb-1">
                   Moon in {moon.sign} — Emotional Nature
                 </div>
@@ -290,7 +290,7 @@ export default function KundliDownload({ data, input }) {
               </div>
             )}
 
-            <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3">
+            <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3 print:break-inside-avoid-page">
               <div className="text-xs font-bold text-primary-dark uppercase mb-1">
                 {md.planet} Mahadasha — Current Life Theme
               </div>

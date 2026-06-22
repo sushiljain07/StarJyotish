@@ -152,7 +152,13 @@ export default function Result() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  const [activeMain, setActiveMain] = useState('kundli')
+  // Carried over from the landing page's AI persona spotlight (see
+  // Landing.jsx → Home.jsx) — read straight off the raw location state,
+  // before the early-return guard below, since it has to seed the initial
+  // tab and hook initializers must run unconditionally on every render.
+  const landToAsk = Boolean(state?.landToAsk || state?.presetQuestion)
+
+  const [activeMain, setActiveMain] = useState(landToAsk ? 'ask' : 'kundli')
   const [activeKundliSub, setActiveKundliSub] = useState('birth_chart')
   const [activeAdvancedSub, setActiveAdvancedSub] = useState('bhava')
   const [activeInsightSub, setActiveInsightSub] = useState('reading')
@@ -163,7 +169,7 @@ export default function Result() {
     return null
   }
 
-  const { data, input } = state
+  const { data, input, presetQuestion = null } = state
   const topic = getTopic(input.topic)
   const topicId = topic?.id ?? null
 
@@ -321,7 +327,7 @@ export default function Result() {
 
         {/* ══════════════ ASK ══════════════ */}
         <div className={activeMain === 'ask' ? '' : 'hidden'}>
-          <AskChart input={input} />
+          <AskChart input={input} initialQuestion={presetQuestion} />
         </div>
 
       </div>

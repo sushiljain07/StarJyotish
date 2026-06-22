@@ -15,6 +15,11 @@ export default function Home() {
 
   const topicId = state?.topic ?? null
   const topic = getTopic(topicId)
+  // Carried over from the landing page's AI persona spotlight (see
+  // Landing.jsx → AskPersonaCard.jsx) — lets Result.jsx land the visitor
+  // straight on the Ask tab, optionally with a question already asked.
+  const presetQuestion = state?.presetQuestion ?? null
+  const landToAsk = Boolean(state?.landToAsk || presetQuestion)
 
   async function handleSubmit(formInput) {
     setLoading(true)
@@ -26,7 +31,7 @@ export default function Home() {
     const input = topicId ? { ...formInput, topic: topicId } : formInput
     try {
       const data = await fetchKundli(input)
-      navigate('/kundli', { state: { data, input } })
+      navigate('/kundli', { state: { data, input, presetQuestion, landToAsk } })
     } catch (err) {
       setError(
         err.message.toLowerCase().includes('place') || err.message.toLowerCase().includes('not found')
@@ -72,6 +77,16 @@ export default function Home() {
                 {topic.icon} {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
               </span>
               <button onClick={() => navigate('/')} className="text-indigo-500 underline shrink-0 ml-2">
+                {t('change_focus')}
+              </button>
+            </div>
+          )}
+          {presetQuestion && (
+            <div className="mb-4 flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 text-xs">
+              <span className="text-amber-700 font-medium truncate">
+                💬 {t('home_asking_label')}: “{presetQuestion}”
+              </span>
+              <button onClick={() => navigate('/')} className="text-amber-600 underline shrink-0 ml-2">
                 {t('change_focus')}
               </button>
             </div>

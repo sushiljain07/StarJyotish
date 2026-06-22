@@ -5,7 +5,7 @@ import { API_BASE } from '../api/config'
 
 const MAX_QUESTIONS = 10
 
-export default function AskChart({ input }) {
+export default function AskChart({ input, initialQuestion = null }) {
   const { t, i18n } = useTranslation()
   const [messages, setMessages]     = useState([])
   const [questionCount, setCount]   = useState(0)
@@ -14,16 +14,28 @@ export default function AskChart({ input }) {
   const [errorMsg, setErrorMsg]     = useState('')
   const [provider, setProvider]     = useState(null)
   const bottomRef = useRef(null)
+  // Guards against StrictMode's double-mount in dev, and against any
+  // re-render, sending the carried-over question from the landing page's
+  // AI persona spotlight more than once.
+  const autoSentRef = useRef(false)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  useEffect(() => {
+    if (initialQuestion && !autoSentRef.current) {
+      autoSentRef.current = true
+      handleSend(initialQuestion)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestion])
+
   const remaining = MAX_QUESTIONS - questionCount
   const limitReached = questionCount >= MAX_QUESTIONS
 
-  async function handleSend() {
-    const question = inputValue.trim()
+  async function handleSend(questionOverride) {
+    const question = (questionOverride ?? inputValue).trim()
     if (!question || loading || limitReached) return
 
     const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
@@ -67,7 +79,7 @@ export default function AskChart({ input }) {
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <div className="text-sm font-semibold text-slate-800">💬 {t('tab_ask')}</div>
-          <div className="text-xs text-slate-400">Ask about your chart</div>
+          <div className="text-xs text-slate-400">{t('ask_subtitle')}</div>
         </div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
           limitReached
@@ -76,7 +88,7 @@ export default function AskChart({ input }) {
             ? 'bg-amber-50 text-amber-600'
             : 'bg-primary-light text-indigo-600'
         }`}>
-          {limitReached ? '0 left' : t('ask_questions_remaining', { count: remaining })}
+          {limitReached ? t('ask_zero_left') : t('ask_questions_remaining', { count: remaining })}
         </span>
       </div>
 
@@ -85,8 +97,8 @@ export default function AskChart({ input }) {
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
             <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
-            <p className="text-slate-400 text-sm">Ask up to 10 questions about your birth chart</p>
-            <p className="text-slate-300 text-xs mt-1">e.g. "What does my ascendant say about career?"</p>
+            <p className="text-slate-400 text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
+            <p className="text-slate-300 text-xs mt-1">{t('ask_empty_example')}</p>
           </div>
         )}
         {messages.map((msg, i) => (
@@ -116,7 +128,7 @@ export default function AskChart({ input }) {
         )}
         {limitReached && (
           <div className="text-center py-3">
-            <p className="text-xs text-slate-400">{t('ask_limit_reached')}</p>
+            <p className="text-xs text-slate-400">{t('ask_limit_reached', { count: MAX_QUESTIONS })}</p>
           </div>
         )}
         <div ref={bottomRef} />
@@ -130,12 +142,12 @@ export default function AskChart({ input }) {
             onChange={e => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={limitReached || loading}
-            placeholder={limitReached ? t('ask_limit_reached') : t('ask_placeholder')}
+            placeholder={limitReached ? t('ask_limit_reached', { count: MAX_QUESTIONS }) : t('ask_placeholder')}
             rows={1}
             className="flex-1 resize-none border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-slate-100 disabled:text-slate-400"
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!inputValue.trim() || limitReached || loading}
             className="bg-primary hover:bg-primary-dark disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-xl px-4 py-2 text-sm font-semibold transition flex-shrink-0"
           >

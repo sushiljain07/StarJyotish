@@ -358,9 +358,11 @@ _GEM_LAGNA_MAP = "gemstones/vedic-gemstones/SKILL.md"
 
 _CLASSICAL = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 
-_GROQ_URL      = "https://api.groq.com/openai/v1/chat/completions"
-_GROQ_MODEL    = "llama-3.3-70b-versatile"
-_CLAUDE_MODEL  = "claude-sonnet-4-6"
+_GROQ_URL          = "https://api.groq.com/openai/v1/chat/completions"
+_GROQ_MODEL        = "llama-3.3-70b-versatile"
+_CLAUDE_MODEL      = "claude-sonnet-4-6"
+_OPENROUTER_URL    = "https://openrouter.ai/api/v1/chat/completions"
+_OPENROUTER_MODEL  = "anthropic/claude-sonnet-4.6"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -771,11 +773,19 @@ def parse_sections(raw: str) -> list[dict]:
 
 
 def _call_claude(messages: list[dict], json_mode: bool = False) -> str:
-    """Call Claude API. Raises ValueError if key missing, or any SDK exception on error."""
+    """
+    Call Claude — via OpenRouter if OPENROUTER_API_KEY is set, otherwise
+    directly via the Anthropic SDK using ANTHROPIC_API_KEY.
+    Raises ValueError if neither key is set, or any exception on API error.
+    """
+    openrouter_key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
+    if openrouter_key:
+        return _call_claude_via_openrouter(messages, openrouter_key, json_mode)
+
     import anthropic as _anthropic
     api_key = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
     if not api_key:
-        raise ValueError("ANTHROPIC_API_KEY not set")
+        raise ValueError("Neither OPENROUTER_API_KEY nor ANTHROPIC_API_KEY is set")
     client = _anthropic.Anthropic(api_key=api_key)
     kwargs: dict = {
         "model": _CLAUDE_MODEL,
@@ -790,6 +800,35 @@ def _call_claude(messages: list[dict], json_mode: bool = False) -> str:
         if block.type == "text":
             return block.text
     return ""
+
+
+def _call_claude_via_openrouter(
+    messages: list[dict],
+    api_key: str,
+    json_mode: bool = False,
+) -> str:
+    """
+    Call Claude Sonnet 4.6 through OpenRouter's OpenAI-compatible endpoint.
+    OpenRouter bills/proxies the request but the model itself is still
+    Anthropic's Claude — only the transport changes.
+    """
+    payload: dict = {"model": _OPENROUTER_MODEL, "messages": messages, "max_tokens": 4096}
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+    resp = requests.post(
+        _OPENROUTER_URL,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            # Optional, but OpenRouter recommends these for attribution/rankings.
+            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://astroguru.app"),
+            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "AstroGuru"),
+        },
+        json=payload,
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.json()["choices"][0]["message"]["content"]
 
 
 def _call_groq(
@@ -831,8 +870,9 @@ def _call_groq(
 
 def _call_llm(messages: list[dict], json_mode: bool = False) -> tuple[str, str]:
     """
-    Primary: Claude (claude-sonnet-4-6).
-    Fallback: Groq/Llama when ANTHROPIC_API_KEY is missing or Claude returns an error.
+    Primary: Claude (claude-sonnet-4-6), via OpenRouter if OPENROUTER_API_KEY
+    is set, else directly via ANTHROPIC_API_KEY.
+    Fallback: Groq/Llama when neither key is set or Claude returns an error.
     Returns (text, provider_label) — provider_label reflects whichever one
     actually served this specific request, since the fallback can kick in
     silently and a hardcoded "Powered by Claude" in the UI would be wrong
@@ -842,7 +882,7 @@ def _call_llm(messages: list[dict], json_mode: bool = False) -> tuple[str, str]:
     try:
         return _call_claude(messages, json_mode), "Claude"
     except ValueError as exc:
-        claude_reason = str(exc)  # e.g. "ANTHROPIC_API_KEY not set"
+        claude_reason = str(exc)  # e.g. "Neither OPENROUTER_API_KEY nor ANTHROPIC_API_KEY is set"
     except Exception as exc:
         claude_reason = f"{type(exc).__name__}: {exc}"
         logger.warning("Claude API error (%s), falling back to Groq", exc)

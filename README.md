@@ -113,8 +113,9 @@ Open **http://localhost:5173** in your browser. The dev server proxies `/api` to
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Recommended | Primary LLM for Reading, Ask, and Career Report |
-| `GROQ_API_KEY` | Optional | Fallback LLM, used if Anthropic is unset or errors |
+| `OPENROUTER_API_KEY` | Recommended | Primary LLM (Claude Sonnet 4.6 via OpenRouter) for Reading, Ask, and Career Report. Takes priority over `ANTHROPIC_API_KEY` if both are set |
+| `ANTHROPIC_API_KEY` | Optional | Used in place of OpenRouter if `OPENROUTER_API_KEY` is unset — calls Claude directly via Anthropic's API |
+| `GROQ_API_KEY` | Optional | Fallback LLM, used if neither of the above is set or Claude errors |
 | `FRONTEND_URL` | Production only | Deployed frontend origin, added to the CORS allow-list |
 
 Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with **no API key at all** — only Reading, Ask, and Career Report need an LLM key.
@@ -202,7 +203,7 @@ astro/
 
 The app deploys as two independent pieces — see `backend/Dockerfile` and `frontend/src/api/config.js`:
 
-- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `ANTHROPIC_API_KEY` / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS.
+- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS.
 - **Frontend → Vercel** (or any static host). Set the root directory to `frontend`, build command `npm run build`, output `dist`. Set `VITE_API_URL` to the backend's public URL.
 
 Locally, both pieces talk to each other automatically via the Vite dev proxy — no env vars needed.

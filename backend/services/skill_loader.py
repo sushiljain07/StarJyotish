@@ -20,19 +20,21 @@ _CAREER_FILES = [
 ]
 
 
-def load_career_skills() -> str:
+def _load_skill_files(file_list: list, header: str, subdir: str) -> str:
     """
-    Read all career skill markdown files in priority order.
-    Returns a single concatenated string for use as LLM system context.
-    Returns empty string if the skills directory doesn't exist.
+    Generic skill-file loader: reads the given files in priority order, then
+    catches any remaining .md files under `subdir` not already in the list.
+    Shared by load_career_skills() and load_relationship_skills() (and
+    health/wealth, once those exist) — this loop used to be duplicated
+    inline inside load_career_skills() with nothing career-specific about it.
     """
     if not _SKILLS_ROOT.exists():
         return ""
 
-    parts: list[str] = ["# CAREER ASTROLOGY KNOWLEDGE BASE\n"]
-    loaded: set[str] = set()
+    parts: list = [f"# {header}\n"]
+    loaded: set = set()
 
-    for rel in _CAREER_FILES:
+    for rel in file_list:
         path = _SKILLS_ROOT / rel
         if path.exists():
             parts.append(f"\n{'='*60}")
@@ -41,10 +43,9 @@ def load_career_skills() -> str:
             parts.append(path.read_text(encoding="utf-8", errors="ignore"))
             loaded.add(rel)
 
-    # Catch any remaining career skill files not in the priority list
-    career_dir = _SKILLS_ROOT / "career"
-    if career_dir.exists():
-        for md in sorted(career_dir.rglob("*.md")):
+    subdir_path = _SKILLS_ROOT / subdir
+    if subdir_path.exists():
+        for md in sorted(subdir_path.rglob("*.md")):
             rel = str(md.relative_to(_SKILLS_ROOT)).replace("\\", "/")
             if rel not in loaded:
                 parts.append(f"\n{'='*60}")
@@ -53,6 +54,70 @@ def load_career_skills() -> str:
                 parts.append(md.read_text(encoding="utf-8", errors="ignore"))
 
     return "\n".join(parts)
+
+
+def load_career_skills() -> str:
+    """
+    Read all career skill markdown files in priority order.
+    Returns a single concatenated string for use as LLM system context.
+    Returns empty string if the skills directory doesn't exist.
+    """
+    return _load_skill_files(_CAREER_FILES, "CAREER ASTROLOGY KNOWLEDGE BASE", "career")
+
+
+# ── Relationship skills ────────────────────────────────────────────────────────
+# Mangal Dosha and divorce/infidelity sections deliberately excluded from use
+# in prompts — see services/relationship_analysis.py for why.
+
+_RELATIONSHIP_FILES = [
+    "marriage/SKILL.md",
+    "marriage/references/basics.md",
+    "marriage/references/darakaraka.md",
+    "marriage/references/quality-of-marriage.md",
+    "marriage/references/timing-techniques.md",
+]
+
+
+def load_relationship_skills() -> str:
+    """Read all marriage/relationship skill markdown files in priority order."""
+    return _load_skill_files(_RELATIONSHIP_FILES, "VEDIC RELATIONSHIP & MARRIAGE KNOWLEDGE BASE", "marriage")
+
+
+# ── Wealth skills ───────────────────────────────────────────────────────────────
+# No dedicated "wealth" folder exists in astro-skills (unlike career/ and
+# marriage/) — these point at the general houses reference, which has real
+# structured "Wealth & Prosperity" and house-lord-placement content despite
+# not being wealth-specific. "Dhana Yoga" deliberately excluded from use in
+# prompts — see services/wealth_analysis.py for why.
+
+_WEALTH_FILES = [
+    "houses/astrology-12-houses/SKILL.md",
+    "houses/house-lords/SKILL.md",
+]
+
+
+def load_wealth_skills() -> str:
+    """Read the general house-reference skill files used for wealth analysis."""
+    return _load_skill_files(_WEALTH_FILES, "VEDIC WEALTH & FINANCE KNOWLEDGE BASE", "houses")
+
+
+def get_topic_system_prompt(topic_label: str, methodology_label: str, skills_context: str) -> str:
+    """
+    Generic version of get_system_prompt() below — same shape, parameterized
+    so relationship/health/wealth don't need their own near-duplicate
+    function. get_system_prompt() itself is left untouched for career.
+    """
+    return f"""You are an expert Vedic astrologer specialised in {topic_label} using {methodology_label}.
+Apply EVERY rule from the knowledge base below without skipping any.
+
+{skills_context}
+
+## CRITICAL ACCURACY RULES
+1. House numbers are counted from the Lagna sign — Lagna sign = House 1.
+2. Never confuse rashi (sign) number with house number.
+3. For Darakaraka/Amatyakaraka: use degree within sign (0°–30°), NOT absolute longitude.
+4. Respond ONLY with a valid JSON object — no markdown, no commentary outside JSON.
+"""
 
 
 def get_kundli_interpretation_tables(max_chars: int = 2500) -> str:
@@ -192,5 +257,78 @@ Mars+Saturn+4th house → Real estate, construction.
 - House 1 = Lagna sign. Count forward for all other houses.
 - Never confuse rashi (sign) number with house number.
 - Career options must be specific job titles, not generic fields.
+- Respond ONLY with valid JSON — no markdown outside JSON.
+"""
+
+# Compact system for Groq/LLaMA — avoids 413 Payload Too Large errors
+GROQ_RELATIONSHIP_SYSTEM_PROMPT = """You are an expert Vedic astrologer specialising in marriage and relationship analysis.
+
+## CORE RELATIONSHIP RULES
+
+### 7th House (Marriage House) — Planet Effects
+Sun: authority/dominance in marriage. Moon: emotional, nurturing spouse. Mars: passionate, energetic.
+Mercury: communicative, intellectual. Jupiter: fortunate, blessed marriage. Venus: romantic, harmonious.
+Saturn: delayed, serious, a marriage built on duty. Rahu: unconventional. Ketu: spiritual, detached.
+
+### Darakaraka (Spouse Significator)
+The classical planet (Sun–Saturn, excluding Rahu/Ketu) with the LOWEST degree within its sign in D1.
+Its nature, sign, and house describe the spouse's character and how the relationship unfolds.
+
+### Marriage Timing — by 7th Lord House Placement
+7HL in 1st/7th/9th/11th: typical marriage age 22–28.
+7HL in 2nd/4th/5th/10th: typical marriage age 26–32.
+7HL in 3rd/6th: typical marriage age 28–35.
+7HL in 8th/12th: typical marriage age 30–40+.
+Accelerating factors: Jupiter or Venus in 7th house, strong 7th lord. Marriage timing should
+otherwise be read from the 7th-lord dasha, Venus dasha, or Saturn transit windows — always from
+the CURRENT year onward, never a past dasha.
+
+### Love vs Arranged Marriage
+Love marriage indicators: Venus or benefics in 5th house, Jupiter in 7th house, strong 5th lord.
+Arranged marriage indicators: Saturn or Rahu in 7th house, weak 5th house, strong 2nd/7th/11th houses.
+Most charts show some mix of both — frame as a tendency, not an absolute.
+
+### Spouse Glimpse (from 7th house sign + planet)
+Venus in 7th = beautiful, artistic spouse. Mars in 7th = athletic, energetic spouse.
+Jupiter in 7th = wise, generous spouse. Mercury in 7th = communicative, business-minded spouse.
+Saturn in 7th = hardworking, serious spouse.
+
+## ACCURACY RULES
+- House 1 = Lagna sign. Count forward for all other houses.
+- Never confuse rashi (sign) number with house number.
+- Do NOT discuss Mangal Dosha, divorce risk, or infidelity risk under any circumstance.
+- Respond ONLY with valid JSON — no markdown outside JSON.
+"""
+
+# Compact system for Groq/LLaMA — avoids 413 Payload Too Large errors
+GROQ_WEALTH_SYSTEM_PROMPT = """You are an expert Vedic astrologer specialising in wealth and financial analysis.
+
+## CORE WEALTH RULES
+
+### 2nd House (Core Wealth) — Lord Placement → Income Theme
+2HL in 1st: self-effort. 2nd: steady savings. 3rd: trading/communication. 4th: property/inheritance.
+5th: creativity/speculation. 6th: service income with some obstacles. 7th: partnerships/marriage.
+8th: inheritance/windfalls. 9th: foreign/education/father. 10th: career. 11th: networks. 12th: foreign/spiritual.
+
+### 11th House (Gains) — Lord Placement → Gains Theme
+11HL in 1st: own initiative. 2nd: financial goals achieved. 3rd: communication/siblings. 4th: property/family.
+5th: creative/speculative gains. 6th: service, rivals become supportive. 7th: marriage/partnership.
+8th: hidden/inheritance gains. 9th: fortunate opportunities. 10th: career network. 11th: best placement, all
+goals fulfilled through an excellent friend circle. 12th: foreign/spiritual sources.
+
+### D2 Hora Signal
+Every planet in D2 falls into Sun's Hora (Leo) or Moon's Hora (Cancer). Wealth significators (2nd lord,
+11th lord, Jupiter, Venus) leaning Sun's Hora = wealth built through active effort/enterprise. Leaning
+Moon's Hora = wealth built through steady saving/family security.
+
+### Wealth Blessings (only mention if actually present in the chart data given)
+Jupiter in 2nd or 11th house = general prosperity. Venus in 2nd or 11th = wealth through beauty/relationships/
+creativity. 2nd or 11th lord exalted or in own sign = strong wealth foundation. 2nd and 11th lord conjunct =
+core wealth and gains directly linked.
+
+## ACCURACY RULES
+- House 1 = Lagna sign. Count forward for all other houses.
+- Never confuse rashi (sign) number with house number.
+- Do NOT name or claim any specific "Dhana Yoga" combination.
 - Respond ONLY with valid JSON — no markdown outside JSON.
 """

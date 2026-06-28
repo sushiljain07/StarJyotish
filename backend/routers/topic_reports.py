@@ -1,23 +1,17 @@
-from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
-import pytz
-
-try:
-    import swisseph as swe
-except ImportError:
-    import swisseph as swe
+from fastapi import APIRouter, HTTPException, Request
 
 from models.birth_data import BirthInput
 from models.topic_models import TopicReport, TopicSection, TopicHighlight
-from services.geocode import geocode_place
+from services.chart_context import resolve_birth_context
 from services.astro_calc import calculate_chart
 from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.relationship_analysis import generate_relationship_report
 from services.wealth_analysis import generate_wealth_report
 from services.skill_loader import load_relationship_skills, load_wealth_skills, load_gemstone_remedy_skills
+from services.rate_limit import limiter, LLM_LIMIT
 
 router = APIRouter()
 
@@ -63,21 +57,10 @@ def _build_topic_report(report_data: dict) -> TopicReport:
 
 
 @router.post("/relationship-report", response_model=TopicReport)
-def get_relationship_report(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt   = local_dt.astimezone(pytz.utc)
-
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
+@limiter.limit(LLM_LIMIT)
+def get_relationship_report(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
     d9    = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, 9)
@@ -105,21 +88,10 @@ def get_relationship_report(body: BirthInput):
 
 
 @router.post("/wealth-report", response_model=TopicReport)
-def get_wealth_report(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt   = local_dt.astimezone(pytz.utc)
-
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
+@limiter.limit(LLM_LIMIT)
+def get_wealth_report(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
     d2    = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, 2)

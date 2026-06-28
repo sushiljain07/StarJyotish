@@ -1,23 +1,17 @@
-from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
-import pytz
-
-try:
-    import swisseph as swe
-except ImportError:
-    import swisseph as swe
+from fastapi import APIRouter, HTTPException, Request
 
 from models.birth_data import BirthInput
 from models.career_models import CareerReport, CareerSection, CareerOption
-from services.geocode import geocode_place
+from services.chart_context import resolve_birth_context
 from services.astro_calc import calculate_chart
 from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.transit_calc import calculate_transit
 from services.career_analysis import generate_career_report
 from services.skill_loader import load_career_skills, load_gemstone_remedy_skills
+from services.rate_limit import limiter, LLM_LIMIT
 
 router = APIRouter()
 
@@ -27,23 +21,11 @@ _GEMSTONE_CONTEXT: str = load_gemstone_remedy_skills()
 
 
 @router.post("/career-report", response_model=CareerReport)
-def get_career_report(body: BirthInput):
-    # 1. Geocode
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    # 2. Convert birth time → UTC Julian Day
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt   = local_dt.astimezone(pytz.utc)
-
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
+@limiter.limit(LLM_LIMIT)
+def get_career_report(request: Request, body: BirthInput):
+    # 1-2. Geocode + convert birth time -> UTC Julian Day
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     # 3. Calculate D1 chart and D10 Dasamsa
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)

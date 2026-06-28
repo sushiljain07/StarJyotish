@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import lru_cache
 import requests
 from timezonefinder import TimezoneFinder
 
@@ -14,6 +15,7 @@ class GeoResult:
     display_name: str
 
 
+@lru_cache(maxsize=1024)
 def geocode_place(place: str) -> GeoResult:
     resp = requests.get(
         NOMINATIM_URL,

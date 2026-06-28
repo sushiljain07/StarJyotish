@@ -8,6 +8,8 @@ import Reveal from '../components/Reveal'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import LandingStickyHeader from '../components/LandingStickyHeader'
+import Footer from '../components/Footer'
+import ScrollToTop from '../components/ScrollToTop'
 import TopicIcon from '../components/TopicIcon'
 import TabIcon from '../components/TabIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
@@ -56,6 +58,7 @@ export default function Landing() {
         onLanguageChange={lang => i18n.changeLanguage(lang)}
         onCtaClick={() => goToForm(null)}
       />
+      <ScrollToTop visible={heroPassed} />
 
       {/* ───────────────────── Hero ───────────────────── */}
       <div className="relative overflow-hidden bg-night px-6 pt-12 pb-12 text-center">
@@ -262,7 +265,7 @@ export default function Landing() {
       <SectionDivider />
 
       {/* ───────────────────── FAQ ───────────────────── */}
-      <section className="px-4 py-10">
+      <section id="faq" className="px-4 py-10">
         <div className="max-w-2xl mx-auto">
           <Reveal as="h2" className="text-center font-serif font-semibold text-2xl text-ink mb-6">
             {t('landing_faq_heading')}
@@ -293,9 +296,7 @@ export default function Landing() {
         </button>
       </Reveal>
 
-      <footer className="px-4 py-6 text-center">
-        <p className="text-ink-faint text-[11px] max-w-md mx-auto leading-relaxed">{t('disclaimer')}</p>
-      </footer>
+      <Footer />
     </div>
   )
 }

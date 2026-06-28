@@ -4,6 +4,7 @@ import Landing from './pages/Landing'
 import Home from './pages/Home'
 import Result from './pages/Result'
 import CareerReport from './pages/CareerReport'
+import Disclaimer from './pages/Disclaimer'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/generate" element={<Home />} />
         <Route path="/kundli" element={<Result />} />
         <Route path="/career-report" element={<CareerReport />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
       </Routes>
     </BrowserRouter>
   )

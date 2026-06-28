@@ -17,19 +17,17 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
       }`}
     >
       <div className="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
-        {/* Exact same file as the hero logo, just shown smaller — that's
-            what keeps the two permanently in sync instead of two
-            separately-maintained "versions" of the brand. Most of the
-            wordmark renders in white/cream, so this bar stays dark
-            (rather than the light parchment card it was before) — on a
-            light background most of the logo would be unreadable. */}
-        <img
-          src="/starjyotish-logo.webp"
-          alt="Star Jyotish"
-          width={667}
-          height={297}
-          className="h-10 sm:h-11 w-auto shrink-0"
-        />
+        {/* Was the same webp wordmark used in the hero, shown smaller — but
+            that artwork has a soft glow/shadow baked in by design (it's
+            meant to be looked at large). Shrunk down to header height, the
+            glow doesn't shrink the way sharp edges would, so it reads as
+            blurry rather than refined. Switched to the SVG mark (vector —
+            crisp at any size) + real text (browser-rendered, never soft),
+            the same pairing already used for the brand in Footer.jsx. */}
+        <div className="flex items-center gap-2 shrink-0">
+          <img src="/starjyotish.svg" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
+          <span className="font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
+        </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <div className="hidden sm:flex gap-1">

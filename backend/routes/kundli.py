@@ -1,10 +1,4 @@
-from fastapi import APIRouter, HTTPException
-from datetime import datetime
-try:
-    import swisseph as swe
-except ImportError:
-    import swisseph as swe
-import pytz
+from fastapi import APIRouter, Request
 
 from models.birth_data import BirthInput
 from models.chart_data import (
@@ -13,7 +7,7 @@ from models.chart_data import (
     ReadingRequest, ReadingSection, ReadingResponse,
     AskRequest, AskResponse,
 )
-from services.geocode import geocode_place
+from services.chart_context import resolve_birth_context
 from services.astro_calc import calculate_chart
 from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
@@ -22,28 +16,17 @@ from services.ashtakavarga import calculate_ashtakavarga
 from services.career_analysis import check_all_yogas
 from services.kp_system import enrich_planets_kp
 from services.transit_calc import calculate_transit, calculate_bhava_chalit
+from services.rate_limit import limiter, LLM_LIMIT, COMPUTE_LIMIT
 
 router = APIRouter()
 
 
 @router.post("/kundli", response_model=ChartResponse)
-def get_kundli(body: BirthInput):
-    # 1. Geocode place
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    # 2. Convert local birth time → UTC Julian Day
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
+@limiter.limit(COMPUTE_LIMIT)
+def get_kundli(request: Request, body: BirthInput):
+    # 1-2. Geocode + convert local birth time -> UTC Julian Day
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     # 3. Calculate chart
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
@@ -88,21 +71,10 @@ def get_kundli(body: BirthInput):
 
 
 @router.post("/kundli/reading", response_model=ReadingResponse)
-def get_reading(body: ReadingRequest):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
+@limiter.limit(LLM_LIMIT)
+def get_reading(request: Request, body: ReadingRequest):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
     dasha_raw = calculate_vimshottari(
@@ -149,18 +121,10 @@ def get_reading(body: ReadingRequest):
 
 
 @router.post("/kundli/ask", response_model=AskResponse)
-def ask_kundli(body: AskRequest):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    jd = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
-                    utc_dt.hour + utc_dt.minute / 60.0)
+@limiter.limit(LLM_LIMIT)
+def ask_kundli(request: Request, body: AskRequest):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
     chart = calculate_chart(jd, geo.lat, geo.lon)
     dasha_raw = calculate_vimshottari(
@@ -193,70 +157,38 @@ def ask_kundli(body: AskRequest):
 
 
 @router.post("/kundli/ashtakavarga")
-def get_ashtakavarga(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
-                       utc_dt.hour + utc_dt.minute / 60.0)
+@limiter.limit(COMPUTE_LIMIT)
+def get_ashtakavarga(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
 
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
     return calculate_ashtakavarga(chart["planets"], chart["ascendant"]["sign_index"])
 
 
 @router.post("/kundli/transit")
-def get_transit(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
-                       utc_dt.hour + utc_dt.minute / 60.0)
+@limiter.limit(COMPUTE_LIMIT)
+def get_transit(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
 
     return calculate_transit(jd_ut, geo.lat, geo.lon)
 
 
 @router.post("/kundli/bhava-chalit")
-def get_bhava_chalit(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
-                       utc_dt.hour + utc_dt.minute / 60.0)
+@limiter.limit(COMPUTE_LIMIT)
+def get_bhava_chalit(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
 
     return calculate_bhava_chalit(jd_ut, geo.lat, geo.lon)
 
 
 @router.post("/kundli/kp")
-def get_kp_chart(body: BirthInput):
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day,
-                       utc_dt.hour + utc_dt.minute / 60.0)
+@limiter.limit(COMPUTE_LIMIT)
+def get_kp_chart(request: Request, body: BirthInput):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
 
     chart = calculate_chart(jd_ut, geo.lat, geo.lon)
     kp_planets = enrich_planets_kp(chart["planets"])
@@ -273,28 +205,14 @@ def get_kp_chart(body: BirthInput):
 
 
 @router.post("/kundli/divisional")
-def get_divisional_chart(body: BirthInput, division: int = 1):
+@limiter.limit(COMPUTE_LIMIT)
+def get_divisional_chart(request: Request, body: BirthInput, division: int = 1):
     """
     Get any divisional chart D1–D60.
     Pass ?division=9 for D9, ?division=10 for D10, etc.
     """
-    from services.divisional_charts import calculate_divisional_chart
- 
-    try:
-        geo = geocode_place(body.place)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
- 
-    local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{body.date} {body.time}", "%Y-%m-%d %H:%M")
-    local_dt = local_tz.localize(naive_dt)
-    utc_dt = local_dt.astimezone(pytz.utc)
- 
-    jd_ut = swe.julday(
-        utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
-    )
- 
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
+
     result = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, division)
     return result
- 

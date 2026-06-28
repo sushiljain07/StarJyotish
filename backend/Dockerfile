@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Railway injects $PORT at runtime; default to 8000 for local `docker run`.
+# --proxy-headers tells uvicorn to trust X-Forwarded-For from Railway's edge
+# proxy, so request.client.host (which the rate limiter keys on) is the real
+# visitor IP, not Railway's internal proxy IP for every request.
 ENV PORT=8000
 EXPOSE 8000
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT} --proxy-headers"]

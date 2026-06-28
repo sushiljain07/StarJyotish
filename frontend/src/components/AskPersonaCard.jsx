@@ -1,6 +1,6 @@
 // frontend/src/components/AskPersonaCard.jsx
 //
-// The landing page's signature interactive element. Shows AstroGuru's Ask
+// The landing page's signature interactive element. Shows Star Jyotish's Ask
 // feature working *before* the visitor commits to entering birth details —
 // tapping a chip previews how that question gets answered; tapping "Start"
 // carries the question through to /generate, and once the real chart
@@ -25,7 +25,7 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
       {/* Chat demo bubble */}
       <div className="bg-parchment-card rounded-2xl shadow-md border border-line p-5">
         <div className="flex items-center gap-2 mb-4">
-          <img src="/astroguru.svg" alt="" className="w-6 h-6" />
+          <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
           <span className="text-xs font-semibold text-ink-muted">{t('app_title')}</span>
         </div>
 

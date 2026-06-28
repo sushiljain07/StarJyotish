@@ -54,7 +54,7 @@ function SummaryChips({ data }) {
 
 function mainTabs(t) {
   return [
-    { id: 'kundli',   label: t('nav_kundli'),   icon: '/astroguru.svg' },
+    { id: 'kundli',   label: t('nav_kundli'),   icon: '/starjyotish.svg' },
     { id: 'advanced', label: t('nav_advanced'), icon: 'advanced' },
     { id: 'insights', label: t('tab_reading'),  icon: 'insights' },
     { id: 'ask',      label: t('tab_ask'),      icon: 'ask' },

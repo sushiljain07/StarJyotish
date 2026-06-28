@@ -58,8 +58,8 @@ def call_llm(
                 headers={
                     "Authorization": f"Bearer {openrouter_key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://astroguru.app"),
-                    "X-Title": os.getenv("OPENROUTER_SITE_NAME", "AstroGuru"),
+                    "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://starjyotish.app"),
+                    "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
                 },
                 json={
                     "model": "anthropic/claude-sonnet-4.6",

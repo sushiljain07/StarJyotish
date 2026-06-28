@@ -1,4 +1,4 @@
-# <img src="frontend/public/astroguru.svg" width="24" height="24" alt="" valign="middle" /> AstroGuru — Vedic Astrology
+# <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Vedic Astrology
 
 A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. Stateless — no database, authentication, or payments yet (see [Roadmap](#roadmap)).
 
@@ -59,8 +59,8 @@ For the AI features (Reading, Ask, Career Report) you need at least one of:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/sushiljain07/AstroGuru.git
-cd AstroGuru
+git clone https://github.com/sushiljain07/StarJyotish.git
+cd StarJyotish
 ```
 
 ### 2. Backend setup
@@ -189,7 +189,7 @@ astro/
 │   │   │   ├── astro.js           # API client
 │   │   │   └── config.js          # API_BASE, reads VITE_API_URL
 │   │   └── i18n/                  # i18next setup, en.json, hi.json
-│   ├── public/astroguru.svg       # app icon / favicon
+│   ├── public/starjyotish.svg       # app icon / favicon
 │   ├── package.json
 │   └── vite.config.js             # dev proxy: /api → localhost:8000
 │

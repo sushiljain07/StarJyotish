@@ -60,19 +60,36 @@ export default function Landing() {
       {/* ───────────────────── Hero ───────────────────── */}
       <div className="relative overflow-hidden bg-night px-6 pt-12 pb-12 text-center">
         <CelestialBackdrop className="text-primary opacity-40" />
+        {/* Brand icon — same mark used as the small "Kundli" icon further
+            down this page (see the "What's inside" section). Restores the
+            standalone icon that sat above the title before the wordmark
+            artwork below was introduced. */}
+        <img
+          src="/starjyotish.svg"
+          alt=""
+          className="relative w-16 h-16 mx-auto mb-2"
+        />
         {/* Main naming — the actual logo artwork, background knocked out
             to transparent so it sits flush on bg-night with no edge or
             box around it. Sized to read as part of the hero, not as its
             own section. Same file is reused at a smaller size in the
             sticky header (see LandingStickyHeader.jsx) so the two never
-            drift out of sync. */}
+            drift out of sync.
+            -mb-* compensates for transparent padding baked into the bottom
+            of the source webp (the visible glyphs end well above the
+            image's true bottom edge), which is what was creating the
+            oversized gap before the headline.
+            translate-x corrects for the artwork itself sitting ~3.4%
+            right of center within its own canvas — mx-auto alone centers
+            the *box*, not the visibly-off-center content inside it, which
+            is what made the hero look uncentered on narrow viewports. */}
         <img
           src="/starjyotish-logo.webp"
           alt="Star Jyotish"
           width={667}
           height={297}
           fetchpriority="high"
-          className="relative w-64 sm:w-80 md:w-96 h-auto mx-auto mb-1"
+          className="relative w-64 sm:w-80 md:w-96 h-auto mx-auto -mb-4 sm:-mb-5 md:-mb-6 -translate-x-[3.4%]"
         />
         <h1 className="relative font-serif font-semibold text-3xl sm:text-4xl text-primary-light tracking-tight leading-tight">
           {t('landing_headline')}

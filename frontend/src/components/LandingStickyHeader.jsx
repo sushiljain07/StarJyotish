@@ -28,7 +28,7 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
           alt="Star Jyotish"
           width={667}
           height={297}
-          className="h-9 sm:h-10 w-auto shrink-0"
+          className="h-10 sm:h-11 w-auto shrink-0"
         />
 
         <div className="flex items-center gap-2 shrink-0">

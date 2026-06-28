@@ -8,7 +8,7 @@ from fastapi import HTTPException
 
 _SKILLS_BASE = Path(__file__).parent.parent.parent / "astro-skills"
 
-logger = logging.getLogger("astroguru.ai")
+logger = logging.getLogger("starjyotish.ai")
 
 # Human-readable labels for skill file paths (shown in logs and UI)
 _SKILL_LABELS: dict[str, str] = {
@@ -821,8 +821,8 @@ def _call_claude_via_openrouter(
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             # Optional, but OpenRouter recommends these for attribution/rankings.
-            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://astroguru.app"),
-            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "AstroGuru"),
+            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://starjyotish.app"),
+            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
         },
         json=payload,
         timeout=60,

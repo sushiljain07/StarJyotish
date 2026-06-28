@@ -135,7 +135,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   function handleWaSubmit() {
     if (waNumber.trim()) {
       try {
-        localStorage.setItem('astroguru_wa', JSON.stringify({
+        localStorage.setItem('starjyotish_wa', JSON.stringify({
           number: waNumber.trim(), savedAt: new Date().toISOString(),
         }))
       } catch {}

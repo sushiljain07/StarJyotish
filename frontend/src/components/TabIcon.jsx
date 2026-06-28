@@ -3,7 +3,7 @@
 // Replaces the emoji used for the Advanced/Insights/Ask main tabs (🔬 📖 💬)
 // in mainTabs() (Result.jsx) — these render in both the desktop tab bar and
 // the bottom NavBar, making them the single most-repeated visual element in
-// the app. The in-app Kundli tab keeps using the actual /astroguru.svg logo
+// the app. The in-app Kundli tab keeps using the actual /starjyotish.svg logo
 // (kept here only for the landing page's "what's inside" grid, which has no
 // equivalent logo slot of its own).
 const ICONS = {

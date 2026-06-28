@@ -1,6 +1,6 @@
 // frontend/src/config/aiQuestions.js
 //
-// Sample questions shown in the "Ask AstroGuru" spotlight on the landing
+// Sample questions shown in the "Ask Star Jyotish" spotlight on the landing
 // page (Landing.jsx → AskPersonaCard.jsx). Same pattern as topics.js: only
 // structural data lives here, display text lives in i18n under
 // landing_ai_q_{id}_question / landing_ai_q_{id}_answer.

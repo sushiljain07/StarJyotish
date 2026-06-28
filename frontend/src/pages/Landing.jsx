@@ -13,7 +13,7 @@ import TabIcon from '../components/TabIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import SectionDivider from '../components/SectionDivider'
 
-// Capability badges shown in the hero. These are claims AstroGuru can
+// Capability badges shown in the hero. These are claims Star Jyotish can
 // actually back up today (real Swiss Ephemeris calculations, real
 // bilingual coverage) — deliberately not traction numbers like "500,000+
 // users", which would need to be true before they could be shown honestly.
@@ -58,12 +58,22 @@ export default function Landing() {
       />
 
       {/* ───────────────────── Hero ───────────────────── */}
-      <div className="relative overflow-hidden bg-night px-6 pt-14 pb-12 text-center">
+      <div className="relative overflow-hidden bg-night px-6 pt-12 pb-12 text-center">
         <CelestialBackdrop className="text-primary opacity-40" />
-        <img src="/astroguru.svg" alt="AstroGuru" className="relative w-16 h-16 mx-auto mb-2" />
-        <div className="relative text-primary font-semibold text-xs tracking-[0.15em] uppercase mb-3">
-          {t('app_title')}
-        </div>
+        {/* Main naming — the actual logo artwork, background knocked out
+            to transparent so it sits flush on bg-night with no edge or
+            box around it. Sized to read as part of the hero, not as its
+            own section. Same file is reused at a smaller size in the
+            sticky header (see LandingStickyHeader.jsx) so the two never
+            drift out of sync. */}
+        <img
+          src="/starjyotish-logo.webp"
+          alt="Star Jyotish"
+          width={667}
+          height={297}
+          fetchpriority="high"
+          className="relative w-64 sm:w-80 md:w-96 h-auto mx-auto mb-1"
+        />
         <h1 className="relative font-serif font-semibold text-3xl sm:text-4xl text-primary-light tracking-tight leading-tight">
           {t('landing_headline')}
         </h1>
@@ -207,7 +217,7 @@ export default function Landing() {
                 <div className={`bg-parchment-card rounded-lg border-l-4 ${INSIDE_ACCENTS[id].border} p-5 shadow-sm flex gap-3 items-start`}>
                   <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${INSIDE_ACCENTS[id].chip}`}>
                     {id === 'kundli'
-                      ? <img src="/astroguru.svg" alt="" className="w-5 h-5" />
+                      ? <img src="/starjyotish.svg" alt="" className="w-5 h-5" />
                       : <TabIcon id={id} className="w-5 h-5" />}
                   </span>
                   <span>

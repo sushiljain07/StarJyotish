@@ -14,7 +14,7 @@
 // Reading tab). Split into per-feature entitlements later only if you
 // actually start selling them separately.
 
-const DEV_UNLOCK_KEY = 'astroguru_dev_unlock'
+const DEV_UNLOCK_KEY = 'starjyotish_dev_unlock'
 
 // Master switch. Set VITE_PAYWALL_ENABLED=false in .env to go back to
 // today's fully-open behaviour everywhere, with no component changes.

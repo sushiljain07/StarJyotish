@@ -50,7 +50,7 @@ export default function Home() {
       {/* Hero header */}
       <div className="relative overflow-hidden bg-night px-6 pt-12 pb-8 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />
-        <img src="/astroguru.svg" alt="AstroGuru" className="relative w-16 h-16 mx-auto mb-3" />
+        <img src="/starjyotish.svg" alt="Star Jyotish" className="relative w-16 h-16 mx-auto mb-3" />
         <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
         <p className="relative text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
         {/* Language toggle */}

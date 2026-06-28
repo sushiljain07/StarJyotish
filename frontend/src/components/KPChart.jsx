@@ -70,7 +70,7 @@ export default function KPChart({ input }) {
       {loading && (
         <div className="flex justify-center py-12">
           <div className="text-center">
-            <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto animate-spin mb-2" />
+            <img src="/starjyotish.svg" alt="" className="w-8 h-8 mx-auto animate-spin mb-2" />
             <p className="text-ink-muted text-sm">Calculating KP chart…</p>
           </div>
         </div>

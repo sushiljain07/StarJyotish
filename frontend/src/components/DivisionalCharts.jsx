@@ -143,7 +143,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       {/* Empty state */}
       {!loading && !chartData && (
         <div className="text-center py-12 text-ink-faint">
-          <img src="/astroguru.svg" alt="" className="w-10 h-10 mx-auto mb-3 opacity-60" />
+          <img src="/starjyotish.svg" alt="" className="w-10 h-10 mx-auto mb-3 opacity-60" />
           <p className="text-sm">Select a divisional chart above to view it</p>
         </div>
       )}

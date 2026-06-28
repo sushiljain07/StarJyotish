@@ -96,7 +96,7 @@ export default function AskChart({ input, initialQuestion = null }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
-            <img src="/astroguru.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
+            <img src="/starjyotish.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
             <p className="text-ink-faint text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
             <p className="text-ink-faint/70 text-xs mt-1">{t('ask_empty_example')}</p>
           </div>

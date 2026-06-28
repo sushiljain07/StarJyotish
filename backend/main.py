@@ -1,8 +1,8 @@
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
-
 import os
+import re
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.kundli import router as kundli_router
@@ -12,17 +12,18 @@ from routers.topic_reports import router as topic_reports_router
 
 app = FastAPI(title="Kundli API", version="1.0.0")
 
-import re
-
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
-frontend_url = os.getenv("FRONTEND_URL", "").strip().rstrip("/")
-frontend_url = re.sub(r"^https?://", "", frontend_url, flags=re.IGNORECASE)
-if frontend_url:
-    frontend_url = f"https://{frontend_url}"
-    ALLOWED_ORIGINS.append(frontend_url)
+
+# FRONTEND_URL can hold one or more comma-separated domains
+frontend_urls = os.getenv("FRONTEND_URL", "")
+for raw in frontend_urls.split(","):
+    domain = raw.strip().rstrip("/")
+    domain = re.sub(r"^https?://", "", domain, flags=re.IGNORECASE)
+    if domain:
+        ALLOWED_ORIGINS.append(f"https://{domain}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,7 +37,6 @@ app.include_router(kundli_router, prefix="/api")
 app.include_router(career_router, prefix="/api")
 app.include_router(rajyogas_router, prefix="/api")
 app.include_router(topic_reports_router, prefix="/api")
-
 
 @app.get("/health")
 def health():

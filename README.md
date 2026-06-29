@@ -1,4 +1,4 @@
-# <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Vedic Astrology
+# <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Ancient Wisdom. AI Intelligence.
 
 A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. Stateless — no database, authentication, or payments yet (see [Roadmap](#roadmap)).
 

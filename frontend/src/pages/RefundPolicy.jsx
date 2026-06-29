@@ -68,7 +68,7 @@ export default function RefundPolicy() {
           gateway fees, in line with RBI guidelines applicable to prepaid instruments at that time.</p>
 
         <h2 className={h2}>4. How to request a refund</h2>
-        <p>Email <a href="mailto:info.starjyotish@gmail.com" className="text-primary-dark hover:underline">info.starjyotish@gmail.com</a>{' '}
+        <p>Email <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>{' '}
           with your payment receipt/transaction ID and a short description of the issue. We aim to:</p>
         <ul className={ul}>
           <li>Acknowledge your request within <strong className="text-ink">2 business days</strong></li>

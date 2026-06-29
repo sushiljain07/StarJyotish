@@ -127,7 +127,7 @@ export default function TermsOfUse() {
 
         <h2 className={h2}>15. Contact</h2>
         <p>Questions about these Terms can be sent to{' '}
-          <a href="mailto:info.starjyotish@gmail.com" className="text-primary-dark hover:underline">info.starjyotish@gmail.com</a>.</p>
+          <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>.</p>
       </StaticPageLayout>
     </>
   )

@@ -90,7 +90,7 @@ export default function Footer() {
           </ul>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mt-6 mb-2">{t('footer_contact_heading')}</h3>
           <ul className="space-y-2 text-sm text-ink-onnight/80">
-            <li className="flex items-center gap-1.5">✉️ info.starjyotish@gmail.com</li>
+            <li className="flex items-center gap-1.5">✉️ contact@starjyotish.com</li>
           </ul>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import FAQAccordion from '../components/FAQAccordion'
+import FaqSchema from '../components/FaqSchema'
 
 const LANDING_FAQ_IDS = [1, 2, 3, 4, 5]
 const EXTRA_FAQ_IDS = [6, 7, 8, 9, 10]
@@ -31,6 +32,7 @@ export default function FAQ() {
       <StaticPageLayout title="Frequently Asked Questions" maxWidth="max-w-2xl">
         <FAQAccordion items={items} />
       </StaticPageLayout>
+      <FaqSchema items={items} />
     </>
   )
 }

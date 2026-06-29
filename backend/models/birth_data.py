@@ -1,14 +1,23 @@
 from typing import Optional
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import date, time
 
 
 class BirthInput(BaseModel):
     date: str   # "YYYY-MM-DD"
     time: str   # "HH:MM"
-    place: str  # e.g. "New Delhi, India"
+    # max_length=200: generous headroom above any real place name — even a
+    # fully-detailed Nominatim display_name for a small Indian village
+    # (village, taluk, district, state, postal code, country) typically
+    # runs well under 150 chars — while still blocking pathological input
+    # from reaching the geocoding call or an LLM prompt unbounded.
+    place: str = Field(max_length=200)  # e.g. "New Delhi, India"
     language: str = "en"
-    question: Optional[str] = None
+    # max_length=500: a genuinely detailed, multi-clause question still
+    # comfortably fits (the realistic preset questions in the landing page's
+    # Ask spotlight run 35-42 chars); this just stops unbounded text from
+    # being concatenated into the AI prompt.
+    question: Optional[str] = Field(default=None, max_length=500)
     topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' — set when the
                                   # user arrived via a landing-page topic card; see services/ai.py's
                                   # build_prediction_prompt() for how it's used.

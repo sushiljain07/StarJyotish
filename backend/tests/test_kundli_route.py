@@ -39,6 +39,14 @@ def test_kundli_invalid_date_returns_422():
     assert resp.status_code == 422
 
 
+def test_kundli_overlong_place_returns_422():
+    # place has a 200-char limit (see models/birth_data.py) — guards against
+    # unbounded text reaching the geocoding call or, on other BirthInput
+    # endpoints, an LLM prompt. 201 chars deliberately one over the limit.
+    resp = client.post("/api/kundli", json={**VALID_BODY, "place": "a" * 201})
+    assert resp.status_code == 422
+
+
 def test_kundli_pratyantar_present():
     """Regression test: the route used to build DashaData without forwarding
     current_pratyantar/pratyantars (and current_sookshma/sookshmas), so the API

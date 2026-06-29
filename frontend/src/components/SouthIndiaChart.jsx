@@ -2,6 +2,7 @@
 // Signs are always fixed; ascendant/house numbers rotate
 
 import { useTranslation } from 'react-i18next'
+import { PLANET_COLORS } from '../config/planetColors'
 
 // 0-indexed sign → grid cell [row, col]  (4×4, centre 4 cells are empty)
 const SIGN_TO_CELL = {
@@ -32,14 +33,6 @@ const ABBR_HI = {
   Sun: 'सू', Moon: 'च', Mars: 'मं', Mercury: 'बु',
   Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के',
   Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
-}
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#E53E3E', Mars: '#E53E3E', Rahu: '#E53E3E',
-  Saturn: '#2563EB', Jupiter: '#2563EB',
-  Mercury: '#16A34A', Venus: '#16A34A',
-  Ketu: '#8B0000',
-  Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
 }
 
 const SIGN_ABBR = ['Ar', 'Ta', 'Ge', 'Ca', 'Le', 'Vi', 'Li', 'Sc', 'Sg', 'Cp', 'Aq', 'Pi']

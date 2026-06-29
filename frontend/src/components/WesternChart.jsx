@@ -2,6 +2,7 @@
 // Ascendant on left (9-o'clock); houses/signs go counter-clockwise
 
 import { useTranslation } from 'react-i18next'
+import { PLANET_COLORS } from '../config/planetColors'
 
 const CX = 260
 const CY = 260
@@ -24,14 +25,6 @@ const PLANET_ABBR = {
   Sun: '☉', Moon: '☽', Mars: '♂', Mercury: '☿',
   Jupiter: '♃', Venus: '♀', Saturn: '♄', Rahu: 'Ra', Ketu: 'Ke',
   Neptune: '♆', Uranus: '⛢', Pluto: '♇',
-}
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#E53E3E', Rahu: '#8B0000',
-  Saturn: '#2563EB', Jupiter: '#2563EB',
-  Mercury: '#16A34A', Venus: '#E91E8C',
-  Ketu: '#8B0000',
-  Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
 }
 
 // SVG angle (0=right, 90=bottom, 180=left, 270=top)

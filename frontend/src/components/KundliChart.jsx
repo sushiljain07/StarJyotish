@@ -1,5 +1,6 @@
 // frontend/src/components/KundliChart.jsx
 import { useTranslation } from 'react-i18next'
+import { PLANET_COLORS } from '../config/planetColors'
 
 // ── 500×500 chart geometry ───────────────────────────────────────────────────
 // Outer square : (10,10)→(490,490)   Centre : (250,250)
@@ -60,14 +61,6 @@ const ABBR_HI = {
 }
 
 // AstroSage-style planet colours
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#E53E3E', Mars: '#E53E3E', Rahu: '#E53E3E',
-  Saturn: '#2563EB', Jupiter: '#2563EB',
-  Mercury: '#16A34A', Venus: '#16A34A',
-  Ketu: '#8B0000',
-  Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
-}
-
 // Vedic exaltation / debilitation signs (sign_index 0=Aries … 11=Pisces)
 const EXALTATION   = { Sun:0, Moon:1, Mars:9, Mercury:5, Jupiter:3, Venus:11, Saturn:6 }
 const DEBILITATION = { Sun:6, Moon:7, Mars:3, Mercury:11, Jupiter:9, Venus:5,  Saturn:0 }

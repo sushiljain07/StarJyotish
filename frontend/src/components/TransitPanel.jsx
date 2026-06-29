@@ -2,12 +2,7 @@
 import { useState, useEffect } from 'react'
 import KundliChart from './KundliChart'
 import { API_BASE } from '../api/config'
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#E53E3E', Mars: '#E53E3E', Rahu: '#E53E3E',
-  Saturn: '#2563EB', Jupiter: '#2563EB', Mercury: '#16A34A', Venus: '#16A34A',
-  Ketu: '#8B0000', Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
-}
+import { PLANET_COLORS } from '../config/planetColors'
 
 export default function TransitPanel({ input, natalData }) {
   const [transitData, setTransitData] = useState(null)

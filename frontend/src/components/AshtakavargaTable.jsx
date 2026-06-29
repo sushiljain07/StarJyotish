@@ -1,14 +1,10 @@
 // Ashtakavarga table: Bhinnashtakavarga + Sarvashtakavarga
 import { useState, useEffect } from 'react'
 import { API_BASE } from '../api/config'
+import { PLANET_COLORS } from '../config/planetColors'
 
 const SIGN_ABBR = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
 const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Mercury: '#16A34A',
-  Jupiter: '#2563EB', Venus: '#E91E8C', Saturn: '#2563EB',
-}
 
 function PointCell({ value, max = 8 }) {
   const pct = value / max

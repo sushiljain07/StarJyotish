@@ -216,3 +216,157 @@ def test_settings_public_vs_private(db):
     public = settings.get_public_settings()
     assert public.get("test_public_flag") is True
     assert "test_private_flag" not in public
+
+
+def test_kyc_status_change_writes_audit_log(db):
+    from db.models.astrologer import KycStatus
+    from db.repositories import AstrologerRepository, AuditLogRepository, UserRepository
+
+    users = UserRepository(db)
+    astrologers = AstrologerRepository(db)
+    audit = AuditLogRepository(db)
+
+    admin = users.get_or_create_by_phone(_unique_phone())
+    astro_user = users.get_or_create_by_phone(_unique_phone())
+    astro = astrologers.create(user_id=astro_user.id, price_per_session=499)
+    db.flush()
+
+    astrologers.set_kyc_status(astro, KycStatus.verified, actor_user_id=admin.id)
+    db.flush()
+
+    logs = audit.for_entity("AstrologerProfile", astro.id)
+    assert len(logs) == 1
+    assert logs[0].actor_user_id == admin.id
+    assert logs[0].before == {"kyc_status": "pending"}
+    assert logs[0].after == {"kyc_status": "verified"}
+
+
+def test_booking_cancel_writes_audit_log_with_reason(db):
+    from db.repositories import AuditLogRepository, BookingRepository, UserRepository
+
+    users = UserRepository(db)
+    bookings = BookingRepository(db)
+    audit = AuditLogRepository(db)
+
+    client_user = users.get_or_create_by_phone(_unique_phone())
+    astro_user = users.get_or_create_by_phone(_unique_phone())
+    from db.repositories import AstrologerRepository
+    astro = AstrologerRepository(db).create(user_id=astro_user.id, price_per_session=499)
+    db.flush()
+
+    booking = bookings.create(
+        client_id=client_user.id, astrologer_id=astro.id,
+        scheduled_at=datetime.now(timezone.utc) + timedelta(days=1), price=499,
+    )
+    bookings.cancel(booking, "client requested refund", actor_user_id=client_user.id)
+    db.flush()
+
+    logs = audit.for_entity("Booking", booking.id)
+    assert len(logs) == 1
+    assert logs[0].meta == {"reason": "client requested refund"}
+    assert logs[0].actor_user_id == client_user.id
+
+
+def test_audit_log_system_action_has_no_actor(db):
+    from db.repositories import AuditLogRepository
+
+    audit = AuditLogRepository(db)
+    entity_id = uuid.uuid4()
+    audit.log(action="update", entity_type="Booking", entity_id=entity_id, meta={"note": "auto-expired"})
+    db.flush()
+    logs = audit.for_entity("Booking", entity_id)
+    assert len(logs) == 1
+    assert logs[0].actor_user_id is None
+
+
+def test_feedback_lifecycle(db):
+    from db.models.feedback import FeedbackCategory
+    from db.repositories import FeedbackRepository, UserRepository
+
+    users = UserRepository(db)
+    feedback = FeedbackRepository(db)
+    user = users.get_or_create_by_phone(_unique_phone())
+
+    fb = feedback.create(
+        user_id=user.id, category=FeedbackCategory.report_quality,
+        message="Career report felt generic.", rating=2,
+    )
+    db.flush()
+
+    assert fb in feedback.for_user(user.id)
+    assert fb in feedback.list_unresolved(category=FeedbackCategory.report_quality)
+
+    feedback.mark_resolved(fb, admin_notes="Followed up.")
+    db.flush()
+    assert fb.is_resolved is True
+    assert fb not in feedback.list_unresolved()
+
+
+def test_chat_session_threading_and_auto_title(db):
+    from db.models.chat import ChatRole
+    from db.repositories import ChatSessionRepository, UserRepository
+
+    users = UserRepository(db)
+    chats = ChatSessionRepository(db)
+    user = users.get_or_create_by_phone(_unique_phone())
+
+    session = chats.start_session(user_id=user.id, language="en")
+    assert session.title is None
+
+    chats.append_message(session, role=ChatRole.user, content="Will I get a promotion this year?")
+    chats.append_message(
+        session, role=ChatRole.assistant, content="Jupiter's transit favors growth this year.",
+        llm_provider="anthropic",
+    )
+    db.flush()
+    db.refresh(session)
+
+    assert session.title == "Will I get a promotion this year?"
+    history = chats.history(session.id)
+    assert len(history) == 2
+    assert history[0].role == ChatRole.user
+    assert history[1].role == ChatRole.assistant
+    assert len(chats.list_for_user(user.id)) == 1
+
+    chats.archive(session)
+    db.flush()
+    assert chats.list_for_user(user.id) == []
+    assert len(chats.list_for_user(user.id, include_archived=True)) == 1
+
+
+def test_chat_session_long_first_message_truncates_title(db):
+    from db.models.chat import ChatRole
+    from db.repositories import ChatSessionRepository, UserRepository
+
+    users = UserRepository(db)
+    chats = ChatSessionRepository(db)
+    user = users.get_or_create_by_phone(_unique_phone())
+
+    session = chats.start_session(user_id=user.id)
+    long_question = "Why " * 40 + "will my career improve?"
+    chats.append_message(session, role=ChatRole.user, content=long_question)
+    db.flush()
+    db.refresh(session)
+
+    assert len(session.title) <= 120
+    assert session.title.endswith("...")
+
+
+def test_feedback_rating_out_of_range_is_rejected(db):
+    """Kept last in this module: it's the only test here that calls
+    db.rollback(), and the `db` fixture's session is shared (module-scoped,
+    never committed) across every test above — rolling back here would
+    discard their flushed-but-uncommitted rows too if this ran earlier."""
+    from db.models.feedback import FeedbackCategory
+    from db.repositories import FeedbackRepository, UserRepository
+    from sqlalchemy.exc import IntegrityError
+
+    users = UserRepository(db)
+    feedback = FeedbackRepository(db)
+    user = users.get_or_create_by_phone(_unique_phone())
+
+    # BaseRepository.create() flushes immediately, so the CHECK constraint
+    # violation surfaces here, not at a later explicit flush.
+    with pytest.raises(IntegrityError):
+        feedback.create(user_id=user.id, category=FeedbackCategory.bug, message="x", rating=6)
+    db.rollback()

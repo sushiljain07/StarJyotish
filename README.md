@@ -179,14 +179,15 @@ Most tests pass without any API key configured. A handful of AI-dependent tests 
 ```
 astro/
 ├── backend/
-│   ├── main.py                    # FastAPI app entry point, CORS, router mounting
+│   ├── main.py                    # FastAPI app entry point, CORS, router mounting, /health + /health/db
 │   ├── Dockerfile                 # for Railway/container deploys (pyswisseph needs a C compiler)
-│   ├── alembic.ini, alembic/      # migrations — env.py reads DATABASE_URL; versions/0001_initial_schema.py
+│   ├── alembic.ini, alembic/      # migrations — env.py reads DATABASE_URL; versions/0001_initial_schema.py, 0002_add_audit_feedback_chat.py
 │   ├── db/                        # persistence layer — see db/README.md
 │   │   ├── base.py, mixins.py, session.py
 │   │   ├── models/                # User, BirthProfile, Report, AstrologerProfile, Booking,
 │   │   │                           #   Transaction, Purchase, Notification, UserSession, Wallet,
-│   │   │                           #   WalletLedgerEntry, Review, AppSetting
+│   │   │                           #   WalletLedgerEntry, Review, AppSetting, AuditLog, Feedback,
+│   │   │                           #   ChatSession, ChatMessage
 │   │   ├── repositories/           # one repository per model, e.g. UserRepository, WalletRepository
 │   │   └── seed.py                # `python -m db.seed [--with-dev-data]`
 │   ├── routes/
@@ -264,6 +265,7 @@ Locally, both pieces talk to each other automatically via the Vite dev proxy —
 - WhatsApp intake via Meta Cloud API
 - Server-side PDF generation (current PDF export is browser print-to-PDF only)
 - Wire the frontend's `config/entitlements.js` and `config/auth.js` stubs to the new `/api/settings/public` endpoint instead of their hardcoded values
+- Wire `routes/kundli.py`'s `ask_kundli()` to `ChatSession`/`ChatMessage` (`backend/db/`) so "Ask the Chart" becomes a threaded conversation instead of independent Q&As — the tables/repository exist, the route isn't using them yet
 
 ---
 

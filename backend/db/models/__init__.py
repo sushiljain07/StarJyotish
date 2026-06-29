@@ -7,8 +7,11 @@ path in db/seed.py.
 """
 from db.base import Base  # noqa: F401
 from db.models.astrologer import AstrologerProfile, KycStatus  # noqa: F401
+from db.models.audit_log import AuditAction, AuditLog  # noqa: F401
 from db.models.birth_profile import BirthProfile  # noqa: F401
 from db.models.booking import Booking, BookingMode, BookingStatus  # noqa: F401
+from db.models.chat import ChatMessage, ChatRole, ChatSession  # noqa: F401
+from db.models.feedback import Feedback, FeedbackCategory  # noqa: F401
 from db.models.notification import Notification, NotificationChannel, NotificationStatus  # noqa: F401
 from db.models.purchase import Purchase, PurchaseProductType, PurchaseStatus  # noqa: F401
 from db.models.report import Report, ReportStatus, ReportType  # noqa: F401
@@ -33,4 +36,7 @@ __all__ = [
     "Wallet", "WalletLedgerEntry", "WalletLedgerDirection",
     "Review",
     "AppSetting",
+    "AuditLog", "AuditAction",
+    "Feedback", "FeedbackCategory",
+    "ChatSession", "ChatMessage", "ChatRole",
 ]

@@ -1,7 +1,10 @@
 from db.repositories.astrologer_repository import AstrologerRepository
+from db.repositories.audit_log_repository import AuditLogRepository
 from db.repositories.base_repository import BaseRepository
 from db.repositories.birth_profile_repository import BirthProfileRepository
 from db.repositories.booking_repository import BookingRepository
+from db.repositories.chat_repository import ChatSessionRepository
+from db.repositories.feedback_repository import FeedbackRepository
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.purchase_repository import PurchaseRepository
 from db.repositories.report_repository import ReportRepository
@@ -26,4 +29,7 @@ __all__ = [
     "WalletRepository", "InsufficientBalanceError",
     "ReviewRepository",
     "SettingsRepository",
+    "AuditLogRepository",
+    "FeedbackRepository",
+    "ChatSessionRepository",
 ]

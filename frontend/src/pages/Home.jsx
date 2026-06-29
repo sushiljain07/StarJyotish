@@ -7,6 +7,7 @@ import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
+import Seo from '../components/Seo'
 
 export default function Home() {
   const { t, i18n } = useTranslation()
@@ -47,6 +48,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
+      <Seo
+        title={topic ? `Free ${topic.id.charAt(0).toUpperCase() + topic.id.slice(1)} Astrology Report` : 'Enter Your Birth Details'}
+        description="Enter your date, time, and place of birth to generate a free, Swiss Ephemeris-accurate Vedic Kundli with an AI-powered reading."
+        path="/generate"
+      />
       {/* Hero header */}
       <div className="relative overflow-hidden bg-night px-6 pt-12 pb-8 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />

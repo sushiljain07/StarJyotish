@@ -7,6 +7,7 @@
 // see inline notes. No new design decisions were made for this component.
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import SocialButtons from './SocialButtons'
 
 // Same capability badges already shown in the hero (services/topic.js has no
 // "trust" claims of its own, and these are the only ones the app can back up
@@ -15,31 +16,6 @@ import { useTranslation } from 'react-i18next'
 // a star rating, which don't apply yet (no marketplace, no review data).
 const TRUST_BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_bilingual', 'landing_badge_ai']
 const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
-// Same stroke-icon convention as TabIcon.jsx (viewBox 24, stroke="currentColor",
-// fill="none", with small filled accents) — kept here since these are
-// one-off social glyphs, not shared elsewhere like TabIcon's tab set.
-const SOCIAL_ICONS = {
-  instagram: (
-    <>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none" />
-    </>
-  ),
-  x: <path d="M4 4l16 16M20 4L4 20" />,
-  youtube: (
-    <>
-      <rect x="2.5" y="6" width="19" height="12" rx="3" />
-      <path d="M10.5 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none" />
-    </>
-  ),
-  facebook: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M14 8.7h-1.3c-.9 0-1.4.5-1.4 1.4V12h2.4l-.3 2.2h-2.1V19h-2.2v-4.8H9V12h1.7v-2.2c0-1.8 1.1-3.1 3-3.1H14z" fill="currentColor" stroke="none" />
-    </>
-  ),
-}
 
 function FooterLink({ to, state, children }) {
   return (
@@ -52,21 +28,6 @@ function FooterLink({ to, state, children }) {
         <span className="text-primary/50 text-xs">›</span>{children}
       </Link>
     </li>
-  )
-}
-
-function SocialButton({ icon }) {
-  // Placeholders only — no links yet, per the brief.
-  return (
-    <button
-      type="button"
-      aria-label={icon}
-      className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-ink-onnight hover:text-primary hover:border-primary/40 transition"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-        {SOCIAL_ICONS[icon]}
-      </svg>
-    </button>
   )
 }
 
@@ -86,9 +47,7 @@ export default function Footer() {
           </div>
           <p className="text-sm text-ink-onnight/70 mt-3 leading-relaxed max-w-xs">{t('landing_subhead')}</p>
           <p className="text-xs font-semibold tracking-wide uppercase text-ink-onnight/50 mt-5 mb-2">{t('footer_follow_heading')}</p>
-          <div className="flex gap-2">
-            {Object.keys(SOCIAL_ICONS).map(id => <SocialButton key={id} icon={id} />)}
-          </div>
+          <SocialButtons dark />
         </div>
 
         {/* Services */}
@@ -103,7 +62,10 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Learn */}
+        {/* Learn — Zodiac/Nakshatra/Dasha/Blog stay as "#" deliberately: no
+            content exists for them yet (out of scope for this pass), so
+            pointing them anywhere would just be a different kind of dead
+            link. FAQ now has a real standalone page. */}
         <div>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_learn_heading')}</h3>
           <ul className="space-y-2.5">
@@ -111,23 +73,20 @@ export default function Footer() {
             <FooterLink to="#">{t('footer_link_nakshatra')}</FooterLink>
             <FooterLink to="#">{t('footer_link_dasha')}</FooterLink>
             <FooterLink to="#">{t('footer_link_blog')}</FooterLink>
-            <FooterLink to="/#faq">{t('footer_link_faq')}</FooterLink>
+            <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
           </ul>
         </div>
 
         {/* Company + minimal contact (room left to add phone/address as
-            extra <li> rows later — no restructuring needed) */}
+            extra <li> rows later — no restructuring needed). Pricing/How-it-
+            works stay "#" for the same reason as the Learn column above. */}
         <div>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_company_heading')}</h3>
           <ul className="space-y-2.5">
-            <FooterLink to="#">{t('footer_link_about')}</FooterLink>
+            <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
             <FooterLink to="#">{t('footer_link_how_it_works')}</FooterLink>
             <FooterLink to="#">{t('footer_link_pricing')}</FooterLink>
-            <li>
-              <a href="mailto:info.starjyotish@gmail.com" className="text-ink-onnight/80 hover:text-primary text-sm transition flex items-center gap-1.5">
-                <span className="text-primary/50 text-xs">›</span>{t('footer_link_contact')}
-              </a>
-            </li>
+            <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mt-6 mb-2">{t('footer_contact_heading')}</h3>
           <ul className="space-y-2 text-sm text-ink-onnight/80">
@@ -176,9 +135,10 @@ export default function Footer() {
       {/* ── Bottom bar ── */}
       <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-ink-onnight/60">
-          <Link to="#" className="hover:text-primary transition">{t('footer_bottom_privacy')}</Link>
-          <Link to="#" className="hover:text-primary transition">{t('footer_bottom_cookie')}</Link>
-          <Link to="#" className="hover:text-primary transition">{t('footer_bottom_terms')}</Link>
+          <Link to="/privacy" className="hover:text-primary transition">{t('footer_bottom_privacy')}</Link>
+          <Link to="/privacy#cookies" className="hover:text-primary transition">{t('footer_bottom_cookie')}</Link>
+          <Link to="/terms" className="hover:text-primary transition">{t('footer_bottom_terms')}</Link>
+          <Link to="/refund-policy" className="hover:text-primary transition">{t('footer_bottom_refund')}</Link>
           <Link to="/disclaimer" className="hover:text-primary transition">{t('footer_bottom_disclaimer')}</Link>
         </div>
         <p className="text-ink-onnight/50 text-center">

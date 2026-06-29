@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { API_BASE } from '../api/config'
+import Seo from '../components/Seo'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -188,6 +189,11 @@ export default function CareerReport() {
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
+      <Seo
+        title="Vedic Career Report — AI Career & Vocation Analysis"
+        description="Get a detailed Vedic career report analyzing your best career path, job vs. business verdict, peak career windows, and gemstone remedies — based on D10, Dasha, and Rajyoga analysis."
+        path="/career-report"
+      />
 
       {/* ── Hero header ── */}
       <div className="bg-night px-6 pt-12 pb-8 text-center">

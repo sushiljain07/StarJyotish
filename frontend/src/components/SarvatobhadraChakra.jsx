@@ -168,8 +168,15 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
       </div>
 
       <div className="flex justify-center overflow-x-auto">
-        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}
-             style={{ maxWidth: W, minWidth: Math.min(W, 420) }}
+        {/* Was width={W} height={H} with a hardcoded minWidth, which forced
+            this chart to never shrink below 416px — every phone in the
+            320–414px range would overflow horizontally. Every other chart
+            in this app (KundliChart, SouthIndiaChart, WesternChart) already
+            uses width="100%" + viewBox + a maxWidth cap instead, which lets
+            the SVG scale down freely on narrow screens while still capping
+            out at its intended size on larger ones. Matching that here. */}
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`}
+             style={{ maxWidth: W }}
              className="font-sans">
           {grid.map((row, ri) =>
             row.map((cell, ci) => {

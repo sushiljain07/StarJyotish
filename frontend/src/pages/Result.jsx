@@ -25,6 +25,7 @@ import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
 import TabIcon from '../components/TabIcon'
+import Seo from '../components/Seo'
 
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
@@ -188,6 +189,13 @@ export default function Result() {
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
+      {/* This route only ever renders with data handed off from Home.jsx's
+          router state (see the early-return guard above) — there's no
+          canonical, shareable URL for a search engine to land on, so it's
+          excluded from indexing rather than given a generic/misleading
+          title+description that wouldn't match what a crawler would
+          actually see. */}
+      <Seo title="Your Kundli" description="Your personalized Vedic Kundli and AI reading." path="/kundli" noindex />
       {/* Header */}
       <div className="bg-night text-primary-light">
         <div className="max-w-5xl mx-auto px-4">

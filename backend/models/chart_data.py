@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
 
@@ -80,7 +80,7 @@ class ChartResponse(_Flexible):
 class ReadingRequest(_Flexible):
     date: str       # "YYYY-MM-DD"
     time: str       # "HH:MM" (24-hr)
-    place: str
+    place: str = Field(max_length=200)
     language: str   # "en" or "hi"
     topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' —
                                   # set when the user arrived via a landing-page topic
@@ -105,8 +105,8 @@ class ReadingResponse(_Flexible):
 class AskRequest(_Flexible):
     date: str       # "YYYY-MM-DD"
     time: str       # "HH:MM" (24-hr)
-    place: str
-    question: str
+    place: str = Field(max_length=200)
+    question: str = Field(max_length=500)
     language: str = "en"
 
 

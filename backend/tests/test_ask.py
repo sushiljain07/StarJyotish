@@ -46,6 +46,16 @@ def test_ask_missing_question_returns_422():
     assert resp.status_code == 422
 
 
+def test_ask_overlong_question_returns_422():
+    # question has a 500-char limit (see models/chart_data.py's AskRequest) —
+    # this is the field that gets concatenated directly into the AI prompt,
+    # so it's the most directly relevant constraint of the two H5 added.
+    # No geocode mock needed: Pydantic validates the request body before the
+    # route handler (and therefore geocoding) ever runs.
+    resp = client.post("/api/kundli/ask", json={**VALID_BODY, "question": "a" * 501})
+    assert resp.status_code == 422
+
+
 def test_ask_invalid_place_returns_400():
     body = {**VALID_BODY, "place": "xyzzy_not_a_real_place_12345"}
     with patch("services.chart_context.geocode_place", side_effect=ValueError("Place not found")):

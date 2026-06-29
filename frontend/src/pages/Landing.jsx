@@ -8,6 +8,7 @@ import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
+import FaqSchema from '../components/FaqSchema'
 import LandingStickyHeader from '../components/LandingStickyHeader'
 import Footer from '../components/Footer'
 import ScrollToTop from '../components/ScrollToTop'
@@ -40,6 +41,10 @@ export default function Landing() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [heroSentinelRef, heroPassed] = useScrolledPast()
+  const landingFaqItems = FAQ_IDS.map(n => ({
+    question: t(`landing_faq_q${n}`),
+    answer: t(`landing_faq_a${n}`),
+  }))
 
   function goToForm(topicId, extraState = {}) {
     const state = { ...(topicId ? { topic: topicId } : {}), ...extraState }
@@ -277,15 +282,11 @@ export default function Landing() {
             {t('landing_faq_heading')}
           </Reveal>
           <Reveal delay={100}>
-            <FAQAccordion
-              items={FAQ_IDS.map(n => ({
-                question: t(`landing_faq_q${n}`),
-                answer: t(`landing_faq_a${n}`),
-              }))}
-            />
+            <FAQAccordion items={landingFaqItems} />
           </Reveal>
         </div>
       </section>
+      <FaqSchema items={landingFaqItems} />
 
       {/* ───────────────────── Final CTA ───────────────────── */}
       <Reveal as="div" className="relative overflow-hidden bg-night px-6 py-12 text-center">

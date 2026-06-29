@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/starjyotish.svg" />
+    <!-- PNG fallback specifically for Google Search's favicon: Google's
+         guidelines (developers.google.com/search/docs/appearance/favicon-in-search)
+         require a square icon and recommend PNG/ICO over SVG for reliability
+         in the search-results favicon (SVG-only is the most common reason a
+         site falls back to Google's generic globe icon). Reuses icon-192.png,
+         already shipped for the PWA manifest, well above the 48x48 minimum. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#171B33" />
@@ -31,6 +38,37 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
+    <!-- Organization + WebSite structured data. Static (not via Helmet) since
+         it's identical on every route, unlike the per-page Seo.jsx tags.
+         Deliberately omits:
+         - WebSite.potentialAction (SearchAction): there's no on-site search
+           endpoint to point it at; a SearchAction schema for a feature that
+           doesn't exist is the kind of mismatch Google's guidelines flag.
+         - Organization.sameAs: no official Star Jyotish social/profile URLs
+           exist yet. Add them here once they do (e.g. a real X/LinkedIn/
+           Instagram account for the brand, not a personal GitHub profile). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://starjyotish.com/#organization",
+            "name": "Star Jyotish",
+            "url": "https://starjyotish.com",
+            "logo": "https://starjyotish.com/starjyotish-logo.webp",
+            "description": "AI-powered Vedic astrology platform offering free, Swiss Ephemeris-accurate birth charts and personalized readings in English and Hindi."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://starjyotish.com/#website",
+            "url": "https://starjyotish.com",
+            "name": "Star Jyotish",
+            "publisher": { "@id": "https://starjyotish.com/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

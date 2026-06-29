@@ -16,13 +16,13 @@ def _mock_geo():
 
 
 def test_kundli_returns_200():
-    with patch("routes.kundli.geocode_place", return_value=_mock_geo()):
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
         resp = client.post("/api/kundli", json=VALID_BODY)
     assert resp.status_code == 200
 
 
 def test_kundli_response_fields():
-    with patch("routes.kundli.geocode_place", return_value=_mock_geo()):
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
         resp = client.post("/api/kundli", json=VALID_BODY)
     data = resp.json()
     assert "ascendant" in data
@@ -43,7 +43,7 @@ def test_kundli_pratyantar_present():
     """Regression test: the route used to build DashaData without forwarding
     current_pratyantar/pratyantars (and current_sookshma/sookshmas), so the API
     always returned them empty even though services/dasha.py computed real data."""
-    with patch("routes.kundli.geocode_place", return_value=_mock_geo()):
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
         resp = client.post("/api/kundli", json=VALID_BODY)
     dasha = resp.json()["dasha"]
     assert dasha["current_pratyantar"] is not None
@@ -53,6 +53,6 @@ def test_kundli_pratyantar_present():
 
 
 def test_kundli_place_not_found_returns_400():
-    with patch("routes.kundli.geocode_place", side_effect=ValueError("Place not found")):
+    with patch("services.chart_context.geocode_place", side_effect=ValueError("Place not found")):
         resp = client.post("/api/kundli", json=VALID_BODY)
     assert resp.status_code == 400

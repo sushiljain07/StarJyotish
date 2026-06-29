@@ -14,10 +14,7 @@ from datetime import datetime
 import pytz
 from fastapi import HTTPException
 
-try:
-    import swisseph as swe
-except ImportError:
-    import swisseph as swe
+import swisseph as swe
 
 from services.geocode import geocode_place, GeoResult
 

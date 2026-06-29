@@ -9,14 +9,6 @@ const NAKSHATRAS_27 = [
   'Purva Bhadrapada','Uttara Bhadrapada','Revati',
 ]
 
-const NAK_ABBR = [
-  'Ash','Bha','Kri','Roh','Mri','Ard',
-  'Pun','Pus','Ash','Mag','PPh','UPh',
-  'Has','Chi','Swa','Vis','Anu','Jye',
-  'Mul','PAs','UAs','Shr','Dha','Sha',
-  'PBh','UBh','Rev',
-]
-
 // Grid layout: [row, col] for each nakshatra (0-indexed, 9×9 grid)
 // Outer ring: top row left-to-right, right col top-to-bottom, bottom row right-to-left, left col bottom-to-top
 // Corners (weekdays): [0,0]=Sun, [0,8]=Mon, [8,8]=Sat, [8,0]=Jup
@@ -73,7 +65,6 @@ const CORNER_CELLS = [
 
 // Inner ring signs (12 signs, 2 cells each in the 7×7 inner ring border)
 // 24 cells in the inner ring border
-const SIGNS_EN = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 const SIGN_ABBR_2 = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
 
 // Inner ring border cells (rows 1-7, cols 1-7, only the outermost of that 7×7)

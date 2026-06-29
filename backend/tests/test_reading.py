@@ -42,28 +42,19 @@ def test_unknown_planet_returns_empty():
 
 # ── Section parsing ──────────────────────────────────────────────────────────
 
-SAMPLE_RESPONSE = """===Chart Overview===
-Sun in Aries with strong planetary positions.
+import json
 
-===Personality & Appearance===
-With Scorpio rising, you carry an air of mystery.
+SAMPLE_RESPONSE = json.dumps({
+    "Chart Overview": ["Sun in Aries with strong planetary positions."],
+    "Personality & Appearance": ["With Scorpio rising, you carry an air of mystery."],
+    "Career & Wealth": ["Jupiter blesses your 2nd house."],
+    "Relationships & Marriage": ["Venus exalted in Pisces gives sensitivity."],
+    "Health": ["Mars exalted in Capricorn gives stamina."],
+    "Spiritual Inclination": ["Ketu in 2nd house brings spiritual detachment."],
+    "Current Period (Dasha)": ["Jupiter-Venus period is highly auspicious."],
+})
 
-===Career & Wealth===
-Jupiter blesses your 2nd house.
-
-===Relationships & Marriage===
-Venus exalted in Pisces gives sensitivity.
-
-===Health===
-Mars exalted in Capricorn gives stamina.
-
-===Spiritual Inclination===
-Ketu in 2nd house brings spiritual detachment.
-
-===Current Period (Dasha)===
-Jupiter-Venus period is highly auspicious."""
-
-def test_parse_sections_returns_six():
+def test_parse_sections_returns_seven():
     assert len(parse_sections(SAMPLE_RESPONSE)) == 7
 
 def test_parse_sections_content():
@@ -75,7 +66,7 @@ def test_parse_sections_icons():
     assert p["icon"] == "🧬"
 
 def test_parse_sections_missing_gives_empty():
-    sections = parse_sections("===Career & Wealth===\nGood prospects.")
+    sections = parse_sections(json.dumps({"Career & Wealth": ["Good prospects."]}))
     health = next(s for s in sections if s["title"] == "Health")
     assert health["content"] == ""
 
@@ -128,31 +119,31 @@ def _sections():
     ]
 
 def test_reading_returns_200():
-    with patch("routes.kundli.geocode_place", return_value=_geo()), \
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
          patch("routes.kundli.generate_reading", return_value=_sections()):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 200
 
 def test_reading_has_six_sections():
-    with patch("routes.kundli.geocode_place", return_value=_geo()), \
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
          patch("routes.kundli.generate_reading", return_value=_sections()):
         data = client.post("/api/kundli/reading", json=BODY).json()
     assert len(data["sections"]) == 6
 
 def test_reading_section_fields():
-    with patch("routes.kundli.geocode_place", return_value=_geo()), \
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
          patch("routes.kundli.generate_reading", return_value=_sections()):
         s = client.post("/api/kundli/reading", json=BODY).json()["sections"][0]
     assert {"title", "icon", "content"} <= s.keys()
 
 def test_reading_missing_key_returns_503():
-    with patch("routes.kundli.geocode_place", return_value=_geo()), \
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
          patch("routes.kundli.generate_reading",
                side_effect=HTTPException(status_code=503, detail="GEMINI_API_KEY not configured")):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 503
 
 def test_reading_bad_place_returns_400():
-    with patch("routes.kundli.geocode_place", side_effect=ValueError("Place not found")):
+    with patch("services.chart_context.geocode_place", side_effect=ValueError("Place not found")):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 400

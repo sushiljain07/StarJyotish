@@ -9,9 +9,6 @@ const PLANET_COLORS = {
   Ketu: '#8B0000', Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
 }
 
-const SIGN_NAMES = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
-                    'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
-
 export default function TransitPanel({ input, natalData }) {
   const [transitData, setTransitData] = useState(null)
   const [loading, setLoading] = useState(false)

@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 
 from main import app
+from services.geocode import GeoResult
 
 client = TestClient(app)
 
@@ -18,8 +19,19 @@ VALID_BODY = {
 }
 
 
+def _geo():
+    return GeoResult(lat=28.6139, lon=77.2090, timezone="Asia/Kolkata", display_name="New Delhi")
+
+
 def test_ask_returns_answer():
-    with patch("routes.kundli.ask_chart", return_value="Test answer text."):
+    # ask_chart returns a (answer, provider_label) tuple — see services/ai.py —
+    # not a bare string. The mock previously returned a bare string here,
+    # which `answer, provider = ask_chart(...)` in routes/kundli.py would have
+    # failed to unpack; that was masked by an earlier, unrelated failure (this
+    # test also had no geocode mock, so it depended on a live network call to
+    # Nominatim that doesn't work in every environment).
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
+         patch("routes.kundli.ask_chart", return_value=("Test answer text.", "Claude")):
         resp = client.post("/api/kundli/ask", json=VALID_BODY)
     assert resp.status_code == 200
     data = resp.json()
@@ -36,19 +48,30 @@ def test_ask_missing_question_returns_422():
 
 def test_ask_invalid_place_returns_400():
     body = {**VALID_BODY, "place": "xyzzy_not_a_real_place_12345"}
-    resp = client.post("/api/kundli/ask", json=body)
+    with patch("services.chart_context.geocode_place", side_effect=ValueError("Place not found")):
+        resp = client.post("/api/kundli/ask", json=body)
     assert resp.status_code == 400
 
 
-def test_ask_no_groq_key_returns_503():
-    import os
-    original = os.environ.get("GROQ_API_KEY")
-    os.environ["GROQ_API_KEY"] = ""
+def test_ask_no_key_returns_503():
+    # Today's failover order (see services/ai.py's _call_llm) tries Claude
+    # first (OPENROUTER_API_KEY or ANTHROPIC_API_KEY), then falls back to
+    # Groq (GROQ_API_KEY), only raising 503 once *both* are unavailable.
+    # This test previously cleared only GROQ_API_KEY, which matched an
+    # earlier Groq-primary architecture (see PROGRESS.md) but not the
+    # current one — clearing just Groq while a real Claude key is present
+    # in the environment would actually still succeed via Claude, not 503.
+    keys_to_clear = ["OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "GROQ_API_KEY"]
+    originals = {k: os.environ.get(k) for k in keys_to_clear}
+    for k in keys_to_clear:
+        os.environ[k] = ""
     try:
-        resp = client.post("/api/kundli/ask", json=VALID_BODY)
+        with patch("services.chart_context.geocode_place", return_value=_geo()):
+            resp = client.post("/api/kundli/ask", json=VALID_BODY)
         assert resp.status_code == 503
     finally:
-        if original:
-            os.environ["GROQ_API_KEY"] = original
-        elif "GROQ_API_KEY" in os.environ:
-            del os.environ["GROQ_API_KEY"]
+        for k, v in originals.items():
+            if v:
+                os.environ[k] = v
+            elif k in os.environ:
+                del os.environ[k]

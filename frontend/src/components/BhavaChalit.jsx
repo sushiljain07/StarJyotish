@@ -2,12 +2,7 @@
 // Shows where planets shift between Rashi (whole-sign) and Bhava houses
 import { useState, useEffect } from 'react'
 import { API_BASE } from '../api/config'
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Mercury: '#16A34A',
-  Jupiter: '#2563EB', Venus: '#E91E8C', Saturn: '#1E40AF', Rahu: '#8B0000',
-  Ketu: '#5B21B6', Neptune: '#7C3AED', Uranus: '#0891B2', Pluto: '#374151',
-}
+import { PLANET_COLORS } from '../config/planetColors'
 
 export default function BhavaChalit({ input }) {
   const [data, setData] = useState(null)

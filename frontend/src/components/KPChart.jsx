@@ -2,18 +2,7 @@
 // Shows planet → Sign → House → Star (nakshatra lord) → Sub → Sub-sub
 import { useState, useEffect } from 'react'
 import { API_BASE } from '../api/config'
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#E53E3E', Rahu: '#8B0000',
-  Saturn: '#2563EB', Jupiter: '#2563EB', Mercury: '#16A34A', Venus: '#E91E8C',
-  Ketu: '#8B0000', Neptune: '#7C3AED', Uranus: '#7C3AED', Pluto: '#374151',
-}
-
-const LORD_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#E53E3E', Rahu: '#8B0000',
-  Saturn: '#2563EB', Jupiter: '#2563EB', Mercury: '#16A34A', Venus: '#E91E8C',
-  Ketu: '#8B0000',
-}
+import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
 
 function LordChip({ lord }) {
   if (!lord) return <span className="text-ink-faint">—</span>

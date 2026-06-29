@@ -2,17 +2,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SegmentedToggle from './SegmentedToggle'
-
-const PLANET_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Mercury: '#16A34A',
-  Jupiter: '#2563EB', Venus: '#E91E8C', Saturn: '#1E40AF', Rahu: '#8B0000',
-  Ketu: '#5B21B6', Neptune: '#7C3AED', Uranus: '#0891B2', Pluto: '#374151',
-}
-
-const LORD_COLORS = {
-  Sun: '#E53E3E', Moon: '#7B61FF', Mars: '#CC2200', Rahu: '#8B0000',
-  Saturn: '#1E40AF', Jupiter: '#2563EB', Mercury: '#16A34A', Venus: '#E91E8C', Ketu: '#5B21B6',
-}
+import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
 
 function LordBadge({ lord }) {
   if (!lord) return null

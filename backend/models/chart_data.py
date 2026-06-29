@@ -85,6 +85,7 @@ class ReadingRequest(_Flexible):
     topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' —
                                   # set when the user arrived via a landing-page topic
                                   # card; see services/ai.py build_prediction_prompt().
+    save_for_phone: Optional[str] = Field(default=None, max_length=20)  # see models/birth_data.py
 
 
 class ReadingSection(_Flexible):
@@ -108,6 +109,7 @@ class AskRequest(_Flexible):
     place: str = Field(max_length=200)
     question: str = Field(max_length=500)
     language: str = "en"
+    save_for_phone: Optional[str] = Field(default=None, max_length=20)  # see models/birth_data.py
 
 
 class AskResponse(_Flexible):

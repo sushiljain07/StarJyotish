@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
 import os
 import re
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
@@ -13,6 +14,7 @@ from routes.kundli import router as kundli_router
 from routers.career_report import router as career_router
 from routers.rajyogas import router as rajyogas_router
 from routers.topic_reports import router as topic_reports_router
+from routers.account import router as account_router
 
 app = FastAPI(title="Kundli API", version="1.0.0")
 
@@ -21,6 +23,19 @@ app = FastAPI(title="Kundli API", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
+
+
+@app.exception_handler(RuntimeError)
+def db_not_configured_handler(request: Request, exc: RuntimeError):
+    # db/session.py's get_db() raises plain RuntimeError when DATABASE_URL
+    # isn't set, for the handful of endpoints (routers/account.py) that are
+    # meaningless without persistence. Surfacing this as a clean 503 rather
+    # than an unhandled 500 makes "Postgres isn't provisioned yet" obvious
+    # in the response instead of looking like a server bug.
+    if "DATABASE_URL is not configured" in str(exc):
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
+    raise exc
+
 
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -47,6 +62,7 @@ app.include_router(kundli_router, prefix="/api")
 app.include_router(career_router, prefix="/api")
 app.include_router(rajyogas_router, prefix="/api")
 app.include_router(topic_reports_router, prefix="/api")
+app.include_router(account_router, prefix="/api")
 
 @app.get("/health")
 def health():

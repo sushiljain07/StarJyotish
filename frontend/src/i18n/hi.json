@@ -218,5 +218,20 @@
     "Capricorn": "मकर",
     "Aquarius": "कुम्भ",
     "Pisces": "मीन"
-  }
+  },
+  "login_title": "Star Jyotish में साइन इन करें",
+  "login_subtitle": "अपने फ़ोन नंबर या Google खाते का उपयोग करें।",
+  "login_phone_label": "फ़ोन नंबर",
+  "login_send_code": "कोड भेजें",
+  "login_sending": "भेजा जा रहा है…",
+  "login_code_label": "6-अंकों का कोड दर्ज करें",
+  "login_verify": "सत्यापित करें और जारी रखें",
+  "login_verifying": "सत्यापित किया जा रहा है…",
+  "login_change_number": "नंबर बदलें",
+  "login_resend_code": "कोड फिर भेजें",
+  "login_resend_in": "{{seconds}}से. में फिर भेजें",
+  "login_or": "या",
+  "login_google_failed": "Google साइन-इन विफल हुआ। कृपया पुनः प्रयास करें।",
+  "login_disclaimer": "हम आपके नंबर का उपयोग केवल साइन इन के लिए करेंगे — कभी साझा नहीं, कभी स्पैम नहीं।",
+  "login_seo_description": "अपने फ़ोन नंबर या Google खाते से Star Jyotish में साइन इन करें।"
 }

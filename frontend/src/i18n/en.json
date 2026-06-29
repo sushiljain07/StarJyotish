@@ -218,5 +218,20 @@
     "Capricorn": "Capricorn",
     "Aquarius": "Aquarius",
     "Pisces": "Pisces"
-  }
+  },
+  "login_title": "Sign in to Star Jyotish",
+  "login_subtitle": "Use your phone number or Google account.",
+  "login_phone_label": "Phone number",
+  "login_send_code": "Send code",
+  "login_sending": "Sending…",
+  "login_code_label": "Enter the 6-digit code",
+  "login_verify": "Verify & continue",
+  "login_verifying": "Verifying…",
+  "login_change_number": "Change number",
+  "login_resend_code": "Resend code",
+  "login_resend_in": "Resend in {{seconds}}s",
+  "login_or": "or",
+  "login_google_failed": "Google sign-in failed. Please try again.",
+  "login_disclaimer": "We'll only use your number to sign you in — never shared, never spammed.",
+  "login_seo_description": "Sign in to Star Jyotish with your phone number or Google account."
 }

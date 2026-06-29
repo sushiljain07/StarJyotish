@@ -9,7 +9,7 @@ const PLANET_COLORS = {
   Ketu: '#5B21B6', Neptune: '#7C3AED', Uranus: '#0891B2', Pluto: '#374151',
 }
 
-export default function BhavaChality({ input }) {
+export default function BhavaChalit({ input }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)

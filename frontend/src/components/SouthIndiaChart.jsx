@@ -78,7 +78,6 @@ export default function SouthIndiaChart({
     const isAsc = signIdx === ascIdx
     const ps = bySign[signIdx] ?? []
     const tps = bySignTransit ? (bySignTransit[signIdx] ?? []) : []
-    const houseNum = (signIdx - ascIdx + 12) % 12 + 1
 
     const items = []
     // Lagna marker

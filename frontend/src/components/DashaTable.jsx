@@ -1,6 +1,5 @@
 // frontend/src/components/DashaTable.jsx
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { formatDate } from '../utils/format'
 
 function pct(start, end) {
@@ -82,7 +81,6 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
 }
 
 export default function DashaTable({ dasha }) {
-  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('mahadasha')
 
   if (!dasha) return null

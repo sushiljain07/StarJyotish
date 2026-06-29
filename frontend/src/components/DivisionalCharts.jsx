@@ -49,7 +49,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       if (!res.ok) throw new Error('Failed to fetch chart')
       const data = await res.json()
       setChartData(data)
-    } catch (err) {
+    } catch {
       setError('Could not load chart. Please try again.')
     }
     setLoading(false)

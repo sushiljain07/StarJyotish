@@ -5,15 +5,18 @@ career_analysis.py, where the logic was already fully generic — nothing
 here is career-specific.
 """
 import json
+import logging
 import os
+import re
 import time
 import requests
 from typing import Optional
 
+logger = logging.getLogger("starjyotish.report_utils")
+
 
 def extract_json(raw: str) -> dict:
     """Extract JSON from LLM response, handling markdown fences and leading text."""
-    import re
     stripped = re.sub(r"```(?:json)?\s*", "", raw).strip()
     try:
         return json.loads(stripped)
@@ -74,7 +77,7 @@ def call_llm(
         except json.JSONDecodeError as e:
             raise RuntimeError(f"Claude (via OpenRouter) returned non-JSON: {e}") from e
         except Exception as e:
-            print(f"[{log_prefix}] Claude via OpenRouter error ({type(e).__name__}: {e}), falling back to Groq.")
+            logger.warning("[%s] Claude via OpenRouter error (%s: %s), falling back to Groq.", log_prefix, type(e).__name__, e)
     elif anthropic_key:
         import anthropic as _anthropic
         client = _anthropic.Anthropic(api_key=anthropic_key)
@@ -89,13 +92,13 @@ def call_llm(
             msg = client.messages.create(**create_kwargs)
             return extract_json(msg.content[0].text), "Claude"
         except _anthropic.APIStatusError as e:
-            print(f"[{log_prefix}] Claude API error ({e.status_code}), falling back to Groq.")
+            logger.warning("[%s] Claude API error (%s), falling back to Groq.", log_prefix, e.status_code)
         except _anthropic.APIConnectionError:
-            print(f"[{log_prefix}] Claude connection error, falling back to Groq.")
+            logger.warning("[%s] Claude connection error, falling back to Groq.", log_prefix)
         except json.JSONDecodeError as e:
             raise RuntimeError(f"Claude returned non-JSON: {e}") from e
         except Exception as e:
-            print(f"[{log_prefix}] Claude unexpected error ({type(e).__name__}: {e}), falling back to Groq.")
+            logger.warning("[%s] Claude unexpected error (%s: %s), falling back to Groq.", log_prefix, type(e).__name__, e)
 
     groq_key = os.getenv("GROQ_API_KEY", "").strip()
     if not groq_key:
@@ -154,8 +157,6 @@ def filter_report_language(report: dict) -> dict:
     since "debilitated"/"afflicted"/"malefic" etc. aren't career-specific
     terms. Extracted verbatim from career_analysis.py's original behavior.
     """
-    import re
-
     def _clean(text: str) -> str:
         for pattern, repl in _FORBIDDEN_TERM_REPLACEMENTS:
             text = re.sub(pattern, repl, text, flags=re.IGNORECASE)

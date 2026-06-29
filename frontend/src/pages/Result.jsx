@@ -13,7 +13,7 @@ import TransitPanel       from '../components/TransitPanel'
 import KPChart            from '../components/KPChart'
 import AshtakavargaTable  from '../components/AshtakavargaTable'
 import SarvatobhadraChakra from '../components/SarvatobhadraChakra'
-import BhavaChality       from '../components/BhavaChality'
+import BhavaChalit        from '../components/BhavaChalit'
 import KundliDownload     from '../components/KundliDownload'
 import CareerReportTab   from '../components/CareerReportTab'
 import RajyogasTab       from '../components/RajyogasTab'
@@ -282,7 +282,7 @@ export default function Result() {
           <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
           <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
-            <BhavaChality input={input} />
+            <BhavaChalit input={input} />
           </div>
 
           <div className={activeAdvancedSub === 'ashtakavarga' ? '' : 'hidden'}>

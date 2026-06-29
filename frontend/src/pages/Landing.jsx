@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { TOPICS } from '../config/topics'
 import { isLoginRequired } from '../config/auth'
 import { useScrolledPast } from '../hooks/useScrolledPast'
+import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
@@ -52,6 +53,11 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-parchment overflow-x-hidden">
+      <Seo
+        title="Free Vedic Astrology, AI Kundli & Birth Chart Reading"
+        description="Generate your free Vedic Kundli with Swiss Ephemeris-accurate calculations and an AI-powered reading. Career, relationship, health & wealth insights in English and Hindi — no signup needed."
+        path="/"
+      />
       <LandingStickyHeader
         visible={heroPassed}
         currentLanguage={i18n.language}

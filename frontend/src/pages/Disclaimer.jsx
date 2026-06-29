@@ -1,21 +1,21 @@
 // frontend/src/pages/Disclaimer.jsx
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Footer from '../components/Footer'
+import Seo from '../components/Seo'
+import StaticPageLayout from '../components/StaticPageLayout'
 
 export default function Disclaimer() {
   const { t } = useTranslation()
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
-      <div className="flex-1 px-6 py-12 max-w-2xl mx-auto w-full">
-        <Link to="/" className="text-primary-dark text-sm font-medium hover:underline">
-          {t('disclaimer_page_back')}
-        </Link>
-        <h1 className="font-serif font-semibold text-3xl text-ink mt-4 mb-4">{t('disclaimer_page_heading')}</h1>
-        <p className="text-ink-muted text-sm leading-relaxed">{t('disclaimer')}</p>
-      </div>
-      <Footer />
-    </div>
+    <>
+      <Seo
+        title={t('disclaimer_page_heading')}
+        description="Star Jyotish's astrology disclaimer: AI-generated Vedic readings are for guidance and self-reflection only, not a substitute for professional medical, legal, financial, or psychological advice."
+        path="/disclaimer"
+      />
+      <StaticPageLayout title={t('disclaimer_page_heading')}>
+        <p>{t('disclaimer')}</p>
+      </StaticPageLayout>
+    </>
   )
 }

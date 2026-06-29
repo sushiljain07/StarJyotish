@@ -32,8 +32,11 @@ db/
 | `Wallet` / `WalletLedgerEntry` | `wallets` / `wallet_ledger_entries` | `Wallet.balance` is a denormalized cache; `WalletLedgerEntry` is the append-only source of truth. Always go through `WalletRepository.credit()`/`debit()` — never mutate `balance` directly, or the two will drift. |
 | `Review` | `reviews` | One per `Booking` (unique constraint on `booking_id`), written by the client about the astrologer. |
 | `AppSetting` | `app_settings` | Key/value runtime config (paywall flag, pricing) — string `key` is the primary key, not a UUID. |
+| `AuditLog` | `audit_logs` | Generic "who did what, when" trail for moderation/admin actions (e.g. KYC verification, booking cancellation). Polymorphic `entity_type`/`entity_id`, like `Transaction`'s `related_type`/`related_id`. `actor_user_id` nullable — `NULL` means the system did it, not "unknown". |
+| `Feedback` | `feedback` | Free-form bug reports / feature requests / "this report felt generic" complaints. Distinct from `Review`: private, not booking-scoped, optionally tied to any entity via the same polymorphic pattern. |
+| `ChatSession` / `ChatMessage` | `chat_sessions` / `chat_messages` | Foundation for threading "Ask the Chart" questions into one conversation instead of independent Q&As. Not yet wired into `routes/kundli.py`'s `ask_kundli()` — see that file's docstring. |
 
-13 tables total. See `alembic/versions/0001_initial_schema.py` for the literal DDL, or run `alembic upgrade head` against any Postgres instance to see it for yourself.
+17 tables total. See `alembic/versions/0001_initial_schema.py` and `0002_add_audit_feedback_chat.py` for the literal DDL, or run `alembic upgrade head` against any Postgres instance to see it for yourself.
 
 ## Decisions worth knowing about before extending this
 

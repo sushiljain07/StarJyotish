@@ -67,3 +67,22 @@ app.include_router(account_router, prefix="/api")
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/health/db")
+def health_db():
+    # Deliberately separate from /health above: that one reports the API
+    # process is up, this one reports Postgres specifically is reachable —
+    # useful right after a Railway deploy to confirm DATABASE_URL/the
+    # Postgres plugin are wired correctly before anything else depends on it.
+    from sqlalchemy import text
+    from db.session import SessionLocal, is_db_configured
+
+    if not is_db_configured():
+        return JSONResponse(status_code=503, content={"database": "not_configured"})
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+        return {"database": "connected"}
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"database": "error", "detail": str(e)})

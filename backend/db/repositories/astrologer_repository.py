@@ -4,6 +4,7 @@ from typing import List, Optional
 from sqlalchemy import select
 
 from db.models.astrologer import AstrologerProfile, KycStatus
+from db.models.audit_log import AuditAction
 from db.repositories.base_repository import BaseRepository
 
 
@@ -34,9 +35,26 @@ class AstrologerRepository(BaseRepository[AstrologerProfile]):
         stmt = stmt.order_by(AstrologerProfile.rating_avg.desc()).offset(offset).limit(limit)
         return list(self.db.scalars(stmt))
 
-    def set_kyc_status(self, astrologer: AstrologerProfile, status: KycStatus) -> AstrologerProfile:
+    def set_kyc_status(
+        self, astrologer: AstrologerProfile, status: KycStatus, *, actor_user_id: Optional[uuid.UUID] = None
+    ) -> AstrologerProfile:
+        # Local import avoids a module-level circular import (this file's
+        # imported by db/repositories/__init__.py, which audit_log_repository
+        # is also part of).
+        from db.repositories.audit_log_repository import AuditLogRepository
+
+        previous_status = astrologer.kyc_status
         is_verified = status == KycStatus.verified
-        return self.update(astrologer, kyc_status=status, is_verified=is_verified)
+        updated = self.update(astrologer, kyc_status=status, is_verified=is_verified)
+        AuditLogRepository(self.db).log(
+            action=AuditAction.update,
+            entity_type="AstrologerProfile",
+            entity_id=astrologer.id,
+            actor_user_id=actor_user_id,
+            before={"kyc_status": previous_status.value},
+            after={"kyc_status": status.value},
+        )
+        return updated
 
     def record_review(self, astrologer: AstrologerProfile, rating: int) -> AstrologerProfile:
         """Recomputes the denormalized rating_avg/rating_count cache after a

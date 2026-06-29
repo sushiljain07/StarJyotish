@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import select
 
+from db.models.audit_log import AuditAction
 from db.models.booking import Booking, BookingStatus
 from db.repositories.base_repository import BaseRepository
 
@@ -31,5 +32,20 @@ class BookingRepository(BaseRepository[Booking]):
     def mark_completed(self, booking: Booking) -> Booking:
         return self.update(booking, status=BookingStatus.completed)
 
-    def cancel(self, booking: Booking, reason: str) -> Booking:
-        return self.update(booking, status=BookingStatus.cancelled, cancelled_reason=reason)
+    def cancel(
+        self, booking: Booking, reason: str, *, actor_user_id: Optional[uuid.UUID] = None
+    ) -> Booking:
+        from db.repositories.audit_log_repository import AuditLogRepository
+
+        previous_status = booking.status
+        updated = self.update(booking, status=BookingStatus.cancelled, cancelled_reason=reason)
+        AuditLogRepository(self.db).log(
+            action=AuditAction.update,
+            entity_type="Booking",
+            entity_id=booking.id,
+            actor_user_id=actor_user_id,
+            before={"status": previous_status.value},
+            after={"status": BookingStatus.cancelled.value},
+            meta={"reason": reason},
+        )
+        return updated

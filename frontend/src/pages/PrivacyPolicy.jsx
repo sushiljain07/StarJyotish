@@ -190,7 +190,7 @@ export default function PrivacyPolicy() {
           Grievance Officer: <em className="text-ink-faint">[Name to be appointed upon incorporation]</em><br />
           Operated by: <em className="text-ink-faint">[Legal entity name and registered address — to be added once
           Star Jyotish is formally incorporated]</em><br />
-          Email: <a href="mailto:info.starjyotish@gmail.com" className="text-primary-dark hover:underline">info.starjyotish@gmail.com</a>
+          Email: <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>
         </p>
         <p>We aim to acknowledge privacy-related requests within a reasonable time and resolve them as quickly as
           the nature of the request allows.</p>

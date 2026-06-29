@@ -11,7 +11,7 @@ import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import SocialButtons from '../components/SocialButtons'
 
-const CONTACT_EMAIL = 'info.starjyotish@gmail.com'
+const CONTACT_EMAIL = 'contact@starjyotish.com'
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 
 export default function ContactUs() {

@@ -8,17 +8,20 @@
     <meta name="theme-color" content="#171B33" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Star Jyotish — AI-Powered Vedic Astrology</title>
-    <!-- Static fallback meta tags: react-helmet-async (see main.jsx/Seo.jsx)
-         overwrites these per-page after the app hydrates, but a few
-         consumers (link-unfurlers, some crawlers) read whatever is in the
-         initial HTML response before any JS runs, so the homepage's real
-         tags live here too rather than leaving generic/empty defaults. -->
+    <!-- Static fallback meta tags for non-JS consumers that read the initial
+         HTML before main.jsx hydrates and react-helmet-async (see Seo.jsx)
+         injects the real per-page tags. Deliberately excludes canonical and
+         og:url: those are route-identity values, and a hardcoded homepage
+         URL would be wrong on every other route — confirmed via a real
+         Lighthouse run that this previously produced two conflicting
+         canonical-link elements on every non-home page (Helmet adds its own
+         tag rather than replacing a static one it didn't create). Helmet is
+         the sole source of those two values on every route, including this
+         one. -->
     <meta name="description" content="Free Vedic Kundli with Swiss Ephemeris-accurate calculations and an AI-powered reading. Career, relationship, health & wealth insights in English and Hindi." />
-    <link rel="canonical" href="https://starjyotish.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Star Jyotish — AI-Powered Vedic Astrology" />
     <meta property="og:description" content="Free Vedic Kundli with Swiss Ephemeris-accurate calculations and an AI-powered reading, in English and Hindi." />
-    <meta property="og:url" content="https://starjyotish.com/" />
     <meta property="og:image" content="https://starjyotish.com/starjyotish-logo.webp" />
     <meta property="og:site_name" content="Star Jyotish" />
     <meta name="twitter:card" content="summary_large_image" />

@@ -29,6 +29,14 @@ class BirthInput(BaseModel):
     # compatibility with the relationship-report patch shipped before this
     # field existed.
     marital_status: Optional[str] = "unmarried"
+    # Opt-in persistence: when set, the report-generating routes (career,
+    # rajyogas, relationship, wealth) best-effort save a BirthProfile +
+    # Report row for this phone number via services/persistence.py. Omit
+    # it (the default) and nothing is written — behavior is identical to
+    # before this field existed. Not validated as a real phone number
+    # here; the persistence layer treats it as an opaque identity key the
+    # same way the WhatsApp/Razorpay funnel design already does.
+    save_for_phone: Optional[str] = Field(default=None, max_length=20)
 
     @field_validator("date")
     @classmethod

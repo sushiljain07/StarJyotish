@@ -1,6 +1,6 @@
 # <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Ancient Wisdom. AI Intelligence.
 
-A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. Stateless — no database, authentication, or payments yet (see [Roadmap](#roadmap)).
+A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. The persistence layer (Postgres + SQLAlchemy + Alembic) is in place; phone/OTP login and Razorpay payments are still pending (see [Roadmap](#roadmap)). Every chart/report endpoint still works with zero database configured, exactly as before.
 
 ## Features
 
@@ -32,6 +32,7 @@ A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI
 |-------|-----------|
 | Frontend | React 18, Vite 5, Tailwind CSS 3, react-i18next, react-router-dom |
 | Backend | FastAPI, pyswisseph (Swiss Ephemeris) |
+| Persistence | PostgreSQL, SQLAlchemy 2.x, Alembic — optional, see [Database setup](#3-database-setup-optional) |
 | AI / LLM | Claude (`claude-sonnet-4-6`) primary, Groq (`llama-3.3-70b-versatile`) fallback |
 | Geocoding | OpenStreetMap Nominatim — free, no key needed |
 | Ayanamsa | Lahiri |
@@ -89,7 +90,39 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 The API will be available at **http://localhost:8000**
 Interactive docs: **http://localhost:8000/docs**
 
-### 3. Frontend setup
+### 3. Database setup (optional)
+
+Every chart/report endpoint works with no database configured — skip this
+section entirely for plain local development. Set it up when you want
+saved birth profiles, report history, or to work on the astrologer
+marketplace / payments tables (`backend/db/`).
+
+```bash
+cd backend
+
+# Point DATABASE_URL at a Postgres instance (see backend/.env.example for
+# the exact line to add — a local install, Docker, or a Railway add-on
+# all work the same way).
+
+# Apply all migrations
+alembic upgrade head
+
+# Seed default app_settings (paywall flag, pricing, etc.) — and optionally
+# a sample verified astrologer + client user for local development
+python -m db.seed --with-dev-data
+```
+
+Schema changes go through Alembic, not `Base.metadata.create_all()`:
+```bash
+# After changing/adding a model in backend/db/models/
+alembic revision --autogenerate -m "describe the change"
+alembic upgrade head
+```
+
+See `backend/db/README.md` for the full layout (models, repositories,
+session handling) and the design notes behind it.
+
+### 4. Frontend setup
 
 Open a **new terminal**:
 
@@ -117,6 +150,7 @@ Open **http://localhost:5173** in your browser. The dev server proxies `/api` to
 | `ANTHROPIC_API_KEY` | Optional | Used in place of OpenRouter if `OPENROUTER_API_KEY` is unset — calls Claude directly via Anthropic's API |
 | `GROQ_API_KEY` | Optional | Fallback LLM, used if neither of the above is set or Claude errors |
 | `FRONTEND_URL` | Production only | Deployed frontend origin, added to the CORS allow-list |
+| `DATABASE_URL` | Optional | Postgres connection string for `backend/db/` + Alembic. Every chart/report endpoint works with this unset |
 
 Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with **no API key at all** — only Reading, Ask, and Career Report need an LLM key.
 
@@ -147,12 +181,23 @@ astro/
 ├── backend/
 │   ├── main.py                    # FastAPI app entry point, CORS, router mounting
 │   ├── Dockerfile                 # for Railway/container deploys (pyswisseph needs a C compiler)
+│   ├── alembic.ini, alembic/      # migrations — env.py reads DATABASE_URL; versions/0001_initial_schema.py
+│   ├── db/                        # persistence layer — see db/README.md
+│   │   ├── base.py, mixins.py, session.py
+│   │   ├── models/                # User, BirthProfile, Report, AstrologerProfile, Booking,
+│   │   │                           #   Transaction, Purchase, Notification, UserSession, Wallet,
+│   │   │                           #   WalletLedgerEntry, Review, AppSetting
+│   │   ├── repositories/           # one repository per model, e.g. UserRepository, WalletRepository
+│   │   └── seed.py                # `python -m db.seed [--with-dev-data]`
 │   ├── routes/
 │   │   └── kundli.py              # /api/kundli, /reading, /ask, /ashtakavarga,
 │   │                               #   /transit, /bhava-chalit, /kp, /divisional
 │   ├── routers/
 │   │   ├── career_report.py       # /api/career-report
-│   │   └── rajyogas.py            # /api/rajyogas
+│   │   ├── rajyogas.py            # /api/rajyogas
+│   │   ├── topic_reports.py       # /api/relationship-report, /api/wealth-report
+│   │   └── account.py             # /api/settings/public, /api/account/birth-profiles/{phone},
+│   │                               #   /api/account/reports/{phone} — reads from db/
 │   ├── services/
 │   │   ├── astro_calc.py          # Swiss Ephemeris chart calculation (Lahiri, whole-sign)
 │   │   ├── divisional_charts.py   # D1–D60 divisional chart calculation
@@ -163,8 +208,9 @@ astro/
 │   │   ├── career_analysis.py     # Vedic career report analysis
 │   │   ├── geocode.py             # Place → lat/lon/timezone via Nominatim
 │   │   ├── skill_loader.py        # Loads astro-skills/ reference files into prompts
+│   │   ├── persistence.py         # best-effort report-saving hook used by the routes above
 │   │   └── ai.py                  # Claude (primary) / Groq (fallback) LLM integration
-│   ├── models/                    # birth_data.py, career_models.py, chart_data.py
+│   ├── models/                    # birth_data.py, career_models.py, chart_data.py, account_models.py
 │   ├── tests/                     # pytest suite
 │   ├── requirements.txt
 │   └── .env.example
@@ -203,7 +249,7 @@ astro/
 
 The app deploys as two independent pieces — see `backend/Dockerfile` and `frontend/src/api/config.js`:
 
-- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS.
+- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS. If using the persistence layer, add a Postgres plugin and set `DATABASE_URL`, then run `alembic upgrade head` once (e.g. via Railway's one-off command runner) before traffic hits the new account endpoints.
 - **Frontend → Vercel** (or any static host). Set the root directory to `frontend`, build command `npm run build`, output `dist`. Set `VITE_API_URL` to the backend's public URL.
 
 Locally, both pieces talk to each other automatically via the Vite dev proxy — no env vars needed.
@@ -213,10 +259,11 @@ Locally, both pieces talk to each other automatically via the Vite dev proxy —
 ## Roadmap
 
 - Mobile layout fixes for components still using fixed pixel widths (`DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx`)
-- Postgres persistence + OTP login (currently fully stateless)
-- Razorpay payments
+- ~~Postgres persistence~~ — done (`backend/db/`); phone/OTP login still pending, so every route currently identifies a user by `save_for_phone`/path param rather than a session
+- Razorpay payments — `Transaction`/`Purchase`/`Wallet` tables and repositories exist (`backend/db/`); the Razorpay order/webhook integration itself doesn't yet
 - WhatsApp intake via Meta Cloud API
 - Server-side PDF generation (current PDF export is browser print-to-PDF only)
+- Wire the frontend's `config/entitlements.js` and `config/auth.js` stubs to the new `/api/settings/public` endpoint instead of their hardcoded values
 
 ---
 

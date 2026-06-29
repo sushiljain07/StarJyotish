@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from models.birth_data import BirthInput
 from models.topic_models import TopicReport, TopicSection, TopicHighlight
@@ -12,6 +12,9 @@ from services.relationship_analysis import generate_relationship_report
 from services.wealth_analysis import generate_wealth_report
 from services.skill_loader import load_relationship_skills, load_wealth_skills, load_gemstone_remedy_skills
 from services.rate_limit import limiter, LLM_LIMIT
+from services.persistence import save_report_if_requested
+from db.models.report import ReportType
+from db.session import get_db_optional
 
 router = APIRouter()
 
@@ -58,7 +61,7 @@ def _build_topic_report(report_data: dict) -> TopicReport:
 
 @router.post("/relationship-report", response_model=TopicReport)
 @limiter.limit(LLM_LIMIT)
-def get_relationship_report(request: Request, body: BirthInput):
+def get_relationship_report(request: Request, body: BirthInput, db=Depends(get_db_optional)):
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
@@ -84,12 +87,22 @@ def get_relationship_report(request: Request, body: BirthInput):
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Relationship analysis failed: {e}")
 
-    return _build_topic_report(report_data)
+    response = _build_topic_report(report_data)
+
+    save_report_if_requested(
+        db, user_phone=body.save_for_phone, report_type=ReportType.relationship,
+        content=response.model_dump(), birth_date=body.date, birth_time=body.time,
+        place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
+        language=body.language, llm_provider=response.llm_provider,
+        marital_status=body.marital_status,
+    )
+
+    return response
 
 
 @router.post("/wealth-report", response_model=TopicReport)
 @limiter.limit(LLM_LIMIT)
-def get_wealth_report(request: Request, body: BirthInput):
+def get_wealth_report(request: Request, body: BirthInput, db=Depends(get_db_optional)):
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
@@ -114,4 +127,13 @@ def get_wealth_report(request: Request, body: BirthInput):
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Wealth analysis failed: {e}")
 
-    return _build_topic_report(report_data)
+    response = _build_topic_report(report_data)
+
+    save_report_if_requested(
+        db, user_phone=body.save_for_phone, report_type=ReportType.wealth,
+        content=response.model_dump(), birth_date=body.date, birth_time=body.time,
+        place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
+        language=body.language, llm_provider=response.llm_provider,
+    )
+
+    return response

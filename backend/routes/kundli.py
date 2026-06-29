@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
 from models.birth_data import BirthInput
 from models.chart_data import (
@@ -17,6 +17,9 @@ from services.career_analysis import check_all_yogas
 from services.kp_system import enrich_planets_kp
 from services.transit_calc import calculate_transit, calculate_bhava_chalit
 from services.rate_limit import limiter, LLM_LIMIT, COMPUTE_LIMIT
+from services.persistence import save_report_if_requested
+from db.models.report import ReportType
+from db.session import get_db_optional
 
 router = APIRouter()
 
@@ -72,7 +75,7 @@ def get_kundli(request: Request, body: BirthInput):
 
 @router.post("/kundli/reading", response_model=ReadingResponse)
 @limiter.limit(LLM_LIMIT)
-def get_reading(request: Request, body: ReadingRequest):
+def get_reading(request: Request, body: ReadingRequest, db=Depends(get_db_optional)):
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
@@ -110,7 +113,7 @@ def get_reading(request: Request, body: ReadingRequest):
     ]
 
     reading = generate_reading(chart, dasha_raw, body.language, div_charts, active_yogas=active_yogas)
-    return ReadingResponse(
+    response = ReadingResponse(
         sections=[ReadingSection(**s) for s in reading.get("sections", [])],
         active_yogas=active_yogas,
         prediction_text=reading.get("prediction_text"),
@@ -119,10 +122,19 @@ def get_reading(request: Request, body: ReadingRequest):
         llm_provider=reading.get("llm_provider", ""),
     )
 
+    save_report_if_requested(
+        db, user_phone=body.save_for_phone, report_type=ReportType.reading,
+        content=response.model_dump(), birth_date=body.date, birth_time=body.time,
+        place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
+        language=body.language, llm_provider=response.llm_provider,
+    )
+
+    return response
+
 
 @router.post("/kundli/ask", response_model=AskResponse)
 @limiter.limit(LLM_LIMIT)
-def ask_kundli(request: Request, body: AskRequest):
+def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
@@ -153,7 +165,16 @@ def ask_kundli(request: Request, body: AskRequest):
     transit_data = calculate_transit(jd, geo.lat, geo.lon)
 
     answer, provider = ask_chart(chart, dasha_raw, body.question, body.language, transit=transit_data)
-    return AskResponse(answer=answer, llm_provider=provider)
+    response = AskResponse(answer=answer, llm_provider=provider)
+
+    save_report_if_requested(
+        db, user_phone=body.save_for_phone, report_type=ReportType.ask,
+        content=response.model_dump(), birth_date=body.date, birth_time=body.time,
+        place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
+        language=body.language, llm_provider=provider, question=body.question,
+    )
+
+    return response
 
 
 @router.post("/kundli/ashtakavarga")

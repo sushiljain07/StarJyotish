@@ -94,7 +94,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-parchment">
       <Seo title={t('profile_title')} path="/account" noindex />
-      <SiteHeader scrolled />
+      <SiteHeader />
 
       <div className="max-w-2xl mx-auto px-4 pt-20 sm:pt-24 pb-16">
         {/* Identity header */}

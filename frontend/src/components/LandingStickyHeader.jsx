@@ -6,9 +6,13 @@
 // is driven by that sentinel leaving the viewport, not a raw scroll-Y
 // threshold, so it stays correct regardless of hero height changes.
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function LandingStickyHeader({ visible, onLanguageChange, currentLanguage, onCtaClick }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { isAuthenticated, user, logout } = useAuth()
 
   return (
     <div
@@ -26,7 +30,14 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
             the same pairing already used for the brand in Footer.jsx. */}
         <div className="flex items-center gap-2 shrink-0">
           <img src="/starjyotish.svg" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
-          <span className="font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
+          {/* Hidden below sm: once the sticky header is showing, the
+              visitor has already scrolled past the full hero wordmark, so
+              the icon alone is enough to read as "still on Star Jyotish".
+              Freeing this text's width is what makes room for the Sign
+              in/Logout control added below without this row overflowing
+              on narrow phones (brand + Sign-in + CTA button all share one
+              non-wrapping row here). */}
+          <span className="hidden sm:inline font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -45,6 +56,38 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
               </button>
             ))}
           </div>
+
+          {/* Account control — swaps between "Sign in" and a name/Logout
+              pair based on AuthContext, same pattern as the hero's
+              top-bar version (see Landing.jsx). Name falls back to the
+              phone number when no name has been set yet (the common case
+              right after OTP signup, before a profile edit).
+              On mobile, the sticky header is already tight (brand +
+              language toggle + this + the CTA button all compete for one
+              row), so the *name* hides below `sm` — the action (Sign in /
+              Logout) stays visible at every width, since that's what
+              actually needs to be reachable, not the identity label. */}
+          {isAuthenticated ? (
+            <div className="flex items-center gap-1.5">
+              <span className="hidden sm:inline text-ink-onnight text-xs max-w-[8rem] truncate">
+                {user?.name || user?.phone_number || user?.email}
+              </span>
+              <button
+                onClick={() => logout()}
+                className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-[11px] font-semibold px-2.5 py-1 rounded-full transition"
+              >
+                {t('nav_logout')}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition"
+            >
+              {t('nav_sign_in')}
+            </button>
+          )}
+
           <button
             onClick={onCtaClick}
             className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 py-1.5 rounded-full transition"

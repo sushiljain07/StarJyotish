@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import ScrollManager from './components/ScrollManager'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
 import Result from './pages/Result'
@@ -18,6 +19,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollManager />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/generate" element={<Home />} />

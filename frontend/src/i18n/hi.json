@@ -260,7 +260,16 @@
   "profile_privacy_heading": "गोपनीयता और खाता",
   "profile_privacy_link": "गोपनीयता नीति",
   "profile_delete_account_link": "खाता हटाने का अनुरोध करें",
-  "profile_photo_url": "प्रोफ़ाइल फ़ोटो URL",
-  "profile_photo_url_hint": "किसी छवि का लिंक पेस्ट करें। सीधे अपलोड की सुविधा बाद में आएगी।",
-  "profile_timezone": "समय क्षेत्र"
+  "profile_timezone": "समय क्षेत्र",
+  "profile_cancel": "रद्द करें",
+  "profile_code_sent_to": "{{phone}} पर कोड भेजा गया",
+  "profile_change_number": "बदलें",
+  "profile_add_number": "मोबाइल नंबर जोड़ें",
+  "profile_photo": "प्रोफ़ाइल फ़ोटो",
+  "profile_photo_upload": "फ़ोटो अपलोड करें",
+  "profile_photo_remove": "हटाएं",
+  "profile_photo_processing": "प्रोसेस किया जा रहा है…",
+  "profile_photo_hint": "JPG या PNG, कोई भी आकार — स्वतः आकार बदल दिया जाएगा।",
+  "profile_photo_invalid_file": "कृपया एक मान्य इमेज फ़ाइल चुनें।",
+  "profile_photo_too_large": "यह फ़ाइल बहुत बड़ी है। कृपया छोटी फ़ोटो चुनें।"
 }

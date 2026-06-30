@@ -14,6 +14,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
+import MobileNumberField from '../components/auth/MobileNumberField'
+import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
@@ -130,26 +132,18 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Mobile number is read-only here deliberately — it's this
-              account's login identity, verified by OTP at signup.
-              Changing it would mean re-verifying a new number, a real
-              separate flow (not built yet), not a plain text edit. */}
+          {/* Mobile number isn't a plain text field — it's this account's
+              login identity, so adding or changing it goes through real
+              OTP verification (MobileNumberField owns that whole flow),
+              not a free-text edit that silently changes how you log in. */}
           <div>
             <label className={labelCls}>{t('profile_mobile_number')}</label>
-            <div className="flex items-center gap-2">
-              <input type="text" value={user?.phone_number || t('profile_not_set')} disabled
-                     className={`${inputCls} bg-parchment/60 text-ink-muted cursor-not-allowed`} />
-              {user?.phone_number && (
-                <span className="text-sage text-xs font-medium whitespace-nowrap">{t('profile_verified')}</span>
-              )}
-            </div>
+            <MobileNumberField />
           </div>
 
           <div>
-            <label className={labelCls}>{t('profile_photo_url')} <span className="text-ink-faint font-normal">({t('profile_optional')})</span></label>
-            <input type="url" placeholder="https://example.com/photo.jpg" value={form.avatar_url}
-                   onChange={e => setField('avatar_url', e.target.value)} className={inputCls} />
-            <p className="text-ink-faint text-xs mt-1">{t('profile_photo_url_hint')}</p>
+            <label className={labelCls}>{t('profile_photo')} <span className="text-ink-faint font-normal">({t('profile_optional')})</span></label>
+            <AvatarUpload value={form.avatar_url} onChange={dataUrl => setField('avatar_url', dataUrl)} />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">

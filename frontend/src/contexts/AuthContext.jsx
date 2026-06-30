@@ -15,6 +15,8 @@ import {
   refreshSession as apiRefreshSession,
   logout as apiLogout,
   updateProfile as apiUpdateProfile,
+  sendPhoneLinkOtp as apiSendPhoneLinkOtp,
+  verifyPhoneLinkOtp as apiVerifyPhoneLinkOtp,
 } from '../api/auth'
 
 const AuthContext = createContext(null)
@@ -94,6 +96,22 @@ export function AuthProvider({ children }) {
     })
   ), [authedRequest])
 
+  // Adding/changing the phone number is a two-step OTP flow scoped to the
+  // already-logged-in account (see api/auth.js's comment on why this
+  // isn't the same pair of functions as loginWithPhone above). Only the
+  // verify step needs to update local `user` state — the send step
+  // doesn't change anything about the account yet.
+  const sendPhoneLinkOtp = useCallback((phoneNumber) => (
+    authedRequest(token => apiSendPhoneLinkOtp(token, phoneNumber))
+  ), [authedRequest])
+
+  const verifyPhoneLinkOtp = useCallback((phoneNumber, code) => (
+    authedRequest(token => apiVerifyPhoneLinkOtp(token, phoneNumber, code)).then(updated => {
+      setUser(updated)
+      return updated
+    })
+  ), [authedRequest])
+
   const value = {
     user,
     accessToken,
@@ -104,6 +122,8 @@ export function AuthProvider({ children }) {
     logout,
     authedRequest,
     updateMyProfile,
+    sendPhoneLinkOtp,
+    verifyPhoneLinkOtp,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

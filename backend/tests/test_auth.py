@@ -158,7 +158,17 @@ def test_jwt_round_trip():
 def test_jwt_rejects_tampered_token():
     from services.jwt_service import create_access_token, decode_access_token
     token = create_access_token(uuid.uuid4(), "user")
-    tampered = token[:-1] + ("a" if token[-1] != "a" else "b")
+    # Flip a character well inside the signature segment, not the very
+    # last one — base64's final character of a 32-byte HMAC-SHA256
+    # signature only carries a few meaningful bits (the rest is padding),
+    # so on rare tokens flipping *only* that last character can coincide
+    # with the same underlying bytes and the tampered token would still
+    # verify, making this assertion flaky. A character mid-signature
+    # always carries a full 6 bits, so corrupting it always changes the
+    # decoded bytes.
+    pos = len(token) - 10
+    flipped_char = "a" if token[pos] != "a" else "b"
+    tampered = token[:pos] + flipped_char + token[pos + 1:]
     assert decode_access_token(tampered) is None
 
 
@@ -188,3 +198,44 @@ def test_google_login_rejects_unverified_email(client, monkeypatch):
 
     resp = client.post("/api/auth/google", json={"id_token": "fake-token-for-test"})
     assert resp.status_code == 401
+
+
+def test_add_phone_to_google_only_account(client, monkeypatch):
+    """The scenario this endpoint exists for: an account created via
+    Google (no phone at signup) adds one later from the Profile page."""
+    from services.google_oauth import GoogleProfile
+    import routers.auth as auth_router_module
+
+    fake_profile = GoogleProfile(sub=f"google-{uuid.uuid4()}", email=f"{uuid.uuid4()}@example.com",
+                                  email_verified=True, name="Test User")
+    monkeypatch.setattr(auth_router_module, "verify_google_id_token", lambda token: fake_profile)
+    login = client.post("/api/auth/google", json={"id_token": "fake-token-for-test"})
+    access = login.json()["access_token"]
+    assert login.json()["user"]["phone_number"] is None
+
+    phone = _unique_phone()
+    sent = client.post("/api/account/phone/send", headers={"Authorization": f"Bearer {access}"},
+                        json={"phone_number": phone})
+    assert sent.status_code == 200
+    code = sent.json()["debug_code"]
+
+    verified = client.post("/api/account/phone/verify", headers={"Authorization": f"Bearer {access}"},
+                            json={"phone_number": phone, "code": code})
+    assert verified.status_code == 200
+    assert verified.json()["phone_number"] == phone
+
+
+def test_cannot_link_phone_already_owned_by_another_account(client):
+    phone_a = _unique_phone()
+    sent_a = client.post("/api/auth/otp/send", json={"phone_number": phone_a})
+    client.post("/api/auth/otp/verify", json={"phone_number": phone_a, "code": sent_a.json()["debug_code"]})
+    client.post("/api/auth/logout")
+
+    phone_b = _unique_phone()
+    sent_b = client.post("/api/auth/otp/send", json={"phone_number": phone_b})
+    verify_b = client.post("/api/auth/otp/verify", json={"phone_number": phone_b, "code": sent_b.json()["debug_code"]})
+    access_b = verify_b.json()["access_token"]
+
+    conflict = client.post("/api/account/phone/send", headers={"Authorization": f"Bearer {access_b}"},
+                            json={"phone_number": phone_a})
+    assert conflict.status_code == 409

@@ -54,6 +54,19 @@ export function updateProfile(accessToken, updates) {
   return authFetch('/api/account/me', { method: 'PATCH', accessToken, body: updates })
 }
 
+// Distinct from sendOtp/verifyOtp above: those are the *login* entry
+// point (no current user, may create a new account). These are for
+// adding or changing the phone number on an *already logged-in* account
+// — see routers/account.py's send_phone_link_otp/verify_phone_link_otp
+// for why that needs its own endpoints rather than reusing the login ones.
+export function sendPhoneLinkOtp(accessToken, phoneNumber) {
+  return authFetch('/api/account/phone/send', { accessToken, body: { phone_number: phoneNumber } })
+}
+
+export function verifyPhoneLinkOtp(accessToken, phoneNumber, code) {
+  return authFetch('/api/account/phone/verify', { accessToken, body: { phone_number: phoneNumber, code } })
+}
+
 export function listSessions(accessToken) {
   return authFetch('/api/auth/sessions', { method: 'GET', accessToken })
 }

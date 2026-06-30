@@ -10,7 +10,7 @@ import Reveal from '../components/Reveal'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import FaqSchema from '../components/FaqSchema'
-import LandingStickyHeader from '../components/LandingStickyHeader'
+import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
 import ScrollToTop from '../components/ScrollToTop'
 import TopicIcon from '../components/TopicIcon'
@@ -39,9 +39,9 @@ const INSIDE_ITEMS = ['kundli', 'advanced', 'insights', 'ask']
 const FAQ_IDS = [1, 2, 3, 4, 5]
 
 export default function Landing() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated } = useAuth()
   const [heroSentinelRef, heroPassed] = useScrolledPast()
   const landingFaqItems = FAQ_IDS.map(n => ({
     question: t(`landing_faq_q${n}`),
@@ -74,16 +74,18 @@ export default function Landing() {
         description="Generate your free Vedic Kundli with Swiss Ephemeris-accurate calculations and an AI-powered reading. Career, relationship, health & wealth insights in English and Hindi — no signup needed."
         path="/"
       />
-      <LandingStickyHeader
-        visible={heroPassed}
-        currentLanguage={i18n.language}
-        onLanguageChange={lang => i18n.changeLanguage(lang)}
+      <SiteHeader
+        scrolled={heroPassed}
         onCtaClick={() => goToForm(null)}
       />
       <ScrollToTop visible={heroPassed} />
 
       {/* ───────────────────── Hero ───────────────────── */}
-      <div className="relative overflow-hidden bg-night px-6 pt-12 pb-12 text-center">
+      {/* pt-20/24: clears SiteHeader, which is now `fixed` and present
+          from the first paint (previously only appeared after scrolling
+          past this section, so no clearance was needed — now it always
+          overlays the top ~52px of every page, transparent or not). */}
+      <div className="relative overflow-hidden bg-night px-6 pt-20 sm:pt-24 pb-12 text-center">
         <CelestialBackdrop className="text-primary opacity-40" />
         {/* Brand icon — same mark used as the small "Kundli" icon further
             down this page (see the "What's inside" section). Restores the
@@ -138,54 +140,13 @@ export default function Landing() {
           ))}
         </div>
 
-        {/* Language toggle */}
-        <div className="relative mt-5 flex justify-center gap-2">
-          {['en', 'hi'].map(lang => (
-            <button
-              key={lang}
-              onClick={() => i18n.changeLanguage(lang)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                i18n.language.startsWith(lang)
-                  ? 'bg-primary text-night'
-                  : 'bg-white/10 text-ink-onnight hover:bg-white/20'
-              }`}
-            >
-              {lang === 'en' ? 'EN' : 'हि'}
-            </button>
-          ))}
-        </div>
-
-        {/* Account control — the only login entry point that's visible
-            without any scrolling (LandingStickyHeader's copy of this only
-            appears once the hero scrolls out of view). Swaps to a
-            name/Logout pair once signed in, same as the sticky header.
-            Styled as a real pill button (not a plain underlined link) so
-            it reads as an action, matching the language toggle next to
-            it rather than looking like stray body text. */}
-        <div className="relative mt-3 flex justify-center">
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2 bg-white/10 rounded-full pl-3 pr-1.5 py-1">
-              <span className="text-ink-onnight text-xs max-w-[8rem] truncate">
-                {t('nav_signed_in_as', { name: user?.name || user?.phone_number || user?.email })}
-              </span>
-              <button
-                onClick={() => logout()}
-                className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-[11px] font-semibold px-2.5 py-1 rounded-full transition"
-              >
-                {t('nav_logout')}
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => navigate('/login')}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3.5 py-1.5 rounded-full border border-white/10 transition"
-            >
-              {t('nav_sign_in')}
-            </button>
-          )}
-        </div>
-
-        {/* Primary CTA — the free Kundli itself, not any one topic */}
+        {/* Primary CTA — the free Kundli itself, not any one topic.
+            Language toggle and sign-in/account controls used to be
+            duplicated here (this was the only place they were reachable
+            before scrolling, back when the header only appeared after
+            passing the hero) — now that SiteHeader is always present from
+            the first paint, that duplication is gone; this section is
+            just the hero's own content again. */}
         <button
           onClick={() => goToForm(null)}
           className="relative mt-7 bg-primary hover:bg-primary-dark text-night font-semibold text-sm sm:text-base px-7 py-3 rounded-full shadow-lg hover:shadow-xl transition"

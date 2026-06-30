@@ -7,6 +7,8 @@ import Home from './pages/Home'
 import Result from './pages/Result'
 import CareerReport from './pages/CareerReport'
 import Login from './pages/Login'
+import Profile from './pages/Profile'
+import ProtectedRoute from './components/ProtectedRoute'
 import Disclaimer from './pages/Disclaimer'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
@@ -26,6 +28,7 @@ export default function App() {
           <Route path="/kundli" element={<Result />} />
           <Route path="/career-report" element={<CareerReport />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfUse />} />

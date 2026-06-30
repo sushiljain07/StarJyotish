@@ -260,7 +260,16 @@
   "profile_privacy_heading": "Privacy & Account",
   "profile_privacy_link": "Privacy Policy",
   "profile_delete_account_link": "Request account deletion",
-  "profile_photo_url": "Profile Photo URL",
-  "profile_photo_url_hint": "Paste a link to an image. Direct upload is coming later.",
-  "profile_timezone": "Time Zone"
+  "profile_timezone": "Time Zone",
+  "profile_cancel": "Cancel",
+  "profile_code_sent_to": "Code sent to {{phone}}",
+  "profile_change_number": "Change",
+  "profile_add_number": "Add mobile number",
+  "profile_photo": "Profile Photo",
+  "profile_photo_upload": "Upload Photo",
+  "profile_photo_remove": "Remove",
+  "profile_photo_processing": "Processing…",
+  "profile_photo_hint": "JPG or PNG, any size — resized automatically.",
+  "profile_photo_invalid_file": "Please choose a valid image file.",
+  "profile_photo_too_large": "That file is too large. Please choose a smaller photo."
 }

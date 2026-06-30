@@ -12,7 +12,7 @@ collected later, not at signup either way.
 """
 import enum
 
-from sqlalchemy import Boolean, CheckConstraint, Enum as SAEnum, String
+from sqlalchemy import Boolean, CheckConstraint, Enum as SAEnum, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base
@@ -67,11 +67,18 @@ class User(UUIDPKMixin, TimestampMixin, Base):
     # chart this account creates; the account record itself stays generic
     # "who is logged in" data, nothing more.
     #
-    # avatar_url: a plain URL string rather than an upload pipeline — no
-    # file storage/CDN exists in this app yet, so "optional profile photo"
-    # ships today as "paste a link to one" rather than waiting on that
-    # infrastructure.
-    avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # avatar_url: holds either a small device-uploaded photo as a data:
+    # URI, or (kept for flexibility — e.g. a future Google-profile-photo
+    # import) a plain http(s):// link. The data: URI path is the only one
+    # the UI exposes today (frontend/src/components/auth/AvatarUpload.jsx
+    # resizes/compresses the photo client-side to a small square before
+    # sending it, so this column holds a single self-contained image, not
+    # a reference into separate file storage — no upload pipeline/CDN
+    # exists in this app yet, and a resized thumbnail is small enough
+    # that it doesn't need one). Text rather than a length-capped String:
+    # a base64-encoded thumbnail is comfortably larger than any sane
+    # VARCHAR cap, even compressed.
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     # IANA timezone name (e.g. "Asia/Kolkata", "America/New_York") —
     # optional; nothing in the app currently reads this, it exists so the
     # field is available to features that will care later (e.g.

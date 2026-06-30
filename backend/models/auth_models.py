@@ -103,9 +103,25 @@ class ProfileUpdateRequest(BaseModel):
     @field_validator("avatar_url")
     @classmethod
     def _validate_avatar_url(cls, v: Optional[str]) -> Optional[str]:
-        if v and not (v.startswith("http://") or v.startswith("https://")):
-            raise ValueError("avatar_url must be a full http(s):// URL")
-        return v
+        if not v:
+            return v
+        # Two accepted forms: a data: URI (what AvatarUpload.jsx actually
+        # sends — a small, client-resized photo embedded directly) or a
+        # plain http(s):// link (kept for flexibility, e.g. a future
+        # "import your Google profile photo" feature, even though no UI
+        # exposes that path today). The size cap only matters for the
+        # data: URI form — it exists to stop a direct API call from
+        # bypassing the frontend's client-side resize/compression and
+        # stuffing an arbitrarily large image into this column; a properly
+        # resized thumbnail from AvatarUpload.jsx lands nowhere close to
+        # this limit.
+        if v.startswith("data:image/"):
+            if len(v) > 1_500_000:
+                raise ValueError("Image is too large. Please use a smaller photo.")
+            return v
+        if v.startswith("http://") or v.startswith("https://"):
+            return v
+        raise ValueError("avatar_url must be an uploaded image or a full http(s):// URL")
 
 
 class SessionOut(_ORMModel):

@@ -8,6 +8,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 // Same capability badges already shown in the hero (services/topic.js has no
 // "trust" claims of its own, and these are the only ones the app can back up
@@ -31,6 +32,39 @@ function FooterLink({ to, state, children }) {
   )
 }
 
+// Renders as a native <details>/<summary> on mobile (collapsed by
+// default — the footer is the last thing on an already-long page, and
+// two fully-expanded link columns just add scroll depth most visitors
+// never touch), and as a plain always-open heading + list on sm+, where
+// vertical space isn't scarce and a click-to-expand interaction would
+// just be friction for no benefit. `key={isMobile}` forces a clean
+// remount on breakpoint change so the `open` attribute (which React only
+// applies once, on mount — it doesn't track it afterwards) re-evaluates,
+// e.g. if someone resizes a desktop browser window down past the
+// breakpoint.
+function FooterColumn({ heading, children }) {
+  const isMobile = useIsMobile()
+
+  if (!isMobile) {
+    return (
+      <div>
+        <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{heading}</h3>
+        {children}
+      </div>
+    )
+  }
+
+  return (
+    <details key={String(isMobile)} className="group">
+      <summary className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3 cursor-pointer select-none flex items-center justify-between">
+        {heading}
+        <span className="text-primary-light/60 transition-transform group-open:rotate-180">⌄</span>
+      </summary>
+      {children}
+    </details>
+  )
+}
+
 export default function Footer() {
   const { t, i18n } = useTranslation()
   const year = new Date().getFullYear()
@@ -51,8 +85,7 @@ export default function Footer() {
         </div>
 
         {/* Services */}
-        <div>
-          <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_services_heading')}</h3>
+        <FooterColumn heading={t('footer_services_heading')}>
           <ul className="space-y-2.5">
             <FooterLink to="/generate">{t('footer_link_free_kundli')}</FooterLink>
             <FooterLink to="/generate" state={{ topic: 'career' }}>{t('footer_link_career')}</FooterLink>
@@ -60,14 +93,13 @@ export default function Footer() {
             <FooterLink to="/generate" state={{ topic: 'health' }}>{t('footer_link_health')}</FooterLink>
             <FooterLink to="/generate" state={{ topic: 'finance' }}>{t('footer_link_finance')}</FooterLink>
           </ul>
-        </div>
+        </FooterColumn>
 
         {/* Learn — Zodiac/Nakshatra/Dasha/Blog stay as "#" deliberately: no
             content exists for them yet (out of scope for this pass), so
             pointing them anywhere would just be a different kind of dead
             link. FAQ now has a real standalone page. */}
-        <div>
-          <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_learn_heading')}</h3>
+        <FooterColumn heading={t('footer_learn_heading')}>
           <ul className="space-y-2.5">
             <FooterLink to="#">{t('footer_link_zodiac')}</FooterLink>
             <FooterLink to="#">{t('footer_link_nakshatra')}</FooterLink>
@@ -75,16 +107,22 @@ export default function Footer() {
             <FooterLink to="#">{t('footer_link_blog')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
           </ul>
-        </div>
+        </FooterColumn>
 
         {/* Company + minimal contact (room left to add phone/address as
-            extra <li> rows later — no restructuring needed). Pricing/How-it-
-            works stay "#" for the same reason as the Learn column above. */}
+            extra <li> rows later — no restructuring needed). "How it
+            works" now points at the real 3-step section already on the
+            landing page (id="how-it-works", see Landing.jsx) instead of a
+            dead "#" — that section's content already answers the
+            question, so this just makes it reachable from anywhere
+            instead of building a second copy of the same explanation as
+            a standalone page. Pricing stays "#" — there's genuinely no
+            pricing to show yet (pre-revenue, see README). */}
         <div>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_company_heading')}</h3>
           <ul className="space-y-2.5">
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
-            <FooterLink to="#">{t('footer_link_how_it_works')}</FooterLink>
+            <FooterLink to="/#how-it-works">{t('footer_link_how_it_works')}</FooterLink>
             <FooterLink to="#">{t('footer_link_pricing')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>

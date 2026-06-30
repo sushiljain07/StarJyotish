@@ -2,8 +2,9 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { TOPICS } from '../config/topics'
-import { isLoginRequired } from '../config/auth'
+import { isLoginRequired, hasUsedFreeKundli } from '../config/auth'
 import { useScrolledPast } from '../hooks/useScrolledPast'
+import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import AskPersonaCard from '../components/AskPersonaCard'
@@ -40,6 +41,7 @@ const FAQ_IDS = [1, 2, 3, 4, 5]
 export default function Landing() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const { isAuthenticated, user, logout } = useAuth()
   const [heroSentinelRef, heroPassed] = useScrolledPast()
   const landingFaqItems = FAQ_IDS.map(n => ({
     question: t(`landing_faq_q${n}`),
@@ -49,7 +51,16 @@ export default function Landing() {
   function goToForm(topicId, extraState = {}) {
     const state = { ...(topicId ? { topic: topicId } : {}), ...extraState }
     const hasState = Object.keys(state).length > 0
-    if (isLoginRequired()) {
+    // Two independent reasons to redirect to /login first:
+    //   - isLoginRequired(): the global "always require an account" switch
+    //   - the "first free Kundli" gate: only applies to the generic
+    //     (topicId === null) flow specifically — that's the one the
+    //     landing page's "No signup needed for your first free Kundli"
+    //     copy is actually promising. Topic-specific reports aren't part
+    //     of that promise and already have their own paywall handling
+    //     downstream, so they're left alone here.
+    const needsLoginForFreeLimit = !topicId && !isAuthenticated && hasUsedFreeKundli()
+    if (isLoginRequired() || needsLoginForFreeLimit) {
       navigate('/login', { state: { next: '/generate', ...state } })
       return
     }
@@ -112,8 +123,11 @@ export default function Landing() {
           {t('landing_subhead')}
         </p>
 
-        {/* Capability badges */}
-        <div className="relative flex flex-wrap justify-center gap-2 mt-5 max-w-md mx-auto">
+        {/* Capability badges — max-w widens at sm+ specifically so all 4
+            fit on a single row on tablet/desktop (mobile keeps the
+            narrower max-w-md, which is what lets them wrap onto 2 lines
+            there instead of overflowing or getting cramped). */}
+        <div className="relative flex flex-wrap justify-center gap-2 mt-5 max-w-md sm:max-w-3xl mx-auto">
           {BADGES.map(key => (
             <span
               key={key}
@@ -139,6 +153,36 @@ export default function Landing() {
               {lang === 'en' ? 'EN' : 'हि'}
             </button>
           ))}
+        </div>
+
+        {/* Account control — the only login entry point that's visible
+            without any scrolling (LandingStickyHeader's copy of this only
+            appears once the hero scrolls out of view). Swaps to a
+            name/Logout pair once signed in, same as the sticky header.
+            Styled as a real pill button (not a plain underlined link) so
+            it reads as an action, matching the language toggle next to
+            it rather than looking like stray body text. */}
+        <div className="relative mt-3 flex justify-center">
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2 bg-white/10 rounded-full pl-3 pr-1.5 py-1">
+              <span className="text-ink-onnight text-xs max-w-[8rem] truncate">
+                {t('nav_signed_in_as', { name: user?.name || user?.phone_number || user?.email })}
+              </span>
+              <button
+                onClick={() => logout()}
+                className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-[11px] font-semibold px-2.5 py-1 rounded-full transition"
+              >
+                {t('nav_logout')}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3.5 py-1.5 rounded-full border border-white/10 transition"
+            >
+              {t('nav_sign_in')}
+            </button>
+          )}
         </div>
 
         {/* Primary CTA — the free Kundli itself, not any one topic */}
@@ -206,7 +250,7 @@ export default function Landing() {
       <SectionDivider />
 
       {/* ───────────────────── How it works ───────────────────── */}
-      <section className="px-4 py-10">
+      <section id="how-it-works" className="px-4 py-10 scroll-mt-16">
         <div className="max-w-3xl mx-auto">
           <Reveal as="h2" className="text-center font-serif font-semibold text-2xl text-ink mb-8">
             {t('landing_steps_heading')}

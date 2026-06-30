@@ -17,3 +17,48 @@
 export function isLoginRequired() {
   return import.meta.env.VITE_LOGIN_REQUIRED === 'true'
 }
+
+// ── "Your first free Kundli" gate ────────────────────────────────────
+//
+// The landing page's copy ("No signup needed for your first free
+// Kundli") implies a real limit — generate one for free, log in for any
+// more. Until now nothing actually enforced that; isLoginRequired() above
+// is a single global on/off switch with no concept of "first" anything.
+//
+// This is a *soft*, client-side-only gate: a flag in this browser's
+// localStorage, set once Home.jsx confirms a generic (no-topic) Kundli
+// actually generated successfully for a signed-out visitor (see
+// markFreeKundliUsed()'s call site), and checked here before letting
+// Landing.jsx's primary CTA skip straight to /generate a second time.
+//
+// What this does NOT do: stop someone who clears their browser storage,
+// opens an incognito window, or uses a different browser/device — there's
+// no server-side concept of "this visitor already used their free one"
+// behind this, only a local flag. That's a deliberate scope choice for a
+// pre-revenue product testing the funnel, not an oversight — a real
+// enforcement boundary (IP/device fingerprinting, or simply requiring
+// login before generating anything at all) is a bigger decision with its
+// own tradeoffs and should be made deliberately, not slipped in as a
+// side effect of a UI bug-fix pass.
+const FREE_KUNDLI_STORAGE_KEY = 'sj_free_kundli_used'
+
+export function hasUsedFreeKundli() {
+  try {
+    return localStorage.getItem(FREE_KUNDLI_STORAGE_KEY) === '1'
+  } catch {
+    // Storage can throw in some private-browsing modes — fail open
+    // (treat as "not used yet") rather than blocking the whole flow
+    // over a read that doesn't actually matter much either way.
+    return false
+  }
+}
+
+export function markFreeKundliUsed() {
+  try {
+    localStorage.setItem(FREE_KUNDLI_STORAGE_KEY, '1')
+  } catch {
+    // Same as above — if storage isn't available, the gate simply never
+    // engages for this visitor. Not ideal, but not worth surfacing an
+    // error over.
+  }
+}

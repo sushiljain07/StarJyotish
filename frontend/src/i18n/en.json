@@ -48,7 +48,7 @@
   "error_generic": "Something went wrong. Please try again.",
   "disclaimer": "Predictions are based on Vedic astrology principles and are intended for guidance, self-reflection, and entertainment purposes only. They are not a substitute for professional medical, legal, financial, or psychological advice, and outcomes are not guaranteed.",
   "landing_headline": "Your Birth Chart, Decoded by AI",
-  "landing_subhead": "Free, instant Vedic astrology — accurate, private, in English or Hindi.",
+  "landing_subhead": "Ancient Vedic wisdom, calculated with modern precision — free, private, and ready in seconds.",
   "landing_cta_generic": "Generate My Free Kundli",
   "landing_topics_heading": "Or start with what's actually on your mind",
   "landing_topic_career_label": "Career & Business",
@@ -233,5 +233,8 @@
   "login_or": "or",
   "login_google_failed": "Google sign-in failed. Please try again.",
   "login_disclaimer": "We'll only use your number to sign you in — never shared, never spammed.",
-  "login_seo_description": "Sign in to Star Jyotish with your phone number or Google account."
+  "login_seo_description": "Sign in to Star Jyotish with your phone number or Google account.",
+  "nav_sign_in": "Sign in",
+  "nav_logout": "Logout",
+  "nav_signed_in_as": "Signed in as {{name}}"
 }

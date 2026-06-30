@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
+import { markFreeKundliUsed } from '../config/auth'
+import { useAuth } from '../contexts/AuthContext'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import Seo from '../components/Seo'
@@ -13,6 +15,7 @@ export default function Home() {
   const { t, i18n } = useTranslation()
   const { state } = useLocation()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -34,6 +37,12 @@ export default function Home() {
     const input = topicId ? { ...formInput, topic: topicId } : formInput
     try {
       const data = await fetchKundli(input)
+      // Only the generic (no-topic) flow counts toward the "first free
+      // Kundli" promise — see goToForm()'s comment in Landing.jsx. Logged
+      // -in users aren't subject to this gate at all (it only exists to
+      // route signed-out repeat visitors to /login), so there's nothing
+      // to mark for them.
+      if (!topicId && !isAuthenticated) markFreeKundliUsed()
       navigate('/kundli', { state: { data, input, presetQuestion, landToAsk } })
     } catch (err) {
       setError(

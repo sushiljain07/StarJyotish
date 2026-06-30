@@ -59,6 +59,25 @@ class User(UUIDPKMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true", nullable=False)
     preferred_language: Mapped[str] = mapped_column(String(8), default="en", server_default="en", nullable=False)
 
+    # Pure account-profile fields, deliberately separate from anything
+    # astrology-adjacent (gender, date/time/place of birth briefly lived
+    # here in an earlier pass and were removed on purpose — see the
+    # Profile page redesign discussion). A user's own birth chart, if they
+    # generate one for themselves, lives in BirthProfile like any other
+    # chart this account creates; the account record itself stays generic
+    # "who is logged in" data, nothing more.
+    #
+    # avatar_url: a plain URL string rather than an upload pipeline — no
+    # file storage/CDN exists in this app yet, so "optional profile photo"
+    # ships today as "paste a link to one" rather than waiting on that
+    # infrastructure.
+    avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # IANA timezone name (e.g. "Asia/Kolkata", "America/New_York") —
+    # optional; nothing in the app currently reads this, it exists so the
+    # field is available to features that will care later (e.g.
+    # localizing "your reading is ready" notification timing).
+    timezone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
     birth_profiles = relationship("BirthProfile", back_populates="user", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="user", cascade="all, delete-orphan")
     astrologer_profile = relationship(

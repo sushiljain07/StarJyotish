@@ -72,6 +72,8 @@ class UserOut(_ORMModel):
     name: Optional[str] = None
     role: str
     preferred_language: str
+    avatar_url: Optional[str] = None
+    timezone: Optional[str] = None
     created_at: datetime
 
 
@@ -88,12 +90,21 @@ class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     preferred_language: Optional[str] = None
+    avatar_url: Optional[str] = None
+    timezone: Optional[str] = None
 
     @field_validator("preferred_language")
     @classmethod
     def _validate_lang(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and v not in ("en", "hi"):
             raise ValueError("preferred_language must be 'en' or 'hi'")
+        return v
+
+    @field_validator("avatar_url")
+    @classmethod
+    def _validate_avatar_url(cls, v: Optional[str]) -> Optional[str]:
+        if v and not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("avatar_url must be a full http(s):// URL")
         return v
 
 

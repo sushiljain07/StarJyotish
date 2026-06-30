@@ -236,5 +236,6 @@
   "login_seo_description": "Sign in to Star Jyotish with your phone number or Google account.",
   "nav_sign_in": "Sign in",
   "nav_logout": "Logout",
-  "nav_signed_in_as": "Signed in as {{name}}"
+  "nav_signed_in_as": "Signed in as {{name}}",
+  "nav_cta_compact": "Generate Kundli"
 }

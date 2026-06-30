@@ -30,14 +30,7 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
             the same pairing already used for the brand in Footer.jsx. */}
         <div className="flex items-center gap-2 shrink-0">
           <img src="/starjyotish.svg" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
-          {/* Hidden below sm: once the sticky header is showing, the
-              visitor has already scrolled past the full hero wordmark, so
-              the icon alone is enough to read as "still on Star Jyotish".
-              Freeing this text's width is what makes room for the Sign
-              in/Logout control added below without this row overflowing
-              on narrow phones (brand + Sign-in + CTA button all share one
-              non-wrapping row here). */}
-          <span className="hidden sm:inline font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
+          <span className="font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -88,11 +81,18 @@ export default function LandingStickyHeader({ visible, onLanguageChange, current
             </button>
           )}
 
+          {/* "nav_cta_compact" rather than the hero's full "Generate My
+              Free Kundli" label — this row also carries the full
+              wordmark text and the Sign in/Logout control now, and the
+              long CTA label was the thing actually forcing a choice
+              between showing the brand name and showing those controls.
+              Shortening the CTA here (only here — the hero keeps its
+              full label) was the better trade than hiding the wordmark. */}
           <button
             onClick={onCtaClick}
             className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 py-1.5 rounded-full transition"
           >
-            {t('landing_cta_generic')}
+            {t('nav_cta_compact')}
           </button>
         </div>
       </div>

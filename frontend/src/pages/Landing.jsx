@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { TOPICS } from '../config/topics'
 import { isLoginRequired, hasUsedFreeKundli } from '../config/auth'
 import { useScrolledPast } from '../hooks/useScrolledPast'
+import { useScrollProgress } from '../hooks/useScrollProgress'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
@@ -43,6 +44,11 @@ export default function Landing() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const [heroSentinelRef, heroPassed] = useScrolledPast()
+  // 140px — short enough that the header reads as fully solid well before
+  // you've scrolled even a third of the way through the hero, long enough
+  // that the transition itself doesn't feel like a snap. See
+  // SiteHeader.jsx for what this drives (background opacity + blur).
+  const headerScrollProgress = useScrollProgress(140)
   const landingFaqItems = FAQ_IDS.map(n => ({
     question: t(`landing_faq_q${n}`),
     answer: t(`landing_faq_a${n}`),
@@ -75,7 +81,7 @@ export default function Landing() {
         path="/"
       />
       <SiteHeader
-        scrolled={heroPassed}
+        scrollProgress={headerScrollProgress}
         onCtaClick={() => goToForm(null)}
       />
       <ScrollToTop visible={heroPassed} />

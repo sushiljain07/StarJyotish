@@ -27,3 +27,11 @@ limiter = Limiter(key_func=get_remote_address)
 # Reused across every route file so the actual numbers only live in one place.
 LLM_LIMIT = "10/minute"
 COMPUTE_LIMIT = "30/minute"
+
+# OTP send is the one endpoint that costs real money per call (an SMS) and
+# is the classic target for "spam someone else's phone" abuse, so it gets
+# the tightest limit of any route in the app. Verify is looser since a
+# legitimate user can plausibly mistype a code a couple of times.
+OTP_SEND_LIMIT = "5/minute"
+OTP_VERIFY_LIMIT = "10/minute"
+AUTH_LIMIT = "20/minute"

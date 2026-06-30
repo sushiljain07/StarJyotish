@@ -6,6 +6,7 @@ from db.repositories.booking_repository import BookingRepository
 from db.repositories.chat_repository import ChatSessionRepository
 from db.repositories.feedback_repository import FeedbackRepository
 from db.repositories.notification_repository import NotificationRepository
+from db.repositories.otp_repository import OtpRepository
 from db.repositories.purchase_repository import PurchaseRepository
 from db.repositories.report_repository import ReportRepository
 from db.repositories.review_repository import ReviewRepository
@@ -26,6 +27,7 @@ __all__ = [
     "PurchaseRepository",
     "NotificationRepository",
     "SessionRepository", "hash_token",
+    "OtpRepository",
     "WalletRepository", "InsufficientBalanceError",
     "ReviewRepository",
     "SettingsRepository",

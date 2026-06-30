@@ -42,6 +42,16 @@ class SessionRepository(BaseRepository[UserSession]):
             return None
         return session
 
+    def get_by_raw_token_any_state(self, raw_token: str) -> Optional[UserSession]:
+        """Same lookup as get_active_by_raw_token but returns the row even
+        if it's already revoked/expired. Used only for refresh-token-reuse
+        detection: if a *revoked* token gets presented again, that's not
+        an expired-session edge case, it's a strong signal the raw token
+        leaked and a stale copy is being replayed by someone else — see
+        services/jwt_service.py's rotate_refresh_token()."""
+        stmt = select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_token))
+        return self.db.scalars(stmt).first()
+
     def revoke(self, session: UserSession) -> UserSession:
         return self.update(session, revoked_at=datetime.now(timezone.utc))
 
@@ -53,3 +63,16 @@ class SessionRepository(BaseRepository[UserSession]):
             s.revoked_at = now
         self.db.flush()
         return len(sessions)
+
+    def list_active_for_user(self, user_id: uuid.UUID) -> list[UserSession]:
+        """Powers a "where you're logged in" / "log out other devices"
+        view. Ordered newest-first so the device the user is looking at
+        this list from is normally near the top."""
+        now = datetime.now(timezone.utc)
+        stmt = (
+            select(UserSession)
+            .where(UserSession.user_id == user_id, UserSession.revoked_at.is_(None), UserSession.expires_at > now)
+            .order_by(UserSession.created_at.desc())
+        )
+        return list(self.db.scalars(stmt))
+

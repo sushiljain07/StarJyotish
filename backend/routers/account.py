@@ -17,9 +17,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from db.models.report import ReportType
+from db.models.user import User
 from db.repositories import BirthProfileRepository, ReportRepository, SettingsRepository, UserRepository
 from db.session import get_db, get_db_optional
+from dependencies import get_current_user
 from models.account_models import BirthProfileOut, ReportSummaryOut
+from models.auth_models import ProfileUpdateRequest, UserOut
 
 router = APIRouter()
 
@@ -39,6 +42,26 @@ def get_public_settings(db=Depends(get_db_optional)) -> dict:
     if db is None:
         return _FALLBACK_PUBLIC_SETTINGS
     return SettingsRepository(db).get_public_settings() or _FALLBACK_PUBLIC_SETTINGS
+
+
+@router.get("/account/me", response_model=UserOut)
+def get_my_profile(user: User = Depends(get_current_user)):
+    return UserOut.model_validate(user)
+
+
+@router.patch("/account/me", response_model=UserOut)
+def update_my_profile(
+    payload: ProfileUpdateRequest, user: User = Depends(get_current_user), db=Depends(get_db),
+):
+    updates = payload.model_dump(exclude_unset=True)
+    if "email" in updates and updates["email"]:
+        existing = UserRepository(db).get_by_email(updates["email"])
+        if existing is not None and existing.id != user.id:
+            raise HTTPException(status_code=409, detail="That email is already linked to another account.")
+    for field, value in updates.items():
+        setattr(user, field, value)
+    db.flush()
+    return UserOut.model_validate(user)
 
 
 @router.get("/account/birth-profiles/{phone_number}", response_model=List[BirthProfileOut])

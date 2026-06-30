@@ -13,3 +13,5 @@ slowapi>=0.1.9
 sqlalchemy>=2.0,<2.1
 alembic>=1.13,<1.14
 psycopg2-binary>=2.9
+pyjwt>=2.8.0,<3
+google-auth>=2.29.0,<3

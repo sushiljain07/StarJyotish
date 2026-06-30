@@ -1,6 +1,6 @@
 # <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Ancient Wisdom. AI Intelligence.
 
-A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. The persistence layer (Postgres + SQLAlchemy + Alembic) is in place; phone/OTP login and Razorpay payments are still pending (see [Roadmap](#roadmap)). Every chart/report endpoint still works with zero database configured, exactly as before.
+A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. The persistence layer (Postgres + SQLAlchemy + Alembic) and phone/OTP + Google login are in place; Razorpay payments are still pending (see [Roadmap](#roadmap)). Every chart/report endpoint still works with zero database configured, exactly as before.
 
 ## Features
 
@@ -151,6 +151,15 @@ Open **http://localhost:5173** in your browser. The dev server proxies `/api` to
 | `GROQ_API_KEY` | Optional | Fallback LLM, used if neither of the above is set or Claude errors |
 | `FRONTEND_URL` | Production only | Deployed frontend origin, added to the CORS allow-list |
 | `DATABASE_URL` | Optional | Postgres connection string for `backend/db/` + Alembic. Every chart/report endpoint works with this unset |
+| `JWT_SECRET_KEY` | Required for login | Signs access tokens (`services/jwt_service.py`). Generate with `python -c "import secrets; print(secrets.token_urlsafe(64))"` |
+| `OTP_HASH_SECRET` | Required for login | HMAC key for hashing OTP codes at rest (`db/repositories/otp_repository.py`) — generate the same way as `JWT_SECRET_KEY`, with a different value |
+| `COOKIE_SECURE` | Local dev only | Set to `false` for local HTTP dev — browsers refuse to send a `Secure` cookie over plain `http://`, which would otherwise break the refresh-token cookie entirely on localhost. Leave unset (defaults to `true`) in any real deployment |
+| `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` | Optional | Sends OTP SMS via MSG91 (`services/otp_provider.py`). Preferred over 2Factor if both are set |
+| `TWOFACTOR_API_KEY` | Optional | Sends OTP SMS via 2Factor instead of MSG91 |
+| `OTP_PROVIDER` | Optional | Set to `2factor` to force 2Factor even when an MSG91 key is also present |
+| `GOOGLE_CLIENT_ID` | Required for Google login | Same OAuth Client ID as the frontend's `VITE_GOOGLE_CLIENT_ID` — verifies that Google ID tokens were actually issued for this app |
+
+With no OTP provider key set, `/api/auth/otp/send` logs the code to the server console instead of sending an SMS — OTP login is fully testable locally with zero SMS spend.
 
 Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with **no API key at all** — only Reading, Ask, and Career Report need an LLM key.
 
@@ -159,6 +168,8 @@ Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `VITE_API_URL` | Production only | Backend base URL, e.g. `https://your-backend.up.railway.app`. Leave unset for local dev (uses the Vite proxy instead) |
+| `VITE_GOOGLE_CLIENT_ID` | Required for Google login | Same OAuth Client ID as the backend's `GOOGLE_CLIENT_ID`. The button still renders without it, but Google will reject the sign-in |
+| `VITE_LOGIN_REQUIRED` | Optional | Set to `true` to force login before generating a chart (`config/auth.js`). Defaults to `false` — today's open flow — if unset |
 
 ---
 
@@ -250,7 +261,7 @@ astro/
 
 The app deploys as two independent pieces — see `backend/Dockerfile` and `frontend/src/api/config.js`:
 
-- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS. If using the persistence layer, add a Postgres plugin and set `DATABASE_URL`, then run `alembic upgrade head` once (e.g. via Railway's one-off command runner) before traffic hits the new account endpoints.
+- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS. If using the persistence layer, add a Postgres plugin and set `DATABASE_URL`, then run `alembic upgrade head` once (e.g. via Railway's one-off command runner) before traffic hits the new account/auth endpoints. For login, also set `JWT_SECRET_KEY` and `OTP_HASH_SECRET` (required), plus `GOOGLE_CLIENT_ID` and an OTP SMS provider key (`MSG91_AUTH_KEY`/`MSG91_TEMPLATE_ID` or `TWOFACTOR_API_KEY`) for Google login and real (non-console-logged) OTP delivery.
 - **Frontend → Vercel** (or any static host). Set the root directory to `frontend`, build command `npm run build`, output `dist`. Set `VITE_API_URL` to the backend's public URL.
 
 Locally, both pieces talk to each other automatically via the Vite dev proxy — no env vars needed.
@@ -260,7 +271,8 @@ Locally, both pieces talk to each other automatically via the Vite dev proxy —
 ## Roadmap
 
 - Mobile layout fixes for components still using fixed pixel widths (`DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx`)
-- ~~Postgres persistence~~ — done (`backend/db/`); phone/OTP login still pending, so every route currently identifies a user by `save_for_phone`/path param rather than a session
+- ~~Postgres persistence~~ — done (`backend/db/`)
+- ~~Phone/OTP + Google login~~ — done (`backend/routers/auth.py`, `frontend/src/contexts/AuthContext.jsx`); `config/auth.js`'s `isLoginRequired()` still defaults to `false` (set `VITE_LOGIN_REQUIRED=true` when ready to require it), and existing chart/report routes still also accept `save_for_phone`/path-param identification rather than requiring a session — wiring those to `Depends(get_current_user)` is a separate follow-up, not done here
 - Razorpay payments — `Transaction`/`Purchase`/`Wallet` tables and repositories exist (`backend/db/`); the Razorpay order/webhook integration itself doesn't yet
 - WhatsApp intake via Meta Cloud API
 - Server-side PDF generation (current PDF export is browser print-to-PDF only)

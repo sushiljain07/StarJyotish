@@ -38,6 +38,10 @@ if (typeof window !== 'undefined') {
   }
 }
 
+// Intentionally unused for now — see the comment in hasPremiumAccess()
+// below: kept in place so re-enabling the paywall later is a one-line
+// change instead of rebuilding this.
+// eslint-disable-next-line no-unused-vars
 function isDevUnlocked() {
   if (typeof window === 'undefined') return false
   return localStorage.getItem(DEV_UNLOCK_KEY) === 'on'

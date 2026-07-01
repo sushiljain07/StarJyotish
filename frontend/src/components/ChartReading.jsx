@@ -138,7 +138,10 @@ export default function ChartReading({ input, onSwitchToCareer }) {
         localStorage.setItem('starjyotish_wa', JSON.stringify({
           number: waNumber.trim(), savedAt: new Date().toISOString(),
         }))
-      } catch {}
+      } catch {
+        // Best-effort only — localStorage can throw in private browsing
+        // or when full; the WhatsApp number itself isn't critical to save.
+      }
       setWaSubmitted(true)
     }
   }

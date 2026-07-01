@@ -108,33 +108,51 @@ BODY = {"date": "2000-01-01", "time": "12:00", "place": "New Delhi, India", "lan
 def _geo():
     return GeoResult(lat=28.6139, lon=77.2090, timezone="Asia/Kolkata", display_name="New Delhi")
 
-def _sections():
-    return [
-        {"title": "Personality & Appearance", "icon": "🧬", "content": "Strong presence."},
-        {"title": "Career & Wealth",           "icon": "💼", "content": "Good prospects."},
-        {"title": "Relationships & Marriage",  "icon": "💞", "content": "Harmonious bonds."},
-        {"title": "Health",                    "icon": "🌿", "content": "Good constitution."},
-        {"title": "Spiritual Inclination",     "icon": "🕉️", "content": "Seeking truth."},
-        {"title": "Current Period (Dasha)",    "icon": "⏳", "content": "Auspicious period."},
-    ]
+# generate_reading()'s real return shape (services/ai.py) is a dict — not
+# the flat 6-section list this test used to mock. "sections" is legacy/
+# always-empty on the real code path; the actual reading content the
+# frontend renders (ChartReading.jsx) comes from prediction_text /
+# prediction_sections / teasers / llm_provider. Mocking the old list shape
+# here made these three tests fail against the real route with
+# `AttributeError: 'list' object has no attribute 'get'` — a bug in the
+# test's mock, not in routes/kundli.py or services/ai.py, both of which
+# already agree on the dict shape below.
+def _reading_result():
+    return {
+        "sections": [],
+        "prediction_text": "Jupiter-Venus period is highly auspicious.",
+        "prediction_sections": {
+            "Chart Overview": "Strong presence.",
+            "Career & Wealth": "Good prospects.",
+        },
+        "teasers": {
+            "teaser1": "Activation Ritual for Your Raj Yogas",
+            "teaser2": "Your Peak Career Window",
+            "teaser3": "Job or Business? What Your Chart Actually Says",
+        },
+        "llm_provider": "claude",
+    }
 
 def test_reading_returns_200():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_sections()):
+         patch("routes.kundli.generate_reading", return_value=_reading_result()):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 200
 
-def test_reading_has_six_sections():
+def test_reading_has_prediction_sections():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_sections()):
+         patch("routes.kundli.generate_reading", return_value=_reading_result()):
         data = client.post("/api/kundli/reading", json=BODY).json()
-    assert len(data["sections"]) == 6
+    assert len(data["prediction_sections"]) == 2
+    assert data["prediction_sections"]["Career & Wealth"] == "Good prospects."
 
-def test_reading_section_fields():
+def test_reading_response_fields():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_sections()):
-        s = client.post("/api/kundli/reading", json=BODY).json()["sections"][0]
-    assert {"title", "icon", "content"} <= s.keys()
+         patch("routes.kundli.generate_reading", return_value=_reading_result()):
+        data = client.post("/api/kundli/reading", json=BODY).json()
+    assert {"sections", "prediction_text", "prediction_sections", "teasers", "llm_provider"} <= data.keys()
+    assert data["teasers"]["teaser2"] == "Your Peak Career Window"
+    assert data["llm_provider"] == "claude"
 
 def test_reading_missing_key_returns_503():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \

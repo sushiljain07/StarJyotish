@@ -10,12 +10,16 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from services.rate_limit import limiter
+from services.security_headers import SecurityHeadersMiddleware
+from services.monitoring import init_sentry
 from routes.kundli import router as kundli_router
 from routers.career_report import router as career_router
 from routers.rajyogas import router as rajyogas_router
 from routers.topic_reports import router as topic_reports_router
 from routers.account import router as account_router
 from routers.auth import router as auth_router
+
+init_sentry()
 
 app = FastAPI(title="Kundli API", version="1.0.0")
 
@@ -58,6 +62,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Added last so it wraps everything else (CORS, rate limiting, route
+# handlers) and still stamps headers on error responses from any of them.
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(kundli_router, prefix="/api")
 app.include_router(career_router, prefix="/api")

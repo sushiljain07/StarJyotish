@@ -46,6 +46,7 @@
 **What was done:**
 - All legal pages live: Privacy Policy (`/privacy`), Terms of Use (`/terms`), Refund Policy (`/refund-policy`), Disclaimer (`/disclaimer`)
 - About (`/about`), Contact (`/contact`), FAQ (`/faq`) as standalone indexed pages
+- Mobile layout fixed on all 4 flagged components — `DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx` now use `w-full` on mobile with breakpoint-constrained widths on desktop (`sm:w-[460px]` / `sm:w-[480px]`)
 - SEO: `react-helmet-async` per-page meta + canonical, JSON-LD Organization/WebSite schema in `index.html`, FAQ schema component (`FaqSchema.jsx`), `robots.txt`, `sitemap.xml` auto-generated at build time
 - Open Graph + Twitter Card tags on every route
 - 404 Not Found page with noindex (`/src/pages/NotFound.jsx`)
@@ -55,7 +56,6 @@
 - Error monitoring: Sentry wired in `services/monitoring.py` (backend) and `src/monitoring.js` (frontend) — no-op without `SENTRY_DSN`/`VITE_SENTRY_DSN` env vars
 
 **Remaining (no blockers):**
-- Mobile layout fixes — `DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx` still use fixed pixel widths
 - Analytics — GA4 or Plausible (update Privacy Policy at the same time)
 - Testimonials / social proof section on landing page
 - Blog / content marketing
@@ -246,10 +246,9 @@ Ordered by impact:
 1. Wire report routes to `get_current_user_optional` — identity without forcing login
 2. Threaded Ask the Chart via `ChatSession`/`ChatMessage`
 3. Frontend test suite setup (Vitest + RTL)
-4. Mobile layout fixes on 4 components
-5. Analytics (GA4 or Plausible) + Privacy Policy update
-6. Admin dashboard (user list, report viewer, AppSetting toggles)
-7. Code splitting on `Result.jsx`
-8. Redis-backed rate limiting
-9. Staging environment
-10. `pytest-cov` baseline
+4. Analytics (GA4 or Plausible) + Privacy Policy update
+5. Admin dashboard (user list, report viewer, AppSetting toggles)
+6. Code splitting on `Result.jsx`
+7. Redis-backed rate limiting
+8. Staging environment
+9. `pytest-cov` baseline

@@ -81,7 +81,7 @@
 | Analytics | ❌ Missing | GA4 or Plausible — not started |
 | Admin Panel | ❌ Missing | `require_role("admin")` exists; zero routes |
 | Frontend Tests | ❌ Missing | Vitest not set up |
-| Mobile Layout Fixes | ❌ Missing | 4 components with fixed pixel widths |
+| Mobile Layout Fixes | ✅ Done | All 4 components use `w-full` on mobile + breakpoint widths on desktop |
 | Code Splitting | ❌ Missing | `Result.jsx` is one large bundle |
 | WhatsApp Integration | 🔒 Blocked | Meta business verification |
 | Astrologer Marketplace | 🔒 Blocked | Schema exists; payments + KYC needed |
@@ -137,13 +137,12 @@ These can all be built before company registration:
 | 1 | Wire `get_current_user_optional` on report routes | 1 day | Auth hygiene |
 | 2 | Thread Ask the Chart via ChatSession | 2 days | Product quality |
 | 3 | Frontend test suite (Vitest) | 3–5 days | Quality |
-| 4 | Mobile layout fixes (4 components) | 2–3 days | UX |
-| 5 | Analytics (+ Privacy Policy update) | 1 day | Business |
-| 6 | Admin dashboard | 3–5 days | Operations |
-| 7 | Code splitting on Result.jsx | 1 day | Performance |
-| 8 | Redis-backed rate limiting | 1 day | Scalability |
-| 9 | Staging environment | 1 day | DevOps |
-| 10 | `pytest-cov` baseline | 0.5 days | Quality |
+| 4 | Analytics (+ Privacy Policy update) | 1 day | Business |
+| 5 | Admin dashboard | 3–5 days | Operations |
+| 6 | Code splitting on Result.jsx | 1 day | Performance |
+| 7 | Redis-backed rate limiting | 1 day | Scalability |
+| 8 | Staging environment | 1 day | DevOps |
+| 9 | `pytest-cov` baseline | 0.5 days | Quality |
 
 ---
 

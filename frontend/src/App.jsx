@@ -16,6 +16,7 @@ import RefundPolicy from './pages/RefundPolicy'
 import AboutUs from './pages/AboutUs'
 import FAQ from './pages/FAQ'
 import ContactUs from './pages/ContactUs'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -36,6 +37,9 @@ export default function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<ContactUs />} />
+          {/* Must stay last: React Router matches routes in declaration
+              order, so anything above this always wins first. */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

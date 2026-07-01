@@ -1,7 +1,6 @@
 // Western-style circular astrological chart
 // Ascendant on left (9-o'clock); houses/signs go counter-clockwise
 
-import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
 
 const CX = 260
@@ -12,14 +11,7 @@ const R_HOUSE  = 185   // inner edge of house ring
 const R_PLANET = 155   // planet label radius
 const R_INNER  = 70    // inner circle radius
 
-const SIGNS_EN  = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
-const SIGNS_HI  = ['मे','वृ','मि','क','सि','क','तु','वृ','ध','म','कु','मी']
 const SIGN_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓']
-const SIGN_COLORS = [
-  '#FF4444','#22A86E','#2266DD','#FF6600',
-  '#FF4444','#22A86E','#2266DD','#FF6600',
-  '#FF4444','#22A86E','#2266DD','#FF6600',
-]
 
 const PLANET_ABBR = {
   Sun: '☉', Moon: '☽', Mars: '♂', Mercury: '☿',
@@ -36,16 +28,6 @@ function astroToSvgAngle(lonFromAsc) {
 function polarXY(angleDeg, r) {
   const rad = (angleDeg * Math.PI) / 180
   return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)]
-}
-
-function arcPath(r, startAngle, endAngle) {
-  const [x1, y1] = polarXY(startAngle, r)
-  const [x2, y2] = polarXY(endAngle, r)
-  // For 30° arc, large-arc-flag = 0
-  // sweep-flag 0 = counter-clockwise (decreasing angle in our system)
-  const largeArc = Math.abs(endAngle - startAngle) > 180 ? 1 : 0
-  const sweep = 0
-  return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2}`
 }
 
 function sectorPath(r_outer, r_inner, startAngle, endAngle) {
@@ -69,10 +51,6 @@ export default function WesternChart({
   title = 'Western Chart',
   transitPlanets = null,
 }) {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language === 'hi'
-  const signLabels = isHindi ? SIGNS_HI : SIGNS_EN
-
   const ascIdx = ascendant?.sign_index ?? 0
   const ascDeg = ascendant?.degree ?? 0
   const ascLon = ascIdx * 30 + ascDeg  // absolute sidereal longitude of ASC
@@ -175,7 +153,7 @@ export default function WesternChart({
           })}
 
           {/* ── Natal planets ── */}
-          {planetAngles.map((p, i) => {
+          {planetAngles.map((p) => {
             const [px, py] = polarXY(p.svgAngle, R_PLANET)
             const glyph = PLANET_ABBR[p.name] ?? p.name.slice(0, 2)
             const deg = Math.floor(p.degree)

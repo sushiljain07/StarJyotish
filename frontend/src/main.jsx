@@ -5,6 +5,10 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './i18n/index.js'
 import './index.css'
 import App from './App.jsx'
+import { initSentry, SentryErrorBoundary } from './monitoring.js'
+import ErrorFallback from './components/ErrorFallback.jsx'
+
+initSentry()
 
 // Empty string rather than throwing when unset, so the app still boots
 // for local dev before Google Cloud credentials exist — the Google
@@ -15,10 +19,16 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <HelmetProvider>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <App />
-      </GoogleOAuthProvider>
-    </HelmetProvider>
+    {/* Works as a plain error boundary even with Sentry uninitialized
+        (VITE_SENTRY_DSN unset) — it just won't report anywhere in that
+        case. Catches render errors anywhere below it instead of the
+        previous behavior (uncaught error -> blank white page). */}
+    <SentryErrorBoundary fallback={({ resetError }) => <ErrorFallback resetError={resetError} />}>
+      <HelmetProvider>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <App />
+        </GoogleOAuthProvider>
+      </HelmetProvider>
+    </SentryErrorBoundary>
   </StrictMode>
 )

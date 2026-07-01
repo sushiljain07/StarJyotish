@@ -29,6 +29,17 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // This project doesn't use PropTypes anywhere (no `prop-types`
+      // dependency exists), and JSX text legitimately contains raw
+      // apostrophes/quotes throughout the copy — both rules were still at
+      // their `eslint-plugin-react` recommended-config default of "error"
+      // despite that, which is what made these the two largest categories
+      // (441 of 448) of a real `npm run lint` run before this change. Kept
+      // as warnings rather than turned off entirely, so a genuinely new
+      // instance still shows up in `npm run lint` output — just doesn't
+      // fail CI over pre-existing, non-bug findings.
+      'react/prop-types': 'warn',
+      'react/no-unescaped-entities': 'warn',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

@@ -121,7 +121,7 @@ export default function Landing() {
           alt="Star Jyotish"
           width={667}
           height={297}
-          fetchpriority="high"
+          fetchPriority="high"
           className="relative w-64 sm:w-80 md:w-96 h-auto mx-auto -mb-4 sm:-mb-5 md:-mb-6 -translate-x-[3.4%]"
         />
         <h1 className="relative font-serif font-semibold text-3xl sm:text-4xl text-primary-light tracking-tight leading-tight">

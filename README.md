@@ -41,7 +41,7 @@ A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI
 **Other**
 - **English / Hindi** language toggle throughout, including AI output
 - **Download as PDF** — browser print-to-PDF of the chart summary
-- **Responsive design** — desktop top-nav + mobile bottom nav
+- **Responsive design** — desktop top-nav + mobile bottom nav; all chart components (`DivisionalCharts`, `TransitPanel`, `Result`, `KundliDownload`) use `w-full` on mobile with breakpoint-constrained widths on desktop
 - **Place autocomplete** via OpenStreetMap Nominatim (no API key needed)
 - **SEO** — react-helmet-async per-page meta, JSON-LD Organization/WebSite schema, FAQ schema, sitemap.xml generated at build time, robots.txt
 - **Security headers** — CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Permissions-Policy on both backend (FastAPI middleware) and frontend (Vercel headers)
@@ -392,7 +392,6 @@ Two independent services:
 - **Wire auth on report routes** — swap `save_for_phone` for `Depends(get_current_user)` or a `get_current_user_optional` middle path
 - **Threaded Ask the Chart** — wire `ask_kundli()` to `ChatSession`/`ChatMessage` tables (tables exist, route doesn't use them yet)
 - **Frontend test suite** — Vitest + React Testing Library (zero frontend tests currently)
-- **Mobile layout fixes** — `DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx` still use fixed pixel widths
 - **Analytics** — GA4 or Plausible (Privacy Policy already says none are running — update both together)
 - **Code splitting** — `Result.jsx` bundles all chart components; `React.lazy()` + `Suspense` would cut initial load
 - **Redis-backed rate limiting** — in-memory limiter won't survive multiple Railway instances

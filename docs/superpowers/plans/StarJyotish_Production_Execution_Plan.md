@@ -1,234 +1,255 @@
-# Star Jyotish Production Execution Plan
+# Star Jyotish — Production Execution Plan
+
+*Last updated: July 2026. Reflects the actual current codebase state.*
+
+---
+
+## Current Status Summary
+
+| Phase | Name | Status |
+|---|---|---|
+| 0 | Project Audit & Stabilization | ✅ Complete |
+| 1 | Production Readiness | ✅ Complete |
+| 2 | Database Foundation | ✅ Complete |
+| 3 | Authentication | ✅ Complete |
+| 4 | User Dashboard | ✅ Complete (basic) |
+| 5 | Payments | 🔒 Blocked (company registration) |
+| 6 | WhatsApp Integration | 🔒 Blocked (Meta business verification) |
+| 7 | AI Improvements | 🟡 Partial |
+| 8 | Astrologer Marketplace | ❌ Not started (schema only) |
+| 9 | Chat / Audio / Video | ❌ Not started |
+| 10 | Admin Portal | ❌ Not started (dependency wired) |
+| 11 | E-Commerce | ❌ Not started |
+| 12 | SEO & Content | 🟡 Partial |
+| 13 | Growth Features | ❌ Not started |
+| 14 | Production Hardening | 🟡 Partial |
+| 15 | Launch Readiness | 🟡 Partial |
+
+---
+
+## Phase 0 — Project Audit & Stabilization ✅ Complete
+
+**What was done:**
+- Full codebase audit (July 2026) — architecture, dead code, security, test coverage, deployment
+- Removed stray misplaced file (`backend/services/DivisionalCharts.jsx`)
+- Fixed 3 stale test mocks in `test_reading.py` (mocks were using old list shape instead of dict)
+- Fixed `fetchpriority` → `fetchPriority` in `Landing.jsx` (JSX prop name)
+- Removed dead code in `WesternChart.jsx` (unused `arcPath`, `SIGN_COLORS`, `signLabels`, unused i18n import)
+- Fixed empty catch block lint warning in `ChartReading.jsx`
+- Downgraded two ESLint rules from error to warning that the codebase never followed (`react/prop-types`, `react/no-unescaped-entities`) — `npm run lint` now exits 0
+- See audit report: `docs/AUDIT_REPORT.md`
 
-## Phase 0 -- Project Audit & Stabilization (2--3 days)
+---
 
-**Goal:** Ensure the project is clean before adding features.
-
-### Tasks
+## Phase 1 — Production Readiness ✅ Complete
 
--   Review entire codebase
--   Detect dead code
--   Remove unused components
--   Identify duplicate logic
--   Review folder structure
--   Review API endpoints
--   Review environment variables
--   Review dependencies
--   Run security audit
--   Run npm audit
--   Run pip audit
--   Create technical debt report
+**What was done:**
+- All legal pages live: Privacy Policy (`/privacy`), Terms of Use (`/terms`), Refund Policy (`/refund-policy`), Disclaimer (`/disclaimer`)
+- About (`/about`), Contact (`/contact`), FAQ (`/faq`) as standalone indexed pages
+- SEO: `react-helmet-async` per-page meta + canonical, JSON-LD Organization/WebSite schema in `index.html`, FAQ schema component (`FaqSchema.jsx`), `robots.txt`, `sitemap.xml` auto-generated at build time
+- Open Graph + Twitter Card tags on every route
+- 404 Not Found page with noindex (`/src/pages/NotFound.jsx`)
+- React `ErrorBoundary` via `@sentry/react` wrapping the full app (`main.jsx`) — styled fallback UI instead of blank screen
+- Security headers on backend: `SecurityHeadersMiddleware` in `services/security_headers.py` — CSP, HSTS, nosniff, X-Frame-Options, Permissions-Policy, Referrer-Policy. `/docs` and `/redoc` exempted from CSP so Swagger works.
+- Security headers on frontend: `vercel.json` expanded with same header set + CSP scoped to actual backend domain
+- Error monitoring: Sentry wired in `services/monitoring.py` (backend) and `src/monitoring.js` (frontend) — no-op without `SENTRY_DSN`/`VITE_SENTRY_DSN` env vars
+
+**Remaining (no blockers):**
+- Mobile layout fixes — `DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx` still use fixed pixel widths
+- Analytics — GA4 or Plausible (update Privacy Policy at the same time)
+- Testimonials / social proof section on landing page
+- Blog / content marketing
+
+---
 
-### Claude Prompt
+## Phase 2 — Database Foundation ✅ Complete
 
-> Review the entire Star Jyotish project as a Senior Software Architect.
-> Do not add any new features yet. Audit the complete codebase for
-> architecture, maintainability, code duplication, security issues,
-> dependency problems, unused components, dead code, API
-> inconsistencies, naming conventions, environment configuration,
-> performance bottlenecks, and technical debt. Produce a categorized
-> report with High, Medium, and Low priority findings. Then refactor
-> only the safe issues without changing application behavior. Ensure the
-> project builds successfully after every change. Document every
-> modified file and explain why it was changed.
+**What was done:**
+- 16 SQLAlchemy models: `User`, `BirthProfile`, `Report`, `AstrologerProfile`, `Booking`, `Transaction`, `Purchase`, `Wallet`, `WalletLedgerEntry`, `Review`, `AppSetting`, `AuditLog`, `Feedback`, `ChatSession`, `ChatMessage`, `OtpCode`
+- One repository per model following repository pattern
+- 6 Alembic migrations (0001 initial schema → 0006 widen avatar_url)
+- `get_db` / `get_db_optional` dependency split — existing chart endpoints work with `DATABASE_URL` unset
+- `db/seed.py` with `--with-dev-data` flag
+- Best-effort persistence hook (`services/persistence.py`) — DB failure never affects report generation
 
-## Phase 1 -- Production Readiness (Week 1)
+**Remaining:**
+- Add explicit DB indexes on high-frequency query paths once real traffic patterns are visible (e.g. `BirthProfile`/`Report` by phone)
+- Move `ChatSession`/`ChatMessage` tables into active use (created but not yet wired to `ask_kundli()` route)
 
-Tasks: Privacy Policy, Terms, Refund Policy, About, Contact, FAQ,
-Footer, SEO, robots.txt, sitemap.xml, Open Graph, Mobile responsiveness.
+---
 
-### Claude Prompt
+## Phase 3 — Authentication ✅ Complete
 
-> Implement every Phase 1 recommendation from the Product Audit
-> document. Treat these as production-ready requirements. Review the
-> existing implementation before making changes. Reuse components
-> wherever possible. Maintain the existing UI and design language.
-> Implement legal pages, footer links, SEO using react-helmet-async,
-> robots.txt, sitemap.xml, canonical URLs, Open Graph metadata,
-> standalone About, Contact and FAQ pages, and fix all responsive layout
-> issues without redesigning the application. Verify responsiveness on
-> 320px, 375px, 768px, 1024px and desktop. Produce a deployment
-> checklist and regression test report before marking the phase
-> complete.
+**What was done:**
+- Phone OTP login via MSG91 (primary) or 2Factor (alternative) — console-logs code locally without a provider key
+- Google OAuth login via `@react-oauth/google` + backend `google-auth` verification
+- JWT access tokens (short-lived) + rotating refresh tokens stored as httpOnly `Secure` cookies
+- `UserSession` model with multi-device support and per-session revocation (`/api/auth/sessions/{id}`)
+- `/api/auth/me`, `/api/auth/refresh`, `/api/auth/logout` endpoints
+- `AuthContext.jsx` in frontend — login state, token refresh, logout
+- `ProtectedRoute.jsx` — redirects unauthenticated users to `/login`
+- Login page (`/login`) with phone OTP form + Google button
+- Cookie security: `Secure`/`SameSite` correctly set; `COOKIE_SECURE=false` override for local `http://` dev
 
-## Phase 2 -- Database Foundation
+**Remaining:**
+- `get_current_user_optional` dependency — would allow identity attachment on report routes without requiring login (middle path between today's anonymous flow and full auth enforcement)
+- Wire report-generation routes to `Depends(get_current_user)` or the optional variant above — currently uses `save_for_phone` identification
 
-Tasks: PostgreSQL, SQLAlchemy, Alembic, User model, Birth chart model,
-Reports, Transactions, Settings.
+---
 
-### Claude Prompt
+## Phase 4 — User Dashboard ✅ Complete (basic)
 
-> Design and implement a production-grade PostgreSQL database
-> architecture for Star Jyotish using SQLAlchemy and Alembic. Create
-> normalized schemas for Users, Birth Profiles, AI Reports,
-> Transactions, Purchases, Notifications, Sessions, Astrologers,
-> Bookings, Wallets, Reviews, and Application Settings. Generate
-> migrations, indexes, foreign keys, constraints, seed data, and
-> repository patterns. Refactor the backend to use the new persistence
-> layer while preserving existing API behavior.
+**What was done:**
+- Profile page (`/account`, protected route) — display name, avatar upload (canvas-compressed), birth details
+- Avatar upload uses canvas compression before sending to avoid large payloads
+- Account API endpoints in `routers/account.py` — birth profiles, reports by phone, public settings
 
-## Phase 3 -- Authentication
+**Remaining:**
+- Full birth chart history view (saved charts list)
+- Saved reports list with re-open
+- Notification preferences
+- Account deletion / data export (DPDP Act compliance)
 
-Tasks: Login, Signup, OTP, Google Login, Session Management.
+---
 
-### Claude Prompt
+## Phase 5 — Payments 🔒 Blocked
 
-> Implement a secure authentication system for Star Jyotish using phone
-> OTP as the primary login method and Google OAuth as an optional login
-> method. Build production-ready authentication with JWT, refresh
-> tokens, session expiration, account management, passwordless login,
-> user profile management, logout, protected routes, backend
-> authorization middleware, and frontend authentication context.
+**Schema complete, integration pending company registration.**
 
-## Phase 4 -- User Dashboard
+What exists:
+- `Transaction`, `Purchase`, `Wallet`, `WalletLedgerEntry` models and repositories
+- `hasPremiumAccess()` stub in `config/entitlements.js` (returns `true` — all content free until payments live)
+- `VITE_PAYWALL_ENABLED` env var toggle and dev-unlock mechanism
 
-Tasks: Saved Kundlis, Saved Reports, History, Profile, Preferences.
+What's missing:
+- Razorpay order creation + webhook verification
+- Payment flow UI (checkout modal, success/failure states)
+- Entitlement wiring: `hasPremiumAccess()` needs to check `Purchase` table instead of returning `true`
 
-### Claude Prompt
+Unblocks after: company incorporation, Razorpay merchant KYC approval.
 
-> Build a complete authenticated customer dashboard that allows users to
-> manage their saved birth charts, AI reports, consultation history,
-> account settings, language preferences, purchases, notifications, and
-> subscriptions.
+---
 
-## Phase 5 -- Payments
+## Phase 6 — WhatsApp Integration 🔒 Blocked
 
-Tasks: Razorpay, Webhooks, Premium Access, Subscription, Invoice,
-Payment History.
+Blocked by Meta Business verification, which requires a registered entity.
 
-### Claude Prompt
+Backend `otp_provider.py` is structured to add a WhatsApp OTP delivery path alongside MSG91/2Factor once the API access is granted.
 
-> Replace the existing placeholder payment flow with a production-ready
-> Razorpay integration. Implement secure checkout, payment verification,
-> webhook handling, purchase records, premium entitlement management,
-> subscription support, invoice generation, payment history, refund
-> handling, and graceful failure recovery. Refactor hasPremiumAccess()
-> to use database-driven entitlements.
+---
 
-## Phase 6 -- WhatsApp Integration
+## Phase 7 — AI Improvements 🟡 Partial
 
-Tasks: Meta Business API, Templates, Report Delivery, Notifications.
+**Done:**
+- Primary/fallback LLM routing (OpenRouter → Anthropic → Groq)
+- Real `astro-skills/` grounding library (~1.1 MB across career, gemstones, marriage, nakshatra, numerology, rudraksha, houses, planets, children, vedic-kundli)
+- Topic-specific deep-dive reports (Career, Relationship, Wealth) each with dedicated analysis service
+- Bilingual output (EN/HI)
+- Provider tracking (`llm_provider` field in all responses)
 
-### Claude Prompt
+**Remaining:**
+- Threaded "Ask the Chart" — wire `ask_kundli()` to `ChatSession`/`ChatMessage` tables (tables exist, route still stateless)
+- Confidence scores / explainability
+- "Explain like I'm 5" mode
+- AI source transparency UI ("Sources used" disclosure)
+- Prompt evaluation framework
 
-> Integrate the Meta WhatsApp Business Cloud API into Star Jyotish.
-> Implement WhatsApp-based OTP delivery, AI report delivery,
-> consultation reminders, booking confirmations, payment notifications,
-> and user engagement campaigns.
+---
 
-## Phase 7 -- AI Improvements
+## Phase 8 — Astrologer Marketplace ❌ Schema only
 
-Tasks: AI Memory, Explain Like I'm 5, Sources Used, Confidence Score,
-Better Prompt Engineering.
+`AstrologerProfile`, `Booking`, `Review` models exist. No routes, no UI, no payout logic. Dependent on payments (Phase 5) being live first. Also needs company registration for astrologer KYC/payout flows.
 
-### Claude Prompt
+---
 
-> Enhance the AI experience by implementing explainability,
-> transparency, and personalization. Display knowledge sources used for
-> AI responses, introduce confidence scores, add an Explain Like I'm 5
-> mode, personalize follow-up conversations, and improve prompt
-> engineering.
+## Phase 9 — Chat / Audio / Video ❌ Not started
 
-## Phase 8 -- Astrologer Marketplace
+`ChatSession` / `ChatMessage` models exist for the AI chat use case. Human-to-human realtime chat (100ms/Agora) not started.
 
-Tasks: Onboarding, KYC, Dashboard, Pricing, Availability.
+---
 
-### Claude Prompt
+## Phase 10 — Admin Portal ❌ Not started
 
-> Build a production-grade astrologer marketplace including onboarding,
-> KYC verification, profile management, pricing, scheduling, ratings,
-> earnings dashboard, payout management, appointment booking, and
-> approval workflows.
+`require_role("admin")` dependency exists in `dependencies.py`. `admin` enum value exists in `User` model. Zero admin routes or UI exist. Unblocked — can be built now.
 
-## Phase 9 -- Chat / Audio / Video
+---
 
-Tasks: Chat, Voice, Video, Session Notes.
+## Phase 11 — E-Commerce ❌ Not started
 
-### Claude Prompt
+Gemstone/Rudraksha store concept. Not started. Dependent on payments.
 
-> Implement secure real-time chat, audio, and video consultations using
-> 100ms or Agora with appointment scheduling, chat history, timers,
-> quality monitoring, and feedback.
+---
 
-## Phase 10 -- Admin Portal
+## Phase 12 — SEO & Content 🟡 Partial
 
-Tasks: User Management, Reports, Analytics, Refunds, Astrologer
-Approval.
+**Done:**
+- react-helmet-async per-page meta + canonical URLs
+- JSON-LD Organization/WebSite schema
+- FAQ schema (`FaqSchema.jsx`)
+- sitemap.xml auto-generated at build (`npm run sitemap`)
+- robots.txt
 
-### Claude Prompt
+**Remaining:**
+- Blog / content engine
+- Dynamic sitemap for blog/report pages
+- Article schema for blog posts
+- Breadcrumb schema
 
-> Build a complete administrator portal with dashboards for users,
-> astrologers, bookings, payments, refunds, analytics, moderation, and
-> role-based access.
+---
 
-## Phase 11 -- E-Commerce
+## Phase 13 — Growth Features ❌ Not started
 
-Tasks: Gemstone Store, Rudraksha, Cart, Orders, Shipping.
+Referral system, coupons, loyalty rewards, wallet credits. Dependent on payments.
 
-### Claude Prompt
+---
 
-> Build a complete e-commerce module for gemstones and spiritual
-> products with inventory, recommendations, shopping cart, checkout,
-> shipping, orders, and reviews.
+## Phase 14 — Production Hardening 🟡 Partial
 
-## Phase 12 -- SEO & Content
+**Done:**
+- Rate limiting via `slowapi` — tiered (5/min OTP, 10/min LLM, 30/min compute)
+- Error monitoring — Sentry (backend + frontend)
+- Health endpoints — `/health` + `/health/db`
+- CI/CD — GitHub Actions (pytest with Postgres service + eslint + vite build)
+- Security headers — CSP, HSTS, nosniff, frame-options, permissions-policy
 
-Tasks: Blog, Dynamic Sitemap, Schema.org, JSON-LD.
+**Remaining:**
+- Redis-backed rate limiting (in-memory limiter breaks across multiple Railway instances — already flagged in `services/rate_limit.py` comments)
+- Caching for repeat chart/reading computations
+- Structured logging with correlation IDs
+- Staging environment (separate Railway + Vercel stack)
+- Docker Compose for one-command local full-stack dev (Postgres + backend + frontend)
+- `pytest-cov` — coverage tooling not configured
+- Frontend test suite — zero tests currently (Vitest not set up)
 
-### Claude Prompt
+---
 
-> Transform Star Jyotish into an SEO-first platform by implementing a
-> blog engine, dynamic sitemap, structured data, FAQ schema,
-> Organization schema, Article schema, breadcrumb schema, and optimized
-> metadata.
+## Phase 15 — Launch Readiness 🟡 Partial
 
-## Phase 13 -- Growth
+**Done:**
+- PWA manifest (`manifest.json`, `icon-192.png`, `icon-512.png`)
+- Legal pages complete
+- SEO infrastructure in place
 
-Tasks: Referral, Coupons, Wallet, Rewards.
+**Remaining:**
+- Play Store / App Store assets and submission
+- Accessibility audit (ARIA, keyboard nav, contrast on high-traffic routes)
+- Load testing on chart + AI endpoints
+- Rollback procedure documentation
+- Final performance pass (code splitting, lazy loading)
 
-### Claude Prompt
+---
 
-> Build referral programs, coupons, wallet credits, loyalty rewards,
-> affiliate tracking, promotional campaigns, onboarding incentives, and
-> engagement automation.
+## Immediate Priorities (no blockers, start now)
 
-## Phase 14 -- Production Hardening
+Ordered by impact:
 
-Tasks: Redis, Logging, Monitoring, Caching, CI/CD.
-
-### Claude Prompt
-
-> Prepare the application for production at scale with Redis caching,
-> distributed rate limiting, centralized logging, monitoring, analytics,
-> Docker optimization, CI/CD, backups, disaster recovery, and security
-> hardening.
-
-## Phase 15 -- Launch Readiness
-
-Tasks: Play Store, App Store, Legal, Branding, Documentation.
-
-### Claude Prompt
-
-> Conduct a complete production readiness review and prepare Google Play
-> Store and Apple App Store assets, legal documentation, deployment
-> guides, monitoring dashboards, rollback procedures, and a final launch
-> checklist.
-
-# Recommended Execution Order
-
-1.  Project Audit
-2.  Production Readiness
-3.  Database
-4.  Authentication
-5.  User Dashboard
-6.  Payments
-7.  WhatsApp Integration
-8.  AI Improvements
-9.  Astrologer Marketplace
-10. Chat / Audio / Video
-11. Admin Portal
-12. E-Commerce
-13. SEO & Content
-14. Growth Features
-15. Production Hardening
-16. Launch Readiness
+1. Wire report routes to `get_current_user_optional` — identity without forcing login
+2. Threaded Ask the Chart via `ChatSession`/`ChatMessage`
+3. Frontend test suite setup (Vitest + RTL)
+4. Mobile layout fixes on 4 components
+5. Analytics (GA4 or Plausible) + Privacy Policy update
+6. Admin dashboard (user list, report viewer, AppSetting toggles)
+7. Code splitting on `Result.jsx`
+8. Redis-backed rate limiting
+9. Staging environment
+10. `pytest-cov` baseline

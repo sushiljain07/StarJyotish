@@ -1,6 +1,10 @@
 # <img src="frontend/public/starjyotish.svg" width="24" height="24" alt="" valign="middle" /> Star Jyotish — Ancient Wisdom. AI Intelligence.
 
-A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and a dedicated Vedic career-analysis report. The persistence layer (Postgres + SQLAlchemy + Alembic) and phone/OTP + Google login are in place; Razorpay payments are still pending (see [Roadmap](#roadmap)). Every chart/report endpoint still works with zero database configured, exactly as before.
+A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI-generated readings and dedicated Vedic report flows for Career, Relationship, and Wealth. The persistence layer (PostgreSQL + SQLAlchemy + Alembic), phone OTP + Google OAuth authentication, security headers, error monitoring (Sentry), and CI/CD (GitHub Actions) are all in place. Razorpay payments are the primary remaining blocker — pending company registration.
+
+**Live:** [starjyotish.com](https://starjyotish.com)
+
+---
 
 ## Features
 
@@ -16,27 +20,51 @@ A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI
 - **Planetary positions** — sign, house, nakshatra, pada, retrograde, dignity
 
 **AI**
-- **AI Vedic reading** — Claude (Sonnet) as primary LLM, with automatic fallback to Groq/Llama if no Anthropic key is set or the call fails. Prompts are grounded in a local `astro-skills/` reference library (career, gemstones, marriage, nakshatra, rudraksha, etc.)
-- **Ask the Chart** — up to 10 AI-powered Q&A per chart
-- **Vedic Career Report** — separate report flow analysing career/business direction from D10, Dasha, and Rajyoga data, in English or Hindi
+- **AI Vedic reading** — Claude (Sonnet via OpenRouter) as primary LLM, automatic fallback to Groq/Llama. Prompts grounded in a local `astro-skills/` reference library (career, gemstones, marriage, nakshatra, rudraksha, houses, planets, numerology, children — ~1.1 MB of structured reference material)
+- **Ask the Chart** — up to 10 AI-powered Q&A per chart session
+- **Vedic Career Report** — D10 Dashamsha + Dasha + Rajyoga analysis, English or Hindi
+- **Relationship Report** — D9 Navamsa analysis
+- **Wealth Report** — D2 Hora + D10 analysis
+
+**Account & auth**
+- **Phone OTP login** — SMS via MSG91 or 2Factor (console-logs OTP locally without a provider key)
+- **Google OAuth** — one-tap sign-in
+- **JWT + rotating refresh tokens** — httpOnly cookies, session revocation, multi-device support
+- **User profile** — name, avatar (canvas-compressed upload), birth details
+
+**Pages & legal**
+- Landing, Generate, Result, Career Report, Login, Account/Profile
+- Privacy Policy, Terms of Use, Refund Policy, Disclaimer, About, FAQ, Contact
+- 404 Not Found page
+- React ErrorBoundary — styled fallback instead of blank-screen crashes
 
 **Other**
-- **English / Hindi** language toggle
-- **Download as PDF** — print-to-PDF of the chart summary
-- **Responsive design** — desktop browser + mobile bottom nav
+- **English / Hindi** language toggle throughout, including AI output
+- **Download as PDF** — browser print-to-PDF of the chart summary
+- **Responsive design** — desktop top-nav + mobile bottom nav
 - **Place autocomplete** via OpenStreetMap Nominatim (no API key needed)
+- **SEO** — react-helmet-async per-page meta, JSON-LD Organization/WebSite schema, FAQ schema, sitemap.xml generated at build time, robots.txt
+- **Security headers** — CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Permissions-Policy on both backend (FastAPI middleware) and frontend (Vercel headers)
+- **Error monitoring** — Sentry wired in backend and frontend, opt-in via env var
+- **Rate limiting** — tiered slowapi limits (5/min OTP send, 10/min LLM endpoints, 30/min compute)
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18, Vite 5, Tailwind CSS 3, react-i18next, react-router-dom |
-| Backend | FastAPI, pyswisseph (Swiss Ephemeris) |
-| Persistence | PostgreSQL, SQLAlchemy 2.x, Alembic — optional, see [Database setup](#3-database-setup-optional) |
-| AI / LLM | Claude (`claude-sonnet-4-6`) primary, Groq (`llama-3.3-70b-versatile`) fallback |
+| Frontend | React 18, Vite 5, Tailwind CSS 3, react-i18next, react-router-dom 7, react-helmet-async |
+| Backend | FastAPI, pyswisseph (Swiss Ephemeris), slowapi |
+| Persistence | PostgreSQL, SQLAlchemy 2.x, Alembic (6 migrations, 16 models) |
+| Auth | Phone OTP + Google OAuth, JWT (PyJWT), httpOnly refresh-token cookies |
+| AI / LLM | Claude (`claude-sonnet-4-6`) via OpenRouter (primary), Groq (`llama-3.3-70b-versatile`) fallback, direct Anthropic API optional |
+| Monitoring | Sentry (backend `sentry-sdk[fastapi]`, frontend `@sentry/react`) — opt-in via `SENTRY_DSN` |
 | Geocoding | OpenStreetMap Nominatim — free, no key needed |
 | Ayanamsa | Lahiri |
 | House system | Whole sign (KP module additionally computes sub-lords on the same base chart) |
+| CI/CD | GitHub Actions — pytest (with Postgres service) + eslint + Vite build on every push/PR |
+| Hosting | Backend → Railway (Docker), Frontend → Vercel |
 
 ---
 
@@ -49,94 +77,76 @@ A Vedic birth chart (Kundli) web application powered by Swiss Ephemeris, with AI
 | npm | 9+ | comes with Node.js |
 | Git | any | https://git-scm.com |
 
-For the AI features (Reading, Ask, Career Report) you need at least one of:
-- **Anthropic API key** (primary) — https://console.anthropic.com
+For the AI features (Reading, Ask, Career/Relationship/Wealth Reports) you need at least one of:
+- **OpenRouter API key** (recommended) — https://openrouter.ai — routes to Claude Sonnet 4.6
+- **Anthropic API key** (alternative) — https://console.anthropic.com
 - **Groq API key** (fallback, free) — https://console.groq.com
+
+Charts, Dasha, KP, Ashtakavarga, Rajyogas, and planet tables work with **no API key at all**.
 
 ---
 
 ## Quick Start
 
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/sushiljain07/StarJyotish.git
 cd StarJyotish
 ```
 
-### 2. Backend setup
+### 2. Backend
 
 ```bash
 cd backend
-
-# Create and activate a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate        # macOS / Linux
 # .venv\Scripts\activate         # Windows
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Configure environment variables
 cp .env.example .env
-# Open .env and add your Anthropic and/or Groq API key
+# Edit .env — at minimum add one LLM key (OPENROUTER_API_KEY or GROQ_API_KEY)
 ```
 
-Start the backend:
+Start:
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-The API will be available at **http://localhost:8000**
-Interactive docs: **http://localhost:8000/docs**
+API: **http://localhost:8000** · Interactive docs: **http://localhost:8000/docs**
 
-### 3. Database setup (optional)
+### 3. Database (optional for chart features, required for auth/accounts)
 
-Every chart/report endpoint works with no database configured — skip this
-section entirely for plain local development. Set it up when you want
-saved birth profiles, report history, or to work on the astrologer
-marketplace / payments tables (`backend/db/`).
+Every chart/report endpoint works with no database — skip for plain local dev. Required for saved profiles, auth, and the account system.
 
 ```bash
-cd backend
+# Requires a running Postgres instance (local install, Docker, or Railway plugin)
+# Add DATABASE_URL to backend/.env first
 
-# Point DATABASE_URL at a Postgres instance (see backend/.env.example for
-# the exact line to add — a local install, Docker, or a Railway add-on
-# all work the same way).
-
-# Apply all migrations
 alembic upgrade head
 
-# Seed default app_settings (paywall flag, pricing, etc.) — and optionally
-# a sample verified astrologer + client user for local development
+# Seed dev data (sample user, app settings)
 python -m db.seed --with-dev-data
 ```
 
-Schema changes go through Alembic, not `Base.metadata.create_all()`:
+Schema changes via Alembic:
 ```bash
-# After changing/adding a model in backend/db/models/
 alembic revision --autogenerate -m "describe the change"
 alembic upgrade head
 ```
 
-See `backend/db/README.md` for the full layout (models, repositories,
-session handling) and the design notes behind it.
+See `backend/db/README.md` for the full model/repository layout.
 
-### 4. Frontend setup
-
-Open a **new terminal**:
+### 4. Frontend
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-Open **http://localhost:5173** in your browser. The dev server proxies `/api` to `http://localhost:8000` automatically (see `vite.config.js`) — no frontend env var needed for local development.
+Open **http://localhost:5173** — the dev server proxies `/api` to `http://localhost:8000` automatically.
 
 ---
 
@@ -146,30 +156,31 @@ Open **http://localhost:5173** in your browser. The dev server proxies `/api` to
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENROUTER_API_KEY` | Recommended | Primary LLM (Claude Sonnet 4.6 via OpenRouter) for Reading, Ask, and Career Report. Takes priority over `ANTHROPIC_API_KEY` if both are set |
-| `ANTHROPIC_API_KEY` | Optional | Used in place of OpenRouter if `OPENROUTER_API_KEY` is unset — calls Claude directly via Anthropic's API |
-| `GROQ_API_KEY` | Optional | Fallback LLM, used if neither of the above is set or Claude errors |
-| `FRONTEND_URL` | Production only | Deployed frontend origin, added to the CORS allow-list |
-| `DATABASE_URL` | Optional | Postgres connection string for `backend/db/` + Alembic. Every chart/report endpoint works with this unset |
-| `JWT_SECRET_KEY` | Required for login | Signs access tokens (`services/jwt_service.py`). Generate with `python -c "import secrets; print(secrets.token_urlsafe(64))"` |
-| `OTP_HASH_SECRET` | Required for login | HMAC key for hashing OTP codes at rest (`db/repositories/otp_repository.py`) — generate the same way as `JWT_SECRET_KEY`, with a different value |
-| `COOKIE_SECURE` | Local dev only | Set to `false` for local HTTP dev — browsers refuse to send a `Secure` cookie over plain `http://`, which would otherwise break the refresh-token cookie entirely on localhost. Leave unset (defaults to `true`) in any real deployment |
-| `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` | Optional | Sends OTP SMS via MSG91 (`services/otp_provider.py`). Preferred over 2Factor if both are set |
-| `TWOFACTOR_API_KEY` | Optional | Sends OTP SMS via 2Factor instead of MSG91 |
-| `OTP_PROVIDER` | Optional | Set to `2factor` to force 2Factor even when an MSG91 key is also present |
-| `GOOGLE_CLIENT_ID` | Required for Google login | Same OAuth Client ID as the frontend's `VITE_GOOGLE_CLIENT_ID` — verifies that Google ID tokens were actually issued for this app |
+| `OPENROUTER_API_KEY` | Recommended | Primary LLM (Claude Sonnet 4.6 via OpenRouter). Takes priority over `ANTHROPIC_API_KEY` |
+| `ANTHROPIC_API_KEY` | Optional | Direct Anthropic API — used if `OPENROUTER_API_KEY` is unset |
+| `GROQ_API_KEY` | Optional | Fallback LLM if neither above is set or Claude errors |
+| `FRONTEND_URL` | Production | Deployed frontend origin(s), comma-separated, added to CORS allow-list |
+| `DATABASE_URL` | Optional | Postgres connection string. Every chart endpoint works without it |
+| `JWT_SECRET_KEY` | Required for login | Signs access tokens. Generate: `python -c "import secrets; print(secrets.token_urlsafe(64))"` |
+| `OTP_HASH_SECRET` | Required for login | HMAC key for OTP hashing — generate the same way, different value |
+| `COOKIE_SECURE` | Local dev | Set to `false` for `http://localhost` — leave unset in production |
+| `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` | Optional | SMS OTP via MSG91 (preferred if both set) |
+| `TWOFACTOR_API_KEY` | Optional | SMS OTP via 2Factor |
+| `OTP_PROVIDER` | Optional | Set to `2factor` to force 2Factor when both SMS keys are present |
+| `GOOGLE_CLIENT_ID` | Required for Google login | OAuth Client ID from Google Cloud Console |
+| `SENTRY_DSN` | Optional | Sentry error monitoring. No-op if unset. Get from sentry.io → Python/FastAPI project |
+| `SENTRY_ENVIRONMENT` | Optional | Defaults to `production`. Set to `staging` for a staging environment |
 
-With no OTP provider key set, `/api/auth/otp/send` logs the code to the server console instead of sending an SMS — OTP login is fully testable locally with zero SMS spend.
+Without an OTP SMS key, `/api/auth/otp/send` logs the code to the server console — fully testable locally at zero cost.
 
-Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with **no API key at all** — only Reading, Ask, and Career Report need an LLM key.
-
-### Frontend (build-time)
+### Frontend (build-time, `frontend/.env`)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VITE_API_URL` | Production only | Backend base URL, e.g. `https://your-backend.up.railway.app`. Leave unset for local dev (uses the Vite proxy instead) |
-| `VITE_GOOGLE_CLIENT_ID` | Required for Google login | Same OAuth Client ID as the backend's `GOOGLE_CLIENT_ID`. The button still renders without it, but Google will reject the sign-in |
-| `VITE_LOGIN_REQUIRED` | Optional | Set to `true` to force login before generating a chart (`config/auth.js`). Defaults to `false` — today's open flow — if unset |
+| `VITE_API_URL` | Production | Backend URL, e.g. `https://your-backend.up.railway.app`. Unset for local dev (Vite proxy handles it) |
+| `VITE_GOOGLE_CLIENT_ID` | Required for Google login | Same OAuth Client ID as backend's `GOOGLE_CLIENT_ID` |
+| `VITE_LOGIN_REQUIRED` | Optional | Set to `true` to require login before generating a chart. Defaults to `false` |
+| `VITE_SENTRY_DSN` | Optional | Sentry error monitoring (frontend). No-op if unset. Get from sentry.io → React project |
 
 ---
 
@@ -177,39 +188,59 @@ Charts, divisional charts, Dasha, Ashtakavarga, KP, and planet tables work with 
 
 ```bash
 cd backend
-source .venv/bin/activate   # if not already active
+source .venv/bin/activate
 pytest tests/ -v
 ```
 
-Most tests pass without any API key configured. A handful of AI-dependent tests in `test_ask.py` require a working `GROQ_API_KEY`/`ANTHROPIC_API_KEY` to pass, and a few in `test_reading.py` are currently out of sync with the reading response shape — worth a look before relying on `pytest tests/` as a full regression gate.
+**78 tests total: 48 pass without any config, 30 skip without `DATABASE_URL`** (auth + DB repository tests — they self-skip rather than fail when Postgres isn't configured).
+
+To run the full suite including DB tests:
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/starjyotish_test \
+JWT_SECRET_KEY=any-non-empty-string \
+OTP_HASH_SECRET=any-other-non-empty-string \
+alembic upgrade head && pytest tests/ -v
+# Result: 78 passed, 0 failed
+```
+
+AI-dependent tests (`test_ask.py`) skip automatically without a live API key — expected.
+
+CI runs the full 78-test suite on every push via `.github/workflows/ci.yml`.
 
 ---
 
 ## Project Structure
 
 ```
-astro/
+StarJyotish/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # pytest (with Postgres) + eslint + vite build on push/PR
+│
 ├── backend/
-│   ├── main.py                    # FastAPI app entry point, CORS, router mounting, /health + /health/db
-│   ├── Dockerfile                 # for Railway/container deploys (pyswisseph needs a C compiler)
-│   ├── alembic.ini, alembic/      # migrations — env.py reads DATABASE_URL; versions/0001_initial_schema.py, 0002_add_audit_feedback_chat.py
-│   ├── db/                        # persistence layer — see db/README.md
-│   │   ├── base.py, mixins.py, session.py
-│   │   ├── models/                # User, BirthProfile, Report, AstrologerProfile, Booking,
-│   │   │                           #   Transaction, Purchase, Notification, UserSession, Wallet,
-│   │   │                           #   WalletLedgerEntry, Review, AppSetting, AuditLog, Feedback,
-│   │   │                           #   ChatSession, ChatMessage
-│   │   ├── repositories/           # one repository per model, e.g. UserRepository, WalletRepository
-│   │   └── seed.py                # `python -m db.seed [--with-dev-data]`
+│   ├── main.py                    # FastAPI app, CORS, middleware mounting, /health + /health/db
+│   ├── Dockerfile                 # Railway/Docker deploy (pyswisseph needs a C compiler)
+│   ├── alembic.ini                # Alembic config
+│   ├── alembic/versions/          # 6 migrations: 0001 initial schema → 0006 widen avatar_url
+│   ├── db/                        # Persistence layer — see backend/db/README.md
+│   │   ├── models/                # 16 SQLAlchemy models:
+│   │   │                          #   User, BirthProfile, Report, AstrologerProfile, Booking,
+│   │   │                          #   Transaction, Purchase, Wallet, WalletLedgerEntry,
+│   │   │                          #   Review, AppSetting, AuditLog, Feedback,
+│   │   │                          #   ChatSession, ChatMessage, OtpCode
+│   │   ├── repositories/          # One repository per model (UserRepository, WalletRepository…)
+│   │   ├── session.py             # get_db / get_db_optional FastAPI dependencies
+│   │   └── seed.py                # python -m db.seed [--with-dev-data]
 │   ├── routes/
 │   │   └── kundli.py              # /api/kundli, /reading, /ask, /ashtakavarga,
-│   │                               #   /transit, /bhava-chalit, /kp, /divisional
+│   │                              #   /transit, /bhava-chalit, /kp, /divisional
 │   ├── routers/
+│   │   ├── auth.py                # /api/auth/otp/send|verify, /google, /refresh, /logout,
+│   │   │                          #   /me, /sessions
+│   │   ├── account.py             # /api/account/birth-profiles, /reports, /settings/public
 │   │   ├── career_report.py       # /api/career-report
 │   │   ├── rajyogas.py            # /api/rajyogas
-│   │   ├── topic_reports.py       # /api/relationship-report, /api/wealth-report
-│   │   └── account.py             # /api/settings/public, /api/account/birth-profiles/{phone},
-│   │                               #   /api/account/reports/{phone} — reads from db/
+│   │   └── topic_reports.py       # /api/relationship-report, /api/wealth-report
 │   ├── services/
 │   │   ├── astro_calc.py          # Swiss Ephemeris chart calculation (Lahiri, whole-sign)
 │   │   ├── divisional_charts.py   # D1–D60 divisional chart calculation
@@ -217,70 +248,170 @@ astro/
 │   │   ├── ashtakavarga.py        # Ashtakavarga calculation
 │   │   ├── kp_system.py           # KP sub-lord / cuspal-interlink calculation
 │   │   ├── transit_calc.py        # Current transit calculation
-│   │   ├── career_analysis.py     # Vedic career report analysis
-│   │   ├── geocode.py             # Place → lat/lon/timezone via Nominatim
+│   │   ├── career_analysis.py     # Career report prompt + analysis
+│   │   ├── relationship_analysis.py # Relationship report prompt + analysis
+│   │   ├── wealth_analysis.py     # Wealth report prompt + analysis
+│   │   ├── ai.py                  # Claude (primary) / Groq (fallback) LLM integration
 │   │   ├── skill_loader.py        # Loads astro-skills/ reference files into prompts
-│   │   ├── persistence.py         # best-effort report-saving hook used by the routes above
-│   │   └── ai.py                  # Claude (primary) / Groq (fallback) LLM integration
-│   ├── models/                    # birth_data.py, career_models.py, chart_data.py, account_models.py
-│   ├── tests/                     # pytest suite
+│   │   ├── geocode.py             # Place → lat/lon/timezone via Nominatim (lru_cache)
+│   │   ├── jwt_service.py         # JWT sign/verify
+│   │   ├── otp_provider.py        # MSG91 / 2Factor / console-log fallback
+│   │   ├── google_oauth.py        # Google ID token verification
+│   │   ├── persistence.py         # Best-effort report-save hook (never fails the request)
+│   │   ├── rate_limit.py          # Shared slowapi limiter + limit constants
+│   │   ├── security_headers.py    # ASGI middleware: CSP, HSTS, nosniff, frame-options
+│   │   └── monitoring.py          # Sentry init (no-op if SENTRY_DSN unset)
+│   ├── models/                    # Pydantic request/response models
+│   │   ├── birth_data.py
+│   │   ├── chart_data.py          # ReadingRequest/Response, AskRequest/Response, etc.
+│   │   ├── career_models.py
+│   │   └── account_models.py
+│   ├── dependencies.py            # get_current_user, require_role FastAPI dependencies
+│   ├── tests/                     # 78-test pytest suite
+│   │   ├── test_astro_calc.py
+│   │   ├── test_dasha.py
+│   │   ├── test_geocode.py
+│   │   ├── test_kundli_route.py
+│   │   ├── test_reading.py
+│   │   ├── test_ask.py
+│   │   ├── test_auth.py           # skips without DATABASE_URL
+│   │   └── test_db_repositories.py # skips without DATABASE_URL
 │   ├── requirements.txt
 │   └── .env.example
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx                # routes: / , /kundli , /career-report
+│   │   ├── App.jsx                # Routes: / /generate /kundli /career-report /login
+│   │   │                          #   /account /disclaimer /privacy /terms /refund-policy
+│   │   │                          #   /about /faq /contact + catch-all 404
+│   │   ├── main.jsx               # React root: SentryErrorBoundary → HelmetProvider → App
+│   │   ├── monitoring.js          # Sentry init (no-op if VITE_SENTRY_DSN unset)
 │   │   ├── pages/
-│   │   │   ├── Home.jsx           # birth details input
-│   │   │   ├── Result.jsx         # chart results, tab navigation
-│   │   │   └── CareerReport.jsx   # standalone career report flow
+│   │   │   ├── Landing.jsx        # Marketing landing page
+│   │   │   ├── Home.jsx           # Birth details input form
+│   │   │   ├── Result.jsx         # Chart results, tab navigation
+│   │   │   ├── CareerReport.jsx   # Standalone career report flow
+│   │   │   ├── Login.jsx          # Phone OTP + Google login
+│   │   │   ├── Profile.jsx        # Account settings + avatar
+│   │   │   ├── NotFound.jsx       # 404 catch-all (noindexed)
+│   │   │   ├── AboutUs.jsx
+│   │   │   ├── ContactUs.jsx
+│   │   │   ├── FAQ.jsx
+│   │   │   ├── Disclaimer.jsx
+│   │   │   ├── PrivacyPolicy.jsx
+│   │   │   ├── TermsOfUse.jsx
+│   │   │   └── RefundPolicy.jsx
 │   │   ├── components/
-│   │   │   ├── KundliChart.jsx                         # North Indian SVG chart renderer
-│   │   │   ├── DivisionalCharts.jsx                     # all 16 divisional charts (D1–D60)
-│   │   │   ├── KPChart.jsx, BhavaChality.jsx, SarvatobhadraChakra.jsx
+│   │   │   ├── KundliChart.jsx    # North Indian SVG chart renderer
+│   │   │   ├── DivisionalCharts.jsx # All 16 divisional charts (D1–D60)
+│   │   │   ├── KPChart.jsx, BhavaChalit.jsx, SarvatobhadraChakra.jsx
 │   │   │   ├── AshtakavargaTable.jsx, TransitPanel.jsx, DashaTable.jsx, PlanetTable.jsx
-│   │   │   ├── RajyogasTab.jsx, CareerReportTab.jsx
-│   │   │   ├── ChartReading.jsx, AskChart.jsx           # AI reading + Q&A
-│   │   │   ├── KundliDownload.jsx                       # print-to-PDF summary
-│   │   │   ├── BirthForm.jsx, NavBar.jsx, LanguageToggle.jsx
+│   │   │   ├── RajyogasTab.jsx, CareerReportTab.jsx, TopicReportTab.jsx
+│   │   │   ├── ChartReading.jsx, AskChart.jsx     # AI reading + Q&A
+│   │   │   ├── KundliDownload.jsx                 # Print-to-PDF
+│   │   │   ├── ErrorFallback.jsx                  # ErrorBoundary fallback UI
+│   │   │   ├── Seo.jsx                            # react-helmet-async per-page tags
+│   │   │   ├── ProtectedRoute.jsx                 # Redirects unauthenticated users
+│   │   │   ├── auth/                              # PhoneOtpForm, GoogleLoginButton, etc.
+│   │   │   └── …                                  # NavBar, Footer, BirthForm, PaywallCard, etc.
+│   │   ├── contexts/
+│   │   │   └── AuthContext.jsx    # JWT auth state, token refresh, login/logout
+│   │   ├── config/
+│   │   │   ├── auth.js            # isLoginRequired() — reads VITE_LOGIN_REQUIRED
+│   │   │   └── entitlements.js    # hasPremiumAccess() — currently returns true (pre-payment)
 │   │   ├── api/
-│   │   │   ├── astro.js           # API client
-│   │   │   └── config.js          # API_BASE, reads VITE_API_URL
+│   │   │   ├── astro.js           # API client (all chart/report calls)
+│   │   │   └── config.js          # API_BASE from VITE_API_URL
 │   │   └── i18n/                  # i18next setup, en.json, hi.json
-│   ├── public/starjyotish.svg       # app icon / favicon
+│   ├── public/
+│   │   ├── starjyotish.svg        # App icon / favicon
+│   │   ├── icon-192.png, icon-512.png  # PWA manifest icons
+│   │   ├── manifest.json          # PWA manifest
+│   │   ├── robots.txt             # Allow all, Sitemap: reference
+│   │   └── sitemap.xml            # Auto-generated at build time (npm run sitemap)
+│   ├── scripts/
+│   │   └── generate-sitemap.js    # Sitemap generator (runs as part of npm run build)
+│   ├── vercel.json                # SPA rewrite + security headers (CSP, HSTS, etc.)
 │   ├── package.json
-│   └── vite.config.js             # dev proxy: /api → localhost:8000
+│   └── vite.config.js             # Dev proxy: /api → localhost:8000
 │
-└── astro-skills/                  # reference library (career, gemstones, marriage,
-                                    #   nakshatra, rudraksha, etc.) loaded into AI prompts
+└── astro-skills/                  # ~1.1 MB reference library loaded into AI prompts
+    ├── index.md                   # Skill compatibility cross-reference table
+    ├── career/                    # D10 Dashamsha, Career Compass
+    ├── gemstones/                 # Navratna, activation rituals, compatibility
+    ├── houses/                    # All 12 houses
+    ├── marriage/                  # D9 Navamsa, Guna Milan
+    ├── nakshatra/                 # All 27 nakshatras
+    ├── numerology/                # Vedic numerology (Mulank/Bhagyank)
+    ├── planets/                   # All 9 Vedic grahas
+    ├── rudraksha/                 # Mukhi recommendations
+    ├── children/                  # D7 Saptamsha
+    └── vedic-kundli/              # Core Parashari principles
 ```
 
 ---
 
 ## Deployment
 
-The app deploys as two independent pieces — see `backend/Dockerfile` and `frontend/src/api/config.js`:
+Two independent services:
 
-- **Backend → Railway** (or any Docker host). Set the service root directory to `backend`; it has its own `Dockerfile` since `pyswisseph` compiles from source and needs a C toolchain. Set `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`) / `GROQ_API_KEY` and, once the frontend is deployed, `FRONTEND_URL` for CORS. If using the persistence layer, add a Postgres plugin and set `DATABASE_URL`, then run `alembic upgrade head` once (e.g. via Railway's one-off command runner) before traffic hits the new account/auth endpoints. For login, also set `JWT_SECRET_KEY` and `OTP_HASH_SECRET` (required), plus `GOOGLE_CLIENT_ID` and an OTP SMS provider key (`MSG91_AUTH_KEY`/`MSG91_TEMPLATE_ID` or `TWOFACTOR_API_KEY`) for Google login and real (non-console-logged) OTP delivery.
-- **Frontend → Vercel** (or any static host). Set the root directory to `frontend`, build command `npm run build`, output `dist`. Set `VITE_API_URL` to the backend's public URL.
+**Backend → Railway**
+- Service root: `backend/` — the `Dockerfile` handles `pyswisseph`'s C-compile requirement
+- Required env vars: `OPENROUTER_API_KEY` (or `ANTHROPIC_API_KEY`), `GROQ_API_KEY`, `FRONTEND_URL`, `DATABASE_URL` (Railway Postgres plugin), `JWT_SECRET_KEY`, `OTP_HASH_SECRET`, `GOOGLE_CLIENT_ID`
+- Optional: `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` (or `TWOFACTOR_API_KEY`) for real SMS, `SENTRY_DSN` for error tracking
+- First deploy: run `alembic upgrade head` via Railway's one-off command runner before traffic hits auth endpoints
 
-Locally, both pieces talk to each other automatically via the Vite dev proxy — no env vars needed.
+**Frontend → Vercel**
+- Root directory: `frontend/`, build command: `npm run build`, output: `dist/`
+- Required env vars: `VITE_API_URL` (Railway backend URL), `VITE_GOOGLE_CLIENT_ID`
+- Optional: `VITE_SENTRY_DSN` for error tracking
 
 ---
 
 ## Roadmap
 
-- Mobile layout fixes for components still using fixed pixel widths (`DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx`)
-- ~~Postgres persistence~~ — done (`backend/db/`)
-- ~~Phone/OTP + Google login~~ — done (`backend/routers/auth.py`, `frontend/src/contexts/AuthContext.jsx`); `config/auth.js`'s `isLoginRequired()` still defaults to `false` (set `VITE_LOGIN_REQUIRED=true` when ready to require it), and existing chart/report routes still also accept `save_for_phone`/path-param identification rather than requiring a session — wiring those to `Depends(get_current_user)` is a separate follow-up, not done here
-- Razorpay payments — `Transaction`/`Purchase`/`Wallet` tables and repositories exist (`backend/db/`); the Razorpay order/webhook integration itself doesn't yet
-- WhatsApp intake via Meta Cloud API
-- Server-side PDF generation (current PDF export is browser print-to-PDF only)
-- Wire the frontend's `config/entitlements.js` and `config/auth.js` stubs to the new `/api/settings/public` endpoint instead of their hardcoded values
-- Wire `routes/kundli.py`'s `ask_kundli()` to `ChatSession`/`ChatMessage` (`backend/db/`) so "Ask the Chart" becomes a threaded conversation instead of independent Q&As — the tables/repository exist, the route isn't using them yet
+### ✅ Done
+
+- Swiss Ephemeris chart engine (D1–D60, KP, Ashtakavarga, Dasha, Transit, Rajyoga)
+- AI reading + Ask the Chart + Career / Relationship / Wealth reports
+- PostgreSQL persistence layer (16 models, 6 Alembic migrations, repository pattern)
+- Phone OTP + Google OAuth authentication (JWT + rotating refresh tokens)
+- User profile + avatar upload
+- SEO infrastructure (react-helmet-async, sitemap, JSON-LD, FAQ schema)
+- All legal pages (Privacy Policy, Terms, Refund Policy, Disclaimer)
+- About, Contact, FAQ standalone pages
+- 404 page + React ErrorBoundary
+- Security headers (CSP, HSTS, nosniff, frame-options) on both backend and frontend
+- Error monitoring (Sentry) — backend + frontend, opt-in via env var
+- Rate limiting — tiered per endpoint type
+- CI/CD — GitHub Actions (pytest with Postgres + eslint + build on every push/PR)
+- English / Hindi bilingual throughout
+
+### 🔜 Next (no blockers — pre-registration work)
+
+- **Wire auth on report routes** — swap `save_for_phone` for `Depends(get_current_user)` or a `get_current_user_optional` middle path
+- **Threaded Ask the Chart** — wire `ask_kundli()` to `ChatSession`/`ChatMessage` tables (tables exist, route doesn't use them yet)
+- **Frontend test suite** — Vitest + React Testing Library (zero frontend tests currently)
+- **Mobile layout fixes** — `DivisionalCharts.jsx`, `TransitPanel.jsx`, `Result.jsx`, `KundliDownload.jsx` still use fixed pixel widths
+- **Analytics** — GA4 or Plausible (Privacy Policy already says none are running — update both together)
+- **Code splitting** — `Result.jsx` bundles all chart components; `React.lazy()` + `Suspense` would cut initial load
+- **Redis-backed rate limiting** — in-memory limiter won't survive multiple Railway instances
+- **Admin dashboard** — user/report viewer, `AppSetting` toggles (`require_role("admin")` dependency already exists)
+- **Server-side PDF generation** — current PDF is browser print-to-PDF only
+- **`pytest-cov`** — coverage tooling not yet configured
+- **Wire `config/entitlements.js`** to `/api/settings/public` instead of hardcoded values
+- **Staging environment** — separate Railway + Vercel environment for pre-production testing
+
+### 🔒 Blocked (require company registration)
+
+- **Razorpay payments** — `Transaction`/`Purchase`/`Wallet` tables exist; Razorpay order/webhook integration pending merchant KYC
+- **WhatsApp Business Cloud API** — Meta requires verified business entity
+- **DLT-registered SMS** — production sender ID registration under TRAI requires GSTIN
+- **GST invoicing** — requires GSTIN
+- **Astrologer marketplace** — `AstrologerProfile`/`Booking`/`Review` tables exist; payout logic pending Razorpay Route setup
 
 ---
 
 ## License
 
-No license file is currently included in this repository — treat as proprietary/all-rights-reserved until one is added.
+No license file is currently included — treat as proprietary / all-rights-reserved until one is added.

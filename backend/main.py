@@ -19,6 +19,7 @@ from routers.topic_reports import router as topic_reports_router
 from routers.account import router as account_router
 from routers.auth import router as auth_router
 from routers.places import router as places_router
+from routers.admin import router as admin_router
 
 init_sentry()
 
@@ -75,6 +76,7 @@ app.include_router(topic_reports_router, prefix="/api")
 app.include_router(account_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(places_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
 
 @app.get("/health")
 def health():

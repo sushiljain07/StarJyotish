@@ -11,19 +11,19 @@ export default function Login() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
 
   const next = location.state?.next || '/'
 
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.
   if (isAuthenticated) {
-    navigate(next, { replace: true })
+    navigate(user?.role === 'admin' ? '/admin' : next, { replace: true })
     return null
   }
 
-  function handleSuccess() {
-    navigate(next, { replace: true })
+  function handleSuccess(loggedInUser) {
+    navigate(loggedInUser?.role === 'admin' ? '/admin' : next, { replace: true })
   }
 
   return (

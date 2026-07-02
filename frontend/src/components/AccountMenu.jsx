@@ -88,6 +88,26 @@ export default function AccountMenu() {
           >
             {t('nav_my_profile')}
           </Link>
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              role="menuitem"
+              className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+            >
+              Admin Dashboard
+            </Link>
+          )}
+          {user?.role === 'astrologer' && (
+            <Link
+              to="/astrologer"
+              onClick={() => setOpen(false)}
+              role="menuitem"
+              className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+            >
+              My Dashboard
+            </Link>
+          )}
           <button
             onClick={() => { setOpen(false); logout() }}
             role="menuitem"

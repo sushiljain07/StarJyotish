@@ -18,12 +18,14 @@ export default function Login() {
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.
   if (isAuthenticated) {
-    navigate(user?.role === 'admin' ? '/admin' : next, { replace: true })
+    const role = user?.role
+    navigate(role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : next, { replace: true })
     return null
   }
 
   function handleSuccess(loggedInUser) {
-    navigate(loggedInUser?.role === 'admin' ? '/admin' : next, { replace: true })
+    const role = loggedInUser?.role
+    navigate(role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : next, { replace: true })
   }
 
   return (

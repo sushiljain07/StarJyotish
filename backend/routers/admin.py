@@ -27,10 +27,11 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from db.models.audit_log import AuditLog
+from db.models.astrologer import AstrologerProfile, KycStatus
 from db.models.report import Report
 from db.models.setting import AppSetting
-from db.models.user import User
-from db.repositories import AuditLogRepository, ReportRepository, SettingsRepository
+from db.models.user import User, UserRole
+from db.repositories import AuditLogRepository, AstrologerRepository, ReportRepository, SettingsRepository, UserRepository
 from db.session import get_db
 from dependencies import require_role
 
@@ -255,3 +256,163 @@ def list_audit_logs(
         )
         for log in logs
     ]
+
+
+# ── Astrologers ────────────────────────────────────────────────────────────────
+
+class AstrologerSummary(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    name: Optional[str]
+    phone_number: Optional[str]
+    email: Optional[str]
+    bio: Optional[str]
+    specialties: List[Any]
+    languages: List[Any]
+    experience_years: int
+    price_per_session: float
+    rating_avg: float
+    rating_count: int
+    is_verified: bool
+    kyc_status: str
+    created_at: str
+
+    model_config = {"from_attributes": True}
+
+
+class OnboardAstrologerRequest(BaseModel):
+    phone_number: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[str] = None
+    bio: Optional[str] = None
+    specialties: List[str] = []
+    languages: List[str] = []
+    experience_years: int = 0
+    price_per_session: float = 0.0
+
+
+@router.get("/astrologers", response_model=List[AstrologerSummary])
+def list_astrologers(
+    verified_only: bool = Query(default=False),
+    limit: int = Query(default=100, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+    _: User = _admin_required,
+):
+    """List all astrologer profiles. Admin view always shows unverified too
+    unless verified_only=true is passed explicitly."""
+    profiles = AstrologerRepository(db).search(
+        verified_only=verified_only, limit=limit, offset=offset
+    )
+    result = []
+    for p in profiles:
+        user = db.get(User, p.user_id)
+        result.append(AstrologerSummary(
+            id=p.id,
+            user_id=p.user_id,
+            name=user.name if user else None,
+            phone_number=user.phone_number if user else None,
+            email=user.email if user else None,
+            bio=p.bio,
+            specialties=p.specialties,
+            languages=p.languages,
+            experience_years=p.experience_years,
+            price_per_session=float(p.price_per_session),
+            rating_avg=float(p.rating_avg),
+            rating_count=p.rating_count,
+            is_verified=p.is_verified,
+            kyc_status=p.kyc_status.value,
+            created_at=_fmt(p.created_at),
+        ))
+    return result
+
+
+@router.post("/astrologers", response_model=AstrologerSummary)
+def onboard_astrologer(
+    body: OnboardAstrologerRequest,
+    db: Session = Depends(get_db),
+    admin: User = _admin_required,
+):
+    """Create a new astrologer account. Creates the User (role=astrologer)
+    and the AstrologerProfile in one transaction."""
+    user_repo = UserRepository(db)
+    astro_repo = AstrologerRepository(db)
+
+    if body.phone_number:
+        existing = user_repo.get_by_phone(body.phone_number)
+        if existing:
+            raise HTTPException(status_code=409, detail="A user with this phone number already exists")
+
+    user = user_repo.create(
+        phone_number=body.phone_number,
+        name=body.name,
+        email=body.email,
+        role=UserRole.astrologer,
+    )
+    profile = astro_repo.create(
+        user_id=user.id,
+        bio=body.bio,
+        specialties=body.specialties,
+        languages=body.languages,
+        experience_years=body.experience_years,
+        price_per_session=body.price_per_session,
+    )
+    db.commit()
+    db.refresh(profile)
+
+    return AstrologerSummary(
+        id=profile.id,
+        user_id=user.id,
+        name=user.name,
+        phone_number=user.phone_number,
+        email=user.email,
+        bio=profile.bio,
+        specialties=profile.specialties,
+        languages=profile.languages,
+        experience_years=profile.experience_years,
+        price_per_session=float(profile.price_per_session),
+        rating_avg=float(profile.rating_avg),
+        rating_count=profile.rating_count,
+        is_verified=profile.is_verified,
+        kyc_status=profile.kyc_status.value,
+        created_at=_fmt(profile.created_at),
+    )
+
+
+@router.patch("/astrologers/{profile_id}/kyc", response_model=AstrologerSummary)
+def set_kyc_status(
+    profile_id: uuid.UUID,
+    status: KycStatus = Query(...),
+    db: Session = Depends(get_db),
+    admin: User = _admin_required,
+):
+    """Approve or reject an astrologer's KYC. Sets is_verified=True when
+    status=verified, False otherwise, and writes an audit log entry."""
+    profile = db.get(AstrologerProfile, profile_id)
+    if profile is None:
+        raise HTTPException(status_code=404, detail="Astrologer profile not found")
+
+    updated = AstrologerRepository(db).set_kyc_status(
+        profile, status, actor_user_id=admin.id
+    )
+    db.commit()
+    db.refresh(updated)
+
+    user = db.get(User, updated.user_id)
+    return AstrologerSummary(
+        id=updated.id,
+        user_id=updated.user_id,
+        name=user.name if user else None,
+        phone_number=user.phone_number if user else None,
+        email=user.email if user else None,
+        bio=updated.bio,
+        specialties=updated.specialties,
+        languages=updated.languages,
+        experience_years=updated.experience_years,
+        price_per_session=float(updated.price_per_session),
+        rating_avg=float(updated.rating_avg),
+        rating_count=updated.rating_count,
+        is_verified=updated.is_verified,
+        kyc_status=updated.kyc_status.value,
+        created_at=_fmt(updated.created_at),
+    )

@@ -13,11 +13,16 @@ export default function AskChart({ input, initialQuestion = null }) {
   const [loading, setLoading]       = useState(false)
   const [errorMsg, setErrorMsg]     = useState('')
   const [provider, setProvider]     = useState(null)
-  const bottomRef = useRef(null)
+  // Session ID returned by the backend on the first question and passed back
+  // on every subsequent one so the backend can build conversation history.
+  // Stored in a ref (not state) so it never triggers a re-render — it's
+  // purely an API plumbing detail the UI doesn't need to react to.
+  const sessionIdRef = useRef(null)
   // Guards against StrictMode's double-mount in dev, and against any
   // re-render, sending the carried-over question from the landing page's
   // AI persona spotlight more than once.
   const autoSentRef = useRef(false)
+  const bottomRef = useRef(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -48,13 +53,25 @@ export default function AskChart({ input, initialQuestion = null }) {
       const res = await fetch(`${API_BASE}/api/kundli/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...input, question, language: lang }),
+        body: JSON.stringify({
+          ...input,
+          question,
+          language: lang,
+          // Pass the session_id from the previous response so the backend
+          // can look up conversation history and give contextual answers.
+          // Null on the very first question — the backend creates a new session
+          // and returns its ID, which we store below for all subsequent calls.
+          session_id: sessionIdRef.current,
+        }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.detail || t('ask_error'))
       }
       const data = await res.json()
+      // Store the session_id for the next question. The backend returns the
+      // same ID on every response once a session exists, so this is idempotent.
+      if (data.session_id) sessionIdRef.current = data.session_id
       setMessages(prev => [...prev, { role: 'assistant', text: data.answer }])
       setProvider(data.llm_provider || null)
       setCount(prev => prev + 1)

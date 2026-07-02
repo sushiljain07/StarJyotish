@@ -1,31 +1,54 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import KundliChart        from '../components/KundliChart'
-import DashaTable         from '../components/DashaTable'
-import PlanetTable        from '../components/PlanetTable'
-import ChartReading       from '../components/ChartReading'
-import AskChart           from '../components/AskChart'
-import NavBar             from '../components/NavBar'
-import DivisionalCharts   from '../components/DivisionalCharts'
-import TransitPanel       from '../components/TransitPanel'
-import KPChart            from '../components/KPChart'
-import AshtakavargaTable  from '../components/AshtakavargaTable'
-import SarvatobhadraChakra from '../components/SarvatobhadraChakra'
-import BhavaChalit        from '../components/BhavaChalit'
-import KundliDownload     from '../components/KundliDownload'
-import CareerReportTab   from '../components/CareerReportTab'
-import RajyogasTab       from '../components/RajyogasTab'
-import TopicInsightTab   from '../components/TopicInsightTab'
-import TopicReportTab    from '../components/TopicReportTab'
-import SegmentedToggle   from '../components/SegmentedToggle'
-
+// ── Eager imports ────────────────────────────────────────────────────────────
+// Components the user sees immediately on first render (birth chart tab).
+// Everything else is lazy so the initial JS bundle the landing page downloads
+// doesn't include 2,700+ lines of chart/AI/report code nobody has asked for yet.
+import KundliChart     from '../components/KundliChart'
+import DashaTable      from '../components/DashaTable'
+import PlanetTable     from '../components/PlanetTable'
+import NavBar          from '../components/NavBar'
+import SegmentedToggle from '../components/SegmentedToggle'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
-import TabIcon from '../components/TabIcon'
-import Seo from '../components/Seo'
+import TabIcon   from '../components/TabIcon'
+import Seo       from '../components/Seo'
+
+// ── Lazy imports ─────────────────────────────────────────────────────────────
+// Loaded on first access of the tab that needs them. Vite automatically splits
+// each of these into a separate chunk, so a user who only ever looks at the
+// birth chart and planets never downloads the AI reading or advanced chart code.
+const KPChart            = lazy(() => import('../components/KPChart'))
+const DivisionalCharts   = lazy(() => import('../components/DivisionalCharts'))
+const TransitPanel       = lazy(() => import('../components/TransitPanel'))
+const KundliDownload     = lazy(() => import('../components/KundliDownload'))
+const BhavaChalit        = lazy(() => import('../components/BhavaChalit'))
+const AshtakavargaTable  = lazy(() => import('../components/AshtakavargaTable'))
+const SarvatobhadraChakra = lazy(() => import('../components/SarvatobhadraChakra'))
+const ChartReading       = lazy(() => import('../components/ChartReading'))
+const AskChart           = lazy(() => import('../components/AskChart'))
+const RajyogasTab        = lazy(() => import('../components/RajyogasTab'))
+const CareerReportTab    = lazy(() => import('../components/CareerReportTab'))
+const TopicInsightTab    = lazy(() => import('../components/TopicInsightTab'))
+const TopicReportTab     = lazy(() => import('../components/TopicReportTab'))
+
+// ── Suspense fallback ────────────────────────────────────────────────────────
+// Matches the existing spinner aesthetic used elsewhere in the app
+// (rotating planet emoji + pulsing progress bar in ChartReading.jsx /
+// CareerReport.jsx) so tab transitions feel intentional, not broken.
+function TabLoader() {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <div className="text-3xl mb-3 animate-spin">🪐</div>
+      <div className="w-40 h-1.5 bg-night/10 rounded-full overflow-hidden">
+        <div className="h-full rounded-full animate-pulse bg-primary w-3/4" />
+      </div>
+    </div>
+  )
+}
 
 function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
@@ -182,7 +205,11 @@ export default function Result() {
       )
     }
     if (chartStyle === 'kp') {
-      return <KPChart input={input} />
+      return (
+        <Suspense fallback={<TabLoader />}>
+          <KPChart input={input} />
+        </Suspense>
+      )
     }
     return null
   }
@@ -256,10 +283,6 @@ export default function Result() {
             {renderBirthChart()}
           </div>
 
-          <div className={activeKundliSub === 'divisional' ? '' : 'hidden'}>
-            <DivisionalCharts input={input} defaultDivision={topic?.division} />
-          </div>
-
           <div className={activeKundliSub === 'planets' ? '' : 'hidden'}>
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
@@ -268,66 +291,79 @@ export default function Result() {
             <DashaTable dasha={data.dasha} />
           </div>
 
-          <div className={activeKundliSub === 'transit' ? '' : 'hidden'}>
-            <TransitPanel input={input} natalData={data} />
-          </div>
+          {/* Lazy sub-tabs — loaded on first access */}
+          <Suspense fallback={<TabLoader />}>
+            <div className={activeKundliSub === 'divisional' ? '' : 'hidden'}>
+              <DivisionalCharts input={input} defaultDivision={topic?.division} />
+            </div>
 
-          <div className={activeKundliSub === 'download' ? '' : 'hidden'}>
-            <KundliDownload data={data} input={input} />
-          </div>
+            <div className={activeKundliSub === 'transit' ? '' : 'hidden'}>
+              <TransitPanel input={input} natalData={data} />
+            </div>
+
+            <div className={activeKundliSub === 'download' ? '' : 'hidden'}>
+              <KundliDownload data={data} input={input} />
+            </div>
+          </Suspense>
         </div>
 
         {/* ══════════════ ADVANCED ══════════════ */}
         <div className={activeMain === 'advanced' ? '' : 'hidden'}>
           <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
-          <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
-            <BhavaChalit input={input} />
-          </div>
+          <Suspense fallback={<TabLoader />}>
+            <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
+              <BhavaChalit input={input} />
+            </div>
 
-          <div className={activeAdvancedSub === 'ashtakavarga' ? '' : 'hidden'}>
-            <AshtakavargaTable input={input} />
-          </div>
+            <div className={activeAdvancedSub === 'ashtakavarga' ? '' : 'hidden'}>
+              <AshtakavargaTable input={input} />
+            </div>
 
-          <div className={activeAdvancedSub === 'sarvatobhadra' ? '' : 'hidden'}>
-            {/* Note: pre-existing gap, not introduced here — natal-only view
-                until something actually feeds live transit data in. */}
-            <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
-          </div>
+            <div className={activeAdvancedSub === 'sarvatobhadra' ? '' : 'hidden'}>
+              {/* Note: pre-existing gap, not introduced here — natal-only view
+                  until something actually feeds live transit data in. */}
+              <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
+            </div>
+          </Suspense>
         </div>
 
         {/* ══════════════ INSIGHTS ══════════════ */}
         <div className={activeMain === 'insights' ? '' : 'hidden'}>
           <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
 
-          <div className={activeInsightSub === 'reading' ? '' : 'hidden'}>
-            <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />
-          </div>
-
-          <div className={activeInsightSub === 'rajyogas' ? '' : 'hidden'}>
-            <RajyogasTab input={input} />
-          </div>
-
-          <div className={activeInsightSub === 'career' ? '' : 'hidden'}>
-            <CareerReportTab input={input} />
-          </div>
-
-          {(topicId === 'relationship' || topicId === 'finance') && (
-            <div className={activeInsightSub === topicId ? '' : 'hidden'}>
-              <TopicReportTab topic={topicId} input={input} />
+          <Suspense fallback={<TabLoader />}>
+            <div className={activeInsightSub === 'reading' ? '' : 'hidden'}>
+              <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />
             </div>
-          )}
 
-          {topicId === 'health' && (
-            <div className={activeInsightSub === topicId ? '' : 'hidden'}>
-              <TopicInsightTab topic={topicId} data={data} />
+            <div className={activeInsightSub === 'rajyogas' ? '' : 'hidden'}>
+              <RajyogasTab input={input} />
             </div>
-          )}
+
+            <div className={activeInsightSub === 'career' ? '' : 'hidden'}>
+              <CareerReportTab input={input} />
+            </div>
+
+            {(topicId === 'relationship' || topicId === 'finance') && (
+              <div className={activeInsightSub === topicId ? '' : 'hidden'}>
+                <TopicReportTab topic={topicId} input={input} />
+              </div>
+            )}
+
+            {topicId === 'health' && (
+              <div className={activeInsightSub === topicId ? '' : 'hidden'}>
+                <TopicInsightTab topic={topicId} data={data} />
+              </div>
+            )}
+          </Suspense>
         </div>
 
         {/* ══════════════ ASK ══════════════ */}
         <div className={activeMain === 'ask' ? '' : 'hidden'}>
-          <AskChart input={input} initialQuestion={presetQuestion} />
+          <Suspense fallback={<TabLoader />}>
+            <AskChart input={input} initialQuestion={presetQuestion} />
+          </Suspense>
         </div>
 
       </div>

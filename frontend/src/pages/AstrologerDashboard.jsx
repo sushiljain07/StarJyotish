@@ -1,5 +1,5 @@
 // frontend/src/pages/AstrologerDashboard.jsx
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import {

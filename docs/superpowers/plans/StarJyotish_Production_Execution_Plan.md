@@ -73,7 +73,7 @@
 - Best-effort persistence hook (`services/persistence.py`) — DB failure never affects report generation
 
 **Remaining:**
-- Add explicit DB indexes on high-frequency query paths once real traffic patterns are visible (e.g. `BirthProfile`/`Report` by phone)
+- All hot query paths are already indexed: `user_id` (index=True) on `BirthProfile` and `Report`, `phone_number` (unique+index) on `User` and `OtpCode`, `birth_profile_id` and `report_type` (index=True) on `Report`. No additional indexes needed for current query patterns.
 - Move `ChatSession`/`ChatMessage` tables into active use (created but not yet wired to `ask_kundli()` route)
 
 ---

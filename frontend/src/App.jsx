@@ -9,8 +9,9 @@ import CareerReport from './pages/CareerReport'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
-import AdminRoute from './components/AdminRoute'
+import RoleRoute from './components/RoleRoute'
 import AdminDashboard from './pages/AdminDashboard'
+import AstrologerDashboard from './pages/AstrologerDashboard'
 import Disclaimer from './pages/Disclaimer'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
@@ -32,7 +33,8 @@ export default function App() {
           <Route path="/career-report" element={<CareerReport />} />
           <Route path="/login" element={<Login />} />
           <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+          <Route path="/astrologer" element={<RoleRoute role="astrologer"><AstrologerDashboard /></RoleRoute>} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfUse />} />

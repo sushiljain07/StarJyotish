@@ -36,3 +36,15 @@ export function fetchKPChart({ date, time, place }) {
 export function fetchDivisional({ date, time, place, division }) {
   return postJson(`/api/kundli/divisional?division=${division}`, { date, time, place })
 }
+
+// Place-name autocomplete for the birth form. Goes through our own backend
+// (routers/places.py) rather than calling Nominatim directly from the
+// browser — Nominatim's usage policy disallows client-side autocomplete
+// against its public API and blocks/CORS-rejects that pattern, which is
+// why suggestions were silently returning nothing.
+export async function fetchPlaceSuggestions(query) {
+  const resp = await fetch(`${API_BASE}/api/places/suggest?q=${encodeURIComponent(query)}`)
+  if (!resp.ok) return []
+  const data = await resp.json()
+  return data.suggestions ?? []
+}

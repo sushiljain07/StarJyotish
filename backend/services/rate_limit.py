@@ -35,3 +35,8 @@ COMPUTE_LIMIT = "30/minute"
 OTP_SEND_LIMIT = "5/minute"
 OTP_VERIFY_LIMIT = "10/minute"
 AUTH_LIMIT = "20/minute"
+
+# Place autocomplete: generous enough for normal typing (already debounced
+# client-side), but capped so this backend stays within Nominatim's own
+# "max 1 request/second" usage policy in aggregate per client.
+PLACES_LIMIT = "60/minute"

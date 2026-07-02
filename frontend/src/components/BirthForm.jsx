@@ -1,6 +1,7 @@
 // frontend/src/components/BirthForm.jsx
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { fetchPlaceSuggestions } from '../api/astro'
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -22,12 +23,8 @@ function usePlaceSuggestions(query) {
     clearTimeout(timer.current)
     timer.current = setTimeout(async () => {
       try {
-        const resp = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
-          { headers: { 'Accept-Language': 'en' } }
-        )
-        const data = await resp.json()
-        setSuggestions(data.map(d => d.display_name))
+        const results = await fetchPlaceSuggestions(query)
+        setSuggestions(results)
       } catch {
         setSuggestions([])
       }

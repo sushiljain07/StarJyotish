@@ -9,6 +9,8 @@ import CareerReport from './pages/CareerReport'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
+import AdminDashboard from './pages/AdminDashboard'
 import Disclaimer from './pages/Disclaimer'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
@@ -30,6 +32,7 @@ export default function App() {
           <Route path="/career-report" element={<CareerReport />} />
           <Route path="/login" element={<Login />} />
           <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfUse />} />

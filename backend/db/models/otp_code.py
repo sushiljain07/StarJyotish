@@ -24,7 +24,9 @@ from db.mixins import TimestampMixin, UUIDPKMixin
 class OtpCode(UUIDPKMixin, TimestampMixin, Base):
     __tablename__ = "otp_codes"
 
-    phone_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
+    # Column stores either a phone number (E.164, max 16 chars) or an email
+    # address (RFC 5321 max 254 chars) — widened in migration 0008.
+    phone_number: Mapped[str] = mapped_column(String(254), unique=True, nullable=False, index=True)
     # HMAC-SHA256 hex digest of the 6-digit code, keyed by OTP_HASH_SECRET.
     code_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)

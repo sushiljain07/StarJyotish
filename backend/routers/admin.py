@@ -416,3 +416,69 @@ def set_kyc_status(
         kyc_status=updated.kyc_status.value,
         created_at=_fmt(updated.created_at),
     )
+
+
+# ── Testimonials management ────────────────────────────────────────────────────
+
+from db.models.testimonial import Testimonial, TestimonialStatus
+from db.repositories import TestimonialRepository
+
+
+class TestimonialAdminOut(BaseModel):
+    id: uuid.UUID
+    display_name: str
+    location: Optional[str]
+    text: str
+    detail: Optional[str]
+    status: str
+    is_featured: bool
+    admin_notes: Optional[str]
+    user_id: Optional[uuid.UUID]
+    created_at: str
+
+
+class TestimonialStatusRequest(BaseModel):
+    status: TestimonialStatus
+    admin_notes: Optional[str] = None
+
+
+def _fmt_testimonial(t) -> TestimonialAdminOut:
+    return TestimonialAdminOut(
+        id=t.id,
+        display_name=t.display_name,
+        location=t.location,
+        text=t.text,
+        detail=t.detail,
+        status=t.status.value,
+        is_featured=t.is_featured,
+        admin_notes=t.admin_notes,
+        user_id=t.user_id,
+        created_at=_fmt(t.created_at),
+    )
+
+
+@router.get("/testimonials", response_model=List[TestimonialAdminOut])
+def admin_list_testimonials(
+    db: Session = Depends(get_db),
+    _: User = _admin_required,
+):
+    """All testimonials across every status — for the admin Testimonials tab."""
+    return [_fmt_testimonial(t) for t in TestimonialRepository(db).list_all()]
+
+
+@router.patch("/testimonials/{testimonial_id}", response_model=TestimonialAdminOut)
+def admin_set_testimonial_status(
+    testimonial_id: uuid.UUID,
+    body: TestimonialStatusRequest,
+    db: Session = Depends(get_db),
+    _: User = _admin_required,
+):
+    """Approve, reject, or feature a submitted testimonial.
+    Setting status=featured also sets is_featured=True (shown on landing page).
+    Setting status=approved keeps it on /testimonials but off the landing page."""
+    t = db.get(Testimonial, testimonial_id)
+    if t is None:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+    TestimonialRepository(db).set_status(t, body.status, body.admin_notes)
+    db.commit()
+    return _fmt_testimonial(t)

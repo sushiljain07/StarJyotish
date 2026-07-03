@@ -12,6 +12,7 @@ from db.models.birth_profile import BirthProfile  # noqa: F401
 from db.models.booking import Booking, BookingMode, BookingStatus  # noqa: F401
 from db.models.chat import ChatMessage, ChatRole, ChatSession  # noqa: F401
 from db.models.feedback import Feedback, FeedbackCategory  # noqa: F401
+from db.models.testimonial import Testimonial, TestimonialStatus  # noqa: F401
 from db.models.notification import Notification, NotificationChannel, NotificationStatus  # noqa: F401
 from db.models.otp_code import OtpCode  # noqa: F401
 from db.models.purchase import Purchase, PurchaseProductType, PurchaseStatus  # noqa: F401
@@ -40,5 +41,6 @@ __all__ = [
     "AppSetting",
     "AuditLog", "AuditAction",
     "Feedback", "FeedbackCategory",
+    "Testimonial", "TestimonialStatus",
     "ChatSession", "ChatMessage", "ChatRole",
 ]

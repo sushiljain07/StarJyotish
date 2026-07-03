@@ -8,13 +8,36 @@ import {
   adminAuditLogs,
   adminListAstrologers, adminOnboardAstrologer, adminSetKyc,
 } from '../api/admin'
+import { API_BASE } from '../api/config'
+
+// Testimonials admin API — direct fetch since these aren't in the admin.js client yet
+async function adminListTestimonials(token) {
+  const r = await fetch(`${API_BASE}/api/admin/testimonials`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  })
+  const data = await r.json()
+  if (!r.ok) throw new Error(data.detail ?? 'Error')
+  return data
+}
+async function adminSetTestimonialStatus(token, id, status, notes) {
+  const r = await fetch(`${API_BASE}/api/admin/testimonials/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    credentials: 'include',
+    body: JSON.stringify({ status, admin_notes: notes }),
+  })
+  const data = await r.json()
+  if (!r.ok) throw new Error(data.detail ?? 'Error')
+  return data
+}
 
 const TABS = [
   { id: 'users',       label: 'Users' },
   { id: 'astrologers', label: 'Astrologers' },
   { id: 'settings',    label: 'Feature Flags' },
   { id: 'pricing',     label: 'Pricing Plans' },
-  { id: 'blog',        label: 'Blog' },
+  { id: 'blog',          label: 'Blog' },
+  { id: 'testimonials',  label: 'Testimonials' },
   { id: 'audit',       label: 'Audit Log' },
 ]
 
@@ -705,6 +728,116 @@ function BlogTab({ token }) {
   )
 }
 
+// ── Testimonials admin tab ─────────────────────────────────────────────────────
+
+const STATUS_LABELS = {
+  pending:  { label: 'Pending',  color: 'bg-primary-light text-primary-dark' },
+  approved: { label: 'Approved', color: 'bg-sage-light text-sage' },
+  featured: { label: 'Featured', color: 'bg-primary text-night' },
+  rejected: { label: 'Rejected', color: 'bg-vermillion-light text-vermillion' },
+}
+
+function TestimonialsAdminTab({ token }) {
+  const [items,   setItems]   = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState('')
+  const [saving,  setSaving]  = useState({})
+
+  const load = useCallback(async () => {
+    setLoading(true); setError('')
+    try { setItems(await adminListTestimonials(token)) }
+    catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }, [token])
+
+  useEffect(() => { load() }, [load])
+
+  async function setStatus(id, status) {
+    setSaving(p => ({...p, [id]: true}))
+    try { await adminSetTestimonialStatus(token, id, status, null); await load() }
+    catch (e) { setError(e.message) }
+    finally { setSaving(p => ({...p, [id]: false})) }
+  }
+
+  const pending  = (items ?? []).filter(t => t.status === 'pending')
+  const rest     = (items ?? []).filter(t => t.status !== 'pending')
+
+  return (
+    <div>
+      {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-4">{error}</div>}
+      <p className="text-xs text-ink-faint mb-4">
+        <strong>Featured</strong> (max 4) — shown on the landing page. <strong>Approved</strong> — shown on /testimonials page only. <strong>Rejected</strong> — hidden everywhere.
+        <a href="/testimonials" target="_blank" rel="noreferrer" className="ml-2 text-primary-dark underline">View /testimonials page →</a>
+      </p>
+
+      {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : (
+        <div className="space-y-3">
+          {pending.length > 0 && (
+            <div className="font-semibold text-xs text-ink-muted uppercase tracking-wide mb-2">
+              Awaiting review ({pending.length})
+            </div>
+          )}
+          {[...pending, ...rest].map(t => {
+            const s = STATUS_LABELS[t.status] ?? STATUS_LABELS.pending
+            return (
+              <SectionCard key={t.id}>
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
+                      <span className="text-xs font-semibold text-ink">{t.display_name}</span>
+                      {t.location && <span className="text-xs text-ink-faint">{t.location}</span>}
+                    </div>
+                    <p className="text-sm text-ink leading-relaxed">{t.text}</p>
+                    {t.detail && <p className="text-xs text-primary-dark mt-1">Used: {t.detail}</p>}
+                    {t.admin_notes && <p className="text-xs text-ink-faint mt-1 italic">Note: {t.admin_notes}</p>}
+                    <p className="text-xs text-ink-faint mt-1">{new Date(t.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</p>
+                  </div>
+                  <div className="flex flex-col gap-1.5 flex-shrink-0">
+                    {t.status !== 'featured' && (
+                      <button onClick={() => setStatus(t.id, 'featured')} disabled={saving[t.id]}
+                        className="px-3 py-1.5 bg-primary text-night text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50 whitespace-nowrap">
+                        ★ Feature
+                      </button>
+                    )}
+                    {t.status !== 'approved' && t.status !== 'featured' && (
+                      <button onClick={() => setStatus(t.id, 'approved')} disabled={saving[t.id]}
+                        className="px-3 py-1.5 bg-sage-light text-sage text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50">
+                        Approve
+                      </button>
+                    )}
+                    {t.status === 'featured' && (
+                      <button onClick={() => setStatus(t.id, 'approved')} disabled={saving[t.id]}
+                        className="px-3 py-1.5 bg-parchment border border-line text-ink-muted text-xs rounded-lg hover:bg-parchment-card transition disabled:opacity-50 whitespace-nowrap">
+                        Un-feature
+                      </button>
+                    )}
+                    {t.status !== 'rejected' && (
+                      <button onClick={() => setStatus(t.id, 'rejected')} disabled={saving[t.id]}
+                        className="px-3 py-1.5 bg-parchment border border-line text-ink-muted text-xs rounded-lg hover:bg-vermillion-light hover:text-vermillion hover:border-vermillion/30 transition disabled:opacity-50">
+                        Reject
+                      </button>
+                    )}
+                    {t.status === 'rejected' && (
+                      <button onClick={() => setStatus(t.id, 'pending')} disabled={saving[t.id]}
+                        className="px-3 py-1.5 bg-parchment border border-line text-ink-muted text-xs rounded-lg hover:bg-primary-light transition disabled:opacity-50">
+                        Re-review
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </SectionCard>
+            )
+          })}
+          {(items ?? []).length === 0 && (
+            <p className="text-ink-faint text-sm text-center py-12">No testimonials submitted yet.</p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Audit log tab ──────────────────────────────────────────────────────────────
 
 function AuditTab({ token }) {
@@ -811,8 +944,9 @@ export default function AdminDashboard() {
         {tab === 'astrologers' && <AstrologersTab token={accessToken} />}
         {tab === 'settings'    && <SettingsTab    token={accessToken} />}
         {tab === 'pricing'     && <PricingTab     token={accessToken} />}
-        {tab === 'blog'        && <BlogTab        token={accessToken} />}
-        {tab === 'audit'       && <AuditTab       token={accessToken} />}
+        {tab === 'blog'         && <BlogTab         token={accessToken} />}
+        {tab === 'testimonials' && <TestimonialsAdminTab token={accessToken} />}
+        {tab === 'audit'        && <AuditTab        token={accessToken} />}
       </div>
     </div>
   )

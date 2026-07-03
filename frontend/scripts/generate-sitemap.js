@@ -21,6 +21,10 @@ const PUBLIC_ROUTES = [
   { path: '/',              changefreq: 'weekly',  priority: '1.0' },
   { path: '/generate',      changefreq: 'monthly', priority: '0.9' },
   { path: '/career-report', changefreq: 'monthly', priority: '0.8' },
+  { path: '/pricing',       changefreq: 'monthly', priority: '0.8' },
+  { path: '/blog',          changefreq: 'weekly',  priority: '0.8' },
+  // Blog article slugs are managed dynamically via admin dashboard.
+  // Add new article URLs here when published so they get indexed.
   { path: '/about',         changefreq: 'monthly', priority: '0.5' },
   { path: '/faq',           changefreq: 'monthly', priority: '0.6' },
   { path: '/contact',       changefreq: 'yearly',  priority: '0.4' },

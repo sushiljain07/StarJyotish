@@ -51,7 +51,7 @@ function TestimonialCard({ t, i }) {
 }
 
 // eslint-disable-next-line react/prop-types
-export default function Testimonials({ onCtaClick: _onCtaClick }) {
+export default function Testimonials() {
   const { t } = useTranslation()
   const [items, setItems] = useState(DEFAULTS)
 

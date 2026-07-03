@@ -25,21 +25,33 @@ def _normalize_phone(v: str) -> str:
     return v
 
 
+
+import re as _re
+
+
+def _is_email(v: str) -> bool:
+    return bool(_re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', v))
+
+
+def _normalize_identifier(v: str) -> str:
+    v = v.strip()
+    if _is_email(v):
+        return v.lower()
+    return _normalize_phone(v)
+
+
 class OtpSendRequest(BaseModel):
     phone_number: str
 
     @field_validator("phone_number")
     @classmethod
-    def _validate_phone(cls, v: str) -> str:
-        return _normalize_phone(v)
+    def _validate(cls, v: str) -> str:
+        return _normalize_identifier(v)
 
 
 class OtpSendResponse(BaseModel):
     sent: bool
     expires_in_seconds: int
-    # Only ever populated outside production (see routers/auth.py) so a
-    # developer testing locally without an SMS provider configured can see
-    # the code in the API response instead of digging through server logs.
     debug_code: Optional[str] = None
 
 
@@ -49,8 +61,8 @@ class OtpVerifyRequest(BaseModel):
 
     @field_validator("phone_number")
     @classmethod
-    def _validate_phone(cls, v: str) -> str:
-        return _normalize_phone(v)
+    def _validate(cls, v: str) -> str:
+        return _normalize_identifier(v)
 
     @field_validator("code")
     @classmethod
@@ -59,6 +71,7 @@ class OtpVerifyRequest(BaseModel):
         if not v.isdigit() or len(v) != 6:
             raise ValueError("Code must be 6 digits")
         return v
+
 
 
 class GoogleLoginRequest(BaseModel):

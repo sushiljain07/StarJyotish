@@ -51,4 +51,14 @@ class UserRepository(BaseRepository[User]):
                 self.db.flush()
                 return user
         return self.create(google_sub=google_sub, email=email, name=name)
+    def get_or_create_by_email_otp(self, email: str):
+        """Entry point for email-OTP sign-in. Looks up by email; creates a
+        new account with just the email set if none exists. If the same email
+        later signs in via Google, get_or_create_by_google will find and link
+        the existing row (it already falls back to email lookup)."""
+        user = self.get_by_email(email)
+        if user is not None:
+            return user
+        return self.create(email=email)
+
 

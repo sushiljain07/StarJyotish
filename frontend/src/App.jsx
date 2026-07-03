@@ -20,6 +20,9 @@ import AboutUs from './pages/AboutUs'
 import FAQ from './pages/FAQ'
 import ContactUs from './pages/ContactUs'
 import NotFound from './pages/NotFound'
+import Pricing from './pages/Pricing'
+import Blog from './pages/Blog'
+import BlogArticle from './pages/BlogArticle'
 
 export default function App() {
   return (
@@ -42,6 +45,9 @@ export default function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogArticle />} />
           {/* Must stay last: React Router matches routes in declaration
               order, so anything above this always wins first. */}
           <Route path="*" element={<NotFound />} />

@@ -104,7 +104,7 @@ export default function Footer() {
             <FooterLink to="#">{t('footer_link_zodiac')}</FooterLink>
             <FooterLink to="#">{t('footer_link_nakshatra')}</FooterLink>
             <FooterLink to="#">{t('footer_link_dasha')}</FooterLink>
-            <FooterLink to="#">{t('footer_link_blog')}</FooterLink>
+            <FooterLink to="/blog">{t('footer_link_blog')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
           </ul>
         </FooterColumn>
@@ -123,7 +123,7 @@ export default function Footer() {
           <ul className="space-y-2.5">
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
             <FooterLink to="/#how-it-works">{t('footer_link_how_it_works')}</FooterLink>
-            <FooterLink to="#">{t('footer_link_pricing')}</FooterLink>
+            <FooterLink to="/pricing">{t('footer_link_pricing')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>
           <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mt-6 mb-2">{t('footer_contact_heading')}</h3>

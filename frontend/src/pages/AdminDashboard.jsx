@@ -13,6 +13,8 @@ const TABS = [
   { id: 'users',       label: 'Users' },
   { id: 'astrologers', label: 'Astrologers' },
   { id: 'settings',    label: 'Feature Flags' },
+  { id: 'pricing',     label: 'Pricing Plans' },
+  { id: 'blog',        label: 'Blog' },
   { id: 'audit',       label: 'Audit Log' },
 ]
 
@@ -430,6 +432,279 @@ function SettingsTab({ token }) {
   )
 }
 
+// ── Pricing plans tab ──────────────────────────────────────────────────────────
+
+function PricingTab({ token }) {
+  const [raw,     setRaw]     = useState(null)
+  const [current, setCurrent] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [saving,  setSaving]  = useState(false)
+  const [error,   setError]   = useState('')
+  const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    import('../api/admin').then(({ adminListSettings: ls }) => {
+      ls(token)
+        .then(settings => {
+          const s = settings.find(x => x.key === 'pricing_plans')
+          const str = s ? JSON.stringify(s.value, null, 2) : JSON.stringify([
+            { id: 'free',      name: 'Free',      price_monthly: 0,   highlight: false, badge: null,           accent: 'border-line',    features: ['Full Kundli (all 16 charts)','Dasha timeline','One AI reading','3 Ask questions'],            cta: 'Generate Free Kundli',  tagline: 'Your real Kundli, always free.' },
+            { id: 'seeker',    name: 'Seeker',    price_monthly: 99,  highlight: false, badge: null,           accent: 'border-primary', features: ['Everything in Free','Unlimited charts','Unlimited Ask','All topic reports','Priority AI'],          cta: 'Start Seeker Plan',     tagline: 'For the curious.' },
+            { id: 'jyotishi',  name: 'Jyotishi',  price_monthly: 299, highlight: true,  badge: 'Most Popular', accent: 'border-sage',    features: ['Everything in Seeker','Synastry charts','Transit alerts','PDF downloads'],                        cta: 'Start Jyotishi Plan',   tagline: 'For serious practitioners.' },
+            { id: 'sampoorna', name: 'Sampoorna', price_monthly: 499, highlight: false, badge: 'Coming soon',  accent: 'border-mauve',   features: ['Everything in Jyotishi','1 live consultation/month'],                                            cta: 'Start Sampoorna Plan',  tagline: 'When you want a human astrologer too.' },
+          ], null, 2)
+          setRaw(str); setCurrent(str)
+        })
+        .catch(e => setError(e.message))
+        .finally(() => setLoading(false))
+    })
+  }, [token])
+
+  async function handleSave() {
+    setSaving(true); setError(''); setSuccess(false)
+    try { JSON.parse(raw) } catch { setError('Invalid JSON'); setSaving(false); return }
+    try {
+      const { adminUpsertSetting: us } = await import('../api/admin')
+      await us(token, 'pricing_plans', { value: JSON.parse(raw), description: 'Pricing page plan definitions', is_public: true })
+      setCurrent(raw); setSuccess(true); setTimeout(() => setSuccess(false), 3000)
+    } catch (e) { setError(e.message) }
+    finally { setSaving(false) }
+  }
+
+  return (
+    <div>
+      <p className="text-sm text-ink-muted mb-2">
+        Edit the <code className="text-xs bg-parchment px-1.5 py-0.5 rounded border border-line">pricing_plans</code> setting
+        that the <a href="/pricing" target="_blank" rel="noreferrer" className="text-primary-dark underline">Pricing page</a> reads.
+        Changes live immediately.
+      </p>
+      <p className="text-xs text-ink-faint mb-4">Fields: <code>id</code> <code>name</code> <code>price_monthly</code> <code>features[]</code> <code>cta</code> <code>tagline</code> <code>highlight</code> <code>badge</code> <code>accent</code>. Hindi: <code>name_hi</code> <code>tagline_hi</code> <code>cta_hi</code></p>
+      {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-3">{error}</div>}
+      {success && <div className="bg-sage-light text-sage text-sm rounded-lg px-4 py-3 mb-3">Saved</div>}
+      {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : (
+        <SectionCard>
+          <textarea value={raw ?? ''} onChange={e => setRaw(e.target.value)} rows={24}
+            className="w-full font-mono text-xs bg-parchment border border-line rounded-lg px-3 py-3 text-ink focus:outline-none focus:border-primary-dark resize-y" spellCheck={false} />
+          <div className="flex gap-3 mt-4">
+            <button onClick={handleSave} disabled={saving || raw === current}
+              className="px-5 py-2.5 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-40">
+              {saving ? 'Saving…' : 'Save Plans'}
+            </button>
+            {raw !== current && (
+              <button onClick={() => setRaw(current)} className="px-5 py-2.5 border border-line text-ink-muted text-sm rounded-lg hover:bg-parchment transition">Reset</button>
+            )}
+            <a href="/pricing" target="_blank" rel="noreferrer" className="ml-auto px-4 py-2.5 text-sm text-primary-dark underline self-center">Preview →</a>
+          </div>
+        </SectionCard>
+      )}
+    </div>
+  )
+}
+
+// ── Blog management tab ──────────────────────────────────────────────────────────────────────────────
+
+const BLOG_ARTICLE_TEMPLATE = {
+  title: 'New Article Title',
+  excerpt: 'A one or two sentence description shown in article cards.',
+  category: 'Basics',
+  readMin: 5,
+  tags: ['Tag1', 'Tag2'],
+  date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }),
+  featured: false,
+  status: 'draft',
+  relatedSlugs: [],
+  content: [
+    { type: 'intro', content: 'Opening paragraph that hooks the reader.' },
+    { type: 'h2', content: 'First Section Heading' },
+    { type: 'body', content: 'Paragraph text here.' },
+    { type: 'callout', content: 'Key insight or tip.' },
+    { type: 'list', content: ['First point', 'Second point', 'Third point'] },
+  ],
+}
+
+const STATUS_COLOR = { published: 'bg-sage-light text-sage', draft: 'bg-primary-light text-primary-dark', archived: 'bg-parchment text-ink-faint' }
+
+function BlogTab({ token }) {
+  const [settings, setSettings] = useState({})
+  const [index,    setIndex]    = useState([])
+  const [loading,  setLoading]  = useState(true)
+  const [editing,  setEditing]  = useState(null)
+  const [editRaw,  setEditRaw]  = useState('')
+  const [newSlug,  setNewSlug]  = useState('')
+  const [saving,   setSaving]   = useState(false)
+  const [error,    setError]    = useState('')
+  const [success,  setSuccess]  = useState('')
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { adminListSettings: ls } = await import('../api/admin')
+      const all = await ls(token)
+      const map = {}
+      all.forEach(s => { map[s.key] = s.value })
+      setSettings(map)
+      setIndex(Array.isArray(map.blog_index) ? map.blog_index : [])
+    } catch (e) { setError(e.message) }
+    finally { setLoading(false) }
+  }, [token])
+
+  useEffect(() => { load() }, [load])
+
+  async function saveIndex(newIndex) {
+    const { adminUpsertSetting: us } = await import('../api/admin')
+    await us(token, 'blog_index', { value: newIndex, description: 'Ordered list of blog article slugs', is_public: true })
+    setIndex(newIndex)
+  }
+
+  async function saveArticle() {
+    setSaving(true); setError('')
+    let parsed
+    try { parsed = JSON.parse(editRaw) } catch { setError('Invalid JSON'); setSaving(false); return }
+    try {
+      const { adminUpsertSetting: us } = await import('../api/admin')
+      const isPublic = parsed.status === 'published'
+      await us(token, `blog_article_${editing}`, { value: parsed, description: `Blog: ${parsed.title}`, is_public: isPublic })
+      if (isPublic && !index.includes(editing)) await saveIndex([editing, ...index])
+      setSuccess(`Saved: ${parsed.title}`)
+      setTimeout(() => setSuccess(''), 3000)
+      setEditing(null)
+      await load()
+    } catch (e) { setError(e.message) }
+    finally { setSaving(false) }
+  }
+
+  async function archiveArticle(slug) {
+    const art = settings[`blog_article_${slug}`]
+    if (!art) return
+    const { adminUpsertSetting: us } = await import('../api/admin')
+    await us(token, `blog_article_${slug}`, { value: { ...art, status: 'archived' }, description: `Blog: ${art.title}`, is_public: false })
+    await saveIndex(index.filter(s => s !== slug))
+    await load()
+  }
+
+  async function publishArticle(slug) {
+    const art = settings[`blog_article_${slug}`]
+    if (!art) return
+    const { adminUpsertSetting: us } = await import('../api/admin')
+    await us(token, `blog_article_${slug}`, { value: { ...art, status: 'published' }, description: `Blog: ${art.title}`, is_public: true })
+    if (!index.includes(slug)) await saveIndex([slug, ...index])
+    await load()
+  }
+
+  async function moveUp(slug) {
+    const i = index.indexOf(slug)
+    if (i <= 0) return
+    const ni = [...index]; [ni[i-1], ni[i]] = [ni[i], ni[i-1]]
+    await saveIndex(ni)
+  }
+
+  async function moveDown(slug) {
+    const i = index.indexOf(slug)
+    if (i < 0 || i >= index.length - 1) return
+    const ni = [...index]; [ni[i], ni[i+1]] = [ni[i+1], ni[i]]
+    await saveIndex(ni)
+  }
+
+  async function createArticle() {
+    if (!newSlug.trim()) { setError('Enter a slug first'); return }
+    const slug = newSlug.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    if (settings[`blog_article_${slug}`]) { setError(`Slug "${slug}" already exists`); return }
+    setEditing(slug)
+    setEditRaw(JSON.stringify({ ...BLOG_ARTICLE_TEMPLATE }, null, 2))
+    setNewSlug('')
+  }
+
+  const allSlugs = [...new Set([...index, ...Object.keys(settings).filter(k => k.startsWith('blog_article_')).map(k => k.replace('blog_article_',''))])]
+
+  if (editing !== null) {
+    return (
+      <div>
+        <button onClick={() => setEditing(null)} className="text-primary-dark text-sm font-medium mb-4 hover:underline">← Back to articles</button>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="font-semibold text-ink text-sm">{settings[`blog_article_${editing}`] ? 'Editing' : 'New article'}: <code className="text-xs bg-parchment px-1.5 py-0.5 rounded border border-line">{editing}</code></div>
+            <div className="text-xs text-ink-muted mt-0.5">Set <code>status</code> to <code>"published"</code> to make it live on /blog.</div>
+          </div>
+          <a href={`/blog/${editing}`} target="_blank" rel="noreferrer" className="text-xs text-primary-dark underline">Preview →</a>
+        </div>
+        {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-3">{error}</div>}
+        <SectionCard>
+          <textarea value={editRaw} onChange={e => setEditRaw(e.target.value)} rows={30}
+            className="w-full font-mono text-xs bg-parchment border border-line rounded-lg px-3 py-3 text-ink focus:outline-none focus:border-primary-dark resize-y" spellCheck={false} />
+          <div className="flex gap-3 mt-4">
+            <button onClick={saveArticle} disabled={saving}
+              className="px-5 py-2.5 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-40">
+              {saving ? 'Saving…' : 'Save Article'}
+            </button>
+            <button onClick={() => setEditing(null)} className="px-5 py-2.5 border border-line text-ink-muted text-sm rounded-lg hover:bg-parchment transition">Cancel</button>
+          </div>
+        </SectionCard>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {success && <div className="bg-sage-light text-sage text-sm rounded-lg px-4 py-3 mb-4">✓ {success}</div>}
+      {error   && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-4">{error}</div>}
+      <div className="flex gap-2 mb-4">
+        <input value={newSlug} onChange={e => setNewSlug(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && createArticle()}
+          placeholder="new-article-slug (e.g. saturn-in-aries)"
+          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
+        <button onClick={createArticle} className="px-4 py-2 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition">+ New Article</button>
+      </div>
+      <p className="text-xs text-ink-faint mb-4">Order controls /blog listing. Use ▲/▼ to reorder published articles. Archived articles are hidden from visitors.</p>
+      {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : allSlugs.length === 0 ? (
+        <p className="text-ink-faint text-sm text-center py-12">No articles yet. Create the first one above.</p>
+      ) : (
+        <div className="space-y-2">
+          {allSlugs.map((slug) => {
+            const art = settings[`blog_article_${slug}`] || {}
+            const inIndex = index.includes(slug)
+            const status = art.status || 'draft'
+            return (
+              <SectionCard key={slug}>
+                <div className="flex items-start gap-3">
+                  <div className="flex flex-col gap-1 flex-shrink-0 pt-0.5">
+                    <button onClick={() => moveUp(slug)} disabled={!inIndex || index.indexOf(slug) === 0}
+                      className="text-ink-faint hover:text-ink disabled:opacity-20 text-xs">▲</button>
+                    <button onClick={() => moveDown(slug)} disabled={!inIndex || index.indexOf(slug) === index.length - 1}
+                      className="text-ink-faint hover:text-ink disabled:opacity-20 text-xs">▼</button>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOR[status] ?? STATUS_COLOR.draft}`}>{status}</span>
+                      {art.category && <span className="text-xs text-ink-muted">{art.category}</span>}
+                      {art.featured && <span className="text-xs text-primary font-medium">★ Featured</span>}
+                      {inIndex && <span className="text-xs text-ink-faint">#{index.indexOf(slug)+1}</span>}
+                    </div>
+                    <div className="font-medium text-sm text-ink truncate">{art.title || slug}</div>
+                    {art.excerpt && <div className="text-xs text-ink-muted mt-0.5 line-clamp-1">{art.excerpt}</div>}
+                    <div className="text-xs text-ink-faint mt-1 font-mono">{slug}</div>
+                  </div>
+                  <div className="flex flex-col gap-1.5 flex-shrink-0">
+                    <button onClick={() => { setEditing(slug); setEditRaw(JSON.stringify(art, null, 2)) }}
+                      className="px-3 py-1.5 bg-parchment border border-line text-ink text-xs font-medium rounded-lg hover:bg-primary-light hover:border-primary/30 transition">Edit</button>
+                    {status !== 'published' && (
+                      <button onClick={() => publishArticle(slug)}
+                        className="px-3 py-1.5 bg-sage-light text-sage text-xs font-semibold rounded-lg hover:opacity-90 transition">Publish</button>
+                    )}
+                    {status === 'published' && (
+                      <button onClick={() => archiveArticle(slug)}
+                        className="px-3 py-1.5 bg-parchment border border-line text-ink-muted text-xs rounded-lg hover:bg-vermillion-light hover:text-vermillion hover:border-vermillion/30 transition">Archive</button>
+                    )}
+                  </div>
+                </div>
+              </SectionCard>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Audit log tab ──────────────────────────────────────────────────────────────
 
 function AuditTab({ token }) {
@@ -535,6 +810,8 @@ export default function AdminDashboard() {
         {tab === 'users'       && <UsersTab       token={accessToken} />}
         {tab === 'astrologers' && <AstrologersTab token={accessToken} />}
         {tab === 'settings'    && <SettingsTab    token={accessToken} />}
+        {tab === 'pricing'     && <PricingTab     token={accessToken} />}
+        {tab === 'blog'        && <BlogTab        token={accessToken} />}
         {tab === 'audit'       && <AuditTab       token={accessToken} />}
       </div>
     </div>

@@ -18,6 +18,7 @@ import TopicIcon from '../components/TopicIcon'
 import TabIcon from '../components/TabIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import SectionDivider from '../components/SectionDivider'
+import Testimonials from '../components/Testimonials'
 
 // Capability badges shown in the hero. These are claims Star Jyotish can
 // actually back up today (real Swiss Ephemeris calculations, real
@@ -283,6 +284,11 @@ export default function Landing() {
           </div>
         </div>
       </Reveal>
+
+      <SectionDivider />
+
+      {/* ───────────────────── Testimonials ───────────────────── */}
+      <Testimonials onCtaClick={() => goToForm(null)} />
 
       <SectionDivider />
 

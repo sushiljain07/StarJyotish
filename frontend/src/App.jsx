@@ -24,6 +24,7 @@ import Pricing from './pages/Pricing'
 import Blog from './pages/Blog'
 import BlogArticle from './pages/BlogArticle'
 import TestimonialsPage from './pages/TestimonialsPage'
+import Learn from './pages/Learn'
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogArticle />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
+          <Route path="/learn" element={<Learn />} />
           {/* Must stay last: React Router matches routes in declaration
               order, so anything above this always wins first. */}
           <Route path="*" element={<NotFound />} />

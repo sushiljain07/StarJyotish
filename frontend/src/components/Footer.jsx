@@ -95,12 +95,16 @@ export default function Footer() {
           </ul>
         </FooterColumn>
 
-        {/* Learn — Zodiac/Nakshatra/Dasha/Blog stay as "#" deliberately: no
-            content exists for them yet (out of scope for this pass), so
-            pointing them anywhere would just be a different kind of dead
-            link. FAQ now has a real standalone page. */}
+        {/* Learn — Zodiac/Nakshatra/Dasha still stay as "#" deliberately:
+            the individual guide pages don't exist yet, so pointing them
+            anywhere would just be a different kind of dead link (see
+            components/knowledge/ for the shared infra those pages will
+            use once built). The Knowledge Center hub itself is real now
+            (/learn), so it gets a proper link, and once each guide ships
+            its "#" above should become e.g. "/learn/zodiac". */}
         <FooterColumn heading={t('footer_learn_heading')}>
           <ul className="space-y-2.5">
+            <FooterLink to="/learn">{t('footer_link_knowledge_center', 'Knowledge Center')}</FooterLink>
             <FooterLink to="#">{t('footer_link_zodiac')}</FooterLink>
             <FooterLink to="#">{t('footer_link_nakshatra')}</FooterLink>
             <FooterLink to="#">{t('footer_link_dasha')}</FooterLink>

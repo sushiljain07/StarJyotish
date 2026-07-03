@@ -85,9 +85,16 @@ export default function Blog() {
     fetch(`${API_BASE}/api/account/settings/public`)
       .then(r => r.ok ? r.json() : {})
       .then(data => {
-        // Reconstruct ordered article list from settings
-        const index = data.blog_index
-        if (!Array.isArray(index)) { setLoading(false); return }
+        // Primary path: blog_index controls order and visibility
+        // Fallback: scan all blog_article_* keys directly — handles the
+        // case where blog_index wasn't saved as public yet (e.g. first
+        // publish where the admin saves an article before blog_index exists)
+        const index = Array.isArray(data.blog_index)
+          ? data.blog_index
+          : Object.keys(data)
+              .filter(k => k.startsWith('blog_article_'))
+              .map(k => k.replace('blog_article_', ''))
+
         const list = index
           .map(slug => {
             const art = data[`blog_article_${slug}`]

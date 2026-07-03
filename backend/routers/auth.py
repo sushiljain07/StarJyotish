@@ -43,9 +43,16 @@ from models.auth_models import (
 from services.google_oauth import verify_google_id_token
 from services.jwt_service import REFRESH_TOKEN_TTL_DAYS, create_access_token, ACCESS_TOKEN_TTL_MINUTES
 from services.otp_provider import send_otp_sms
+from services.email_otp import send_otp_email
 from services.rate_limit import AUTH_LIMIT, OTP_SEND_LIMIT, OTP_VERIFY_LIMIT, limiter
 
 router = APIRouter()
+
+
+def _is_email(identifier: str) -> bool:
+    import re
+    return bool(re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", identifier))
+
 
 REFRESH_COOKIE_NAME = "sj_refresh"
 REFRESH_COOKIE_PATH = "/api/auth"
@@ -114,8 +121,12 @@ def send_otp(request: Request, payload: OtpSendRequest, db: Session = Depends(ge
     if wait > 0:
         raise HTTPException(status_code=429, detail=f"Please wait {wait}s before requesting another code.")
 
-    raw_code = otp_repo.issue_code(payload.phone_number)
-    provider = send_otp_sms(payload.phone_number, raw_code)
+    identifier = payload.phone_number  # normalized phone or email
+    raw_code = otp_repo.issue_code(identifier)
+    if _is_email(identifier):
+        provider = send_otp_email(identifier, raw_code)
+    else:
+        provider = send_otp_sms(identifier, raw_code)
 
     from db.repositories.otp_repository import OTP_TTL_MINUTES
     return OtpSendResponse(
@@ -128,9 +139,13 @@ def send_otp(request: Request, payload: OtpSendRequest, db: Session = Depends(ge
 @router.post("/auth/otp/verify", response_model=AuthResponse)
 @limiter.limit(OTP_VERIFY_LIMIT)
 def verify_otp(request: Request, payload: OtpVerifyRequest, response: Response, db: Session = Depends(get_db)):
-    if not OtpRepository(db).verify_code(payload.phone_number, payload.code):
+    identifier = payload.phone_number
+    if not OtpRepository(db).verify_code(identifier, payload.code):
         raise HTTPException(status_code=400, detail="That code is incorrect or has expired.")
-    user = UserRepository(db).get_or_create_by_phone(payload.phone_number)
+    if _is_email(identifier):
+        user = UserRepository(db).get_or_create_by_email_otp(identifier)
+    else:
+        user = UserRepository(db).get_or_create_by_phone(identifier)
     if not user.is_active:
         raise HTTPException(status_code=403, detail="This account has been disabled.")
     return _issue_session_and_response(db, response, user, request)

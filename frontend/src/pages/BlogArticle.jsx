@@ -112,7 +112,7 @@ export default function BlogArticle() {
     setLoading(true)
     setNotFound(false)
 
-    fetch(`${API_BASE}/api/account/settings/public`)
+    fetch(`${API_BASE}/api/settings/public`)
       .then(r => r.ok ? r.json() : {})
       .then(data => {
         const art = data[`blog_article_${slug}`]

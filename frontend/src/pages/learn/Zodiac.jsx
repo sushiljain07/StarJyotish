@@ -174,7 +174,8 @@ export default function ZodiacGuide() {
                 archetype={rashi.archetype}
                 tagline={rashi.tagline}
                 icon={<ZodiacSignIcon id={rashi.id} className="w-7 h-7" />}
-                comingSoon
+                href={rashi.href}
+                comingSoon={rashi.comingSoon !== false}
               />
             </Reveal>
           ))}

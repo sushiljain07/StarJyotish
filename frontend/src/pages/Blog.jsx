@@ -109,8 +109,10 @@ export default function Blog() {
   }, [])
 
   const visible = articles.filter(a => category === 'All' || a.category === category)
-  const featured = visible.find(a => a.featured)
-  const rest = visible.filter(a => !a.featured)
+  // Only separate the featured article when showing All — when a category filter
+  // is active, include it in the regular grid so it's visible (not silently excluded)
+  const featured = category === 'All' ? visible.find(a => a.featured) : null
+  const rest = featured ? visible.filter(a => !a.featured) : visible
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -129,7 +131,7 @@ export default function Blog() {
 
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Category filter */}
-        <Reveal className="flex gap-2 overflow-x-auto pb-1 mb-6">
+        <Reveal className="flex gap-2 overflow-x-auto pb-1 mb-6 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)}
               className={`whitespace-nowrap text-xs px-4 py-2 rounded-lg border transition ${category === cat ? 'bg-primary-dark text-night border-primary-dark font-semibold shadow-sm' : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'}`}>
@@ -152,7 +154,7 @@ export default function Blog() {
           </div>
         ) : (
           <>
-            {featured && category === 'All' && (
+            {featured && (
               <Reveal className="mb-8">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="h-px flex-1 bg-line" />
@@ -178,11 +180,11 @@ export default function Blog() {
           <div className="bg-night rounded-2xl px-6 py-8 text-center">
             <div className="font-serif font-semibold text-xl text-primary-light mb-2">{t('blog_newsletter_heading')}</div>
             <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">{t('blog_newsletter_body')}</p>
-            <div className="flex gap-2 max-w-sm mx-auto">
+            <div className="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto">
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="Your email"
                 className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
-              <button className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+              <button className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-4 py-2.5 rounded-lg transition sm:whitespace-nowrap">
                 {t('blog_notify_cta')}
               </button>
             </div>

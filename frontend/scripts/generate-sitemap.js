@@ -25,6 +25,7 @@ const PUBLIC_ROUTES = [
   { path: '/testimonials',  changefreq: 'weekly',  priority: '0.7' },
   { path: '/blog',          changefreq: 'weekly',  priority: '0.8' },
   { path: '/learn',         changefreq: 'weekly',  priority: '0.8' },
+  { path: '/learn/zodiac',  changefreq: 'monthly', priority: '0.8' },
   // Individual guide pages (Zodiac, Nakshatra, ...) get added here once
   // they exist — see components/knowledge/ for the shared infrastructure.
   // Blog article slugs are managed dynamically via admin dashboard.

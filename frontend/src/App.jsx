@@ -25,6 +25,7 @@ import Blog from './pages/Blog'
 import BlogArticle from './pages/BlogArticle'
 import TestimonialsPage from './pages/TestimonialsPage'
 import Learn from './pages/Learn'
+import ZodiacGuide from './pages/learn/Zodiac'
 
 export default function App() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/blog/:slug" element={<BlogArticle />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/learn" element={<Learn />} />
+          <Route path="/learn/zodiac" element={<ZodiacGuide />} />
           {/* Must stay last: React Router matches routes in declaration
               order, so anything above this always wins first. */}
           <Route path="*" element={<NotFound />} />

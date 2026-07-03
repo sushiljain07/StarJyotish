@@ -1,7 +1,7 @@
 // frontend/src/pages/Pricing.jsx
 //
 // Plan data is fetched from the AppSetting key "pricing_plans" via the
-// existing /api/account/settings/public endpoint. Falls back to
+// existing /api/settings/public endpoint. Falls back to
 // FALLBACK_PLANS if the setting hasn't been configured yet.
 // Admin edits plans in the admin dashboard → Pricing Plans tab.
 import { useState, useEffect } from 'react'
@@ -85,7 +85,7 @@ export default function Pricing() {
   const scrollProgress = useScrollProgress(80)
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/account/settings/public`)
+    fetch(`${API_BASE}/api/settings/public`)
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data?.pricing_plans && Array.isArray(data.pricing_plans)) setPlans(data.pricing_plans) })
       .catch(() => {})

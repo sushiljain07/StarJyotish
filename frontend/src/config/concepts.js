@@ -9,6 +9,7 @@
 // across the whole app a live link — no call site has to change.
 export const CONCEPTS = {
   zodiac:      { label: 'Zodiac Signs', href: '/learn/zodiac' },
+  aries:       { label: 'Mesha (Aries)', href: '/learn/zodiac/aries' },
   'moon-sign': { label: 'Moon Sign',    href: null },
   ascendant:   { label: 'Ascendant',    href: null },
   nakshatra:   { label: 'Nakshatra',    href: null },
@@ -17,6 +18,8 @@ export const CONCEPTS = {
   houses:      { label: 'Houses',       href: null },
   yoga:        { label: 'Yoga',         href: null },
   dosha:       { label: 'Dosha',        href: null },
+  mars:        { label: 'Mars (Mangal)', href: null },
+  venus:       { label: 'Venus (Shukra)', href: null },
 }
 
 export function getConcept(id) {

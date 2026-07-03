@@ -40,6 +40,43 @@ export const GUIDES = {
     relatedTopics: ['moon-sign', 'ascendant', 'nakshatra'],
     nextGuides: ['nakshatra'],
     status: 'available',
+    teaser: 'Understand what a Rashi is and how the zodiac fits into a complete chart.',
+  },
+  // Individual zodiac sign guides live here; MAIN_LEARNING_PATH does NOT
+  // include them — sign-to-sign navigation uses SIGN_LEARNING_PATH below
+  // instead of growing the main curriculum stepper to 18 steps.
+  'zodiac-aries': {
+    id: 'zodiac-aries',
+    title: 'Mesha (Aries)',
+    href: '/learn/zodiac/aries',
+    category: 'zodiac',
+    difficulty: DIFFICULTY.BEGINNER,
+    estimatedReadTime: 12,
+    lastUpdated: '2026-07-03',
+    prerequisites: ['zodiac'],
+    relatedTopics: ['ascendant', 'moon-sign', 'nakshatra', 'mars'],
+    // within the sign sequence, Aries → Taurus; in the main curriculum,
+    // Aries recommends the reader go back to the Zodiac hub before moving
+    // on to Nakshatras
+    nextGuides: ['zodiac-taurus'],
+    prevGuides: [],
+    status: 'available',
+    teaser: 'The first sign: initiative, courage and the willingness to begin.',
+  },
+  'zodiac-taurus': {
+    id: 'zodiac-taurus',
+    title: 'Vrishabha (Taurus)',
+    href: null,
+    category: 'zodiac',
+    difficulty: DIFFICULTY.BEGINNER,
+    estimatedReadTime: 12,
+    lastUpdated: null,
+    prerequisites: ['zodiac'],
+    relatedTopics: ['moon-sign', 'venus'],
+    nextGuides: ['zodiac-gemini'],
+    prevGuides: ['zodiac-aries'],
+    status: 'comingSoon',
+    teaser: 'The builder: steadiness, beauty and the art of endurance.',
   },
   nakshatra: {
     id: 'nakshatra',
@@ -143,5 +180,27 @@ export function getNextGuide(currentId) {
     href: next.href,
     comingSoon: next.status === 'comingSoon',
     description: next.teaser ?? null,
+  }
+}
+
+// Resolves prev/next guide pointers for sign-level navigation (the
+// Aries ← → Taurus stepper that individual sign pages show). Distinct
+// from getNextGuide because sign-to-sign navigation is a separate
+// sequence from the main curriculum path — see knowledgeGraph.js comment
+// above on MAIN_LEARNING_PATH vs individual signs.
+export function getSignNavigation(currentId) {
+  const guide = GUIDES[currentId]
+  if (!guide) return { prev: null, next: null }
+
+  function resolve(id) {
+    if (!id) return null
+    const g = GUIDES[id]
+    if (!g) return null
+    return { id, title: g.title, href: g.href, comingSoon: g.status === 'comingSoon' }
+  }
+
+  return {
+    prev: resolve(guide.prevGuides?.[0]),
+    next: resolve(guide.nextGuides?.[0]),
   }
 }

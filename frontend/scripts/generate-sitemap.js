@@ -24,10 +24,11 @@ const PUBLIC_ROUTES = [
   { path: '/pricing',       changefreq: 'monthly', priority: '0.8' },
   { path: '/testimonials',  changefreq: 'weekly',  priority: '0.7' },
   { path: '/blog',          changefreq: 'weekly',  priority: '0.8' },
-  { path: '/learn',         changefreq: 'weekly',  priority: '0.8' },
-  { path: '/learn/zodiac',  changefreq: 'monthly', priority: '0.8' },
-  // Individual guide pages (Zodiac, Nakshatra, ...) get added here once
-  // they exist — see components/knowledge/ for the shared infrastructure.
+  { path: '/learn',                changefreq: 'weekly',  priority: '0.8' },
+  { path: '/learn/zodiac',         changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/zodiac/aries',   changefreq: 'monthly', priority: '0.8' },
+  // Future zodiac sign pages: /learn/zodiac/taurus, /learn/zodiac/gemini, ...
+  // Add each here when its page ships.
   // Blog article slugs are managed dynamically via admin dashboard.
   // Add new article URLs here when published so they get indexed.
   { path: '/about',         changefreq: 'monthly', priority: '0.5' },

@@ -31,6 +31,7 @@ export default function KnowledgeLayout({
   subtitle,
   meta,
   sidebar,
+  cta,
   contentWidth = 'max-w-2xl',
   children,
 }) {
@@ -55,6 +56,9 @@ export default function KnowledgeLayout({
       ) : (
         <article className={`${contentWidth} mx-auto px-4 py-10`}>{children}</article>
       )}
+
+      {/* Full-width CTA band, outside the reading column */}
+      {cta}
 
       <Footer />
     </div>

@@ -6,12 +6,12 @@
 // not copy — makes it possible to update category descriptions or add a
 // featured guide without touching JSX.
 //
-// None of the individual guide/category pages exist yet (only /learn
-// itself does), so every entry below is marked `comingSoon: true` and
-// left without an `href` — see ArticleCard.jsx for how that renders.
-// The one exception is the Beginner Guides category, which links to the
-// real on-page #beginner-guides section instead of a page that doesn't
-// exist yet.
+// None of the individual guide/category pages exist yet apart from
+// /learn/zodiac, so every other entry below is marked `comingSoon: true`
+// and left without an `href` — see ArticleCard.jsx for how that renders.
+// The two exceptions are Zodiac Signs, which now links to the real
+// /learn/zodiac guide, and Beginner Guides, which links to the real
+// on-page #beginner-guides section.
 
 export const LEARNING_PATHS = [
   {
@@ -71,7 +71,8 @@ export const CATEGORIES = [
     title: 'Zodiac Signs',
     description: 'All 12 Rāshis — traits, ruling planets, and how each one shapes personality and life direction.',
     meta: '12 signs',
-    comingSoon: true,
+    href: '/learn/zodiac',
+    comingSoon: false,
   },
   {
     id: 'nakshatra',

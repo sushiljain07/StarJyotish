@@ -5,7 +5,7 @@
 //   key: "blog_article_{slug}" → value: { title, excerpt, category, readMin, tags,
 //                                          date, featured, content: [...sections] }
 //
-// All fetched from /api/account/settings/public (is_public=true).
+// All fetched from /api/settings/public (is_public=true).
 // Admin manages everything from the admin dashboard → Blog tab.
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -82,7 +82,7 @@ export default function Blog() {
   const scrollProgress = useScrollProgress(80)
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/account/settings/public`)
+    fetch(`${API_BASE}/api/settings/public`)
       .then(r => r.ok ? r.json() : {})
       .then(data => {
         // Primary path: blog_index controls order and visibility

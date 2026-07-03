@@ -6,7 +6,7 @@
 // Users submit testimonials via the /testimonials page.
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { API_BASE } from '../api/config'
 import Reveal from './Reveal'
 
@@ -50,9 +50,9 @@ function TestimonialCard({ t, i }) {
   )
 }
 
-export default function Testimonials({ onCtaClick }) {
+// eslint-disable-next-line react/prop-types
+export default function Testimonials({ onCtaClick: _onCtaClick }) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [items, setItems] = useState(DEFAULTS)
 
   useEffect(() => {
@@ -78,15 +78,12 @@ export default function Testimonials({ onCtaClick }) {
           ))}
         </div>
 
-        <Reveal delay={200} className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
-          <button onClick={() => onCtaClick ? onCtaClick() : navigate('/generate')}
-            className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition">
-            {t('testimonial_cta_label')} →
-          </button>
+        <Reveal delay={200} className="text-center mt-10">
           <Link to="/testimonials"
-            className="text-sm text-primary-dark hover:underline font-medium">
+            className="inline-flex items-center gap-2 text-sm text-primary-dark hover:underline font-medium">
             Read all testimonials →
           </Link>
+          <p className="text-ink-faint text-xs mt-2">{t('landing_footer_note')}</p>
         </Reveal>
       </div>
     </section>

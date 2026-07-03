@@ -25,6 +25,12 @@ import ZodiacCard from '../../components/knowledge/ZodiacCard'
 import ZodiacSignIcon from '../../components/knowledge/ZodiacSignIcon'
 import FAQ from '../../components/knowledge/FAQ'
 import CTA from '../../components/knowledge/CTA'
+import LearningPath from '../../components/knowledge/LearningPath'
+import LearningMetadata from '../../components/knowledge/LearningMetadata'
+import ConceptLink from '../../components/knowledge/ConceptLink'
+import RelatedArticles from '../../components/knowledge/RelatedArticles'
+import { getGuide, getLearningPathSteps, getNextGuide } from '../../config/knowledgeGraph'
+import { getCategoryLabel } from '../../config/learningTaxonomy'
 import {
   ZODIAC_HERO,
   COSMIC_LANGUAGE,
@@ -73,6 +79,10 @@ export default function ZodiacGuide() {
   const navigate = useNavigate()
   const scrollProgress = useScrollProgress(80)
 
+  const guide = getGuide('zodiac')
+  const learningPathSteps = getLearningPathSteps('zodiac')
+  const nextGuide = getNextGuide('zodiac')
+
   return (
     <div className="min-h-screen bg-parchment">
       <Seo
@@ -87,6 +97,15 @@ export default function ZodiacGuide() {
         breadcrumbItems={[{ label: 'Home', to: '/' }, { label: 'Learn', to: '/learn' }, { label: 'Zodiac Signs' }]}
         title={ZODIAC_HERO.title}
         subtitle={ZODIAC_HERO.subtitle}
+        meta={
+          <LearningMetadata
+            estimatedReadTime={guide.estimatedReadTime}
+            difficulty={guide.difficulty}
+            category={getCategoryLabel(guide.category)}
+            lastUpdated={guide.lastUpdated}
+            variant="dark"
+          />
+        }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
@@ -103,6 +122,12 @@ export default function ZodiacGuide() {
           </Link>
         </div>
       </Hero>
+
+      {/* Your Learning Path — new this sprint, doesn't touch any existing
+          section below */}
+      <Section maxWidth="max-w-4xl">
+        <LearningPath steps={learningPathSteps} />
+      </Section>
 
       {/* The Zodiac: A Cosmic Language */}
       <Section eyebrow={COSMIC_LANGUAGE.eyebrow} title={COSMIC_LANGUAGE.title} maxWidth="max-w-3xl">
@@ -167,7 +192,9 @@ export default function ZodiacGuide() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto mb-10">
           {BEYOND_ZODIAC.items.map((item, i) => (
             <Reveal key={item.label} delay={i * 50}>
-              <p className="font-semibold text-sm text-primary-light mb-1.5">{item.label}</p>
+              <p className="font-semibold text-sm text-primary-light mb-1.5">
+                <ConceptLink id={item.conceptId}>{item.label}</ConceptLink>
+              </p>
               <p className="text-ink-onnight text-sm leading-relaxed">{item.description}</p>
             </Reveal>
           ))}
@@ -195,6 +222,23 @@ export default function ZodiacGuide() {
       <Section eyebrow="Common Questions" title="Frequently asked questions">
         <FAQ items={ZODIAC_FAQ} />
       </Section>
+
+      {/* Continue Learning — recommends the next guide in the main
+          learning path (see config/knowledgeGraph.js). Renders a
+          "Coming soon" state rather than a link, since Nakshatras
+          doesn't have a page yet. */}
+      {nextGuide && (
+        <RelatedArticles
+          variant="next"
+          title="Continue learning"
+          items={[{
+            title: nextGuide.title,
+            href: nextGuide.href,
+            comingSoon: nextGuide.comingSoon,
+            description: nextGuide.description,
+          }]}
+        />
+      )}
 
       {/* Final CTA */}
       <CTA

@@ -75,12 +75,12 @@ export const BEYOND_ZODIAC = {
   title: 'Beyond your zodiac sign',
   description: 'A zodiac sign is where a birth chart starts, not where it ends. A complete horoscope also includes:',
   items: [
-    { label: 'Ascendant (Lagna)', description: 'The exact degree rising at your birth — it shapes how the world sees you, and where your chart truly begins.' },
-    { label: 'Moon Sign (Rashi)', description: 'Governs your emotional instincts. In Vedic astrology, this often carries more weight than your Sun sign.' },
-    { label: 'Planets (Grahas)', description: 'Nine placements that color everything from ambition to relationships, each in its own way.' },
-    { label: 'Houses (Bhavas)', description: 'Twelve divisions of life — career, marriage, wealth — each governed by a different part of your chart.' },
-    { label: 'Nakshatras', description: 'Twenty-seven lunar mansions that add a layer of detail no single zodiac sign can capture alone.' },
-    { label: 'Dashas', description: 'Planetary time periods that explain not just what may unfold, but roughly when.' },
+    { label: 'Ascendant (Lagna)', conceptId: 'ascendant', description: 'The exact degree rising at your birth — it shapes how the world sees you, and where your chart truly begins.' },
+    { label: 'Moon Sign (Rashi)', conceptId: 'moon-sign', description: 'Governs your emotional instincts. In Vedic astrology, this often carries more weight than your Sun sign.' },
+    { label: 'Planets (Grahas)', conceptId: 'planets', description: 'Nine placements that color everything from ambition to relationships, each in its own way.' },
+    { label: 'Houses (Bhavas)', conceptId: 'houses', description: 'Twelve divisions of life — career, marriage, wealth — each governed by a different part of your chart.' },
+    { label: 'Nakshatras', conceptId: 'nakshatra', description: 'Twenty-seven lunar mansions that add a layer of detail no single zodiac sign can capture alone.' },
+    { label: 'Dashas', conceptId: 'dasha', description: 'Planetary time periods that explain not just what may unfold, but roughly when.' },
   ],
   analogy: 'Your Zodiac Sign is the cover of the book. Your Kundli is the entire story.',
 }

@@ -30,19 +30,19 @@ export default function CompactFooter() {
 
   return (
     <footer className="border-t border-white/10 bg-night">
-      <div className="max-w-3xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+      <div className="max-w-4xl mx-auto px-4 py-5">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition"
+              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap"
             >
               {t(link.key, link.fallback)}
             </Link>
           ))}
         </nav>
-        <p className="text-ink-onnight/40 text-xs text-center sm:text-right shrink-0">
+        <p className="text-ink-onnight/40 text-xs text-center mt-3">
           {t('footer_copyright', { year })}
         </p>
       </div>

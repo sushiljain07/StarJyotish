@@ -176,12 +176,21 @@ export default function Result() {
   // before the early-return guard below, since it has to seed the initial
   // tab and hook initializers must run unconditionally on every render.
   const landToAsk = Boolean(state?.landToAsk || state?.presetQuestion)
+  // activeTab/activeSubtab: passed from PersonalHome's "deep dive" links so
+  // the user lands directly on the right section (e.g. Dasha, Planets, Rajyogas).
+  const initTab    = state?.activeTab    ?? (landToAsk ? 'ask' : 'kundli')
+  const initSub    = state?.activeSubtab ?? 'birth_chart'
 
-  const [activeMain, setActiveMain] = useState(landToAsk ? 'ask' : 'kundli')
-  const [activeKundliSub, setActiveKundliSub] = useState('birth_chart')
+  const [activeMain, setActiveMain]           = useState(initTab)
+  const [activeKundliSub, setActiveKundliSub] = useState(
+    ['birth_chart','divisional','planets','dasha','transit','download'].includes(initSub) ? initSub : 'birth_chart'
+  )
   const [activeAdvancedSub, setActiveAdvancedSub] = useState('bhava')
-  const [activeInsightSub, setActiveInsightSub] = useState('reading')
+  const [activeInsightSub, setActiveInsightSub]   = useState(
+    ['reading','rajyogas','career'].includes(initSub) ? initSub : 'reading'
+  )
   const [chartStyle, setChartStyle] = useState('north')
+
 
   if (!state?.data) {
     navigate(homeDestination)
@@ -237,16 +246,8 @@ export default function Result() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between py-3 gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button
-                onClick={() => navigate(homeDestination)}
-                aria-label={t('nav_back_home', 'Back to Home')}
-                className="shrink-0 flex items-center gap-1.5 rounded-full hover:bg-white/10 px-2 py-1 -mx-1 transition group"
-              >
-                <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
-                <span className="text-[11px] text-ink-onnight/70 group-hover:text-primary-light transition hidden sm:inline">
-                  {t('nav_back_home', 'Home')}
-                </span>
-              </button>
+              {/* Logo — brand mark only, not a navigation control */}
+              <img src="/starjyotish.svg" alt="" className="w-6 h-6 shrink-0" />
               <div className="min-w-0">
                 {input.name && <div className="font-bold text-lg leading-tight truncate">{input.name}</div>}
                 <div className={`${input.name ? 'text-ink-onnight text-xs' : 'font-bold text-base'} leading-tight truncate`}>
@@ -262,6 +263,13 @@ export default function Result() {
                 )}
               </div>
             </div>
+            {/* Explicit "← Home" button where "New Chart" used to be */}
+            <button
+              onClick={() => navigate(homeDestination)}
+              className="shrink-0 bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
+            >
+              ← {t('nav_back_home', 'Home')}
+            </button>
           </div>
 
           {/* Main tab bar — desktop only; mobile uses the bottom nav instead */}

@@ -229,6 +229,7 @@
   "login_disclaimer": "We'll only use this to sign you in — never shared, never spammed.",
   "login_seo_description": "Sign in to Star Jyotish with your phone number, email, or Google account.",
   "nav_sign_in": "Sign in",
+  "nav_back_home": "Home",
   "nav_logout": "Logout",
   "nav_signed_in_as": "Signed in as {{name}}",
   "nav_cta_compact": "Generate Kundli",

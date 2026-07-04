@@ -295,7 +295,28 @@ export default function Onboarding() {
           <CompletionCelebration
             t={t}
             label={createdProfile?.label}
-            onContinue={() => navigate('/home', { replace: true })}
+            onContinue={() => {
+              // For someone else's chart, go straight to the chart viewer so
+              // the user sees the result immediately rather than landing back
+              // on their own home page. For the user's own chart, /home is
+              // the right destination (it shows their chart there already).
+              if (createdProfile && createdProfile.relation !== 'self' && createdProfile.chart) {
+                navigate('/kundli', {
+                  replace: true,
+                  state: {
+                    data: createdProfile.chart,
+                    input: {
+                      date: createdProfile.birth_date,
+                      time: createdProfile.birth_time,
+                      place: createdProfile.place,
+                      name: createdProfile.label,
+                    },
+                  },
+                })
+              } else {
+                navigate('/home', { replace: true })
+              }
+            }}
           />
         )}
       </OnboardingLayout>

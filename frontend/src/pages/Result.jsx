@@ -239,10 +239,13 @@ export default function Result() {
             <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => navigate(homeDestination)}
-                aria-label={t('app_title')}
-                className="shrink-0 rounded-full hover:bg-white/10 p-1 -m-1 transition"
+                aria-label={t('nav_back_home', 'Back to Home')}
+                className="shrink-0 flex items-center gap-1.5 rounded-full hover:bg-white/10 px-2 py-1 -mx-1 transition group"
               >
-                <img src="/starjyotish.svg" alt="" className="w-7 h-7" />
+                <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
+                <span className="text-[11px] text-ink-onnight/70 group-hover:text-primary-light transition hidden sm:inline">
+                  {t('nav_back_home', 'Home')}
+                </span>
               </button>
               <div className="min-w-0">
                 {input.name && <div className="font-bold text-lg leading-tight truncate">{input.name}</div>}

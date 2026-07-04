@@ -325,5 +325,61 @@
   "login_phone_hint": "उदा. +91 98765 43210",
   "login_email_hint": "उदा. you@example.com",
   "login_code_sent_phone": "हमने आपके नंबर पर 6 अंकों का कोड भेजा:",
-  "login_code_sent_email": "हमने आपके ईमेल पर 6 अंकों का कोड भेजा:"
+  "login_code_sent_email": "हमने आपके ईमेल पर 6 अंकों का कोड भेजा:",
+
+  "nav_my_home": "मेरा होम",
+
+  "home_seo_title": "आपका होम",
+  "home_seo_description": "आपका व्यक्तिगत वैदिक ज्योतिष कार्यक्षेत्र — चार्ट, वर्तमान दशा, और मार्गदर्शित अध्ययन, सब एक ही शांत जगह पर।",
+
+  "home_greeting_morning": "सुप्रभात",
+  "home_greeting_afternoon": "नमस्कार",
+  "home_greeting_evening": "शुभ संध्या",
+  "home_greeting_night": "वापसी पर स्वागत है",
+  "home_hero_subtext": "वैदिक ज्योतिष की आपकी यात्रा जारी है।",
+
+  "home_snapshot_title": "आज की कॉस्मिक झलक",
+  "home_snapshot_ring_label": "महादशा",
+  "home_snapshot_mahadasha": "महादशा",
+  "home_snapshot_antardasha": "अंतर्दशा",
+  "home_snapshot_moon_sign": "चंद्र राशि",
+  "home_snapshot_theme": "एक लंबी बृहस्पति महादशा सीखने, सिखाने और स्थिर विस्तार के माध्यम से विकास का समर्थन करती है — वर्तमान शनि अंतर्दशा चाहती है कि यह विकास जल्दबाजी के बजाय अनुशासित और धैर्यपूर्ण बना रहे।",
+
+  "home_chart_title": "आपकी जन्म कुंडली",
+  "home_chart_lagna_label": "लग्न चार्ट",
+  "home_chart_preview_note": "जब तक आपकी सहेजी गई कुंडली यहाँ नहीं जुड़ती, तब तक एक नमूना लेआउट दिखाया जा रहा है।",
+  "home_chart_cta_view": "पूरी कुंडली देखें",
+  "home_chart_cta_ask": "अपनी कुंडली के बारे में AI से पूछें",
+  "home_chart_cta_new": "नई कुंडली बनाएं",
+
+  "home_journey_title": "अपनी यात्रा जारी रखें",
+  "home_journey_recent_label": "हाल ही में देखा गया",
+  "home_journey_recommended_label": "अनुशंसित",
+  "home_journey_next_step_label": "अगला कदम",
+  "home_journey_coming_soon": "जल्द आ रहा है",
+
+  "home_activity_title": "हाल की गतिविधि",
+  "home_activity_today": "आज",
+  "home_activity_yesterday": "कल",
+  "home_activity_days_ago": "{{count}} दिन पहले",
+  "home_activity_weeks_ago": "{{count}} सप्ताह पहले",
+
+  "home_questions_title": "सुझाए गए प्रश्न",
+  "home_question_strongest-planet": "मेरी कुंडली में सबसे मजबूत ग्रह कौन सा है?",
+  "home_question_saturn-importance": "शनि इतना महत्वपूर्ण क्यों है?",
+  "home_question_current-dasha": "मुझे अपनी वर्तमान दशा के बारे में क्या समझना चाहिए?",
+  "home_question_ascendant-meaning": "मुझे अपने लग्न की व्याख्या कैसे करनी चाहिए?",
+
+  "home_reflection_1": "आपके जीवन में अभी आपको कहाँ बढ़ने के लिए आमंत्रित किया जा रहा है?",
+  "home_reflection_2": "आपने किस बात को टाल रखा है जो शांति से आपके लिए मायने रखती है?",
+  "home_reflection_3": "आप कहाँ जल्दी में हैं, और धैर्य वास्तव में आपकी बेहतर सेवा कहाँ करता है?",
+  "home_reflection_4": "आपके जीवन में कौन सा पैटर्न बार-बार दोहराया जाता है — और यह क्या सिखा रहा हो सकता है?",
+  "home_reflection_5": "इस सप्ताह अपने समय पर भरोसा करना कैसा दिखेगा?",
+
+  "home_coming_soon_title": "और भी बहुत कुछ आने वाला है",
+  "home_coming_soon_daily-insights": "दैनिक अंतर्दृष्टि",
+  "home_coming_soon_transit-timeline": "गोचर समयरेखा",
+  "home_coming_soon_remedies": "व्यक्तिगत उपाय",
+  "home_coming_soon_compatibility": "अनुकूलता",
+  "home_coming_soon_life-milestones": "जीवन के मील के पत्थर"
 }

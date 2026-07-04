@@ -325,5 +325,61 @@
   "login_phone_hint": "e.g. +91 98765 43210",
   "login_email_hint": "e.g. you@example.com",
   "login_code_sent_phone": "We sent a 6-digit code to",
-  "login_code_sent_email": "We emailed a 6-digit code to"
+  "login_code_sent_email": "We emailed a 6-digit code to",
+
+  "nav_my_home": "My Home",
+
+  "home_seo_title": "Your Home",
+  "home_seo_description": "Your personal Vedic astrology workspace — chart, current Dasha, and guided learning, all in one calm place.",
+
+  "home_greeting_morning": "Good morning",
+  "home_greeting_afternoon": "Good afternoon",
+  "home_greeting_evening": "Good evening",
+  "home_greeting_night": "Welcome back",
+  "home_hero_subtext": "Your journey through Vedic astrology continues.",
+
+  "home_snapshot_title": "Today's Cosmic Snapshot",
+  "home_snapshot_ring_label": "Mahadasha",
+  "home_snapshot_mahadasha": "Mahadasha",
+  "home_snapshot_antardasha": "Antardasha",
+  "home_snapshot_moon_sign": "Moon Sign",
+  "home_snapshot_theme": "A long Jupiter Mahadasha favors growth through learning, teaching, and steady expansion — the current Saturn Antardasha asks that growth stay disciplined and patient rather than rushed.",
+
+  "home_chart_title": "Your Birth Chart",
+  "home_chart_lagna_label": "Lagna Chart",
+  "home_chart_preview_note": "Showing a sample layout until your saved chart is connected here.",
+  "home_chart_cta_view": "View Full Chart",
+  "home_chart_cta_ask": "Ask AI about My Chart",
+  "home_chart_cta_new": "Generate New Chart",
+
+  "home_journey_title": "Continue Your Journey",
+  "home_journey_recent_label": "Recently Viewed",
+  "home_journey_recommended_label": "Recommended",
+  "home_journey_next_step_label": "Next Step",
+  "home_journey_coming_soon": "Coming soon",
+
+  "home_activity_title": "Recent Activity",
+  "home_activity_today": "Today",
+  "home_activity_yesterday": "Yesterday",
+  "home_activity_days_ago": "{{count}} days ago",
+  "home_activity_weeks_ago": "{{count}} weeks ago",
+
+  "home_questions_title": "Suggested Questions",
+  "home_question_strongest-planet": "What is the strongest planet in my chart?",
+  "home_question_saturn-importance": "Why is Saturn important?",
+  "home_question_current-dasha": "What should I understand about my current Dasha?",
+  "home_question_ascendant-meaning": "How should I interpret my Ascendant?",
+
+  "home_reflection_1": "Where in your life are you currently being invited to grow?",
+  "home_reflection_2": "What have you been putting off that quietly matters to you?",
+  "home_reflection_3": "Where are you moving quickly, and where does patience actually serve you better?",
+  "home_reflection_4": "What pattern keeps repeating in your life — and what might it be teaching you?",
+  "home_reflection_5": "What would it look like to trust your own timing this week?",
+
+  "home_coming_soon_title": "More is on the way",
+  "home_coming_soon_daily-insights": "Daily Insights",
+  "home_coming_soon_transit-timeline": "Transit Timeline",
+  "home_coming_soon_remedies": "Personalized Remedies",
+  "home_coming_soon_compatibility": "Compatibility",
+  "home_coming_soon_life-milestones": "Life Milestones"
 }

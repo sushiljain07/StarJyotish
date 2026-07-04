@@ -13,7 +13,12 @@ export default function Login() {
   const location = useLocation()
   const { isAuthenticated, user } = useAuth()
 
-  const next = location.state?.next || '/'
+  // Falls back to /home (the personal workspace, see pages/PersonalHome.jsx)
+  // rather than the public Landing page — signing in should land somewhere
+  // that reflects being signed in. `next` still wins whenever a protected
+  // route sent the visitor here (ProtectedRoute.jsx), so this only changes
+  // the plain "/login" case.
+  const next = location.state?.next || '/home'
 
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.

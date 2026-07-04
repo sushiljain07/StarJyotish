@@ -69,7 +69,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, showLanguag
     >
       <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate(isAuthenticated ? '/home' : '/')}
           className="flex items-center gap-2 shrink-0"
           aria-label={t('app_title')}
         >

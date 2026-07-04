@@ -81,6 +81,14 @@ export default function AccountMenu() {
             {secondaryLine && <p className="text-ink-faint text-xs truncate mt-0.5">{secondaryLine}</p>}
           </div>
           <Link
+            to="/home"
+            onClick={() => setOpen(false)}
+            role="menuitem"
+            className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+          >
+            {t('nav_my_home')}
+          </Link>
+          <Link
             to="/account"
             onClick={() => setOpen(false)}
             role="menuitem"

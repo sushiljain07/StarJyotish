@@ -12,12 +12,14 @@
 // a specific reading, which isn't what either feature is for.
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 import MobileNumberField from '../components/auth/MobileNumberField'
 import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
+import { listProfiles } from '../services/astrologyProfiles'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -183,6 +185,46 @@ export default function Profile() {
           <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('profile_membership_heading')}</h2>
           <p className="text-ink-muted text-sm">{t('profile_membership_body')}</p>
         </div>
+
+        {/* Astrology Profiles — shows all saved birth profiles with a
+            direct link to open each one in the chart viewer, and a
+            shortcut to add another via onboarding. Solves the "where do
+            I manage my chart profiles?" question from the SJ-008 audit. */}
+        {(() => {
+          const profiles = listProfiles(user)
+          if (profiles.length === 0) return null
+          return (
+            <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 mt-6">
+              <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('profile_astro_heading', 'Astrology Profiles')}</h2>
+              <p className="text-ink-muted text-sm mb-4">{t('profile_astro_body', 'Your saved birth charts. Click any to open the chart viewer.')}</p>
+              <ul className="space-y-2">
+                {profiles.map(p => (
+                  <li key={p.id} className="flex items-center justify-between bg-parchment rounded-lg px-3 py-2.5 border border-line">
+                    <div>
+                      <span className="text-sm font-medium text-ink">{p.label}</span>
+                      <span className="text-xs text-ink-faint ml-2">{p.place} · {p.birth_date}</span>
+                    </div>
+                    {p.chart && (
+                      <Link
+                        to="/kundli"
+                        state={{ data: p.chart, input: { date: p.birth_date, time: p.birth_time, place: p.place } }}
+                        className="text-xs text-primary-dark hover:underline font-medium shrink-0 ml-3"
+                      >
+                        {t('profile_astro_view', 'View Chart')}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/onboarding"
+                className="inline-block mt-4 text-xs text-primary-dark hover:underline font-medium"
+              >
+                {t('profile_astro_add', '+ Add another chart')}
+              </Link>
+            </div>
+          )
+        })()}
 
         {/* Privacy & account settings */}
         <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 mt-6 space-y-3">

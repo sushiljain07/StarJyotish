@@ -29,20 +29,20 @@ export default function CompactFooter() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-line bg-parchment-card">
-      <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <footer className="border-t border-white/10 bg-night">
+      <div className="max-w-3xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
         <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
           {LINKS.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-faint hover:text-primary-dark text-xs font-medium transition"
+              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition"
             >
               {t(link.key, link.fallback)}
             </Link>
           ))}
         </nav>
-        <p className="text-ink-faint text-xs text-center sm:text-right shrink-0">
+        <p className="text-ink-onnight/40 text-xs text-center sm:text-right shrink-0">
           {t('footer_copyright', { year })}
         </p>
       </div>

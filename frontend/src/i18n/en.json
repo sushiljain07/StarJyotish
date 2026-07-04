@@ -337,6 +337,7 @@
   "login_code_sent_email": "We emailed a 6-digit code to",
 
   "nav_my_home": "My Home",
+  "nav_about_product": "About Star Jyotish",
 
   "home_seo_title": "Your Home",
   "home_seo_description": "Your personal Vedic astrology workspace — chart, current Dasha, and guided learning, all in one calm place.",
@@ -458,6 +459,10 @@
   "not_found_title": "This page doesn't exist",
   "not_found_body": "The link you followed may be broken, or the page may have moved. Let's get you back on track.",
   "not_found_cta": "Go to homepage",
+  "profile_astro_heading": "Astrology Profiles",
+  "profile_astro_body": "Your saved birth charts — click any to open the chart viewer.",
+  "profile_astro_view": "View Chart",
+  "profile_astro_add": "+ Add another chart",
   "career_report_new": "← New",
   "career_report_analyse_another": "Analyse Another Chart"
 }

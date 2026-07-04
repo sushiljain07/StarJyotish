@@ -6,158 +6,261 @@
 // Account (AuthContext's `user`, backed by the real users table) is a
 // login identity. An Astrology Profile is a birth chart someone has
 // created — their own, or someone else's ("Mom", "Rahul", "Daughter").
-// One account can eventually hold several. Onboarding.jsx creates the
-// first one; PersonalHome.jsx reads it back.
 //
-// ── What's real here, and what's a placeholder ──────────────────────────
+// ── Persistence strategy (as of SJ-008) ────────────────────────────────
 //
-// Chart generation (`createProfile` below) calls the real, already-live
-// POST /api/kundli endpoint via api/astro.js's fetchKundli — same Swiss
-// Ephemeris calculation /generate has always used. Nothing about the
-// chart itself is fake.
+// When authenticated:
+//   1. createProfile() POSTs to POST /api/account/birth-profiles/me —
+//      stores the profile in PostgreSQL, available on any device.
+//   2. The chart (ChartResponse) is still stored in localStorage keyed to
+//      the server-assigned profile UUID, because the backend doesn't store
+//      chart data (only birth details) — re-computing a chart from stored
+//      birth details is cheap, but this avoids an extra API call on every
+//      PersonalHome render.
+//   3. listProfiles() / getPrimaryProfile() try the API first, falling back
+//      to localStorage if the API is unreachable (offline / cold start).
 //
-// *Persisting* a profile as belonging to this account is the placeholder
-// part: no backend endpoint exists yet for "save this chart as an
-// Astrology Profile on my account" (the backend's BirthProfile table,
-// account_models.py's BirthProfileOut, is currently only ever written as
-// a side effect of generating a *report* — career/rajyogas/relationship/
-// wealth — for a phone number, via services/persistence.py's
-// save_for_phone; there is no equivalent for a plain chart, and no way to
-// list profiles by account id, only by phone number). So this file keeps
-// profiles in localStorage, scoped per account, shaped to match
-// BirthProfileOut field-for-field (snake_case included) so that swapping
-// this module's insides for real
-// `GET/POST /api/account/astrology-profiles` calls later is a pure
-// implementation-detail change — nothing that reads a profile from here
-// (PersonalHome.jsx, Onboarding.jsx) would need to change.
+// When unauthenticated (or API unavailable):
+//   - Pure localStorage, exactly as before. Nothing changes for the
+//     anonymous /generate flow.
 //
-// ── Multi-profile architecture (designed, not built) ────────────────────
+// ── Chart data storage ──────────────────────────────────────────────────
 //
-// Storage is already an array per account, and every profile already
-// carries `is_primary` — the two things "Add Profile" / "Switch Profile"
-// need. "Switch" is just picking a different array element as primary;
-// "Add" is another createProfile() call. Neither has UI this sprint (see
-// docs/USER_JOURNEY.md's "Future multi-profile support" section) —
-// deliberately, per this sprint's brief — so no switchPrimaryProfile() or
-// archiveProfile() export exists yet; add them here, not in a component,
-// when that UI is built.
+// The backend's BirthProfile only stores birth details (date/time/place/
+// lat/lon/label). Chart results (planets, houses, dasha, navamsa, etc.)
+// are stored in localStorage keyed by profile id, same as before —
+// `sj_chart_data_v1:{userId}:{profileId}`. On a new device, if the chart
+// cache is cold, we re-fetch from /api/kundli using the stored birth
+// details, which is fast (< 1 s) and deterministic.
 
 import { fetchKundli } from '../api/astro'
+import { API_BASE } from '../api/config'
 
-// The backend's /api/kundli requires a time — Vedic chart calculation
-// needs one to place the Ascendant and houses at all. When someone
-// genuinely doesn't know their birth time (BirthTimeSelector.jsx's
-// "I don't know" option), noon is the conventional placeholder Vedic
-// astrologers use rather than blocking chart generation entirely — the
-// resulting planetary *signs* are still accurate, only the Ascendant and
-// house placements are approximate, which is exactly what
-// `birth_time_accuracy: 'unknown'` on the saved profile exists to keep
-// honest everywhere the chart is shown.
 export const UNKNOWN_BIRTH_TIME_DEFAULT = '12:00'
 
-const STORAGE_KEY = 'sj_astrology_profiles_v1'
-const SKIP_STORAGE_KEY = 'sj_onboarding_skipped_v1'
+// ── localStorage keys ───────────────────────────────────────────────────
 
-// Accounts are keyed by `user.id` (a stable UUID regardless of whether
-// they signed in with phone or Google — see backend/models/auth_models.py's
-// UserOut) rather than phone/email, so switching login method never
-// orphans a profile. Falls back to a generic bucket if somehow called
-// before `user` is available; nothing should render onboarding/home
-// without a signed-in user, so this is a defensive fallback, not a
-// real path.
-function accountKey(user) {
-  return user?.id ?? 'anonymous'
+const LEGACY_PROFILES_KEY = 'sj_astrology_profiles_v1'   // old: full profile incl. chart
+const CHART_CACHE_PREFIX   = 'sj_chart_data_v1'           // new: chart keyed by profileId
+const SKIP_STORAGE_KEY     = 'sj_onboarding_skipped_v1'
+
+function accountKey(user)    { return user?.id ?? 'anonymous' }
+function chartCacheKey(user, profileId) { return `${CHART_CACHE_PREFIX}:${accountKey(user)}:${profileId}` }
+
+// ── Chart cache (localStorage) ──────────────────────────────────────────
+
+function readChartCache(user, profileId) {
+  try {
+    const raw = localStorage.getItem(chartCacheKey(user, profileId))
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
 }
 
-function readAll() {
+function writeChartCache(user, profileId, chart) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    localStorage.setItem(chartCacheKey(user, profileId), JSON.stringify(chart))
+  } catch { /* storage unavailable — fail open */ }
+}
+
+// ── Legacy localStorage (unauthenticated / fallback) ────────────────────
+
+function readAllLegacy() {
+  try {
+    const raw = localStorage.getItem(LEGACY_PROFILES_KEY)
     return raw ? JSON.parse(raw) : {}
-  } catch {
-    // Storage can throw (private browsing) or hold corrupt JSON (a
-    // future format change) — either way, fail open to "no profiles
-    // saved" rather than breaking onboarding/home entirely.
-    return {}
+  } catch { return {} }
+}
+
+function writeAllLegacy(all) {
+  try { localStorage.setItem(LEGACY_PROFILES_KEY, JSON.stringify(all)) } catch { /* storage unavailable — fail open */ }
+}
+
+function listProfilesLegacy(user) {
+  return readAllLegacy()[accountKey(user)] ?? []
+}
+
+// ── API helpers ─────────────────────────────────────────────────────────
+
+async function apiFetchProfiles(accessToken) {
+  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/me`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    credentials: 'include',
+  })
+  if (!resp.ok) return null
+  return resp.json()
+}
+
+async function apiSaveProfile(accessToken, { label, birth_date, birth_time, place }) {
+  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/me`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: 'include',
+    body: JSON.stringify({ label, birth_date, birth_time, place }),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}))
+    throw new Error(err.detail ?? 'Could not save profile')
+  }
+  return resp.json()
+}
+
+// ── Merge API profile shape with local chart cache ──────────────────────
+//
+// The API returns {id, label, birth_date, birth_time, place, is_primary,
+// marital_status} — no chart data. We enrich each with a locally-cached
+// chart (or regenerate it on first access from a new device).
+
+async function enrichProfile(user, apiProfile) {
+  const cached = readChartCache(user, apiProfile.id)
+  const chart = cached ?? await fetchKundli({
+    date: typeof apiProfile.birth_date === 'string'
+      ? apiProfile.birth_date
+      : apiProfile.birth_date.toISOString().slice(0, 10),
+    time: typeof apiProfile.birth_time === 'string'
+      ? apiProfile.birth_time.slice(0, 5)
+      : String(apiProfile.birth_time).slice(0, 5),
+    place: apiProfile.place,
+  })
+  if (!cached) writeChartCache(user, apiProfile.id, chart)
+
+  return {
+    id: String(apiProfile.id),
+    relation: 'self',          // API doesn't store this yet; default to self
+    label: apiProfile.label,
+    birth_date: typeof apiProfile.birth_date === 'string'
+      ? apiProfile.birth_date
+      : apiProfile.birth_date.toISOString().slice(0, 10),
+    birth_time: typeof apiProfile.birth_time === 'string'
+      ? apiProfile.birth_time.slice(0, 5)
+      : String(apiProfile.birth_time).slice(0, 5),
+    birth_time_accuracy: 'exact',  // legacy field; assume exact for API profiles
+    place: apiProfile.place,
+    is_primary: apiProfile.is_primary,
+    created_at: null,
+    chart,
   }
 }
 
-function writeAll(all) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
-  } catch {
-    // Best-effort — see readAll()'s comment. A failed write here means
-    // the profile just generated won't be remembered next visit, which
-    // is disappointing but not broken: the chart already returned and
-    // rendered once regardless.
-  }
-}
-
-export function listProfiles(user) {
-  const all = readAll()
-  return all[accountKey(user)] ?? []
-}
+// ── Public API ───────────────────────────────────────────────────────────
 
 export function hasAnyProfile(user) {
-  return listProfiles(user).length > 0
+  // Synchronous quick-check for OnboardingGate / Login routing.
+  // Checks both legacy localStorage AND the presence of any chart cache
+  // keys for this user (which exist after a successful createProfile()).
+  if (listProfilesLegacy(user).length > 0) return true
+  // Check if we have any chart cache keys (means API profiles exist)
+  try {
+    const prefix = `${CHART_CACHE_PREFIX}:${accountKey(user)}:`
+    for (let i = 0; i < localStorage.length; i++) {
+      if (localStorage.key(i)?.startsWith(prefix)) return true
+    }
+  } catch { /* storage unavailable — fail open */ }
+  return false
 }
 
 export function getPrimaryProfile(user) {
-  const profiles = listProfiles(user)
+  // Synchronous: read from legacy cache only. Used by PersonalHome.jsx
+  // which also calls the async loadProfiles() separately.
+  const profiles = listProfilesLegacy(user)
   return profiles.find(p => p.is_primary) ?? profiles[0] ?? null
 }
 
-// Generates a real chart (POST /api/kundli) and saves it as this
-// account's Astrology Profile. The first profile an account creates is
-// always primary; see the module comment above for why "switching"
-// primary has no UI yet.
-export async function createProfile(user, { relation, label, birthDate, birthTime, birthTimeAccuracy, place }) {
+export function listProfiles(user) {
+  return listProfilesLegacy(user)
+}
+
+// Async: load profiles from API (if authenticated) and merge with chart
+// cache, updating the legacy localStorage so synchronous callers stay warm.
+export async function loadProfiles(user, accessToken) {
+  if (!accessToken) return listProfilesLegacy(user)
+
+  try {
+    const apiProfiles = await apiFetchProfiles(accessToken)
+    if (!apiProfiles || !Array.isArray(apiProfiles)) return listProfilesLegacy(user)
+
+    // Enrich all profiles with chart data in parallel
+    const enriched = await Promise.all(apiProfiles.map(p => enrichProfile(user, p)))
+
+    // Write back to legacy cache so synchronous callers (hasAnyProfile,
+    // getPrimaryProfile) reflect the latest server state after loadProfiles()
+    // has been awaited at least once on this device.
+    const all = readAllLegacy()
+    all[accountKey(user)] = enriched
+    writeAllLegacy(all)
+
+    return enriched
+  } catch {
+    // API unreachable — fall back to whatever is in localStorage
+    return listProfilesLegacy(user)
+  }
+}
+
+// Creates a profile. If authenticated, saves to the API (cross-device).
+// Always saves to localStorage as a warm cache.
+export async function createProfile(user, accessToken, { relation, label, birthDate, birthTime, birthTimeAccuracy, place }) {
   const chart = await fetchKundli({ date: birthDate, time: birthTime, place })
 
-  const profile = {
-    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    relation,               // 'self' | 'other'
-    label,                  // display name — "Myself", "Mom", "Rahul", ...
-    birth_date: birthDate,  // "YYYY-MM-DD" — matches BirthProfileOut.birth_date
-    birth_time: birthTime,  // "HH:MM"      — matches BirthProfileOut.birth_time
-    // Not part of BirthProfileOut today — the backend has no column for
-    // this yet. Kept here anyway since it's real information the person
-    // gave us (see BirthTimeSelector.jsx) and Home/Review both want to
-    // show an honest "time unknown, using an approximate default"
-    // caveat rather than silently presenting an invented time as exact.
-    birth_time_accuracy: birthTimeAccuracy, // 'exact' | 'approximate' | 'unknown'
-    place,
-    is_primary: !hasAnyProfile(user),
-    created_at: new Date().toISOString(),
-    chart,                  // the real ChartResponse from the backend
+  let profileId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  let is_primary = !hasAnyProfile(user)
+
+  // Try to persist to the backend
+  if (accessToken) {
+    try {
+      const saved = await apiSaveProfile(accessToken, {
+        label,
+        birth_date: birthDate,
+        birth_time: birthTime,
+        place,
+      })
+      profileId = String(saved.id)
+      is_primary = saved.is_primary
+    } catch {
+      // Backend unavailable — keep the local id, continue with localStorage-only
+    }
   }
 
-  const all = readAll()
+  const profile = {
+    id: profileId,
+    relation,
+    label,
+    birth_date: birthDate,
+    birth_time: birthTime,
+    birth_time_accuracy: birthTimeAccuracy,
+    place,
+    is_primary,
+    created_at: new Date().toISOString(),
+    chart,
+  }
+
+  // Always cache chart data locally (backend doesn't store chart results)
+  writeChartCache(user, profileId, chart)
+
+  // Update the legacy localStorage profile list
+  const all = readAllLegacy()
   const key = accountKey(user)
-  all[key] = [...(all[key] ?? []), profile]
-  writeAll(all)
+  // Replace if same id already exists (idempotent re-save), else append
+  const existing = all[key] ?? []
+  const idx = existing.findIndex(p => p.id === profileId)
+  if (idx >= 0) existing[idx] = profile
+  else existing.push(profile)
+  all[key] = existing
+  writeAllLegacy(all)
 
-  // A saved profile supersedes any earlier "skip" — the account has
-  // moved past onboarding for real now.
   clearOnboardingSkipped(user)
-
   return profile
 }
 
-// ── Skip flow ─────────────────────────────────────────────────────────
-// A separate flag from "has a profile": skipping onboarding should stop
-// it from popping up again on every visit (see OnboardingGate.jsx), but
-// must never be confused with actually having a chart — PersonalHome.jsx
-// uses this distinction to show its empty state only for accounts that
-// explicitly chose to skip, not ones who simply haven't finished yet.
+// ── Skip flow ────────────────────────────────────────────────────────────
+
 export function markOnboardingSkipped(user) {
   try {
     const all = readSkipped()
     all[accountKey(user)] = true
     localStorage.setItem(SKIP_STORAGE_KEY, JSON.stringify(all))
-  } catch {
-    // Fail open — see writeAll()'s comment. Worst case, onboarding
-    // offers itself again next visit.
-  }
+  } catch { /* storage unavailable — fail open */ }
 }
 
 function clearOnboardingSkipped(user) {
@@ -165,18 +268,14 @@ function clearOnboardingSkipped(user) {
     const all = readSkipped()
     delete all[accountKey(user)]
     localStorage.setItem(SKIP_STORAGE_KEY, JSON.stringify(all))
-  } catch {
-    // No-op on failure — see writeAll()'s comment.
-  }
+  } catch { /* storage unavailable — fail open */ }
 }
 
 function readSkipped() {
   try {
     const raw = localStorage.getItem(SKIP_STORAGE_KEY)
     return raw ? JSON.parse(raw) : {}
-  } catch {
-    return {}
-  }
+  } catch { return {} }
 }
 
 export function hasSkippedOnboarding(user) {

@@ -52,7 +52,7 @@ function to24Hour(hour, ampm) {
 export default function Onboarding() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, accessToken } = useAuth()
 
   const [step, setStep] = useState('welcome')
   const [draft, setDraft] = useState({
@@ -109,7 +109,7 @@ export default function Onboarding() {
         ? `${String(to24Hour(draft.hour, draft.ampm)).padStart(2, '0')}:${draft.minute}`
         : UNKNOWN_BIRTH_TIME_DEFAULT
 
-      const profile = await createProfile(user, {
+      const profile = await createProfile(user, accessToken, {
         relation: draft.relation,
         label: draft.label,
         birthDate: draft.birthDate,

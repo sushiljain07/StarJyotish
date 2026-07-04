@@ -34,15 +34,28 @@ import RecentActivity from '../components/home/RecentActivity'
 import SuggestedQuestions from '../components/home/SuggestedQuestions'
 import ReflectionPrompt from '../components/home/ReflectionPrompt'
 import ComingSoonStrip from '../components/home/ComingSoonStrip'
-import { getPrimaryProfile } from '../services/astrologyProfiles'
+import { useState, useEffect } from 'react'
+import { getPrimaryProfile, loadProfiles, listProfiles } from '../services/astrologyProfiles'
 import { getCosmicSnapshotFromChart, getJourney, getRecentActivity, getReflectionKey } from '../config/homeData'
 
 export default function PersonalHome() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, accessToken } = useAuth()
 
-  const profile = getPrimaryProfile(user)
+  // Sync profiles from the API on first render — this is what makes
+  // cross-device work: if localStorage is cold (new device), loadProfiles
+  // fetches from the backend, enriches with chart data, then writes back
+  // to localStorage so getPrimaryProfile() below reflects it on re-render.
+  const [profilesLoaded, setProfilesLoaded] = useState(false)
+  useEffect(() => {
+    loadProfiles(user, accessToken).then(() => setProfilesLoaded(true))
+  }, [user, accessToken]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // activeProfile starts as the primary but can be switched by ProfileSelector
+  const [activeProfile, setActiveProfile] = useState(null)
+  const profile = activeProfile ?? getPrimaryProfile(user)
+  const allProfiles = listProfiles(user)
   const journey = getJourney()
   const activity = getRecentActivity()
   const reflectionKey = getReflectionKey()
@@ -88,8 +101,19 @@ export default function PersonalHome() {
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
       <SiteHeader />
 
+      {/* If localStorage is cold and we're loading from the API, show a
+          brief centering spinner rather than the empty state — otherwise a
+          first-time device login would flash "Your journey is ready to begin"
+          for a split second before the profile snaps in. */}
+      {!profilesLoaded && !profile && (
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-3xl animate-spin">🪐</div>
+        </div>
+      )}
+
+      {(profilesLoaded || profile) && (
       <div className="max-w-3xl mx-auto px-4 pt-20 sm:pt-24 pb-16 space-y-10">
-        <ProfileSelector t={t} profile={profile} />
+        <ProfileSelector t={t} profile={profile} profiles={allProfiles} onSwitch={setActiveProfile} />
         <WelcomeHero t={t} name={user?.name} />
 
         {profile ? (
@@ -134,11 +158,8 @@ export default function PersonalHome() {
 
         <ComingSoonStrip t={t} />
       </div>
+      )}
 
-      {/* The workspace previously had no footer at all — signed-in users
-          could not reach Contact/Privacy/Terms from their own Home
-          without logging out or hunting through Profile first
-          (SJ-006.8's Navigation Audit). */}
       <CompactFooter />
     </div>
   )

@@ -311,7 +311,7 @@ export default function PersonalHome() {
     <div className="min-h-screen bg-parchment">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
       <ScrollToTop visible={scrolledPast} />
-      <SiteHeader scrollProgress={scrollProgress} dark={false} />
+      <SiteHeader scrollProgress={scrollProgress} />
       {/* Sentinel: when this element exits the viewport (user has scrolled down),
           ScrollToTop becomes visible — same pattern as Landing.jsx. */}
       <div ref={sentinelRef} className="absolute top-40" aria-hidden="true" />

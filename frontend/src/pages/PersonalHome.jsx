@@ -12,7 +12,8 @@ import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 import Reveal from '../components/Reveal'
-import ReadingProgress from '../components/knowledge/ReadingProgress'
+import ScrollToTop from '../components/ScrollToTop'
+import { useScrolledPast } from '../hooks/useScrolledPast'
 import ProfileSelector from '../components/home/ProfileSelector'
 import KundliChart from '../components/KundliChart'
 import HomeIcon from '../components/home/HomeIcons'
@@ -266,7 +267,8 @@ export default function PersonalHome() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, accessToken } = useAuth()
-  const scrollProgress = useScrollProgress(80)
+  const [sentinelRef, scrolledPast] = useScrolledPast()
+  const scrollProgress = useScrollProgress(120) // SiteHeader solidification on parchment bg
 
   const [profilesLoaded, setProfilesLoaded] = useState(false)
   useEffect(() => {
@@ -308,8 +310,11 @@ export default function PersonalHome() {
   return (
     <div className="min-h-screen bg-parchment">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
-      <ReadingProgress />
-      <SiteHeader scrollProgress={scrollProgress} />
+      <ScrollToTop visible={scrolledPast} />
+      <SiteHeader scrollProgress={scrollProgress} dark={false} />
+      {/* Sentinel: when this element exits the viewport (user has scrolled down),
+          ScrollToTop becomes visible — same pattern as Landing.jsx. */}
+      <div ref={sentinelRef} className="absolute top-40" aria-hidden="true" />
 
       {loading && (
         <div className="flex items-center justify-center min-h-[60vh]">

@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
+import SiteHeader from '../components/SiteHeader'
 
 // ── Eager imports ────────────────────────────────────────────────────────────
 // Components the user sees immediately on first render (birth chart tab).
@@ -241,29 +242,30 @@ export default function Result() {
           title+description that wouldn't match what a crawler would
           actually see. */}
       <Seo title="Your Kundli" description="Your personalized Vedic Kundli and AI reading." path="/kundli" noindex />
-      {/* Header */}
-      <div className="bg-night text-primary-light">
+
+      {/* Shared brand header — same as every other page */}
+      <SiteHeader />
+
+      {/* Chart identity + tabs — below the brand header, sticky beneath it */}
+      <div className="bg-night text-primary-light sticky top-[52px] z-30">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between py-3 gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Logo — brand mark only, not a navigation control */}
-              <img src="/starjyotish.svg" alt="" className="w-6 h-6 shrink-0" />
-              <div className="min-w-0">
-                {input.name && <div className="font-bold text-lg leading-tight truncate">{input.name}</div>}
-                <div className={`${input.name ? 'text-ink-onnight text-xs' : 'font-bold text-base'} leading-tight truncate`}>
-                  {input.place}
-                </div>
-                <div className="text-ink-onnight text-xs">
-                  {formatDate(input.date)} · {formatTime(input.time)}
-                </div>
+          <div className="flex items-center justify-between py-2.5 gap-3 border-b border-white/10">
+            <div className="min-w-0">
+              {input.name && (
+                <div className="font-bold text-base leading-tight truncate">{input.name}</div>
+              )}
+              <div className={`${input.name ? 'text-ink-onnight/70 text-xs' : 'font-bold text-sm'} leading-tight truncate`}>
+                {input.place}
+              </div>
+              <div className="text-ink-onnight/60 text-xs flex items-center gap-2 flex-wrap">
+                {formatDate(input.date)} · {formatTime(input.time)}
                 {topic && (
-                  <div className="mt-1 inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5 text-[11px] text-primary-light">
+                  <span className="inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5">
                     <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
-                  </div>
+                  </span>
                 )}
               </div>
             </div>
-            {/* Explicit "← Home" button where "New Chart" used to be */}
             <button
               onClick={() => navigate(homeDestination)}
               className="shrink-0 bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
@@ -271,8 +273,6 @@ export default function Result() {
               ← {t('nav_back_home', 'Home')}
             </button>
           </div>
-
-          {/* Main tab bar — desktop only; mobile uses the bottom nav instead */}
           <div className="hidden sm:flex gap-1">
             {MAIN_TABS.map(tab => (
               <button key={tab.id} onClick={() => setActiveMain(tab.id)}

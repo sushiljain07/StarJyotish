@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
-import { useAuth } from '../contexts/AuthContext'
+import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -152,9 +152,7 @@ function LoadingCard() {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function CareerReport() {
-  const { i18n } = useTranslation()
-  const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { t, i18n } = useTranslation()
 
   const [status, setStatus]             = useState('idle')   // idle | loading | done | error
   const [report, setReport]             = useState(null)
@@ -199,32 +197,16 @@ export default function CareerReport() {
         path="/career-report"
       />
 
-      {/* ── Hero header ── */}
-      <div className="bg-night px-6 pt-12 pb-8 text-center">
-        <button
-          onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-          aria-label="Star Jyotish"
-          className="text-4xl mb-3 inline-block rounded-full hover:bg-white/10 p-2 -m-2 transition"
-        >
-          💼
-        </button>
+      {/* This route is orphaned (nothing in the app links here anymore —
+          career reports are reached via Result.jsx's Insights tab /
+          CareerReportTab.jsx today), but it's still directly reachable by
+          URL, so it gets the same header/footer consistency fix as every
+          other page rather than being left as a dead end (SJ-006.9 audit). */}
+      <SiteHeader />
+      <div className="bg-night px-6 pt-24 sm:pt-28 pb-8 text-center">
+        <span className="text-4xl mb-3 inline-block" aria-hidden="true">💼</span>
         <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">Career Report</h1>
         <p className="text-ink-onnight mt-1 text-sm">Vedic Career &amp; Vocation Analysis</p>
-        <div className="mt-4 flex justify-center gap-2">
-          {['en', 'hi'].map(lang => (
-            <button
-              key={lang}
-              onClick={() => i18n.changeLanguage(lang)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                i18n.language.startsWith(lang)
-                  ? 'bg-primary text-night'
-                  : 'bg-white/10 text-ink-onnight hover:bg-white/20'
-              }`}
-            >
-              {lang === 'en' ? 'EN' : 'हि'}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ── Content ── */}
@@ -266,7 +248,7 @@ export default function CareerReport() {
                 onClick={reset}
                 className="shrink-0 text-xs text-primary hover:text-primary-dark font-semibold transition"
               >
-                ← New
+                {t('career_report_new')}
               </button>
             </div>
 
@@ -285,13 +267,15 @@ export default function CareerReport() {
                 onClick={reset}
                 className="px-8 py-2.5 bg-primary hover:bg-primary-dark text-night rounded-full text-sm font-semibold transition shadow-md"
               >
-                Analyse Another Chart
+                {t('career_report_analyse_another')}
               </button>
             </div>
           </div>
         )}
 
       </div>
+
+      <CompactFooter />
     </div>
   )
 }

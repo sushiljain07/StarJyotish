@@ -54,10 +54,28 @@ const ICONS = {
       <polyline points="13.5 6.5 19 12 13.5 17.5" />
     </>
   ),
+  chevronDown: (
+    <polyline points="6 9 12 15 18 9" />
+  ),
   lock: (
     <>
       <rect x="5.5" y="10.5" width="13" height="9" rx="1.5" />
       <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  // Onboarding: ProfileTypeSelector's "Mine" / "Someone Else" cards
+  self: (
+    <>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" />
+    </>
+  ),
+  people: (
+    <>
+      <circle cx="8.5" cy="8" r="3" />
+      <circle cx="16" cy="9" r="2.4" />
+      <path d="M3 19c0-3 2.5-5.5 5.5-5.5S14 16 14 19" />
+      <path d="M15 14.2c2.3.4 4 2.3 4 4.8" />
     </>
   ),
 }

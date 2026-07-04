@@ -1,36 +1,28 @@
 // frontend/src/config/homeData.js
 //
-// Data layer for the authenticated /home page (see docs/PRODUCT_HOME.md).
-// This sprint is architecture-only — no AI, no backend calls — so every
-// getter below returns realistic, hand-written placeholder data instead of
-// fetching anything. What matters is the *shape*: each getter's return
-// value mirrors a real backend model that already exists (or is planned),
-// documented in the comment above it, so wiring this page up later means
-// swapping the function body for a real fetch — none of the components in
-// components/home/ should need to change at all.
+// Data layer for the authenticated /home page (see docs/PRODUCT_HOME.md
+// and docs/USER_JOURNEY.md). Two different kinds of data live here now:
 //
-// Nothing here should be read as real personalization. It's a stand-in for
-// data that will eventually come from the signed-in user's own account.
+//   1. Real, derived from the account's actual Astrology Profile
+//      (services/astrologyProfiles.js) — Cosmic Snapshot and the Birth
+//      Chart preview. Onboarding.jsx generates a real chart via the
+//      existing /api/kundli endpoint, so by the time PersonalHome.jsx
+//      renders these sections, there's nothing left to fake.
+//   2. Still placeholder — Continue Your Journey's "which guide was
+//      recently viewed," Recent Activity, and Reflection have no backend
+//      support yet at all (no reading-history tracking, no activity log).
+//      Each getter below says which is which.
 
 import { getGuide, getNextGuide } from './knowledgeGraph'
 
 // ── Cosmic Snapshot ─────────────────────────────────────────────────────────
-// Mirrors backend/models/chart_data.py's DashaData shape
-// (current_mahadasha / current_antardasha, each a {planet, start, end}
-// entry) plus one Moon-sign lookup off ChartResponse.planets. Once account
-// charts are connected, this becomes a thin adapter over
-// GET /api/account/birth-profiles/{phone} → the primary profile's stored
-// ChartResponse, not a new endpoint of its own.
-const PLACEHOLDER_SNAPSHOT = {
-  currentMahadasha: { planet: 'Jupiter', start: '2021-03-14', end: '2037-03-14' },
-  currentAntardasha: { planet: 'Saturn', start: '2025-11-02', end: '2028-06-19' },
-  moonSign: 'Taurus',
-}
-
-// Percent elapsed through a {start, end} period, both "YYYY-MM-DD" — same
-// calculation DashaTable.jsx uses for its progress bars, kept local here
-// since it's a few lines and this file has no other reason to import a
-// chart-rendering component.
+// Derives {currentMahadasha, currentAntardasha, moonSign, progress} from a
+// real ChartResponse (backend/models/chart_data.py) — the same shape
+// services/astrologyProfiles.js stores on every Astrology Profile as
+// `profile.chart`. PersonalHome.jsx only calls this once a profile
+// exists; there is no placeholder/demo version of this anymore (see
+// docs/PRODUCT_HOME.md's superseded "sample chart" note from the
+// previous sprint — replaced now that onboarding produces a real one).
 function periodProgress(start, end) {
   const now = Date.now()
   const s = new Date(start).getTime()
@@ -40,35 +32,15 @@ function periodProgress(start, end) {
   return Math.round(((now - s) / (e - s)) * 100)
 }
 
-export function getCosmicSnapshot() {
-  const { currentMahadasha, currentAntardasha, moonSign } = PLACEHOLDER_SNAPSHOT
-  return {
-    currentMahadasha,
-    currentAntardasha,
-    moonSign,
-    mahadashaProgressPct: periodProgress(currentMahadasha.start, currentMahadasha.end),
-  }
-}
+export function getCosmicSnapshotFromChart(chart) {
+  const { current_mahadasha, current_antardasha } = chart.dasha
+  const moon = chart.planets.find(p => p.name === 'Moon')
 
-// ── Birth Chart preview ──────────────────────────────────────────────────
-// Mirrors backend/models/chart_data.py's ChartResponse.{ascendant, planets}
-// closely enough to feed straight into <KundliChart> as-is. Once account
-// charts are connected, the primary BirthProfile's saved ChartResponse
-// replaces this wholesale.
-export function getChartPreview() {
   return {
-    ascendant: { sign: 'Leo', sign_index: 4, degree: 12.4, nakshatra: 'Purva Phalguni' },
-    planets: [
-      { name: 'Sun', house: 1, degree: 18.2 },
-      { name: 'Moon', house: 10, degree: 4.7 },
-      { name: 'Mars', house: 6, degree: 27.1 },
-      { name: 'Mercury', house: 12, degree: 9.3 },
-      { name: 'Jupiter', house: 5, degree: 15.8 },
-      { name: 'Venus', house: 11, degree: 2.6 },
-      { name: 'Saturn', house: 7, degree: 22.9 },
-      { name: 'Rahu', house: 3, degree: 11.0 },
-      { name: 'Ketu', house: 9, degree: 11.0 },
-    ],
+    currentMahadasha: current_mahadasha,
+    currentAntardasha: current_antardasha,
+    moonSign: moon?.sign ?? null,
+    mahadashaProgressPct: periodProgress(current_mahadasha.start, current_mahadasha.end),
   }
 }
 

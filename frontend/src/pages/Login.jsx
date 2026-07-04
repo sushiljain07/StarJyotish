@@ -6,6 +6,20 @@ import CelestialBackdrop from '../components/CelestialBackdrop'
 import PhoneOtpForm from '../components/auth/PhoneOtpForm'
 import GoogleLoginButton from '../components/auth/GoogleLoginButton'
 import { useAuth } from '../contexts/AuthContext'
+import { hasAnyProfile } from '../services/astrologyProfiles'
+
+// Decides where a signed-in visitor lands. An explicit `next` (set by
+// ProtectedRoute.jsx when a signed-out visitor tried to reach a specific
+// protected page directly) always wins. Otherwise: an account with at
+// least one Astrology Profile already goes to /home; a brand-new account
+// goes to /onboarding for "Your First Reading" instead — see
+// docs/USER_JOURNEY.md's state machine. OnboardingGate.jsx enforces this
+// same rule again at the /home route itself, so this is purely a
+// same-visit shortcut, not the actual enforcement.
+function destinationFor(user, explicitNext) {
+  if (explicitNext) return explicitNext
+  return hasAnyProfile(user) ? '/home' : '/onboarding'
+}
 
 export default function Login() {
   const { t } = useTranslation()
@@ -13,24 +27,19 @@ export default function Login() {
   const location = useLocation()
   const { isAuthenticated, user } = useAuth()
 
-  // Falls back to /home (the personal workspace, see pages/PersonalHome.jsx)
-  // rather than the public Landing page — signing in should land somewhere
-  // that reflects being signed in. `next` still wins whenever a protected
-  // route sent the visitor here (ProtectedRoute.jsx), so this only changes
-  // the plain "/login" case.
-  const next = location.state?.next || '/home'
-
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.
   if (isAuthenticated) {
     const role = user?.role
-    navigate(role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : next, { replace: true })
+    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(user, location.state?.next)
+    navigate(dest, { replace: true })
     return null
   }
 
   function handleSuccess(loggedInUser) {
     const role = loggedInUser?.role
-    navigate(role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : next, { replace: true })
+    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(loggedInUser, location.state?.next)
+    navigate(dest, { replace: true })
   }
 
   return (

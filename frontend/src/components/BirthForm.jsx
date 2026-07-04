@@ -1,7 +1,7 @@
 // frontend/src/components/BirthForm.jsx
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fetchPlaceSuggestions } from '../api/astro'
+import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -14,26 +14,6 @@ const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1)
 const HOURS_12 = Array.from({ length: 12 }, (_, i) => String(i === 0 ? 12 : i).padStart(2, '0'))
 const MINUTES  = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
 
-function usePlaceSuggestions(query) {
-  const [suggestions, setSuggestions] = useState([])
-  const timer = useRef(null)
-
-  useEffect(() => {
-    if (query.length < 3) { setSuggestions([]); return }
-    clearTimeout(timer.current)
-    timer.current = setTimeout(async () => {
-      try {
-        const results = await fetchPlaceSuggestions(query)
-        setSuggestions(results)
-      } catch {
-        setSuggestions([])
-      }
-    }, 400)
-    return () => clearTimeout(timer.current)
-  }, [query])
-
-  return suggestions
-}
 
 const selCls = "flex-1 border border-line rounded-lg px-2 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
 const inputCls = "w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink focus:outline-none focus:ring-2 focus:ring-primary"

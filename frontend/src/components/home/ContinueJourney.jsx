@@ -1,17 +1,12 @@
 // frontend/src/components/home/ContinueJourney.jsx
-//
-// "Continue Your Journey" — three small cards pulled straight from the
-// Knowledge Center's real graph (config/knowledgeGraph.js), not a
-// separate content model. See config/homeData.js's getJourney() for which
-// three guides are chosen; only that choice is a placeholder today
-// (no reading-history tracking yet), the guide data itself is real.
+// "Continue Your Journey" — three Knowledge Center cards.
 import { Link } from 'react-router-dom'
 import HomeIcon from './HomeIcons'
 
 function JourneyCard({ eyebrow, title, description, href, comingSoon, comingSoonLabel }) {
   const body = (
-    <div className="bg-parchment-card rounded-xl border border-line p-4 h-full flex flex-col hover:border-primary/50 transition">
-      <span className="text-[10px] font-semibold text-primary-dark uppercase tracking-wide mb-1.5">{eyebrow}</span>
+    <div className="bg-parchment-card rounded-xl border border-line p-4 h-full flex flex-col hover:border-primary/50 hover:shadow-md transition shadow-sm">
+      <span className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-1.5">{eyebrow}</span>
       <h3 className="font-serif font-semibold text-ink text-base leading-snug mb-1">{title}</h3>
       {description && <p className="text-ink-muted text-xs leading-relaxed flex-1">{description}</p>}
       <div className="flex items-center justify-between mt-3">
@@ -20,7 +15,7 @@ function JourneyCard({ eyebrow, title, description, href, comingSoon, comingSoon
             <HomeIcon id="lock" className="w-3 h-3" /> {comingSoonLabel}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[11px] text-primary-dark font-semibold">
+          <span className="inline-flex items-center gap-1 text-[11px] text-primary font-semibold">
             <HomeIcon id="arrowRight" className="w-3.5 h-3.5" />
           </span>
         )}

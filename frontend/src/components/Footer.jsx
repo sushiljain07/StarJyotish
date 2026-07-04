@@ -1,20 +1,20 @@
 // frontend/src/components/Footer.jsx
 //
-// Site-wide footer — sits at the bottom of Landing.jsx today, written to be
-// dropped onto any other page later (e.g. Disclaimer.jsx already does).
-// Every color/spacing/radius choice below is an existing token from
-// tailwind.config.js or a pattern copied from Landing.jsx / BirthForm.jsx —
-// see inline notes. No new design decisions were made for this component.
+// Site-wide footer. Cleaned up in SJ-009:
+//   — Services column removed (duplicated topic cards already above the fold)
+//   — Learn column kept but trimmed to real destinations only
+//     (Zodiac/Nakshatra/Dasha placeholder "#" links removed)
+//   — Company column replaced by a single clean column: About, Contact,
+//     Blog; "How It Works" (duplicate of hero section), "Pricing" (not
+//     live yet) removed
+//   — "Get in Touch" section folded into the column — email sits
+//     naturally alongside Contact Us rather than as a separate heading
+//   — Grid is now 3 columns instead of 4 at md+
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
 
-// Same capability badges already shown in the hero (services/topic.js has no
-// "trust" claims of its own, and these are the only ones the app can back up
-// honestly today — see Landing.jsx's BADGES comment). Reusing them here
-// instead of inventing new unverified claims like "Astrologer Verified" or
-// a star rating, which don't apply yet (no marketplace, no review data).
 const TRUST_BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_bilingual', 'landing_badge_ai']
 const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
 
@@ -32,16 +32,6 @@ function FooterLink({ to, state, children }) {
   )
 }
 
-// Renders as a native <details>/<summary> on mobile (collapsed by
-// default — the footer is the last thing on an already-long page, and
-// two fully-expanded link columns just add scroll depth most visitors
-// never touch), and as a plain always-open heading + list on sm+, where
-// vertical space isn't scarce and a click-to-expand interaction would
-// just be friction for no benefit. `key={isMobile}` forces a clean
-// remount on breakpoint change so the `open` attribute (which React only
-// applies once, on mount — it doesn't track it afterwards) re-evaluates,
-// e.g. if someone resizes a desktop browser window down past the
-// breakpoint.
 function FooterColumn({ heading, children }) {
   const isMobile = useIsMobile()
 
@@ -72,9 +62,9 @@ export default function Footer() {
   return (
     <footer className="bg-night border-t border-white/10 text-ink-onnight">
       {/* ── Brand + link columns ── */}
-      <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10">
+      <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-10">
         {/* Brand */}
-        <div className="sm:col-span-2 md:col-span-1">
+        <div>
           <div className="flex items-center gap-2">
             <img src="/starjyotish.svg" alt="" className="w-8 h-8" />
             <span className="font-serif font-semibold text-lg text-primary-light">{t('app_title')}</span>
@@ -84,55 +74,26 @@ export default function Footer() {
           <SocialButtons dark />
         </div>
 
-        {/* Services */}
-        <FooterColumn heading={t('footer_services_heading')}>
-          <ul className="space-y-2.5">
-            <FooterLink to="/generate">{t('footer_link_free_kundli')}</FooterLink>
-            <FooterLink to="/generate" state={{ topic: 'career' }}>{t('footer_link_career')}</FooterLink>
-            <FooterLink to="/generate" state={{ topic: 'relationship' }}>{t('footer_link_relationship')}</FooterLink>
-            <FooterLink to="/generate" state={{ topic: 'health' }}>{t('footer_link_health')}</FooterLink>
-            <FooterLink to="/generate" state={{ topic: 'finance' }}>{t('footer_link_finance')}</FooterLink>
-          </ul>
-        </FooterColumn>
-
-        {/* Learn — Nakshatra/Dasha still stay as "#" deliberately: those
-            guide pages don't exist yet, so pointing them anywhere would
-            just be a different kind of dead link (see components/
-            knowledge/ for the shared infra those pages will use once
-            built). Zodiac and the Knowledge Center hub are both real now. */}
+        {/* Learn — only real, live destinations */}
         <FooterColumn heading={t('footer_learn_heading')}>
           <ul className="space-y-2.5">
             <FooterLink to="/learn">{t('footer_link_knowledge_center', 'Knowledge Center')}</FooterLink>
-            <FooterLink to="/learn/zodiac">{t('footer_link_zodiac')}</FooterLink>
-            <FooterLink to="#">{t('footer_link_nakshatra')}</FooterLink>
-            <FooterLink to="#">{t('footer_link_dasha')}</FooterLink>
-            <FooterLink to="/blog">{t('footer_link_blog')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
+            <FooterLink to="/blog">{t('footer_link_blog')}</FooterLink>
           </ul>
         </FooterColumn>
 
-        {/* Company + minimal contact (room left to add phone/address as
-            extra <li> rows later — no restructuring needed). "How it
-            works" now points at the real 3-step section already on the
-            landing page (id="how-it-works", see Landing.jsx) instead of a
-            dead "#" — that section's content already answers the
-            question, so this just makes it reachable from anywhere
-            instead of building a second copy of the same explanation as
-            a standalone page. Pricing stays "#" — there's genuinely no
-            pricing to show yet (pre-revenue, see README). */}
-        <div>
-          <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3">{t('footer_company_heading')}</h3>
+        {/* Company — about + contact + pricing; email folded in */}
+        <FooterColumn heading={t('footer_company_heading')}>
           <ul className="space-y-2.5">
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
-            <FooterLink to="/#how-it-works">{t('footer_link_how_it_works')}</FooterLink>
             <FooterLink to="/pricing">{t('footer_link_pricing')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>
-          <h3 className="text-xs font-semibold tracking-wide uppercase text-primary-light mt-6 mb-2">{t('footer_contact_heading')}</h3>
-          <ul className="space-y-2 text-sm text-ink-onnight/80">
-            <li className="flex items-center gap-1.5">✉️ contact@starjyotish.com</li>
-          </ul>
-        </div>
+          <p className="flex items-center gap-1.5 text-sm text-ink-onnight/80 mt-4">
+            ✉️ contact@starjyotish.com
+          </p>
+        </FooterColumn>
       </div>
 
       {/* ── Newsletter ── */}
@@ -176,7 +137,6 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-ink-onnight/60">
           <Link to="/privacy" className="hover:text-primary transition">{t('footer_bottom_privacy')}</Link>
-          <Link to="/privacy#cookies" className="hover:text-primary transition">{t('footer_bottom_cookie')}</Link>
           <Link to="/terms" className="hover:text-primary transition">{t('footer_bottom_terms')}</Link>
           <Link to="/refund-policy" className="hover:text-primary transition">{t('footer_bottom_refund')}</Link>
           <Link to="/disclaimer" className="hover:text-primary transition">{t('footer_bottom_disclaimer')}</Link>
@@ -184,7 +144,6 @@ export default function Footer() {
         <p className="text-ink-onnight/50 text-center">
           {t('footer_copyright', { year })} · {t('footer_powered_by')}
         </p>
-        {/* Same EN/हि pattern used in the hero and sticky header */}
         <div className="flex gap-1">
           {['en', 'hi'].map(lang => (
             <button

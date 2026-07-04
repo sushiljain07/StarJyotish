@@ -259,10 +259,6 @@ export default function Result() {
                 )}
               </div>
             </div>
-            <button onClick={() => navigate('/generate')}
-                    className="shrink-0 bg-primary/15 hover:bg-primary/25 text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition">
-              {t('kundli_new_chart')}
-            </button>
           </div>
 
           {/* Main tab bar — desktop only; mobile uses the bottom nav instead */}

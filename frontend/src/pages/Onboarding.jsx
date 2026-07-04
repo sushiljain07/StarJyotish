@@ -10,7 +10,7 @@
 // logic* (generating and saving the chart) — this file never talks to
 // fetchKundli or localStorage directly.
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -52,7 +52,14 @@ function to24Hour(hour, ampm) {
 export default function Onboarding() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, accessToken } = useAuth()
+
+  // Allow re-entry when the user explicitly chose "Add another chart"
+  // (Profile.jsx links here with state { addAnother: true }).
+  // Without this flag, hasAnyProfile() would bounce them straight back
+  // to /home before they could add a second profile.
+  const addingAnother = Boolean(location.state?.addAnother)
 
   const [step, setStep] = useState('welcome')
   const [draft, setDraft] = useState({
@@ -70,13 +77,11 @@ export default function Onboarding() {
   const [createdProfile, setCreatedProfile] = useState(null)
   const placeSuggestions = usePlaceSuggestions(placeQuery)
 
-  // Returning users with an existing profile never see onboarding again —
-  // this mirrors OnboardingGate.jsx's rule from the other direction (a
-  // signed-in visitor landing on /onboarding directly, e.g. via back
-  // button or a stale bookmark).
+  // Returning users with an existing profile skip onboarding unless they
+  // explicitly arrived via "Add another chart" (addingAnother flag above).
   useEffect(() => {
-    if (hasAnyProfile(user)) navigate('/home', { replace: true })
-  }, [user, navigate])
+    if (!addingAnother && hasAnyProfile(user)) navigate('/home', { replace: true })
+  }, [user, navigate, addingAnother])
 
   function update(patch) {
     setDraft(d => ({ ...d, ...patch }))

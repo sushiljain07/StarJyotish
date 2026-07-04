@@ -45,7 +45,7 @@ function initialFor(user) {
 
 export default function Profile() {
   const { t, i18n } = useTranslation()
-  const { user, updateMyProfile, logout } = useAuth()
+  const { user, updateMyProfile } = useAuth()
 
   const [form, setForm] = useState({
     name: user?.name || '',
@@ -199,10 +199,14 @@ export default function Profile() {
               <p className="text-ink-muted text-sm mb-4">{t('profile_astro_body', 'Your saved birth charts. Click any to open the chart viewer.')}</p>
               <ul className="space-y-2">
                 {profiles.map(p => (
-                  <li key={p.id} className="flex items-center justify-between bg-parchment rounded-lg px-3 py-2.5 border border-line">
-                    <div>
-                      <span className="text-sm font-medium text-ink">{p.label}</span>
-                      <span className="text-xs text-ink-faint ml-2">{p.place} · {p.birth_date}</span>
+                  <li key={p.id} className="flex items-start justify-between bg-parchment rounded-lg px-3 py-3 border border-line">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-ink">{p.label}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">
+                        {p.birth_date ? p.birth_date.split('-').reverse().join('-') : ''}
+                        {p.birth_time ? ` · ${p.birth_time}` : ''}
+                      </p>
+                      <p className="text-xs text-ink-faint mt-0.5 truncate">{p.place}</p>
                     </div>
                     {p.chart && (
                       <Link
@@ -218,6 +222,7 @@ export default function Profile() {
               </ul>
               <Link
                 to="/onboarding"
+                state={{ addAnother: true }}
                 className="inline-block mt-4 text-xs text-primary-dark hover:underline font-medium"
               >
                 {t('profile_astro_add', '+ Add another chart')}
@@ -239,9 +244,6 @@ export default function Profile() {
           </a>
         </div>
 
-        <button onClick={() => logout()} className="mt-6 text-vermillion hover:underline text-sm font-medium">
-          {t('nav_logout')}
-        </button>
       </div>
 
       <CompactFooter />

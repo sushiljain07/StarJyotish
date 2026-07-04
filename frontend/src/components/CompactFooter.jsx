@@ -15,12 +15,12 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const LINKS = [
-  { to: '/learn', key: 'footer_link_knowledge_center', fallback: 'Knowledge Center' },
-  { to: '/about', key: 'footer_link_about' },
-  { to: '/faq', key: 'footer_link_faq' },
-  { to: '/contact', key: 'footer_link_contact' },
-  { to: '/privacy', key: 'footer_bottom_privacy' },
-  { to: '/terms', key: 'footer_bottom_terms' },
+  { to: '/learn',        key: 'footer_link_knowledge_center', fallback: 'Knowledge Center' },
+  { to: '/faq',          key: 'footer_link_faq' },
+  { to: '/about',        key: 'footer_link_about' },
+  { to: '/contact',      key: 'footer_link_contact' },
+  { to: '/terms',        key: 'footer_bottom_terms' },
+  { to: '/privacy',      key: 'footer_bottom_privacy' },
   { to: '/refund-policy', key: 'footer_bottom_refund' },
 ]
 

@@ -47,7 +47,7 @@ function useProductNav(isAuthenticated) {
   return [
     { key: 'nav_home', to: isAuthenticated ? '/home' : '/', active: pathname === '/' || pathname === '/home' },
     { key: 'nav_learn', to: '/learn', active: pathname.startsWith('/learn') },
-    { key: 'nav_generate', to: '/generate', active: pathname === '/generate' || pathname === '/onboarding' },
+    { key: 'nav_generate', to: '/generate', active: pathname === '/generate' || pathname === '/onboarding' || pathname === '/kundli' || pathname === '/career-report' },
   ]
 }
 
@@ -139,9 +139,16 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, showLanguag
           )}
 
           {onCtaClick && (
+            // md:hidden — at md+ the Layer 1 nav strip above already has a
+            // "Generate Chart" link to the same destination; showing both
+            // that and this button (worded "Generate Kundli") in the same
+            // header was a duplicate control with inconsistent wording,
+            // introduced when SJ-006.8 added the nav strip alongside this
+            // pre-existing CTA. Below md, the nav strip is hidden, so this
+            // is still the only way to reach /generate from the header.
             <button
               onClick={onCtaClick}
-              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3 sm:px-3.5 py-1.5 rounded-full transition whitespace-nowrap"
+              className="md:hidden bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3 sm:px-3.5 py-1.5 rounded-full transition whitespace-nowrap"
             >
               <span className="sm:hidden">{t('nav_cta_mobile')}</span>
               <span className="hidden sm:inline">{t('nav_cta_compact')}</span>

@@ -112,7 +112,7 @@
   "landing_final_cta_heading": "Ready to meet your Personal AI Astrologer?",
   "landing_final_cta_body": "Your first reading is free, with no signup needed — and it's just the beginning.",
   "focused_on": "Focused on",
-  "kundli_new_chart": "New chart",
+  "kundli_new_chart": "New Chart",
   "home_asking_label": "Asking",
   "change_focus": "change",
   "nav_kundli": "Kundli",
@@ -129,6 +129,8 @@
   "nav_health": "Health",
   "nav_relationship": "Relationship",
   "nav_finance": "Finance",
+  "topic_career_heading": "Career & Business Snapshot",
+  "topic_career_body": "Your 10th house, its lord, and the Dasamsa (D10) reveal the direction your career naturally pulls toward. The planet ruling your Midheaven and your current Mahadasha together shape the timing of your most significant professional shifts.",
   "topic_health_heading": "Health & Wellness Snapshot",
   "topic_health_body": "In Vedic astrology, your ascendant and Moon are the two strongest indicators of physical constitution and vitality. Your Lagna in {{lagna}} and Moon in {{moon}} ({{nakshatra}} nakshatra) shape how your energy naturally runs and how your body tends to recover from stress.",
   "topic_relationship_heading": "Love & Relationships Snapshot",
@@ -165,6 +167,7 @@
   "footer_link_dasha": "Dasha System",
   "footer_link_blog": "Astrology Blog",
   "footer_link_faq": "FAQs",
+  "footer_link_knowledge_center": "Knowledge Center",
   "footer_company_heading": "Company",
   "footer_link_about": "About Us",
   "footer_link_how_it_works": "How It Works",
@@ -449,5 +452,12 @@
 
   "onboarding_generating_1": "Preparing your birth chart...",
   "onboarding_generating_2": "Studying planetary positions...",
-  "onboarding_generating_3": "Almost ready..."
+  "onboarding_generating_3": "Almost ready...",
+  "not_found_seo_title": "Page Not Found — Star Jyotish",
+  "not_found_seo_description": "The page you were looking for could not be found.",
+  "not_found_title": "This page doesn't exist",
+  "not_found_body": "The link you followed may be broken, or the page may have moved. Let's get you back on track.",
+  "not_found_cta": "Go to homepage",
+  "career_report_new": "← New",
+  "career_report_analyse_another": "Analyse Another Chart"
 }

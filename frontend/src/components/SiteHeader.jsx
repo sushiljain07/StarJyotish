@@ -1,18 +1,12 @@
 // frontend/src/components/SiteHeader.jsx
 //
-// Fixed header. Transparent at top of page, solidifies as the user scrolls.
-//
-// Two background modes:
-//   dark=true  (default) — page has a dark/night hero behind the header
-//              (Landing, Generate Chart, Result.jsx). At scroll=0 the night
-//              background shows through at low opacity; as the user scrolls
-//              it solidifies to an opaque night strip.
-//   dark=false — page has a light/parchment background (PersonalHome,
-//              Profile, Learn, static pages). At scroll=0 the header is
-//              nearly invisible against the parchment; as the user scrolls
-//              it solidifies to the same night strip. This prevents the
-//              muddy grey artefact that appeared when rgba(night, 0.15)
-//              rendered on top of the warm parchment colour.
+// Fixed header. Two background modes:
+//   dark=true  (default) — page has a dark hero behind the header. Header
+//              text stays light throughout; background solidifies on scroll.
+//   dark=false — page background is light parchment. At the top the header
+//              is transparent, so its foreground must be DARK to stay
+//              readable; as the night background fades in on scroll the
+//              foreground crossfades to the light-on-dark palette.
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -28,40 +22,47 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, showLanguag
   const otherLang = i18n.language.startsWith('en') ? 'hi' : 'en'
   const p = Math.min(1, Math.max(0, scrollProgress))
 
-  // On dark backgrounds the header starts at 15% opacity and climbs to 95%.
-  // On light (parchment) backgrounds, we start at 0% so there is no grey
-  // artefact at the very top, and climb to the same 95% as you scroll down.
   const bgAlpha     = dark ? 0.15 + p * 0.80 : p * 0.95
   const blurPx      = 6 + p * 6
   const borderAlpha = dark ? p * 0.10 : p * 0.08
+
+  // Foreground colours. On dark pages: always light. On light pages:
+  // dark ink at the top, crossfading to light as the night bg solidifies.
+  // The crossfade midpoint (p=0.5) is where the night bg is ~50% opaque,
+  // which is exactly when light text becomes more readable than dark.
+  const onDark = dark || p > 0.5
+  const titleColor  = onDark ? 'text-primary-light' : 'text-night'
+  const pillClasses = onDark
+    ? 'bg-white/10 hover:bg-white/20 text-ink-onnight'
+    : 'bg-night/10 hover:bg-night/20 text-night'
 
   return (
     <header
       className="fixed top-0 inset-x-0 z-40 border-b transition-[background-color,backdrop-filter,box-shadow,border-color] duration-150 ease-out"
       style={{
         backgroundColor: `rgba(${NIGHT_RGB}, ${bgAlpha})`,
-        backdropFilter:         `blur(${blurPx}px)`,
-        WebkitBackdropFilter:   `blur(${blurPx}px)`,
-        borderColor: `rgba(255, 255, 255, ${borderAlpha})`,
+        backdropFilter:       `blur(${blurPx}px)`,
+        WebkitBackdropFilter: `blur(${blurPx}px)`,
+        borderColor: onDark ? `rgba(255,255,255,${borderAlpha})` : `rgba(${NIGHT_RGB},0.08)`,
       }}
     >
       <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
-        {/* Logo — brand mark only, links to home/landing */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
           className="flex items-center gap-2 shrink-0"
           aria-label={t('app_title')}
         >
           <img src="/starjyotish.svg" alt="" className="w-7 h-7 sm:w-8 sm:h-8" />
-          <span className="font-serif font-semibold text-lg sm:text-xl text-primary-light">{t('app_title')}</span>
+          <span className={`font-serif font-semibold text-lg sm:text-xl transition-colors duration-150 ${titleColor}`}>
+            {t('app_title')}
+          </span>
         </button>
 
-        {/* Right-side controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {showLanguageToggle && (
             <button
               onClick={() => i18n.changeLanguage(otherLang)}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight text-[11px] font-semibold px-2.5 py-1.5 rounded-full transition"
+              className={`text-[11px] font-semibold px-2.5 py-1.5 rounded-full transition ${pillClasses}`}
             >
               {otherLang === 'en' ? 'EN' : 'हि'}
             </button>
@@ -70,7 +71,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, showLanguag
           {!isAuthenticated && (
             <button
               onClick={() => navigate('/login')}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition"
+              className={`text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full transition ${pillClasses}`}
             >
               {t('nav_sign_in')}
             </button>

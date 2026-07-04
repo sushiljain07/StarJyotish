@@ -83,9 +83,9 @@ export default function DivisionalCharts({ input, defaultDivision }) {
           <button
             key={d}
             onClick={() => fetchDivisional(d)}
-            title={desc}
+            title={`${title} — ${desc}`}
             className={`
-              flex flex-col items-center justify-center
+              flex flex-col items-center justify-center min-w-0
               rounded-xl p-2 border text-center
               transition-all duration-150 cursor-pointer
               ${selectedD === d
@@ -95,7 +95,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
             `}
           >
             <span className="font-bold text-sm">{name}</span>
-            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-primary-light' : 'text-ink-faint'}`}>
+            <span className={`text-[10px] mt-0.5 w-full truncate px-0.5 ${selectedD === d ? 'text-primary-light' : 'text-ink-faint'}`}>
               {title}
             </span>
           </button>

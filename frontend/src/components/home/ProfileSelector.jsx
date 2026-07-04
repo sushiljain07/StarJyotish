@@ -30,7 +30,7 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
 
   return (
     <div className="flex items-center gap-2 mb-3" ref={ref}>
-      <span className="text-[10px] text-ink-onnight/50 uppercase tracking-wide">
+      <span className="text-[10px] text-ink-faint uppercase tracking-wide">
         {t('home_profile_selector_label')}
       </span>
 
@@ -40,9 +40,9 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
           onClick={() => hasMany && setOpen(o => !o)}
           aria-haspopup={hasMany ? 'listbox' : undefined}
           aria-expanded={hasMany ? open : undefined}
-          className={`inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full pl-3 pr-2.5 py-1.5 text-sm font-medium text-ink-onnight transition ${
+          className={`inline-flex items-center gap-1.5 bg-parchment-card border border-line rounded-full pl-3 pr-2.5 py-1.5 text-sm font-medium text-ink transition ${
             hasMany
-              ? 'cursor-pointer hover:bg-white/20 hover:border-white/30'
+              ? 'cursor-pointer hover:border-primary/50 hover:bg-primary-light/40'
               : 'cursor-default'
           }`}
         >

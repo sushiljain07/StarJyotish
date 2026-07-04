@@ -490,12 +490,14 @@ export default function PersonalHome() {
                     )
                   })}
                 </div>
-                <button
-                  onClick={() => openChart('ask')}
-                  className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-6 py-2.5 rounded-full transition"
-                >
-                  Ask your own question →
-                </button>
+                <div className="text-center sm:text-left">
+                  <button
+                    onClick={() => openChart('ask')}
+                    className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-6 py-2.5 rounded-full transition"
+                  >
+                    Ask your own question
+                  </button>
+                </div>
               </section>
             </Reveal>
 

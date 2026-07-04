@@ -26,7 +26,7 @@ export default function ChartPreviewCard({ t, chart, chartTitle, timeAccuracy, o
       </div>
 
       {/* Actions */}
-      <div className="bg-parchment-card border-t border-line px-5 py-4 flex flex-wrap items-center gap-2.5">
+      <div className="bg-parchment-card border-t border-line px-5 py-4 flex flex-wrap items-center justify-center gap-3">
         <button
           onClick={onViewChart}
           className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-5 py-2 rounded-full transition"
@@ -41,7 +41,7 @@ export default function ChartPreviewCard({ t, chart, chartTitle, timeAccuracy, o
         </button>
         <button
           onClick={onGenerateNew}
-          className="text-ink-muted hover:text-primary-dark text-sm font-medium px-2 py-2 transition ml-auto"
+          className="text-ink-muted hover:text-primary-dark text-sm font-medium transition underline-offset-2 hover:underline"
         >
           {t('home_chart_cta_new')}
         </button>

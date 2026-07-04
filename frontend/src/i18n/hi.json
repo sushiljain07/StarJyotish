@@ -229,6 +229,7 @@
   "login_disclaimer": "हम इसका उपयोग केवल साइन इन के लिए करेंगे।",
   "login_seo_description": "Star Jyotish में फोन नंबर, ईमेल या Google से साइन इन करें।",
   "nav_sign_in": "साइन इन करें",
+  "nav_back_home": "होम",
   "nav_logout": "लॉगआउट",
   "nav_signed_in_as": "{{name}} के रूप में साइन इन",
   "nav_cta_compact": "कुंडली बनाएं",

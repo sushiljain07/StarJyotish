@@ -240,6 +240,15 @@ export default function Landing() {
               </Reveal>
             ))}
           </div>
+          {/* Doesn't promise unbuilt memory/personalization features — just
+              names the fact already true today: a birth chart is a fixed
+              calculation, so there's no "expiry" forcing a one-time visit.
+              This is where the sprint's continuity idea lives without a
+              4th grid item (which would break the existing 3-column
+              layout for no real gain). */}
+          <Reveal delay={300} className="text-center text-ink-muted text-xs mt-8 max-w-md mx-auto">
+            {t('landing_steps_continuity')}
+          </Reveal>
         </div>
       </section>
 

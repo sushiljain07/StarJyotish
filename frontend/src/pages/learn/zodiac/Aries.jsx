@@ -16,6 +16,7 @@
 // and register the route in App.jsx + generate-sitemap.js.
 // Nothing else changes — the framework wires itself from config.
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import { useAuth } from '../../../contexts/AuthContext'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import Reflection from '../../../components/knowledge/Reflection'
@@ -79,6 +80,7 @@ export default function AriesGuide() {
   const guide = getGuide('zodiac-aries')
   const learningPathSteps = getLearningPathSteps('zodiac')  // main curriculum position
   const { prev, next } = getSignNavigation('zodiac-aries')  // sign-level nav
+  const { isAuthenticated } = useAuth()
 
   return (
     <KnowledgeLayout
@@ -87,7 +89,7 @@ export default function AriesGuide() {
       path="/learn/zodiac/aries"
       eyebrow="Zodiac Signs"
       breadcrumbItems={[
-        { label: 'Home',          to: '/' },
+        { label: 'Home',          to: isAuthenticated ? '/home' : '/' },
         { label: 'Learn',         to: '/learn' },
         { label: 'Zodiac Signs',  to: '/learn/zodiac' },
         { label: 'Mesha (Aries)' },

@@ -10,17 +10,22 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Footer from './Footer'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function StaticPageLayout({ title, eyebrow, maxWidth = 'max-w-2xl', children }) {
   const { t } = useTranslation()
+  const { isAuthenticated } = useAuth()
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
       <div className={`flex-1 px-4 sm:px-6 py-10 sm:py-12 ${maxWidth} mx-auto w-full`}>
-        <Link to="/" className="text-primary-dark text-sm font-medium hover:underline">
+        <Link to={isAuthenticated ? '/home' : '/'} className="text-primary-dark text-sm font-medium hover:underline">
           {/* Reusing the existing disclaimer key — the copy ("← Back to
               Home") is identical and generic, so a second key would just be
-              a duplicate string to keep translated in sync. */}
+              a duplicate string to keep translated in sync. Where it
+              actually goes now depends on who's reading: a signed-in
+              visitor's "Home" is their own workspace (see
+              pages/PersonalHome.jsx), not the marketing page. */}
           {t('disclaimer_page_back')}
         </Link>
         {eyebrow && (

@@ -18,8 +18,11 @@ export default function RoleRoute({ role, children }) {
   }
 
   if (user.role !== role) {
-    // Wrong role — send to home, not login (they are logged in)
-    return <Navigate to="/" replace />
+    // Wrong role — send to their own Home, not login (they are logged
+    // in) and not '/' (that's the signed-out marketing page; /home is
+    // what "home" means for a signed-in visitor everywhere else in this
+    // app — see pages/PersonalHome.jsx).
+    return <Navigate to="/home" replace />
   }
 
   return children

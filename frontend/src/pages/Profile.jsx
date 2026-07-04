@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 import MobileNumberField from '../components/auth/MobileNumberField'
 import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
@@ -200,6 +201,8 @@ export default function Profile() {
           {t('nav_logout')}
         </button>
       </div>
+
+      <CompactFooter />
     </div>
   )
 }

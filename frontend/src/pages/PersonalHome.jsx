@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 import Reveal from '../components/Reveal'
 import WelcomeHero from '../components/home/WelcomeHero'
 import ProfileSelector from '../components/home/ProfileSelector'
@@ -133,6 +134,12 @@ export default function PersonalHome() {
 
         <ComingSoonStrip t={t} />
       </div>
+
+      {/* The workspace previously had no footer at all — signed-in users
+          could not reach Contact/Privacy/Terms from their own Home
+          without logging out or hunting through Profile first
+          (SJ-006.8's Navigation Audit). */}
+      <CompactFooter />
     </div>
   )
 }

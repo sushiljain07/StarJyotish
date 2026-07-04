@@ -10,9 +10,11 @@ import { useAuth } from '../contexts/AuthContext'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import Seo from '../components/Seo'
+import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 
 export default function Home() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { state } = useLocation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
@@ -62,34 +64,18 @@ export default function Home() {
         description="Enter your date, time, and place of birth to generate a free, Swiss Ephemeris-accurate Vedic Kundli with an AI-powered reading."
         path="/generate"
       />
-      {/* Hero header */}
-      <div className="relative overflow-hidden bg-night px-6 pt-12 pb-8 text-center">
+      {/* SiteHeader replaces this page's old bespoke mini-header (logo +
+          language toggle only) — that version had no way to reach Learn,
+          Home, or the account menu, so a signed-in visitor landing here
+          (e.g. from PersonalHome's "Generate New Chart") lost their own
+          nav entirely. Same header everyone else gets; the brand
+          moment below is now just page content, not navigation. */}
+      <SiteHeader />
+      <div className="relative overflow-hidden bg-night px-6 pt-24 sm:pt-28 pb-8 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />
-        <button
-          onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-          aria-label={t('app_title')}
-          className="relative block mx-auto mb-3 rounded-full hover:bg-white/10 p-1 -m-1 transition"
-        >
-          <img src="/starjyotish.svg" alt="" className="w-16 h-16" />
-        </button>
+        <img src="/starjyotish.svg" alt="" className="relative block mx-auto mb-3 w-16 h-16" />
         <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
         <p className="relative text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
-        {/* Language toggle */}
-        <div className="relative mt-4 flex justify-center gap-2">
-          {['en', 'hi'].map(lang => (
-            <button
-              key={lang}
-              onClick={() => i18n.changeLanguage(lang)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                i18n.language.startsWith(lang)
-                  ? 'bg-primary text-night'
-                  : 'bg-white/10 text-ink-onnight hover:bg-white/20'
-              }`}
-            >
-              {lang === 'en' ? 'EN' : 'हि'}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Form card */}
@@ -123,6 +109,12 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* Previously this page had no footer at all — Contact/Privacy/Terms
+          were unreachable without leaving the flow first (SJ-006.8's
+          Navigation Audit). CompactFooter, not the full marketing
+          Footer — this is a focused task screen, not a landing page. */}
+      <CompactFooter />
     </div>
   )
 }

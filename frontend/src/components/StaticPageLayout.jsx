@@ -9,6 +9,7 @@
 // title/description are inherently per-page (see Seo.jsx).
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import SiteHeader from './SiteHeader'
 import Footer from './Footer'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -18,7 +19,14 @@ export default function StaticPageLayout({ title, eyebrow, maxWidth = 'max-w-2xl
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
-      <div className={`flex-1 px-4 sm:px-6 py-10 sm:py-12 ${maxWidth} mx-auto w-full`}>
+      {/* These pages (About/FAQ/Contact/Disclaimer/Privacy/Terms/Refund)
+          used to be reachable only via the "← Back to Home" link below —
+          a real dead end, since there was no way from here to Learn,
+          Generate Chart, or the account menu without first going Home
+          (see SJ-006.8's Navigation Audit). Mounting the same SiteHeader
+          every other page uses fixes that in one place instead of seven. */}
+      <SiteHeader />
+      <div className={`flex-1 px-4 sm:px-6 pt-20 sm:pt-24 pb-10 sm:pb-12 ${maxWidth} mx-auto w-full`}>
         <Link to={isAuthenticated ? '/home' : '/'} className="text-primary-dark text-sm font-medium hover:underline">
           {/* Reusing the existing disclaimer key — the copy ("← Back to
               Home") is identical and generic, so a second key would just be

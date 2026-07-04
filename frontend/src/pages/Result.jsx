@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../contexts/AuthContext'
 
 // ── Eager imports ────────────────────────────────────────────────────────────
 // Components the user sees immediately on first render (birth chart tab).
@@ -161,6 +162,14 @@ export default function Result() {
   const { t } = useTranslation()
   const { state } = useLocation()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+
+  // Where "go back to where I came from" means for this visitor — their
+  // own workspace if they're signed in, the marketing page otherwise.
+  // Used both by the missing-state guard right below (a stale link or a
+  // hard refresh loses router state entirely) and by the header's own
+  // logo/back link further down, so the two can never disagree.
+  const homeDestination = isAuthenticated ? '/home' : '/'
 
   // Carried over from the landing page's AI persona spotlight (see
   // Landing.jsx → Home.jsx) — read straight off the raw location state,
@@ -175,7 +184,7 @@ export default function Result() {
   const [chartStyle, setChartStyle] = useState('north')
 
   if (!state?.data) {
-    navigate('/')
+    navigate(homeDestination)
     return null
   }
 
@@ -226,24 +235,33 @@ export default function Result() {
       {/* Header */}
       <div className="bg-night text-primary-light">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
-            <div>
-              {input.name && <div className="font-bold text-lg leading-tight">{input.name}</div>}
-              <div className={`${input.name ? 'text-ink-onnight text-xs' : 'font-bold text-base'} leading-tight`}>
-                {input.place}
-              </div>
-              <div className="text-ink-onnight text-xs">
-                {formatDate(input.date)} · {formatTime(input.time)}
-              </div>
-              {topic && (
-                <div className="mt-1 inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5 text-[11px] text-primary-light">
-                  <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+          <div className="flex items-center justify-between py-3 gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={() => navigate(homeDestination)}
+                aria-label={t('app_title')}
+                className="shrink-0 rounded-full hover:bg-white/10 p-1 -m-1 transition"
+              >
+                <img src="/starjyotish.svg" alt="" className="w-7 h-7" />
+              </button>
+              <div className="min-w-0">
+                {input.name && <div className="font-bold text-lg leading-tight truncate">{input.name}</div>}
+                <div className={`${input.name ? 'text-ink-onnight text-xs' : 'font-bold text-base'} leading-tight truncate`}>
+                  {input.place}
                 </div>
-              )}
+                <div className="text-ink-onnight text-xs">
+                  {formatDate(input.date)} · {formatTime(input.time)}
+                </div>
+                {topic && (
+                  <div className="mt-1 inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5 text-[11px] text-primary-light">
+                    <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
+                  </div>
+                )}
+              </div>
             </div>
-            <button onClick={() => navigate('/')}
-                    className="bg-primary/15 hover:bg-primary/25 text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition">
-              ← New chart
+            <button onClick={() => navigate('/generate')}
+                    className="shrink-0 bg-primary/15 hover:bg-primary/25 text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition">
+              {t('kundli_new_chart')}
             </button>
           </div>
 

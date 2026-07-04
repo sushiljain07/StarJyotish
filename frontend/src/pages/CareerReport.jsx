@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
+import { useAuth } from '../contexts/AuthContext'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -151,6 +153,8 @@ function LoadingCard() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function CareerReport() {
   const { i18n } = useTranslation()
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   const [status, setStatus]             = useState('idle')   // idle | loading | done | error
   const [report, setReport]             = useState(null)
@@ -197,7 +201,13 @@ export default function CareerReport() {
 
       {/* ── Hero header ── */}
       <div className="bg-night px-6 pt-12 pb-8 text-center">
-        <div className="text-4xl mb-3">💼</div>
+        <button
+          onClick={() => navigate(isAuthenticated ? '/home' : '/')}
+          aria-label="Star Jyotish"
+          className="text-4xl mb-3 inline-block rounded-full hover:bg-white/10 p-2 -m-2 transition"
+        >
+          💼
+        </button>
         <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">Career Report</h1>
         <p className="text-ink-onnight mt-1 text-sm">Vedic Career &amp; Vocation Analysis</p>
         <div className="mt-4 flex justify-center gap-2">

@@ -65,7 +65,13 @@ export default function Home() {
       {/* Hero header */}
       <div className="relative overflow-hidden bg-night px-6 pt-12 pb-8 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />
-        <img src="/starjyotish.svg" alt="Star Jyotish" className="relative w-16 h-16 mx-auto mb-3" />
+        <button
+          onClick={() => navigate(isAuthenticated ? '/home' : '/')}
+          aria-label={t('app_title')}
+          className="relative block mx-auto mb-3 rounded-full hover:bg-white/10 p-1 -m-1 transition"
+        >
+          <img src="/starjyotish.svg" alt="" className="w-16 h-16" />
+        </button>
         <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
         <p className="relative text-ink-onnight mt-1 text-sm">{t('tagline')}</p>
         {/* Language toggle */}

@@ -13,6 +13,7 @@
 // All copy lives in config/zodiacContent.js — this file only composes
 // layout, exactly per the "future proofing" requirement for this page.
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 import Seo from '../../components/Seo'
 import SiteHeader from '../../components/SiteHeader'
 import Footer from '../../components/Footer'
@@ -77,6 +78,7 @@ function SystemCard({ system, accent = false }) {
 
 export default function ZodiacGuide() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
 
   const guide = getGuide('zodiac')
@@ -94,7 +96,7 @@ export default function ZodiacGuide() {
 
       <Hero
         eyebrow="Knowledge Center"
-        breadcrumbItems={[{ label: 'Home', to: '/' }, { label: 'Learn', to: '/learn' }, { label: 'Zodiac Signs' }]}
+        breadcrumbItems={[{ label: 'Home', to: isAuthenticated ? '/home' : '/' }, { label: 'Learn', to: '/learn' }, { label: 'Zodiac Signs' }]}
         title={ZODIAC_HERO.title}
         subtitle={ZODIAC_HERO.subtitle}
         meta={

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
+import AccountMenu from '../components/AccountMenu'
 import {
   adminListUsers, adminUserReports,
   adminListSettings, adminUpsertSetting,
@@ -922,7 +923,7 @@ export default function AdminDashboard() {
             <div className="font-serif font-semibold text-lg">⚙️ Admin Dashboard</div>
             <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
           </div>
-          <a href="/" className="text-xs text-ink-onnight hover:text-primary-light transition">← App</a>
+          <AccountMenu />
         </div>
 
         {/* Tab bar */}

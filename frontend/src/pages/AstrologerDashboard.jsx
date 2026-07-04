@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
+import AccountMenu from '../components/AccountMenu'
 import {
   astrologerGetProfile,
   astrologerUpdateProfile,
@@ -313,7 +314,7 @@ export default function AstrologerDashboard() {
             <div className="font-serif font-semibold text-lg">🔮 Astrologer Portal</div>
             <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
           </div>
-          <a href="/" className="text-xs text-ink-onnight hover:text-primary-light transition">← App</a>
+          <AccountMenu />
         </div>
 
         <div className="max-w-2xl mx-auto px-4 flex gap-1 overflow-x-auto">

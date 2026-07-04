@@ -1,12 +1,6 @@
 // frontend/src/components/home/WelcomeHero.jsx
-//
-// The page's opening line — a greeting, not a hero banner. Deliberately
-// quiet compared to the public pages' dark celestial hero (Landing.jsx,
-// the old Home.jsx): this is a returning user's workspace, not a first
-// impression, so the same constellation motif reappears here only as a
-// faint watermark rather than a full dark band.
-import CelestialBackdrop from '../CelestialBackdrop'
-
+// Greets the user from the dark hero band. Text is light since it sits
+// on the night background introduced in SJ-009's home redesign.
 function greetingKeyFor(date = new Date()) {
   const hour = date.getHours()
   if (hour < 5) return 'home_greeting_night'
@@ -21,14 +15,11 @@ export default function WelcomeHero({ t, name }) {
   const firstName = name?.split(' ')[0]
 
   return (
-    <div className="relative overflow-hidden rounded-2xl -mx-1">
-      <CelestialBackdrop className="text-primary/[0.08]" />
-      <div className="relative py-2">
-        <h1 className="font-serif font-semibold text-3xl sm:text-4xl text-ink tracking-tight">
-          {firstName ? `${greeting}, ${firstName}` : greeting}
-        </h1>
-        <p className="text-ink-muted text-sm sm:text-base mt-2">{t('home_hero_subtext')}</p>
-      </div>
+    <div className="py-4">
+      <h1 className="font-serif font-semibold text-3xl sm:text-4xl text-primary-light tracking-tight">
+        {firstName ? `${greeting}, ${firstName}` : greeting}
+      </h1>
+      <p className="text-ink-onnight/80 text-sm sm:text-base mt-2">{t('home_hero_subtext')}</p>
     </div>
   )
 }

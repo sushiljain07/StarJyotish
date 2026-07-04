@@ -29,8 +29,8 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
   }
 
   return (
-    <div className="flex items-center gap-2" ref={ref}>
-      <span className="text-[10px] text-ink-faint uppercase tracking-wide">
+    <div className="flex items-center gap-2 mb-3" ref={ref}>
+      <span className="text-[10px] text-ink-onnight/50 uppercase tracking-wide">
         {t('home_profile_selector_label')}
       </span>
 
@@ -40,9 +40,9 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
           onClick={() => hasMany && setOpen(o => !o)}
           aria-haspopup={hasMany ? 'listbox' : undefined}
           aria-expanded={hasMany ? open : undefined}
-          className={`inline-flex items-center gap-1.5 bg-parchment-card border border-line rounded-full pl-3 pr-2.5 py-1.5 text-sm font-medium text-ink transition ${
+          className={`inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full pl-3 pr-2.5 py-1.5 text-sm font-medium text-ink-onnight transition ${
             hasMany
-              ? 'cursor-pointer hover:border-primary/50 hover:bg-primary-light/30'
+              ? 'cursor-pointer hover:bg-white/20 hover:border-white/30'
               : 'cursor-default'
           }`}
         >
@@ -74,7 +74,7 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
                   className={`w-full text-left px-3.5 py-2 text-sm flex items-center gap-2 transition ${
                     p.id === profile.id
                       ? 'text-primary-dark font-semibold bg-primary-light/40'
-                      : 'text-ink hover:bg-primary-light/20'
+                      : 'text-ink hover:bg-primary-light/30'
                   }`}
                 >
                   <HomeIcon

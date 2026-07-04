@@ -2,7 +2,7 @@ from datetime import date, datetime, time
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class _ORMModel(BaseModel):
@@ -17,6 +17,15 @@ class BirthProfileOut(_ORMModel):
     place: str
     is_primary: bool
     marital_status: Optional[str] = None
+
+
+class BirthProfileCreate(BaseModel):
+    """Input body for POST /api/account/birth-profiles/me."""
+    label: str = Field(max_length=80)
+    birth_date: str   # "YYYY-MM-DD"
+    birth_time: str   # "HH:MM"
+    place: str = Field(max_length=200)
+    birth_time_accuracy: Optional[str] = None  # 'exact' | 'approximate' | 'unknown' — stored in relation field
 
 
 class ReportSummaryOut(_ORMModel):

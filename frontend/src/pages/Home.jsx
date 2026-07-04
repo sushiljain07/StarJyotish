@@ -71,7 +71,7 @@ export default function Home() {
           nav entirely. Same header everyone else gets; the brand
           moment below is now just page content, not navigation. */}
       <SiteHeader />
-      <div className="relative overflow-hidden bg-night px-6 pt-24 sm:pt-28 pb-8 text-center">
+      <div className="relative overflow-hidden bg-night px-6 pt-24 sm:pt-28 pb-12 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />
         <img src="/starjyotish.svg" alt="" className="relative block mx-auto mb-3 w-16 h-16" />
         <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>

@@ -22,7 +22,7 @@ from db.repositories import BirthProfileRepository, OtpRepository, ReportReposit
 from db.repositories.otp_repository import OTP_TTL_MINUTES
 from db.session import get_db, get_db_optional
 from dependencies import get_current_user
-from models.account_models import BirthProfileOut, ReportSummaryOut
+from models.account_models import BirthProfileOut, BirthProfileCreate, ReportSummaryOut
 from models.auth_models import OtpSendRequest, OtpSendResponse, OtpVerifyRequest, ProfileUpdateRequest, UserOut
 from services.otp_provider import send_otp_sms
 from services.rate_limit import OTP_SEND_LIMIT, OTP_VERIFY_LIMIT, limiter
@@ -127,6 +127,45 @@ def verify_phone_link_otp(
     db.flush()
     return UserOut.model_validate(user)
 
+
+@router.get("/account/birth-profiles/me", response_model=List[BirthProfileOut])
+def list_my_birth_profiles(user: User = Depends(get_current_user), db=Depends(get_db)):
+    """List all birth profiles for the authenticated user (cross-device safe — keyed to the JWT
+    user, not a phone number). Returns profiles ordered oldest-first."""
+    return BirthProfileRepository(db).list_for_user(user.id)
+
+
+@router.post("/account/birth-profiles/me", response_model=BirthProfileOut, status_code=201)
+def save_my_birth_profile(
+    body: BirthProfileCreate,
+    user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Save a birth profile for the authenticated user. Geocodes the place to resolve lat/lon/tz,
+    then calls get_or_create_for_chart so re-saving the same details is idempotent rather than
+    duplicating rows. Returns the saved (or matched) profile."""
+    from datetime import date as date_, time as time_
+    from services.chart_context import resolve_birth_context
+    from fastapi import HTTPException as _HTTPException
+
+    try:
+        ctx = resolve_birth_context(body.place, body.birth_date, body.birth_time)
+    except _HTTPException:
+        raise HTTPException(status_code=400, detail=f"Could not geocode place: {body.place!r}. Try a more specific name, e.g. 'Raipur, Chhattisgarh, India'.")
+
+    profile = BirthProfileRepository(db).get_or_create_for_chart(
+        user.id,
+        birth_date=date_.fromisoformat(body.birth_date),
+        birth_time=time_.fromisoformat(body.birth_time),
+        place=body.place,
+        lat=ctx.geo.lat,
+        lon=ctx.geo.lon,
+        timezone=ctx.geo.timezone,
+        label=body.label,
+    )
+    db.commit()
+    db.refresh(profile)
+    return profile
 
 @router.get("/account/birth-profiles/{phone_number}", response_model=List[BirthProfileOut])
 def list_birth_profiles(phone_number: str, db=Depends(get_db)):

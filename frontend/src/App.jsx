@@ -5,6 +5,8 @@ import ScrollManager from './components/ScrollManager'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
 import PersonalHome from './pages/PersonalHome'
+import Onboarding from './pages/Onboarding'
+import OnboardingGate from './components/OnboardingGate'
 import Result from './pages/Result'
 import CareerReport from './pages/CareerReport'
 import Login from './pages/Login'
@@ -37,7 +39,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/generate" element={<Home />} />
-          <Route path="/home" element={<ProtectedRoute><PersonalHome /></ProtectedRoute>} />
+          <Route path="/home" element={<ProtectedRoute><OnboardingGate><PersonalHome /></OnboardingGate></ProtectedRoute>} />
+          <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/kundli" element={<Result />} />
           <Route path="/career-report" element={<CareerReport />} />
           <Route path="/login" element={<Login />} />

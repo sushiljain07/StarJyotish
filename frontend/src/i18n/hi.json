@@ -346,11 +346,18 @@
   "home_snapshot_theme": "एक लंबी बृहस्पति महादशा सीखने, सिखाने और स्थिर विस्तार के माध्यम से विकास का समर्थन करती है — वर्तमान शनि अंतर्दशा चाहती है कि यह विकास जल्दबाजी के बजाय अनुशासित और धैर्यपूर्ण बना रहे।",
 
   "home_chart_title": "आपकी जन्म कुंडली",
+  "home_chart_title_other": "{{name}} की जन्म कुंडली",
   "home_chart_lagna_label": "लग्न चार्ट",
-  "home_chart_preview_note": "जब तक आपकी सहेजी गई कुंडली यहाँ नहीं जुड़ती, तब तक एक नमूना लेआउट दिखाया जा रहा है।",
+  "home_chart_time_approx_note": "जन्म समय अनुमानित था — सटीक समय के साथ भाव स्थिति थोड़ी बदल सकती है।",
+  "home_chart_time_unknown_note": "जन्म समय उपलब्ध नहीं था — एक डिफ़ॉल्ट समय का उपयोग किया गया है, इसलिए लग्न और भाव अनुमानित हैं।",
   "home_chart_cta_view": "पूरी कुंडली देखें",
   "home_chart_cta_ask": "अपनी कुंडली के बारे में AI से पूछें",
   "home_chart_cta_new": "नई कुंडली बनाएं",
+
+  "home_empty_title": "आपकी यात्रा शुरू होने के लिए तैयार है",
+  "home_empty_body": "आपके जन्म के बारे में बस कुछ सरल प्रश्न। फिर यह जगह सचमुच आपकी बन जाएगी — आपकी कॉस्मिक झलक, आपकी कुंडली, आपका आगे का रास्ता।",
+  "home_profile_selector_label": "ज्योतिष प्रोफ़ाइल",
+  "home_profile_selector_hint": "एक से अधिक प्रोफ़ाइल जल्द ही उपलब्ध होंगी",
 
   "home_journey_title": "अपनी यात्रा जारी रखें",
   "home_journey_recent_label": "हाल ही में देखा गया",
@@ -381,5 +388,60 @@
   "home_coming_soon_transit-timeline": "गोचर समयरेखा",
   "home_coming_soon_remedies": "व्यक्तिगत उपाय",
   "home_coming_soon_compatibility": "अनुकूलता",
-  "home_coming_soon_life-milestones": "जीवन के मील के पत्थर"
+  "home_coming_soon_life-milestones": "जीवन के मील के पत्थर",
+
+  "form_day": "दिन",
+  "form_month": "महीना",
+  "form_year": "वर्ष",
+
+  "onboarding_seo_title": "आपकी पहली रीडिंग",
+  "onboarding_seo_description": "आपके जन्म के बारे में कुछ सरल प्रश्न, फिर आपकी वास्तविक वैदिक जन्म कुंडली।",
+  "onboarding_skip": "अभी के लिए छोड़ें",
+  "onboarding_continue": "जारी रखें",
+
+  "onboarding_welcome_title": "नमस्ते! Star Jyotish में आपका स्वागत है।",
+  "onboarding_welcome_body": "हमारी यात्रा शुरू करने से पहले, मैं आपके जन्म के बारे में थोड़ा जानना चाहूँगा। इसमें बस एक मिनट लगेगा।",
+  "onboarding_welcome_cta": "मेरी पहली रीडिंग शुरू करें",
+
+  "onboarding_whose_title": "आप किसकी कुंडली बनाना चाहते हैं?",
+  "onboarding_whose_mine": "मेरी",
+  "onboarding_whose_mine_desc": "आपकी अपनी जन्म कुंडली",
+  "onboarding_whose_other": "किसी और की",
+  "onboarding_whose_other_desc": "परिवार का सदस्य या मित्र",
+
+  "onboarding_label_title_self": "आपका नाम क्या है?",
+  "onboarding_label_title_other": "हम इस प्रोफ़ाइल को क्या कहें?",
+  "onboarding_label_placeholder_self": "उदा. सुशील",
+  "onboarding_label_placeholder_other": "उदा. मम्मी, राहुल, बेटी",
+
+  "onboarding_date_title": "उनका जन्म कब हुआ था?",
+
+  "onboarding_time_title": "क्या आपको जन्म का समय पता है?",
+  "onboarding_time_exact": "हाँ, बिल्कुल सही",
+  "onboarding_time_approximate": "लगभग",
+  "onboarding_time_unknown": "मुझे नहीं पता",
+  "onboarding_time_approximate_note": "एक अनुमानित समय भी मदद करता है — सटीक मिनट के साथ लग्न और भाव स्थिति थोड़ी बदल सकती है।",
+  "onboarding_time_unknown_note": "यह बिल्कुल ठीक है। हम एक डिफ़ॉल्ट समय का उपयोग करके आपकी ग्रह स्थिति की गणना करेंगे — लग्न और भावों को छोड़कर बाकी सब सटीक रहता है।",
+
+  "onboarding_place_title": "उनका जन्म कहाँ हुआ था?",
+  "onboarding_place_placeholder": "उदा. नई दिल्ली, भारत",
+
+  "onboarding_review_title": "शुरू करने से पहले पुष्टि करें",
+  "onboarding_review_cta": "मेरी जन्म कुंडली तैयार करें",
+
+  "onboarding_complete_title": "आपकी पहली ज्योतिष प्रोफ़ाइल तैयार है",
+  "onboarding_complete_body": "{{name}} की कुंडली तैयार हो चुकी है। यह एक बहुत लंबी कहानी की शुरुआत है।",
+  "onboarding_complete_cta": "मेरे होम में प्रवेश करें",
+  "onboarding_review_edit": "संपादित करें",
+  "onboarding_review_whose": "किसकी कुंडली",
+  "onboarding_review_name": "नाम",
+  "onboarding_review_date": "जन्म तिथि",
+  "onboarding_review_time": "जन्म समय",
+  "onboarding_review_place": "जन्म स्थान",
+  "onboarding_review_time_unknown": "ज्ञात नहीं",
+  "onboarding_review_time_approx_tag": "अनुमानित",
+
+  "onboarding_generating_1": "आपकी जन्म कुंडली तैयार की जा रही है...",
+  "onboarding_generating_2": "ग्रहों की स्थिति का अध्ययन किया जा रहा है...",
+  "onboarding_generating_3": "लगभग तैयार..."
 }

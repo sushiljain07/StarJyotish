@@ -1,5 +1,14 @@
 # The Personal Home (`/home`)
 
+> **Updated by the Onboarding sprint (see `docs/USER_JOURNEY.md`).** This
+> page no longer shows placeholder Cosmic Snapshot / Birth Chart data —
+> `Onboarding.jsx` now generates a real chart via `/api/kundli`, and
+> `PersonalHome.jsx` reads it back through
+> `services/astrologyProfiles.js`. Accounts with no Astrology Profile see
+> `EmptyHomeState` instead. The sections below are left as written for
+> this page's original sprint, with corrections noted inline where things
+> changed.
+
 ## Purpose
 
 `/home` is Star Jyotish's authenticated landing page — the personal
@@ -35,19 +44,23 @@ This was an **architecture, layout, and component** sprint:
 ## Routing
 
 - New route: `/home`, registered in `App.jsx`, wrapped in
-  `<ProtectedRoute>` (redirects to `/login` if signed out, same pattern
-  as `/account`).
-- `Login.jsx`'s post-login fallback (`next`) now defaults to `/home`
-  instead of `/` — signing in lands you in your workspace, not back on
-  the marketing page. A `next` state (set by `ProtectedRoute` when a
-  signed-out visitor hits a protected page directly) still takes
-  priority, so that flow is untouched.
+  `<ProtectedRoute><OnboardingGate>` — `OnboardingGate.jsx` (added by the
+  Onboarding sprint, see `docs/USER_JOURNEY.md`) redirects accounts with
+  no Astrology Profile and no explicit skip into `/onboarding` first.
+- `Login.jsx`'s post-login destination now defaults to `/home` for
+  returning accounts and `/onboarding` for brand-new ones (see
+  `docs/USER_JOURNEY.md`) instead of the public Landing page. A `next`
+  state (set by `ProtectedRoute` when a signed-out visitor hits a
+  protected page directly) still takes priority, so that flow is
+  untouched.
 - `SiteHeader.jsx`'s logo now goes to `/home` for signed-in visitors and
   `/` for everyone else.
 - `AccountMenu.jsx` gained a "My Home" link above "My Profile".
 - `/generate` (the existing birth-form page, `pages/Home.jsx`) is
-  unchanged — it's still where both a first-time visitor and this new
-  page's "Generate New Chart" / "Ask AI" CTAs go.
+  unchanged — it's still where a first-time (signed-out) visitor and
+  this page's "Generate New Chart" CTA go. "View Full Chart" / "Ask AI
+  about My Chart" now go straight to `/kundli` with the account's real
+  saved chart instead (see below).
 
 ## Component hierarchy
 
@@ -83,33 +96,29 @@ Everything currently comes from `config/homeData.js`. Each getter's
 comment names the real backend model it already mirrors, so the swap
 later is mechanical:
 
-| Section | Placeholder getter | Future backend source |
+| Section | Getter | Source |
 |---|---|---|
-| Cosmic Snapshot | `getCosmicSnapshot()` | `ChartResponse.dasha` (`DashaData` in `backend/models/chart_data.py`) via the account's primary saved chart |
-| Birth Chart preview | `getChartPreview()` | `ChartResponse.{ascendant, planets}`, same model |
+| Cosmic Snapshot | `getCosmicSnapshotFromChart(chart)` | **Real as of the Onboarding sprint** — derived from the account's own `ChartResponse.dasha`, saved on their Astrology Profile |
+| Birth Chart preview | `profile.chart` (from `services/astrologyProfiles.js`) | **Real as of the Onboarding sprint** — the same `ChartResponse.{ascendant, planets}` |
 | Continue Your Journey | `getJourney()` | Real data already — `config/knowledgeGraph.js`. Only *which* guide counts as "recently viewed" is mocked (no reading-history tracking exists yet) |
 | Recent Activity | `getRecentActivity()` | `GET /api/account/reports/{phone_number}` → `ReportSummaryOut` (`backend/models/account_models.py`, `backend/routers/account.py` — this endpoint already exists), widened to also cover non-report events (Ask questions, chart generation) once those have a backend model |
 | Suggested Questions | `SUGGESTED_QUESTIONS` (static) | Static by design — these are prompts, not personalized data |
 | Reflection | `getReflectionKey()` | Static by design — deliberately not predictive/personalized |
 
-`getCosmicSnapshot()` and `getChartPreview()` both read from a single
-hand-written placeholder object today; in both cases the real source will
-be the same account-scoped chart, most likely surfaced through a new
-"primary chart" read that composes the existing
-`GET /api/account/birth-profiles/{phone_number}` (which profile is
-primary) with a stored `ChartResponse` for it. That's one future backend
-addition (a persisted `ChartResponse` per `BirthProfile`, or a re-run of
-the existing chart computation on read) — everything on the frontend
-already expects that exact shape.
+Cosmic Snapshot and the Birth Chart preview were placeholder in this
+page's original sprint; see `docs/USER_JOURNEY.md` for how
+`Onboarding.jsx` and `services/astrologyProfiles.js` made them real
+without either component changing shape.
 
 ## Future AI integration points
 
-- **Suggested Questions** and **"Ask AI about My Chart"** already route
-  into the real Ask flow (`/generate` → `Result.jsx` → `AskChart.jsx`,
-  via the existing `{ landToAsk, presetQuestion }` state handoff
-  `AskPersonaCard.jsx` uses on the landing page). No new AI wiring is
-  needed here — once a saved chart exists, these buttons can point
-  straight at `/kundli` with that chart's data instead of `/generate`.
+- **Suggested Questions** and **"Ask AI about My Chart"** route into the
+  real Ask flow. *(Updated by the Onboarding sprint.)* For an account
+  with a saved Astrology Profile, that's now a direct `/kundli` deep-link
+  with the real chart (see above) rather than a trip through `/generate`;
+  an account without one (the `EmptyHomeState` case) still falls back to
+  `/generate` with the existing `{ landToAsk, presetQuestion }` handoff
+  `AskPersonaCard.jsx` uses on the landing page.
 - **Cosmic Snapshot's** one-paragraph theme is static placeholder copy
   today (`home_snapshot_theme` in `i18n/{en,hi}.json`). Once a real
   Reading/summary endpoint exists for "what does my current
@@ -128,14 +137,20 @@ already expects that exact shape.
   first impression, so `WelcomeHero` keeps the light `parchment`
   background and only echoes the brand's constellation motif
   (`CelestialBackdrop`) as a very faint watermark behind the greeting.
-- **Chart preview honesty.** `ChartPreviewCard` reuses the real
-  `KundliChart` renderer with placeholder planet positions, but carries a
-  small caption ("Showing a sample layout until your saved chart is
-  connected here") rather than silently presenting mock data as if it
-  were the visitor's own chart — the same honesty pattern
-  `Profile.jsx`'s membership card already uses for not implying a paid
-  tier exists before billing is built. That caption is the one line that
-  goes away once account charts are wired up.
+- **Chart preview honesty.** *(Updated by the Onboarding sprint.)*
+  `ChartPreviewCard` now renders the account's real, saved chart — there
+  is no more placeholder data or "sample layout" caption. The one caveat
+  it still shows is honest rather than decorative: if the birth time was
+  approximate or unknown (see `docs/USER_JOURNEY.md`'s Step 5), it says
+  so, since the Ascendant and houses are genuinely less certain in that
+  case.
+- **"View Full Chart" / "Ask AI about My Chart".** *(Updated by the
+  Onboarding sprint.)* These now deep-link straight into `/kundli`
+  (`Result.jsx`) with the account's real saved `ChartResponse` — the
+  "once a saved chart exists" future this doc originally described is
+  the current behavior now. "Generate New Chart" still goes to
+  `/generate` (a fresh, unsaved chart), since there's no "Add Profile"
+  UI yet to save a second one — see `docs/USER_JOURNEY.md`.
 - **Mahadasha progress ring.** The one custom visual on this page is a
   circular progress ring in `CosmicSnapshot` showing how far through the
   current Mahadasha the chart is — real information (the same

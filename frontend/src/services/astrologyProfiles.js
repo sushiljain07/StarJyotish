@@ -53,13 +53,13 @@ function readChartCache(user, profileId) {
   try {
     const raw = localStorage.getItem(chartCacheKey(user, profileId))
     return raw ? JSON.parse(raw) : null
-  } catch (_) { return null }
+  } catch { return null }
 }
 
 function writeChartCache(user, profileId, chart) {
   try {
     localStorage.setItem(chartCacheKey(user, profileId), JSON.stringify(chart))
-  } catch (_) {}
+  } catch { /* storage unavailable — fail open */ }
 }
 
 // ── Legacy localStorage (unauthenticated / fallback) ────────────────────
@@ -68,11 +68,11 @@ function readAllLegacy() {
   try {
     const raw = localStorage.getItem(LEGACY_PROFILES_KEY)
     return raw ? JSON.parse(raw) : {}
-  } catch (_) { return {} }
+  } catch { return {} }
 }
 
 function writeAllLegacy(all) {
-  try { localStorage.setItem(LEGACY_PROFILES_KEY, JSON.stringify(all)) } catch (_) {}
+  try { localStorage.setItem(LEGACY_PROFILES_KEY, JSON.stringify(all)) } catch { /* storage unavailable — fail open */ }
 }
 
 function listProfilesLegacy(user) {
@@ -157,7 +157,7 @@ export function hasAnyProfile(user) {
     for (let i = 0; i < localStorage.length; i++) {
       if (localStorage.key(i)?.startsWith(prefix)) return true
     }
-  } catch (_) {}
+  } catch { /* storage unavailable — fail open */ }
   return false
 }
 
@@ -192,7 +192,7 @@ export async function loadProfiles(user, accessToken) {
     writeAllLegacy(all)
 
     return enriched
-  } catch (_) {
+  } catch {
     // API unreachable — fall back to whatever is in localStorage
     return listProfilesLegacy(user)
   }
@@ -217,7 +217,7 @@ export async function createProfile(user, accessToken, { relation, label, birthD
       })
       profileId = String(saved.id)
       is_primary = saved.is_primary
-    } catch (_) {
+    } catch {
       // Backend unavailable — keep the local id, continue with localStorage-only
     }
   }
@@ -260,7 +260,7 @@ export function markOnboardingSkipped(user) {
     const all = readSkipped()
     all[accountKey(user)] = true
     localStorage.setItem(SKIP_STORAGE_KEY, JSON.stringify(all))
-  } catch (_) {}
+  } catch { /* storage unavailable — fail open */ }
 }
 
 function clearOnboardingSkipped(user) {
@@ -268,14 +268,14 @@ function clearOnboardingSkipped(user) {
     const all = readSkipped()
     delete all[accountKey(user)]
     localStorage.setItem(SKIP_STORAGE_KEY, JSON.stringify(all))
-  } catch (_) {}
+  } catch { /* storage unavailable — fail open */ }
 }
 
 function readSkipped() {
   try {
     const raw = localStorage.getItem(SKIP_STORAGE_KEY)
     return raw ? JSON.parse(raw) : {}
-  } catch (_) { return {} }
+  } catch { return {} }
 }
 
 export function hasSkippedOnboarding(user) {

@@ -64,22 +64,6 @@ export function getJourney(lastViewedId = 'birth-chart-basics') {
   return { recentlyViewed, recommended, nextStep }
 }
 
-// ── Recent Activity ──────────────────────────────────────────────────────
-// Mirrors backend/models/account_models.py's ReportSummaryOut list from
-// GET /api/account/reports/{phone_number} (report_type + created_at),
-// widened here to also cover non-report events (chart generation, Ask
-// questions) that don't have a backend model yet. `type` picks the icon.
-const PLACEHOLDER_ACTIVITY = [
-  { id: 'a1', type: 'report', label: 'Generated Career Report', timestamp: '2026-07-02T09:15:00Z' },
-  { id: 'a2', type: 'ask', label: 'Asked AI about Saturn', timestamp: '2026-06-29T18:40:00Z' },
-  { id: 'a3', type: 'guide', label: 'Viewed Aries Guide', timestamp: '2026-06-27T07:05:00Z' },
-  { id: 'a4', type: 'chart', label: 'Generated Birth Chart', timestamp: '2026-06-21T12:00:00Z' },
-]
-
-export function getRecentActivity() {
-  return PLACEHOLDER_ACTIVITY
-}
-
 // ── Suggested Questions ──────────────────────────────────────────────────
 // Distinct from config/aiQuestions.js (that file backs the *signed-out*
 // landing-page demo, complete with canned demo answers). These have no

@@ -490,7 +490,7 @@ export default function PersonalHome() {
                     )
                   })}
                 </div>
-                <div className="text-center sm:text-left">
+                <div className="flex justify-center">
                   <button
                     onClick={() => openChart('ask')}
                     className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-6 py-2.5 rounded-full transition"

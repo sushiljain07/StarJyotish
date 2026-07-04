@@ -56,7 +56,7 @@ function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
   const md = data.dasha.current_mahadasha
   return (
-    <div className="flex flex-wrap gap-2 px-4 py-2 bg-parchment-card border-b border-line">
+    <div className="flex flex-wrap gap-2 py-2">
       <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
         Lagna: {data.ascendant.sign}
       </span>
@@ -246,21 +246,24 @@ export default function Result() {
       {/* Shared brand header — same as every other page */}
       <SiteHeader />
 
-      {/* Chart identity + tabs — below the brand header, sticky beneath it */}
-      <div className="bg-night text-primary-light sticky top-[52px] z-30">
+      {/* Chart context bar — deliberately different background from the brand
+          SiteHeader above (bg-night-light vs bg-night) so the two layers read
+          as distinct: the top bar is the app, this bar is the chart. */}
+      <div className="bg-parchment-card border-b border-line sticky top-[52px] z-30">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between py-2.5 gap-3 border-b border-white/10">
+          {/* Identity row: person details + Home button */}
+          <div className="flex items-center justify-between py-2.5 gap-3">
             <div className="min-w-0">
               {input.name && (
-                <div className="font-bold text-base leading-tight truncate">{input.name}</div>
+                <div className="font-bold text-sm text-ink leading-tight truncate">{input.name}</div>
               )}
-              <div className={`${input.name ? 'text-ink-onnight/70 text-xs' : 'font-bold text-sm'} leading-tight truncate`}>
+              <div className="text-ink-muted text-xs leading-tight truncate">
                 {input.place}
               </div>
-              <div className="text-ink-onnight/60 text-xs flex items-center gap-2 flex-wrap">
+              <div className="text-ink-faint text-xs flex items-center gap-2 flex-wrap mt-0.5">
                 {formatDate(input.date)} · {formatTime(input.time)}
                 {topic && (
-                  <span className="inline-flex items-center gap-1 bg-primary/15 rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 bg-primary-light text-primary-dark rounded-full px-2 py-0.5 text-[11px] font-medium">
                     <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
                   </span>
                 )}
@@ -268,18 +271,21 @@ export default function Result() {
             </div>
             <button
               onClick={() => navigate(homeDestination)}
-              className="shrink-0 bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
+              className="shrink-0 bg-night hover:bg-night-light text-ink-onnight text-xs font-semibold px-3 py-1.5 rounded-full transition"
             >
-              ← {t('nav_back_home', 'Home')}
+              {t('nav_back_home', 'Home')}
             </button>
           </div>
-          <div className="hidden sm:flex gap-1">
+          {/* Lagna/Rashi/Mahadasha chips — moved inside context bar so they're always visible */}
+          <SummaryChips data={data} />
+          {/* Tab bar — desktop only */}
+          <div className="hidden sm:flex gap-1 mt-1">
             {MAIN_TABS.map(tab => (
               <button key={tab.id} onClick={() => setActiveMain(tab.id)}
                       className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition inline-flex items-center gap-1.5 ${
                         activeMain === tab.id
-                          ? 'bg-parchment-card text-primary-dark'
-                          : 'text-ink-onnight hover:text-primary-light hover:bg-white/10'
+                          ? 'bg-parchment text-primary-dark border-t border-x border-line'
+                          : 'text-ink-muted hover:text-ink hover:bg-parchment/60'
                       }`}>
                 {tab.icon.startsWith('/')
                   ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
@@ -289,11 +295,6 @@ export default function Result() {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Summary chips */}
-      <div className="max-w-5xl mx-auto w-full">
-        <SummaryChips data={data} />
       </div>
 
       {/* Content */}

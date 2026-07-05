@@ -1196,11 +1196,19 @@ def ask_chart(
     question: str,
     language: str,
     transit: Optional[dict] = None,
+    conversation_history: Optional[list[dict]] = None,
 ) -> tuple[str, str]:
     """
     Answer a kundli question using the full available chart context.
     Returns (answer, provider_label) — see _call_llm for why the provider
     needs to be tracked per-request rather than assumed.
+
+    conversation_history: prior {question, answer} turns in this same
+    session (see services/ask_sessions.py), oldest first. Lets the model
+    correlate a follow-up like "and what about marriage timing?" with what
+    was actually asked/answered before, instead of treating every question
+    as if it arrived with no context. Empty/None for the first question of
+    a session — handled the same as "no history" below, not as an error.
 
     Chart data passed in (from the route):
       chart['planets']          — D1 placements
@@ -1279,6 +1287,20 @@ def ask_chart(
     if transit_text:
         charts_listed += ", Transit"
 
+    # ── Prior conversation turns (if any) ──────────────────────────────────
+    history_text = ""
+    if conversation_history:
+        turns = "\n".join(
+            f"Q{i+1}: {turn['question']}\nA{i+1}: {turn['answer']}"
+            for i, turn in enumerate(conversation_history)
+        )
+        history_text = (
+            f"\n\nEARLIER IN THIS CONVERSATION (for context — the person may "
+            f"be following up on one of these, e.g. \"what about X instead\" "
+            f"or \"why is that\"; don't repeat an earlier answer verbatim, "
+            f"build on it):\n{turns}\n"
+        )
+
     prompt = (
         f"You are an expert Vedic astrologer. Answer the following question "
         f"in {lang_instruction}. "
@@ -1299,6 +1321,7 @@ def ask_chart(
         + extra_div_text
         + transit_text
         + skill_text
+        + history_text
         + f"\n\nQUESTION: {question}"
     )
 

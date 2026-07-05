@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 
 // Faint kundli wheel SVG watermark
@@ -48,6 +49,7 @@ const BENEFITS = [
 
 export default function ChartReading({ input, onSwitchToCareer }) {
   const { t, i18n } = useTranslation()
+  const { isAuthenticated } = useAuth()
 
   const [status, setStatus]           = useState('idle')
   const [predSections, setPredSections] = useState({})
@@ -119,6 +121,23 @@ export default function ChartReading({ input, onSwitchToCareer }) {
     }
   }
 
+  // Auto-reveal for signed-in visitors — the "Reveal My Prediction" click
+  // gate exists for the anonymous funnel (it's a deliberate curiosity/
+  // conversion moment for someone who just typed in a birth chart with no
+  // account), but a signed-in person coming from their own home page
+  // already made that decision by opening the tab. Making them click
+  // again to see their own reading is friction with no purpose. Guarded
+  // by a ref (not just `status === 'idle'`) so this fires exactly once
+  // per mount, not every time status happens to cycle back through idle.
+  const autoRevealedRef = useRef(false)
+  useEffect(() => {
+    if (isAuthenticated && status === 'idle' && !autoRevealedRef.current) {
+      autoRevealedRef.current = true
+      generate()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
+
   // Exit intent — fire once when mouse moves toward browser top
   useEffect(() => {
     if (status !== 'done') return
@@ -152,7 +171,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   }
 
   // ── IDLE ──────────────────────────────────────────────────────────────────
-  if (status === 'idle') return (
+  if (status === 'idle' && !isAuthenticated) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">🔮</div>
       <h2 className="text-xl font-bold text-ink mb-2">{t('reading_idle_heading')}</h2>
@@ -168,7 +187,11 @@ export default function ChartReading({ input, onSwitchToCareer }) {
   )
 
   // ── LOADING ───────────────────────────────────────────────────────────────
-  if (status === 'loading') return (
+  // Also covers the one render where an authenticated visitor is still
+  // technically 'idle' before the auto-reveal effect above fires — without
+  // this, that single frame would flash the "Reveal My Prediction" button
+  // pointlessly before immediately replacing it with this same screen.
+  if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
       <p className="font-medium text-primary-dark">Reading your birth chart…</p>

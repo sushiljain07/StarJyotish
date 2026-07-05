@@ -107,6 +107,22 @@ async function apiSaveProfile(accessToken, { label, birth_date, birth_time, plac
   return resp.json()
 }
 
+async function apiDeleteProfile(accessToken, profileId) {
+  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/${profileId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    credentials: 'include',
+  })
+  if (!resp.ok && resp.status !== 404) {
+    const err = await resp.json().catch(() => ({}))
+    throw new Error(err.detail ?? 'Could not delete profile')
+  }
+  // A 404 here means it's already gone (e.g. deleted from another device,
+  // or a stale double-click) — treated as success rather than an error,
+  // since the end state the caller wants (this profile no longer existing)
+  // is already true either way.
+}
+
 // ── Merge API profile shape with local chart cache ──────────────────────
 //
 // The API returns {id, label, birth_date, birth_time, place, is_primary,
@@ -251,6 +267,39 @@ export async function createProfile(user, accessToken, { relation, label, birthD
 
   clearOnboardingSkipped(user)
   return profile
+}
+
+// Deletes a profile. If authenticated, deletes from the API first (source
+// of truth for cross-device state); always cleans up local caches
+// afterward regardless, so an unauthenticated/offline delete still removes
+// it from this device even though there's nothing server-side to call.
+export async function deleteProfile(user, accessToken, profileId) {
+  if (accessToken) {
+    await apiDeleteProfile(accessToken, profileId)
+  }
+
+  // Remove the cached chart for this profile.
+  try {
+    localStorage.removeItem(chartCacheKey(user, profileId))
+  } catch { /* best-effort */ }
+
+  // Remove from the legacy profile list, promoting another profile to
+  // primary if the deleted one was primary — mirrors the backend's own
+  // reassignment in routers/account.py's delete endpoint, kept in sync
+  // here too since listProfiles()/getPrimaryProfile() read this legacy
+  // cache synchronously without waiting on the next loadProfiles() call.
+  const all = readAllLegacy()
+  const key = accountKey(user)
+  const existing = all[key] ?? []
+  const wasPrimary = existing.find(p => p.id === profileId)?.is_primary
+  const remaining = existing.filter(p => p.id !== profileId)
+  if (wasPrimary && remaining.length > 0) {
+    remaining[0] = { ...remaining[0], is_primary: true }
+  }
+  all[key] = remaining
+  writeAllLegacy(all)
+
+  return remaining
 }
 
 // ── Skip flow ────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@
 // markup, so this file should stay short even as the Knowledge Center
 // grows.
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
@@ -28,6 +29,7 @@ import {
 
 export default function Learn() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
 
   return (
@@ -43,6 +45,17 @@ export default function Learn() {
         eyebrow="Knowledge Center"
         title="Understand your chart, one idea at a time"
         subtitle="A calm, practical library for learning Vedic astrology — grounded in classical teaching, written for people who don't already know the terminology."
+        // The hub itself had no Home affordance beyond SiteHeader's small
+        // logo click — every page one level deeper (Zodiac, Aries) already
+        // has this exact breadcrumb, so the hub was the one gap in an
+        // otherwise-consistent pattern rather than needing a different one.
+        // Two items, not one: Breadcrumb.jsx always renders the LAST item
+        // as plain (non-link) "current page" text, so a single-item
+        // ["Home"] array would render Home as unclickable text, not a link.
+        breadcrumbItems={[
+          { label: 'Home', to: isAuthenticated ? '/home' : '/' },
+          { label: 'Knowledge Center' },
+        ]}
       />
 
       {/* Featured Learning Paths */}

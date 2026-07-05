@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
@@ -191,9 +192,27 @@ function CareerOptionCard({ opt }) {
 
 export default function CareerReportTab({ input }) {
   const { t, i18n } = useTranslation()
+  const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Auto-reveal for signed-in visitors — see the matching effect and its
+  // comment in ChartReading.jsx for the reasoning. Declared before the
+  // hasPremiumAccess() early return below: hooks can't follow a
+  // conditional return, so this fires on every render regardless, but the
+  // effect body itself still only ever calls generate() once someone's
+  // actually entitled to see this report (status starts/stays 'idle'
+  // for anyone who never gets past the paywall, since generate() is
+  // never reachable for them either way).
+  const autoRevealedRef = useRef(false)
+  useEffect(() => {
+    if (isAuthenticated && hasPremiumAccess() && status === 'idle' && !autoRevealedRef.current) {
+      autoRevealedRef.current = true
+      generate()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
 
   if (!hasPremiumAccess()) {
     return (
@@ -233,7 +252,7 @@ export default function CareerReportTab({ input }) {
     }
   }
 
-  if (status === 'idle') return (
+  if (status === 'idle' && !isAuthenticated) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">💼</div>
       <h2 className="text-xl font-bold text-ink mb-2">Vedic Career Report</h2>
@@ -251,7 +270,9 @@ export default function CareerReportTab({ input }) {
     </div>
   )
 
-  if (status === 'loading') return (
+  // Also covers the one render where an authenticated visitor is still
+  // technically 'idle' before the auto-reveal effect above fires.
+  if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">Reading your career destiny…</p>

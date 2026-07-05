@@ -24,6 +24,16 @@
 .prediction-fade {
   animation: fadeSlideIn 0.6s ease forwards;
 }
+/* Same motion, snappier timing and a smaller rise — for tab panels people
+   click through repeatedly (Result.jsx's Kundli/Advanced/Insights/Ask and
+   their sub-tabs), where 0.6s would feel sluggish rather than smooth. */
+@keyframes fadeSlideInFast {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tab-fade {
+  animation: fadeSlideInFast 0.25s ease-out forwards;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   @keyframes wheelSpin {

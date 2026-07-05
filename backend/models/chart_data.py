@@ -110,8 +110,16 @@ class AskRequest(_Flexible):
     question: str = Field(max_length=500)
     language: str = "en"
     save_for_phone: Optional[str] = Field(default=None, max_length=20)  # see models/birth_data.py
+    # Returned by the previous /kundli/ask response and echoed back here so
+    # the backend can look up this conversation's prior Q&A — see
+    # services/ask_sessions.py. None on the first question of a session.
+    session_id: Optional[str] = Field(default=None, max_length=64)
 
 
 class AskResponse(_Flexible):
     answer: str
     llm_provider: str = ""
+    # Always present, even on the first question — the frontend stores this
+    # and sends it back as session_id on every subsequent question in the
+    # same conversation.
+    session_id: str = ""

@@ -19,7 +19,7 @@ import CompactFooter from '../components/CompactFooter'
 import MobileNumberField from '../components/auth/MobileNumberField'
 import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
-import { listProfiles } from '../services/astrologyProfiles'
+import { listProfiles, deleteProfile } from '../services/astrologyProfiles'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -45,7 +45,7 @@ function initialFor(user) {
 
 export default function Profile() {
   const { t, i18n } = useTranslation()
-  const { user, updateMyProfile } = useAuth()
+  const { user, accessToken, updateMyProfile } = useAuth()
 
   const [form, setForm] = useState({
     name: user?.name || '',
@@ -58,6 +58,10 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [savedAt, setSavedAt] = useState(null)
+  // Local state (not just listProfiles(user) read fresh in render) so
+  // deleting a profile updates this list immediately without needing a
+  // full page reload or a second render trigger.
+  const [profilesState, setProfilesState] = useState(() => listProfiles(user))
 
   function setField(field, value) {
     if (field === 'avatar_url') setAvatarError(false)
@@ -187,11 +191,12 @@ export default function Profile() {
         </div>
 
         {/* Astrology Profiles — shows all saved birth profiles with a
-            direct link to open each one in the chart viewer, and a
-            shortcut to add another via onboarding. Solves the "where do
-            I manage my chart profiles?" question from the SJ-008 audit. */}
+            direct link to open each one in the chart viewer, a shortcut
+            to add another via onboarding, and a way to remove one. Solves
+            the "where do I manage my chart profiles?" question from the
+            SJ-008 audit. */}
         {(() => {
-          const profiles = listProfiles(user)
+          const profiles = profilesState
           if (profiles.length === 0) return null
           return (
             <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 mt-6">
@@ -199,7 +204,7 @@ export default function Profile() {
               <p className="text-ink-muted text-sm mb-4">{t('profile_astro_body', 'Your saved birth charts. Click any to open the chart viewer.')}</p>
               <ul className="space-y-2">
                 {profiles.map(p => (
-                  <li key={p.id} className="flex items-start justify-between bg-parchment rounded-lg px-3 py-3 border border-line">
+                  <li key={p.id} className="flex items-start justify-between bg-parchment rounded-lg px-3 py-3 border border-line gap-3">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-ink">{p.label}</p>
                       <p className="text-xs text-ink-faint mt-0.5">
@@ -208,15 +213,28 @@ export default function Profile() {
                       </p>
                       <p className="text-xs text-ink-faint mt-0.5 truncate">{p.place}</p>
                     </div>
-                    {p.chart && (
-                      <Link
-                        to="/kundli"
-                        state={{ data: p.chart, input: { date: p.birth_date, time: p.birth_time, place: p.place } }}
-                        className="text-xs text-primary-dark hover:underline font-medium shrink-0 ml-3"
+                    <div className="flex items-center gap-3 shrink-0">
+                      {p.chart && (
+                        <Link
+                          to="/kundli"
+                          state={{ data: p.chart, input: { name: p.label, date: p.birth_date, time: p.birth_time, place: p.place } }}
+                          className="text-xs text-primary-dark hover:underline font-medium"
+                        >
+                          {t('profile_astro_view', 'View Chart')}
+                        </Link>
+                      )}
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!window.confirm(`Delete "${p.label}"? This can't be undone.`)) return
+                          const remaining = await deleteProfile(user, accessToken, p.id)
+                          setProfilesState(remaining)
+                        }}
+                        className="text-xs text-vermillion hover:underline font-medium"
                       >
-                        {t('profile_astro_view', 'View Chart')}
-                      </Link>
-                    )}
+                        {t('profile_astro_delete', 'Delete')}
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>

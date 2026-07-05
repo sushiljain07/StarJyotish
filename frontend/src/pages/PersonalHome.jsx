@@ -95,7 +95,7 @@ export default function PersonalHome() {
     navigate('/kundli', {
       state: {
         data: profile.chart,
-        input: { date: profile.birth_date, time: profile.birth_time, place: profile.place },
+        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
         activeTab: activeTabId,
         activeSubtab,
       },
@@ -107,7 +107,7 @@ export default function PersonalHome() {
     navigate('/kundli', {
       state: {
         data: profile.chart,
-        input: { date: profile.birth_date, time: profile.birth_time, place: profile.place, topic: topicId },
+        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place, topic: topicId },
         activeTab: 'insights',
         activeSubtab: topicId === 'career' ? 'career' : topicId,
       },
@@ -159,7 +159,20 @@ export default function PersonalHome() {
 
             {/* ── Identity ── */}
             <div>
-              <ProfileSelector t={t} profile={profile} profiles={allProfiles} onSwitch={setActiveProfile} />
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <ProfileSelector t={t} profile={profile} profiles={allProfiles} onSwitch={setActiveProfile} />
+                {/* Same destination Profile.jsx's "+ Add another chart"
+                    link already used — this was previously only reachable
+                    from the Profile page, one extra click away from where
+                    people actually manage their charts day to day. */}
+                <Link
+                  to="/onboarding"
+                  state={{ addAnother: true }}
+                  className="text-xs font-semibold text-primary-dark hover:underline shrink-0"
+                >
+                  + Add another chart
+                </Link>
+              </div>
               <div className="flex flex-wrap items-start justify-between gap-3 mt-4">
                 <div>
                   <h1 className="font-serif font-semibold text-2xl sm:text-3xl text-ink tracking-tight">

@@ -13,6 +13,7 @@ import DashaTable      from '../components/DashaTable'
 import PlanetTable     from '../components/PlanetTable'
 import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
+import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
@@ -129,28 +130,9 @@ const CHART_STYLES = [
   { id: 'kp',    label: 'KP' },
 ]
 
-const ACCENT_CLASSES = {
-  primary: 'bg-primary border-primary text-night shadow-sm',
-  mauve:   'bg-mauve border-mauve text-white shadow-sm',
-  sage:    'bg-sage border-sage text-white shadow-sm',
-}
-
 // Navigation pills — bold, filled, used for "which view am I looking at."
 function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
-  return (
-    <div className="flex gap-2 mb-4 flex-wrap">
-      {subtabs.map(s => (
-        <button key={s.id} onClick={() => onChange(s.id)}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition ${
-                  active === s.id
-                    ? ACCENT_CLASSES[accent]
-                    : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
-                }`}>
-          {s.label}
-        </button>
-      ))}
-    </div>
-  )
+  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} />
 }
 
 // Deliberately distinct from SubTabBar — a small labeled segmented control
@@ -284,21 +266,14 @@ export default function Result() {
           {/* Lagna/Rashi/Mahadasha chips — moved inside context bar so they're always visible */}
           <SummaryChips data={data} />
           {/* Tab bar — desktop only */}
-          <div className="hidden sm:flex gap-1 mt-1">
-            {MAIN_TABS.map(tab => (
-              <button key={tab.id} onClick={() => setActiveMain(tab.id)}
-                      className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition inline-flex items-center gap-1.5 ${
-                        activeMain === tab.id
-                          ? 'bg-parchment text-primary-dark border-t border-x border-line'
-                          : 'text-ink-muted hover:text-ink hover:bg-parchment/60'
-                      }`}>
-                {tab.icon.startsWith('/')
-                  ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
-                  : <TabIcon id={tab.icon} className="w-4 h-4" />}
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <AnimatedTabRow
+            tabs={MAIN_TABS}
+            active={activeMain}
+            onChange={setActiveMain}
+            renderIcon={tab => tab.icon.startsWith('/')
+              ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
+              : <TabIcon id={tab.icon} className="w-4 h-4" />}
+          />
         </div>
       </div>
 
@@ -306,52 +281,52 @@ export default function Result() {
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
 
         {/* ══════════════ KUNDLI ══════════════ */}
-        <div className={activeMain === 'kundli' ? '' : 'hidden'}>
+        <div className={activeMain === 'kundli' ? 'tab-fade' : 'hidden'}>
           <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
 
-          <div className={activeKundliSub === 'birth_chart' ? '' : 'hidden'}>
+          <div className={activeKundliSub === 'birth_chart' ? 'tab-fade' : 'hidden'}>
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
           </div>
 
-          <div className={activeKundliSub === 'planets' ? '' : 'hidden'}>
+          <div className={activeKundliSub === 'planets' ? 'tab-fade' : 'hidden'}>
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
 
-          <div className={activeKundliSub === 'dasha' ? '' : 'hidden'}>
+          <div className={activeKundliSub === 'dasha' ? 'tab-fade' : 'hidden'}>
             <DashaTable dasha={data.dasha} />
           </div>
 
           {/* Lazy sub-tabs — loaded on first access */}
           <Suspense fallback={<TabLoader />}>
-            <div className={activeKundliSub === 'divisional' ? '' : 'hidden'}>
+            <div className={activeKundliSub === 'divisional' ? 'tab-fade' : 'hidden'}>
               <DivisionalCharts input={input} defaultDivision={topic?.division} />
             </div>
 
-            <div className={activeKundliSub === 'transit' ? '' : 'hidden'}>
+            <div className={activeKundliSub === 'transit' ? 'tab-fade' : 'hidden'}>
               <TransitPanel input={input} natalData={data} />
             </div>
 
-            <div className={activeKundliSub === 'download' ? '' : 'hidden'}>
+            <div className={activeKundliSub === 'download' ? 'tab-fade' : 'hidden'}>
               <KundliDownload data={data} input={input} />
             </div>
           </Suspense>
         </div>
 
         {/* ══════════════ ADVANCED ══════════════ */}
-        <div className={activeMain === 'advanced' ? '' : 'hidden'}>
+        <div className={activeMain === 'advanced' ? 'tab-fade' : 'hidden'}>
           <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
           <Suspense fallback={<TabLoader />}>
-            <div className={activeAdvancedSub === 'bhava' ? '' : 'hidden'}>
+            <div className={activeAdvancedSub === 'bhava' ? 'tab-fade' : 'hidden'}>
               <BhavaChalit input={input} />
             </div>
 
-            <div className={activeAdvancedSub === 'ashtakavarga' ? '' : 'hidden'}>
+            <div className={activeAdvancedSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
               <AshtakavargaTable input={input} />
             </div>
 
-            <div className={activeAdvancedSub === 'sarvatobhadra' ? '' : 'hidden'}>
+            <div className={activeAdvancedSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
               {/* Note: pre-existing gap, not introduced here — natal-only view
                   until something actually feeds live transit data in. */}
               <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
@@ -360,24 +335,24 @@ export default function Result() {
         </div>
 
         {/* ══════════════ INSIGHTS ══════════════ */}
-        <div className={activeMain === 'insights' ? '' : 'hidden'}>
+        <div className={activeMain === 'insights' ? 'tab-fade' : 'hidden'}>
           <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
 
           <Suspense fallback={<TabLoader />}>
-            <div className={activeInsightSub === 'reading' ? '' : 'hidden'}>
+            <div className={activeInsightSub === 'reading' ? 'tab-fade' : 'hidden'}>
               <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />
             </div>
 
-            <div className={activeInsightSub === 'rajyogas' ? '' : 'hidden'}>
+            <div className={activeInsightSub === 'rajyogas' ? 'tab-fade' : 'hidden'}>
               <RajyogasTab input={input} />
             </div>
 
-            <div className={activeInsightSub === 'career' ? '' : 'hidden'}>
+            <div className={activeInsightSub === 'career' ? 'tab-fade' : 'hidden'}>
               <CareerReportTab input={input} />
             </div>
 
             {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (
-              <div className={activeInsightSub === topicId ? '' : 'hidden'}>
+              <div className={activeInsightSub === topicId ? 'tab-fade' : 'hidden'}>
                 <TopicReportTab topic={topicId} input={input} />
               </div>
             )}
@@ -385,7 +360,7 @@ export default function Result() {
         </div>
 
         {/* ══════════════ ASK ══════════════ */}
-        <div className={activeMain === 'ask' ? '' : 'hidden'}>
+        <div className={activeMain === 'ask' ? 'tab-fade' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <AskChart input={input} initialQuestion={presetQuestion} />
           </Suspense>

@@ -147,6 +147,7 @@ def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
     
     from services.divisional_charts import calculate_divisional_chart
     from services.ai import _detect_division
+    from services.ask_sessions import get_history, append_turn
 
     # Detect the primary chart for this question
     division = _detect_division(body.question)
@@ -165,8 +166,13 @@ def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
 
     transit_data = calculate_transit(jd, geo.lat, geo.lon)
 
-    answer, provider = ask_chart(chart, dasha_raw, body.question, body.language, transit=transit_data)
-    response = AskResponse(answer=answer, llm_provider=provider)
+    conversation_history = get_history(body.session_id)
+    answer, provider = ask_chart(
+        chart, dasha_raw, body.question, body.language,
+        transit=transit_data, conversation_history=conversation_history,
+    )
+    session_id = append_turn(body.session_id, body.question, answer)
+    response = AskResponse(answer=answer, llm_provider=provider, session_id=session_id)
 
     save_report_if_requested(
         db, user_phone=body.save_for_phone, report_type=ReportType.ask,

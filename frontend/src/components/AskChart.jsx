@@ -3,7 +3,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
 
-const MAX_QUESTIONS = 10
+// Matches AskPersonaPanel.jsx's home-page persona limit — previously this
+// was 10 while the home page's "Ask Jyoti" was 5, an inconsistency with no
+// real reason (same backend endpoint, same per-question LLM cost either
+// way) other than having been set independently at different times.
+const MAX_QUESTIONS = 5
 
 export default function AskChart({ input, initialQuestion = null }) {
   const { t, i18n } = useTranslation()

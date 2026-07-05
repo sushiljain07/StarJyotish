@@ -431,6 +431,7 @@
   "profile_astro_heading": "Astrology Profiles",
   "profile_astro_body": "Your saved birth charts — click any to open the chart viewer.",
   "profile_astro_view": "View Chart",
+  "profile_astro_delete": "Delete",
   "profile_astro_add": "+ Add another chart",
   "career_report_new": "← New",
   "career_report_analyse_another": "Analyse Another Chart"

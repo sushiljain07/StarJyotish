@@ -39,6 +39,25 @@ function Arc({ startFrac, endFrac, color }) {
   )
 }
 
+// A dot at today's current time, positioned in the same raw (pre-rotation)
+// coordinate space the Arc dasharray math above uses — angle 0 sits at
+// SVG's 3 o'clock, and the whole <svg> gets a CSS -rotate-90 so that
+// becomes 12 o'clock visually, same as every Arc segment. Without this,
+// the ring is just a static illustration with no way to tell "where in
+// today am I right now" relative to the colored windows.
+function NowMarker({ frac }) {
+  if (frac == null) return null
+  const angle = frac * 2 * Math.PI
+  const x = 130 + RADIUS * Math.cos(angle)
+  const y = 130 + RADIUS * Math.sin(angle)
+  return (
+    <>
+      <circle cx={x} cy={y} r="7" fill="none" stroke="#F0CB80" strokeWidth="1.5" opacity="0.5" />
+      <circle cx={x} cy={y} r="4" fill="#F0CB80" />
+    </>
+  )
+}
+
 export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtext, chips, recalcNote }) {
   const sunriseMin = parseTimeToMinutes(panchang?.sunrise)
   const sunsetMin = parseTimeToMinutes(panchang?.sunset)
@@ -52,6 +71,16 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
   }
 
   const m = panchang?.muhurtas
+
+  // "Now" only makes sense to mark while we're actually between sunrise
+  // and sunset — outside that window the ring doesn't represent the
+  // current moment at all (it's still "today", just night), so the
+  // marker is hidden entirely rather than clamped to a misleading edge.
+  const now = new Date()
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+  const nowFrac = daySpan && nowMin >= sunriseMin && nowMin <= sunsetMin
+    ? (nowMin - sunriseMin) / daySpan
+    : null
 
   return (
     <div className="bg-gradient-to-br from-night-light to-night border border-primary/20 rounded-3xl p-8 sm:p-10 relative overflow-hidden">
@@ -72,6 +101,7 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
                   <Arc startFrac={toFraction(m.abhijit_muhurta?.start)} endFrac={toFraction(m.abhijit_muhurta?.end)} color="#5B7A5E" />
                 </>
               )}
+              <NowMarker frac={nowFrac} />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <p className="font-serif font-semibold text-4xl text-primary-light leading-none">
@@ -82,10 +112,16 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
               </p>
             </div>
           </div>
+          {daySpan && (
+            <p className="text-center text-[10.5px] text-ink-onnight/40 mt-2.5">
+              Ring spans sunrise ({panchang.sunrise}) to sunset ({panchang.sunset}) — the gold dot marks right now
+            </p>
+          )}
           {daySpan && m && (
-            <div className="flex items-center justify-center gap-4 mt-3 text-[10.5px] text-ink-onnight/50">
+            <div className="flex items-center justify-center gap-4 mt-2 text-[10.5px] text-ink-onnight/50 flex-wrap">
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-vermillion inline-block" /> Avoid window</span>
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sage inline-block" /> Favorable window</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary inline-block" /> Now</span>
             </div>
           )}
         </div>

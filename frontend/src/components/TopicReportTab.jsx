@@ -10,8 +10,9 @@
 // Unlike Career, these reports are NOT behind hasPremiumAccess() — the
 // monetization plan gates only the Career Report, so relationship/health/
 // wealth stay free, consistent with the rest of the free tier.
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import SegmentedToggle from './SegmentedToggle'
 
@@ -212,12 +213,30 @@ function HighlightCard({ h }) {
 
 export default function TopicReportTab({ topic, input }) {
   const { t, i18n } = useTranslation()
+  const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [maritalStatus, setMaritalStatus] = useState('unmarried')
 
   const cfg = TOPIC_CONFIG[topic]
+
+  // Auto-reveal for signed-in visitors — see ChartReading.jsx for the
+  // reasoning. Deliberately excluded for topics needing marital status
+  // first (relationship): that idle screen isn't a "do you want to see
+  // this" gate, it's a required input, so it stays even for signed-in
+  // users regardless of this flag. Declared before the `!cfg` early
+  // return below (hooks can't follow a conditional return), with `cfg?.`
+  // guards since cfg is briefly undefined for an invalid topic prop.
+  const autoRevealedRef = useRef(false)
+  useEffect(() => {
+    if (isAuthenticated && cfg && !cfg.requiresMaritalStatus && status === 'idle' && !autoRevealedRef.current) {
+      autoRevealedRef.current = true
+      generate()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, topic])
+
   if (!cfg) return null
 
   const maritalStatusOptions = [
@@ -252,7 +271,9 @@ export default function TopicReportTab({ topic, input }) {
     }
   }
 
-  if (status === 'idle') return (
+  const skipIdleScreen = isAuthenticated && !cfg.requiresMaritalStatus
+
+  if (status === 'idle' && !skipIdleScreen) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">{cfg.icon}</div>
       <h2 className="text-xl font-bold text-ink mb-2">{t(`topic_report_${topic}_idle_heading`)}</h2>
@@ -278,7 +299,10 @@ export default function TopicReportTab({ topic, input }) {
     </div>
   )
 
-  if (status === 'loading') return (
+  // Also covers the one render where a signed-in visitor (on a topic that
+  // doesn't need marital-status input first) is still technically 'idle'
+  // before the auto-reveal effect above fires.
+  if (status === 'loading' || (status === 'idle' && skipIdleScreen)) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>

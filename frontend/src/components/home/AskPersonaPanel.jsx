@@ -15,6 +15,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../../api/config'
+import JyotiAvatar from './JyotiAvatar'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -112,11 +113,8 @@ export default function AskPersonaPanel({ userId, input }) {
         onClick={() => setOpen(true)}
         className="fixed bottom-24 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
-        <span className="w-9 h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="9" r="4" stroke="#171B33" strokeWidth="1.6" />
-            <path d="M5 20c1.5-3.5 4.2-5 7-5s5.5 1.5 7 5" stroke="#171B33" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
+        <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
+          <JyotiAvatar />
         </span>
         <span className="text-left">
           <span className="block text-xs font-bold text-parchment">Ask {PERSONA_NAME}</span>
@@ -133,7 +131,9 @@ export default function AskPersonaPanel({ userId, input }) {
         }`}
       >
         <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-line bg-night">
-          <span className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-light to-primary shrink-0" />
+          <span className="w-11 h-11 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
+            <JyotiAvatar />
+          </span>
           <div>
             <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{PERSONA_NAME}</h3>
             <p className="text-[11px] text-ink-onnight/50">Your personal chart guide</p>
@@ -144,8 +144,8 @@ export default function AskPersonaPanel({ userId, input }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
           {messages.length === 0 && (
             <div className="max-w-[92%] bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed text-ink-muted">
-              Namaste 🙏 I only know your birth chart and today's transits — ask me anything about your career,
-              relationships, health, or timing. I can't answer outside your kundli.
+              Namaste 🙏 I only know your birth chart and today&apos;s transits — ask me anything about your career,
+              relationships, health, or timing. I can&apos;t answer outside your kundli.
             </div>
           )}
           {messages.map((m, i) => (

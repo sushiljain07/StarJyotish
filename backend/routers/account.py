@@ -12,6 +12,7 @@ gracefully (return today's hardcoded defaults) when DATABASE_URL isn't
 set, so the frontend can start calling it immediately without requiring
 Postgres to be provisioned first.
 """
+import uuid
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -167,7 +168,36 @@ def save_my_birth_profile(
     db.refresh(profile)
     return profile
 
-@router.get("/account/birth-profiles/{phone_number}", response_model=List[BirthProfileOut])
+@router.delete("/account/birth-profiles/{profile_id}", status_code=204)
+def delete_my_birth_profile(
+    profile_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Delete one of the authenticated user's birth profiles. 404s (rather
+    than 403) if the profile belongs to someone else, so this endpoint
+    doesn't leak whether a given profile_id exists at all to a user who
+    doesn't own it.
+
+    Chart data itself lives client-side only (frontend/src/services/
+    astrologyProfiles.js's localStorage cache) — this only removes the
+    birth-details row and any saved Reports for it; the frontend clears
+    its own cached chart for this profile_id after this call succeeds.
+    """
+    repo = BirthProfileRepository(db)
+    profile = repo.get(profile_id)
+    if profile is None or profile.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Birth profile not found")
+
+    was_primary = profile.is_primary
+    repo.delete(profile)
+
+    if was_primary:
+        remaining = repo.list_for_user(user.id)
+        if remaining:
+            repo.update(remaining[0], is_primary=True)
+
+    db.commit()
 def list_birth_profiles(phone_number: str, db=Depends(get_db)):
     user = UserRepository(db).get_by_phone(phone_number)
     if user is None:

@@ -1,9 +1,5 @@
-// frontend/src/components/home/DailyPanchang.jsx
-//
-// Presentational only — data comes from hooks/usePanchang.js, fetched once
-// in PersonalHome.jsx and shared with HeroDial (arc positions) and
-// utils/dailyInsights.js's computeDoAvoid (Rahu Kaal line), rather than
-// each section fetching /api/panchang separately.
+import { useTranslation } from 'react-i18next'
+
 function Fact({ label, value }) {
   return (
     <div className="bg-parchment-card border border-line rounded-lg px-3 py-2.5">
@@ -29,20 +25,21 @@ function MuhurtaChip({ name, window, tone }) {
 }
 
 export default function DailyPanchang({ location, data, loading, error }) {
+  const { t } = useTranslation()
+
   if (!location) {
     return (
       <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
-        <p className="text-ink-muted text-sm">
-          Set your current city above to see today&apos;s Panchang and auspicious timing.
-        </p>
+        <p className="text-ink-muted text-sm">{t('panchang_set_city_msg')}</p>
       </div>
     )
   }
 
   if (loading && !data) {
     return (
-      <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
+      <div className="bg-panchang-card border border-line rounded-xl p-5 text-center">
         <div className="text-2xl animate-spin inline-block">🪔</div>
+        <p className="text-ink-faint text-xs mt-2">{t('panchang_loading_msg')}</p>
       </div>
     )
   }
@@ -50,7 +47,7 @@ export default function DailyPanchang({ location, data, loading, error }) {
   if (error) {
     return (
       <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
-        <p className="text-ink-muted text-sm">Couldn&apos;t load today&apos;s Panchang. Try again shortly.</p>
+        <p className="text-ink-muted text-sm">{t('panchang_error_msg')}</p>
       </div>
     )
   }
@@ -63,34 +60,28 @@ export default function DailyPanchang({ location, data, loading, error }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <Fact label="Tithi" value={data.tithi ? `${data.tithi.name} (${data.tithi.paksha})` : null} />
-        <Fact label="Nakshatra" value={data.nakshatra} />
-        <Fact label="Yoga" value={data.yoga} />
-        <Fact label="Karana" value={data.karana} />
-        <Fact label="Sunrise" value={data.sunrise} />
-        <Fact label="Sunset" value={data.sunset} />
-        <Fact label="Moonrise" value={data.moonrise} />
-        <Fact label="Moonset" value={data.moonset} />
+        <Fact label={t('panchang_tithi')} value={data.tithi ? `${data.tithi.name} (${data.tithi.paksha})` : null} />
+        <Fact label={t('panchang_nakshatra')} value={data.nakshatra} />
+        <Fact label={t('panchang_yoga')} value={data.yoga} />
+        <Fact label={t('panchang_karana')} value={data.karana} />
+        <Fact label={t('panchang_sunrise')} value={data.sunrise} />
+        <Fact label={t('panchang_sunset')} value={data.sunset} />
+        <Fact label={t('panchang_moonrise')} value={data.moonrise} />
+        <Fact label={t('panchang_moonset')} value={data.moonset} />
       </div>
 
       {m && (
         <div>
-          <p className="text-xs font-semibold text-ink-muted mb-2.5">Auspicious &amp; inauspicious windows today</p>
+          <p className="text-xs font-semibold text-ink-muted mb-2.5">{t('panchang_auspicious_heading')}</p>
           <div className="flex flex-wrap gap-2.5">
-            <MuhurtaChip name="Rahu Kaal" window={m.rahu_kaal} tone="avoid" />
-            <MuhurtaChip name="Yamaganda" window={m.yamaganda} tone="avoid" />
-            <MuhurtaChip name="Gulika Kaal" window={m.gulika_kaal} tone="avoid" />
-            <MuhurtaChip name="Abhijit Muhurta" window={m.abhijit_muhurta} tone="favorable" />
+            <MuhurtaChip name={t('panchang_rahu_kaal')} window={m.rahu_kaal} tone="avoid" />
+            <MuhurtaChip name={t('panchang_yamaganda')} window={m.yamaganda} tone="avoid" />
+            <MuhurtaChip name={t('panchang_gulika_kaal')} window={m.gulika_kaal} tone="avoid" />
+            <MuhurtaChip name={t('panchang_abhijit_muhurta')} window={m.abhijit_muhurta} tone="favorable" />
           </div>
         </div>
       )}
 
-      {/* Eclipse banner kept deliberately dark — it's a rare, significant
-          event and should read as distinct from routine daily content,
-          the one place on this otherwise-light page where that contrast
-          earns its keep. Only ever renders when calculate_panchang found
-          one actually visible from this location within the lookahead
-          window, so there is no "no eclipse" empty state to design for. */}
       {eclipse && (
         <div
           className="rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3.5 border border-vermillion/30"
@@ -99,12 +90,11 @@ export default function DailyPanchang({ location, data, loading, error }) {
           <span className="text-2xl shrink-0">{eclipse.type === 'lunar' ? '🌑' : '🌒'}</span>
           <div className="flex-1">
             <p className="text-[11px] uppercase tracking-wide text-vermillion font-semibold mb-0.5">
-              Upcoming · {eclipse.date}
+              {t('panchang_eclipse_upcoming', { date: eclipse.date })}
             </p>
             <p className="font-serif font-semibold text-primary-light text-sm">{eclipse.name}</p>
             <p className="text-ink-onnight/60 text-xs mt-1">
-              Visible from your current location, peaking around {eclipse.peak_time_local}.
-              Full guidance on timing and traditional observances is coming soon.
+              {t('panchang_eclipse_body', { time: eclipse.peak_time_local })}
             </p>
           </div>
         </div>

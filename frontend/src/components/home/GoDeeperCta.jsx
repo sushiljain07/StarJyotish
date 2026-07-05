@@ -1,5 +1,7 @@
-// frontend/src/components/home/GoDeeperCta.jsx
+import { useTranslation } from 'react-i18next'
+
 export default function GoDeeperCta({ onOpenFullReading, guideHref, guideLabel }) {
+  const { t } = useTranslation()
   return (
     <div className="grid sm:grid-cols-2 gap-4">
       <button
@@ -7,11 +9,11 @@ export default function GoDeeperCta({ onOpenFullReading, guideHref, guideLabel }
         className="text-left rounded-2xl p-6 bg-gradient-to-br from-primary to-primary-dark flex flex-col justify-between min-h-[130px] hover:shadow-lg transition"
       >
         <div>
-          <h4 className="font-serif font-semibold text-[17px] text-night mb-1.5">Your full AI reading</h4>
-          <p className="text-[13px] text-night/70">A complete narrative synthesis of your entire kundli — not a chat, a proper reading you can keep.</p>
+          <h4 className="font-serif font-semibold text-[17px] text-night mb-1.5">{t('go_deeper_reading_title')}</h4>
+          <p className="text-[13px] text-night/70">{t('go_deeper_reading_body')}</p>
         </div>
         <span className="self-start mt-3.5 text-xs font-bold px-4 py-2 rounded-full bg-night text-primary-light">
-          Generate full reading →
+          {t('go_deeper_reading_btn')}
         </span>
       </button>
       <a
@@ -20,10 +22,10 @@ export default function GoDeeperCta({ onOpenFullReading, guideHref, guideLabel }
       >
         <div>
           <h4 className="font-serif font-semibold text-[17px] text-ink mb-1.5">{guideLabel}</h4>
-          <p className="text-[13px] text-ink-muted">Read the full personality, career, and compatibility guide for your Lagna sign.</p>
+          <p className="text-[13px] text-ink-muted">{t('go_deeper_guide_body')}</p>
         </div>
         <span className="self-start mt-3.5 text-xs font-bold px-4 py-2 rounded-full bg-night text-primary-light">
-          Explore guide →
+          {t('go_deeper_guide_btn')}
         </span>
       </a>
     </div>

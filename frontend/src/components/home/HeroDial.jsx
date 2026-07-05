@@ -1,17 +1,9 @@
-// frontend/src/components/home/HeroDial.jsx
-//
+import { useTranslation } from 'react-i18next'
+
 // The dial ring represents today's daylight span (sunrise -> sunset) as a
 // full circle, with Rahu Kaal / Yamaganda / Gulika Kaal shaded vermillion
 // and Abhijit Muhurta shaded sage — all positioned from the ACTUAL times
-// DailyPanchang fetched, not decorative placeholder arcs. If panchang data
-// isn't loaded yet, the ring renders as a plain neutral circle rather than
-// guessing at segment positions.
-//
-// The colors are real (same Rahu Kaal/Abhijit Muhurta data as the muhurta
-// chips further down the page), but the ring on its own gave no way to
-// decode them — a legend right underneath is cheaper and more honest than
-// either dropping the color-coding or assuming people will scroll down to
-// the Panchang section to work out what red vs green meant here.
+// DailyPanchang fetched, not decorative placeholder arcs.
 const RADIUS = 112
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
@@ -59,6 +51,7 @@ function NowMarker({ frac }) {
 }
 
 export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtext, chips, recalcNote }) {
+  const { t } = useTranslation()
   const sunriseMin = parseTimeToMinutes(panchang?.sunrise)
   const sunsetMin = parseTimeToMinutes(panchang?.sunset)
   const daySpan = sunriseMin != null && sunsetMin != null ? sunsetMin - sunriseMin : null
@@ -108,20 +101,20 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
                 {dayScore?.score ?? '—'}<span className="text-base text-ink-onnight/60 font-normal">/10</span>
               </p>
               <p className="text-[11px] tracking-widest uppercase text-ink-onnight/60 mt-1.5">
-                {dayScore?.label ?? 'Loading'}
+                {dayScore?.label ?? t('dial_loading')}
               </p>
             </div>
           </div>
           {daySpan && (
             <p className="text-center text-[10.5px] text-ink-onnight/40 mt-2.5">
-              Ring spans sunrise ({panchang.sunrise}) to sunset ({panchang.sunset}) — the gold dot marks right now
+              {t('dial_ring_caption', { sunrise: panchang.sunrise, sunset: panchang.sunset })}
             </p>
           )}
           {daySpan && m && (
             <div className="flex items-center justify-center gap-4 mt-2 text-[10.5px] text-ink-onnight/50 flex-wrap">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-vermillion inline-block" /> Avoid window</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sage inline-block" /> Favorable window</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary inline-block" /> Now</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-vermillion inline-block" /> {t('dial_avoid_window')}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sage inline-block" /> {t('dial_favorable_window')}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary inline-block" /> {t('dial_now')}</span>
             </div>
           )}
         </div>

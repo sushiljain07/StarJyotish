@@ -19,6 +19,11 @@ export default {
         night: {
           DEFAULT: '#171B33',
           light:   '#262B4A',
+          // Darkest layer, used only as the /home page's page-level
+          // background (SJ-009's "cosmic dial" redesign) — one shade below
+          // DEFAULT so hero/cards sitting on top of it still read as
+          // distinct layers instead of blending into one flat dark block.
+          deep:    '#0F1226',
         },
         // Warm parchment surfaces, replacing the old slate-50/white pairing.
         parchment: {

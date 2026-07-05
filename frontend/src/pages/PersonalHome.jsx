@@ -14,11 +14,15 @@ import CompactFooter from '../components/CompactFooter'
 import Reveal from '../components/Reveal'
 import ScrollToTop from '../components/ScrollToTop'
 import { useScrolledPast } from '../hooks/useScrolledPast'
+import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import ProfileSelector from '../components/home/ProfileSelector'
+import LocationBar from '../components/home/LocationBar'
+import DailyPanchang from '../components/home/DailyPanchang'
 import KundliChart from '../components/KundliChart'
 import HomeIcon from '../components/home/HomeIcons'
 import { getPrimaryProfile, loadProfiles, listProfiles } from '../services/astrologyProfiles'
 import { getJourney, getReflectionKey, SUGGESTED_QUESTIONS } from '../config/homeData'
+import { withHindiSign, withHindiPlanet } from '../config/hindiNames'
 import { formatDate, formatTime } from '../utils/format'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
@@ -269,6 +273,7 @@ export default function PersonalHome() {
   const { user, accessToken } = useAuth()
   const [sentinelRef, scrolledPast] = useScrolledPast()
   const scrollProgress = useScrollProgress(120) // SiteHeader solidification on parchment bg
+  const { location, status: locationStatus, retryGeolocation, setManualLocation } = useCurrentLocation()
 
   const [profilesLoaded, setProfilesLoaded] = useState(false)
   useEffect(() => {
@@ -344,26 +349,42 @@ export default function PersonalHome() {
               {/* Summary chips */}
               <div className="flex flex-wrap gap-2 mt-4">
                 <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
-                  Lagna: {chart.ascendant.sign}
+                  Lagna: {withHindiSign(chart.ascendant.sign)}
                 </span>
                 {moon && (
                   <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
-                    Rashi: {moon.sign}
+                    Rashi: {withHindiSign(moon.sign)}
                   </span>
                 )}
                 <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
-                  Mahadasha: {md.planet}
+                  Mahadasha: {withHindiPlanet(md.planet)}
                 </span>
                 {ad && (
                   <span className="bg-sage-light text-sage text-xs font-semibold px-3 py-1 rounded-full">
-                    Antardasha: {ad.planet}
+                    Antardasha: {withHindiPlanet(ad.planet)}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* ── Birth Chart ── */}
+            {/* ── Today ── */}
             <Reveal delay={0}>
+              <div className="space-y-3">
+                <LocationBar
+                  location={location}
+                  status={locationStatus}
+                  onRetryGeolocation={retryGeolocation}
+                  onSetManualLocation={setManualLocation}
+                  birthPlace={profile.place}
+                />
+                <Section eyebrow="Today" title="Panchang & Auspicious Timing">
+                  <DailyPanchang location={location} />
+                </Section>
+              </div>
+            </Reveal>
+
+            {/* ── Birth Chart ── */}
+            <Reveal delay={20}>
               <Section eyebrow="Your Chart" title="Birth Chart (Lagna)">
                 <div className="bg-parchment-card border border-line rounded-2xl overflow-hidden">
                   <div className="p-4 sm:p-6">

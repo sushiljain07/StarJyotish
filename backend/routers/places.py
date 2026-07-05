@@ -26,3 +26,27 @@ def suggest_places(request: Request, q: str = Query(..., min_length=3, max_lengt
         return {"suggestions": []}
 
     return {"suggestions": [r["display_name"] for r in results]}
+
+
+@router.get("/places/search")
+@limiter.limit(PLACES_LIMIT)
+def search_places_full(request: Request, q: str = Query(..., min_length=3, max_length=200)):
+    """Same underlying lookup as /places/suggest, but returns lat/lon
+    alongside each match. /places/suggest can't change shape without
+    breaking BirthForm.jsx's existing string-array consumers, so this is
+    a separate endpoint for callers that need coordinates directly —
+    currently just the home page's "update current city" picker, which
+    needs somewhere to send a person's current location besides re-running
+    a full geocode.
+    """
+    try:
+        results = search_places(q)
+    except Exception:
+        return {"places": []}
+
+    return {
+        "places": [
+            {"display_name": r["display_name"], "lat": float(r["lat"]), "lon": float(r["lon"])}
+            for r in results
+        ]
+    }

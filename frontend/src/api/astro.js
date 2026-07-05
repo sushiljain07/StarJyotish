@@ -48,3 +48,21 @@ export async function fetchPlaceSuggestions(query) {
   const data = await resp.json()
   return data.suggestions ?? []
 }
+
+// Same lookup as fetchPlaceSuggestions, but with lat/lon attached to each
+// match — used by the home page's "update current city" picker, which
+// needs coordinates to send to /api/panchang, not just a display string.
+export async function fetchPlaceMatches(query) {
+  const resp = await fetch(`${API_BASE}/api/places/search?q=${encodeURIComponent(query)}`)
+  if (!resp.ok) return []
+  const data = await resp.json()
+  return data.places ?? []
+}
+
+// Today's Panchang for a given CURRENT location — deliberately separate
+// from fetchTransit above, which is keyed to birth data. lat/lon here
+// come from browser geolocation or a manually chosen city, never from an
+// Astrology Profile's birth place.
+export function fetchPanchang({ lat, lon, timezone }) {
+  return postJson('/api/panchang', { lat, lon, timezone })
+}

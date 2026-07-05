@@ -1,31 +1,23 @@
-// frontend/src/components/home/TabsBar.jsx
-//
-// Anchor navigation, not a show/hide toggle — every section on this page
-// is relevant regardless of which "period" the person is thinking about
-// (a Do/Avoid item and a life-area trend are both "today" facts, just
-// framed differently), so hiding sections behind tabs was actively
-// removing content people wanted to see. Clicking a tab now just scrolls
-// to the matching part of one continuous page.
-const TABS = [
-  { id: 'today', label: 'Today' },
-  { id: 'week', label: 'This Week' },
-  { id: 'month', label: 'This Month' },
-]
+import { useTranslation } from 'react-i18next'
+
+const TAB_IDS = ['today', 'week', 'month']
+const TAB_KEYS = { today: 'tab_today', week: 'tab_this_week', month: 'tab_this_month' }
 
 export default function TabsBar({ active, onChange }) {
+  const { t } = useTranslation()
   return (
     <div className="flex gap-1.5">
-      {TABS.map(tab => (
+      {TAB_IDS.map(id => (
         <button
-          key={tab.id}
-          onClick={() => onChange(tab.id)}
+          key={id}
+          onClick={() => onChange(id)}
           className={`text-[13px] font-semibold px-4 py-2 rounded-full border transition ${
-            active === tab.id
+            active === id
               ? 'bg-night text-primary-light border-night'
               : 'border-line text-ink-muted hover:border-primary/50 hover:text-primary-dark'
           }`}
         >
-          {tab.label}
+          {t(TAB_KEYS[id])}
         </button>
       ))}
     </div>

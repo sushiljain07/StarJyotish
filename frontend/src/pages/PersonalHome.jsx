@@ -1,23 +1,7 @@
 // frontend/src/pages/PersonalHome.jsx
 //
 // The authenticated home page — a daily instrument panel over the
-// person's own chart, not a static readout of their birth chart (that
-// lives one click away via "Full Chart & Analysis", using Result.jsx).
-// Three data sources feed this page and are deliberately kept separate:
-//   - the natal chart (profile.chart) — fixed forever, from birth data
-//   - transit + outlook (hooks/useChartExtras.js) — keyed to birth data,
-//     changes with the sky, not the person's location
-//   - panchang (hooks/usePanchang.js) — keyed to CURRENT location, not
-//     birth place; see services/panchang.py's module docstring
-//
-// Layout: light parchment page (matching the rest of the site) with the
-// Hero Dial and eclipse banner kept deliberately dark as the one
-// signature "look up at the stars" moment — see tailwind.config.js's
-// night.deep token comment. Every section renders in one continuous flow;
-// the Today/This Week/This Month bar is anchor navigation, not a
-// show/hide toggle — a Do/Avoid item and a life-area trend are both
-// "today" facts just framed differently, so hiding either behind a tab
-// was removing content people wanted to see, not simplifying anything.
+// person's own chart.
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -51,20 +35,16 @@ import {
 } from '../utils/dailyInsights'
 import { formatDate, formatTime } from '../utils/format'
 
-// Only Aries currently has a built zodiac guide route (see App.jsx) — the
-// Knowledge Center hasn't built the other 11 yet, so linking straight to
-// e.g. "/learn/zodiac/scorpio" for a Scorpio Lagna would 404. Fall back to
-// the hub page until the rest of the guides ship.
-function zodiacGuideFor(signName) {
+function zodiacGuideFor(signName, t) {
   const slug = signName?.toLowerCase()
-  if (slug === 'aries') return { href: '/learn/zodiac/aries', label: 'Your Aries guide' }
-  return { href: '/learn/zodiac', label: `Your ${signName ?? ''} guide`.trim() }
+  if (slug === 'aries') return { href: '/learn/zodiac/aries', label: t('home_aries_guide') }
+  return { href: '/learn/zodiac', label: t('home_your_sign_guide', { sign: signName ?? '' }) }
 }
 
 const SECTION_IDS = { today: 'section-today', week: 'section-week', month: 'section-month' }
 
 export default function PersonalHome() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { user, accessToken } = useAuth()
   const scrollProgress = useScrollProgress(120)
@@ -114,11 +94,8 @@ export default function PersonalHome() {
     })
   }
 
-  function openFullReading() {
-    openChart('reading', 'insights')
-  }
-
   const loading = !profilesLoaded && !profile
+  const locale = i18n.language?.startsWith('hi') ? 'hi-IN' : 'en-GB'
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -136,41 +113,41 @@ export default function PersonalHome() {
         const moon = chart.planets.find(p => p.name === 'Moon')
         const md = chart.dasha.current_mahadasha
         const ad = chart.dasha.current_antardasha
-        const guide = zodiacGuideFor(chart.ascendant.sign)
+        const guide = zodiacGuideFor(chart.ascendant.sign, t)
 
         const transitPlanets = transit?.transit_planets ?? null
-        const dayScore = transitPlanets ? computeDayScore(chart, transitPlanets) : null
-        const doAvoid = transitPlanets ? computeDoAvoid(chart, transitPlanets, panchang.data) : null
-        const lifeAreas = transitPlanets ? computeLifeAreas(chart, transitPlanets) : null
-        const spotlight = transitPlanets ? computeSpotlight(chart, transitPlanets) : null
-        const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate) : []
+        const dayScore     = transitPlanets ? computeDayScore(chart, transitPlanets, t)               : null
+        const doAvoid      = transitPlanets ? computeDoAvoid(chart, transitPlanets, panchang.data, t) : null
+        const lifeAreas    = transitPlanets ? computeLifeAreas(chart, transitPlanets, t)              : null
+        const spotlight    = transitPlanets ? computeSpotlight(chart, transitPlanets, t)              : null
+        const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
-        const heroHeadline = spotlight?.moonSpotlight?.text ?? 'Loading today\u2019s reading from your chart…'
+        const heroHeadline = spotlight?.moonSpotlight?.text ?? t('home_reading_loading')
         const heroChips = [
-          `🌙 ${withHindiSign(moon?.sign ?? '')} → your ${spotlight?.moonSpotlight?.house ?? '—'} bhava`,
+          `🌙 ${withHindiSign(moon?.sign ?? '')} → ${t('home_bhava_chip', { house: spotlight?.moonSpotlight?.house ?? '—' })}`,
           `🪐 ${withHindiPlanet(md.planet)}${ad ? ` / ${withHindiPlanet(ad.planet)}` : ''}`,
           panchang.data?.muhurtas?.rahu_kaal?.start
-            ? `⏳ Rahu Kaal ${panchang.data.muhurtas.rahu_kaal.start}–${panchang.data.muhurtas.rahu_kaal.end}`
+            ? `⏳ ${t('panchang_rahu_kaal')} ${panchang.data.muhurtas.rahu_kaal.start}–${panchang.data.muhurtas.rahu_kaal.end}`
             : null,
         ].filter(Boolean)
+
+        const recalcNote = location
+          ? t('dial_recalc_note', { city: location.label ?? t('location_currently_in') })
+          : t('dial_set_city_note')
 
         return (
           <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-16 space-y-7">
 
-            {/* ── Identity ── */}
+            {/* Identity */}
             <div>
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <ProfileSelector t={t} profile={profile} profiles={allProfiles} onSwitch={setActiveProfile} />
-                {/* Same destination Profile.jsx's "+ Add another chart"
-                    link already used — this was previously only reachable
-                    from the Profile page, one extra click away from where
-                    people actually manage their charts day to day. */}
                 <Link
                   to="/onboarding"
                   state={{ addAnother: true }}
                   className="text-xs font-semibold text-primary-dark hover:underline shrink-0"
                 >
-                  + Add another chart
+                  {t('home_add_another_chart')}
                 </Link>
               </div>
               <div className="flex flex-wrap items-start justify-between gap-3 mt-4">
@@ -186,24 +163,24 @@ export default function PersonalHome() {
                   onClick={() => openChart('birth_chart', 'kundli')}
                   className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-4 py-2"
                 >
-                  Full Chart &amp; Analysis →
+                  {t('home_full_chart_analysis')}
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
                 <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
-                  Lagna: {withHindiSign(chart.ascendant.sign)}
+                  {t('home_lagna_label')}: {withHindiSign(chart.ascendant.sign)}
                 </span>
                 {moon && (
                   <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
-                    Rashi: {withHindiSign(moon.sign)}
+                    {t('home_rashi_label')}: {withHindiSign(moon.sign)}
                   </span>
                 )}
                 <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
-                  Mahadasha: {withHindiPlanet(md.planet)}
+                  {t('home_mahadasha_label')}: {withHindiPlanet(md.planet)}
                 </span>
                 {ad && (
                   <span className="bg-sage-light text-sage text-xs font-semibold px-3 py-1 rounded-full">
-                    Antardasha: {withHindiPlanet(ad.planet)}
+                    {t('home_antardasha_label')}: {withHindiPlanet(ad.planet)}
                   </span>
                 )}
               </div>
@@ -221,21 +198,17 @@ export default function PersonalHome() {
               <TabsBar active={activeTab} onChange={scrollToSection} />
             </div>
 
-            {/* ── TODAY ── */}
+            {/* TODAY */}
             <div ref={el => (sectionRefs.current.today = el)} id={SECTION_IDS.today} className="space-y-7 scroll-mt-32">
               <Reveal delay={0}>
                 <HeroDial
                   panchang={panchang.data}
                   dayScore={dayScore}
-                  eyebrow={`Today · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                  eyebrow={`${t('tab_today')} · ${new Date().toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}`}
                   headline={heroHeadline}
                   subtext={spotlight?.dashaSpotlight?.text}
                   chips={heroChips}
-                  recalcNote={
-                    location
-                      ? `Recalculated for ${location.label ?? 'your current location'} · Panchang updates automatically if you travel`
-                      : 'Set your current city below for accurate Panchang timing'
-                  }
+                  recalcNote={recalcNote}
                 />
               </Reveal>
 
@@ -248,7 +221,7 @@ export default function PersonalHome() {
               <Reveal delay={40}>
                 <div>
                   <h2 className="font-serif font-semibold text-lg text-ink mb-3">
-                    Today&apos;s Panchang
+                    {t('home_today_panchang')}
                     {location?.label && <span className="text-xs font-sans font-medium text-ink-faint ml-2">{location.label}</span>}
                   </h2>
                   <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
@@ -256,13 +229,13 @@ export default function PersonalHome() {
               </Reveal>
             </div>
 
-            {/* ── THIS WEEK ── */}
+            {/* THIS WEEK */}
             <div ref={el => (sectionRefs.current.week = el)} id={SECTION_IDS.week} className="space-y-7 scroll-mt-32">
               {lifeAreas && (
                 <Reveal delay={0}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-ink mb-1">This week, by life area</h2>
-                    <p className="text-xs text-ink-faint mb-3">from your D10, D9, D2/D11 &amp; D6 charts</p>
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('home_this_week_label')}</h2>
+                    <p className="text-xs text-ink-faint mb-3">{t('home_this_week_subtext')}</p>
                     <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
                   </div>
                 </Reveal>
@@ -271,34 +244,34 @@ export default function PersonalHome() {
               {spotlight && (
                 <Reveal delay={20}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-ink mb-3">Right now in your chart</h2>
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_right_now_label')}</h2>
                     <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
                   </div>
                 </Reveal>
               )}
             </div>
 
-            {/* ── THIS MONTH ── */}
+            {/* THIS MONTH */}
             <div ref={el => (sectionRefs.current.month = el)} id={SECTION_IDS.month} className="space-y-7 scroll-mt-32">
               <Reveal delay={0}>
                 <div>
-                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Coming up for you</h2>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_coming_up_label')}</h2>
                   {comingUpEvents.length > 0
                     ? <ComingUpStrip events={comingUpEvents} />
-                    : <p className="text-sm text-ink-muted">Loading your forward outlook…</p>}
+                    : <p className="text-sm text-ink-muted">{t('home_coming_up_loading')}</p>}
                 </div>
               </Reveal>
 
               <Reveal delay={20}>
                 <div>
-                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Go deeper</h2>
-                  <GoDeeperCta onOpenFullReading={openFullReading} guideHref={guide.href} guideLabel={guide.label} />
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_go_deeper_label')}</h2>
+                  <GoDeeperCta onOpenFullReading={() => openChart('reading', 'insights')} guideHref={guide.href} guideLabel={guide.label} />
                 </div>
               </Reveal>
 
               <Reveal delay={40}>
                 <div>
-                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Your reports</h2>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_your_reports_label')}</h2>
                   <ReportsStrip onOpenReport={openReport} />
                 </div>
               </Reveal>
@@ -309,7 +282,6 @@ export default function PersonalHome() {
             </Reveal>
 
             <DisclaimerBlock />
-
           </div>
         )
       })()}
@@ -323,7 +295,7 @@ export default function PersonalHome() {
               to="/onboarding"
               className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold px-6 py-3 rounded-full transition"
             >
-              Set up my birth chart
+              {t('home_set_up_chart')}
             </Link>
           </div>
         </div>

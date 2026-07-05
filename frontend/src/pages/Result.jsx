@@ -187,8 +187,14 @@ export default function Result() {
     ['birth_chart','divisional','planets','dasha','transit','download'].includes(initSub) ? initSub : 'birth_chart'
   )
   const [activeAdvancedSub, setActiveAdvancedSub] = useState('bhava')
+  // 'health'/'relationship'/'finance' are valid activeInsightSub values
+  // whenever input.topic matches (see the topicId-gated tabs below) — they
+  // were missing from this whitelist, so a deep-link straight to e.g. the
+  // Wealth report silently fell back to 'reading' instead. Kundli's own
+  // subtab whitelist above already lists every valid id explicitly, this
+  // just matches that pattern for Insights.
   const [activeInsightSub, setActiveInsightSub]   = useState(
-    ['reading','rajyogas','career'].includes(initSub) ? initSub : 'reading'
+    ['reading', 'rajyogas', 'career', 'health', 'relationship', 'finance'].includes(initSub) ? initSub : 'reading'
   )
   const [chartStyle, setChartStyle] = useState('north')
 

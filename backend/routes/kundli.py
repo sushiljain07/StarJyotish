@@ -16,6 +16,7 @@ from services.ashtakavarga import calculate_ashtakavarga
 from services.career_analysis import check_all_yogas
 from services.kp_system import enrich_planets_kp
 from services.transit_calc import calculate_transit, calculate_bhava_chalit
+from services.outlook import get_outlook
 from services.rate_limit import limiter, LLM_LIMIT, COMPUTE_LIMIT
 from services.persistence import save_report_if_requested
 from db.models.report import ReportType
@@ -203,6 +204,22 @@ def get_bhava_chalit(request: Request, body: BirthInput):
     geo, jd_ut = ctx.geo, ctx.jd_ut
 
     return calculate_bhava_chalit(jd_ut, geo.lat, geo.lon)
+
+
+@router.post("/kundli/outlook")
+@limiter.limit(COMPUTE_LIMIT)
+def get_outlook_route(request: Request, body: BirthInput):
+    """Forward-looking transit facts for the home page's "Coming up"
+    section — Sade Sati status and the next sign change for each slow
+    planet. Needs the natal Moon sign, so this is birth-data-keyed like
+    /kundli/transit, not location-keyed like /panchang.
+    """
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
+
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+    moon = next(p for p in chart["planets"] if p["name"] == "Moon")
+    return get_outlook(moon["sign_index"])
 
 
 @router.post("/kundli/kp")

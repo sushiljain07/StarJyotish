@@ -21,6 +21,14 @@ export function fetchTransit({ date, time, place }) {
   return postJson('/api/kundli/transit', { date, time, place })
 }
 
+// Forward-looking transit facts (Sade Sati status, next Saturn/Jupiter/
+// Rahu sign change) for the home page's "Coming up" section — see
+// services/outlook.py for why this needs its own endpoint rather than
+// reusing /kundli/transit, which only reports the current snapshot.
+export function fetchOutlook({ date, time, place }) {
+  return postJson('/api/kundli/outlook', { date, time, place })
+}
+
 export function fetchAshtakavarga({ date, time, place }) {
   return postJson('/api/kundli/ashtakavarga', { date, time, place })
 }

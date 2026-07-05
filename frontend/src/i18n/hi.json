@@ -218,8 +218,9 @@
     "Pisces": "मीन"
   },
   "login_title": "Star Jyotish में साइन इन करें",
-  "login_subtitle": "अपना फोन नंबर, ईमेल या Google से साइन इन करें।",
+  "login_subtitle": "अपने ईमेल या Google से साइन इन करें। फोन से साइन इन जल्द आ रहा है।",
   "login_phone_label": "फोन नंबर या ईमेल",
+  "login_email_label": "ईमेल पता",
   "login_send_code": "OTP भेजें",
   "login_sending": "भेजा जा रहा है…",
   "login_code_label": "6-अंकों का कोड दर्ज करें",

@@ -27,6 +27,17 @@ export default function Login() {
   const location = useLocation()
   const { isAuthenticated, user } = useAuth()
 
+  // "Back to wherever this was opened from" — react-router's history state
+  // carries an `idx` that's 0 for the first entry of this tab's session,
+  // so idx === 0 means there's nothing in-app to go back to (e.g. someone
+  // opened /login directly, or in a new tab) and navigate(-1) would leave
+  // the app entirely rather than doing what "click outside" implies.
+  function goBackOrHome() {
+    const idx = window.history.state?.idx
+    if (typeof idx === 'number' && idx > 0) navigate(-1)
+    else navigate('/')
+  }
+
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.
   if (isAuthenticated) {
@@ -43,11 +54,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div
+      className="min-h-screen bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden"
+      onClick={goBackOrHome}
+    >
       <Seo title={t('login_title')} description={t('login_seo_description')} path="/login" noindex />
       <CelestialBackdrop className="text-primary opacity-30 absolute inset-0" />
 
-      <div className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8">
+      <div
+        className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8"
+        onClick={e => e.stopPropagation()}
+      >
         <Link to="/" className="block text-center mb-5">
           <img src="/starjyotish.svg" alt="Star Jyotish" className="w-12 h-12 mx-auto mb-2" />
         </Link>

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { TOPICS } from '../config/topics'
 import { isLoginRequired, hasUsedFreeKundli } from '../config/auth'
-import { useScrolledPast } from '../hooks/useScrolledPast'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -13,7 +12,6 @@ import FAQAccordion from '../components/FAQAccordion'
 import FaqSchema from '../components/FaqSchema'
 import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
-import ScrollToTop from '../components/ScrollToTop'
 import TopicIcon from '../components/TopicIcon'
 import TabIcon from '../components/TabIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
@@ -44,7 +42,6 @@ export default function Landing() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
-  const [heroSentinelRef, heroPassed] = useScrolledPast()
   // 140px — short enough that the header reads as fully solid well before
   // you've scrolled even a third of the way through the hero, long enough
   // that the transition itself doesn't feel like a snap. See
@@ -85,7 +82,6 @@ export default function Landing() {
         scrollProgress={headerScrollProgress}
         onCtaClick={() => goToForm(null)}
       />
-      <ScrollToTop visible={heroPassed} />
 
       {/* ───────────────────── Hero ───────────────────── */}
       {/* pt-20/24: clears SiteHeader, which is now `fixed` and present
@@ -162,8 +158,6 @@ export default function Landing() {
         </button>
         <p className="relative text-ink-onnight text-xs mt-2">{t('landing_footer_note')}</p>
       </div>
-      {/* Sentinel — once this scrolls out of view, the sticky header appears */}
-      <div ref={heroSentinelRef} />
 
       {/* ───────────────── AI persona spotlight — asymmetric on desktop ───────────────── */}
       <section className="px-4 py-12 overflow-hidden">

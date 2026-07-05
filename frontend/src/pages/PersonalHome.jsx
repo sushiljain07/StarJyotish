@@ -26,8 +26,6 @@ import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 import Reveal from '../components/Reveal'
-import ScrollToTop from '../components/ScrollToTop'
-import { useScrolledPast } from '../hooks/useScrolledPast'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
@@ -69,7 +67,6 @@ export default function PersonalHome() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, accessToken } = useAuth()
-  const [sentinelRef, scrolledPast] = useScrolledPast()
   const scrollProgress = useScrollProgress(120)
 
   const [profilesLoaded, setProfilesLoaded] = useState(false)
@@ -126,9 +123,7 @@ export default function PersonalHome() {
   return (
     <div className="min-h-screen bg-parchment">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
-      <ScrollToTop visible={scrolledPast} />
       <SiteHeader scrollProgress={scrollProgress} />
-      <div ref={sentinelRef} className="absolute top-40" aria-hidden="true" />
 
       {loading && (
         <div className="flex items-center justify-center min-h-[60vh]">

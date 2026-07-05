@@ -12,7 +12,7 @@
 // again.
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 function initialFor(user) {
@@ -26,6 +26,7 @@ function initialFor(user) {
 export default function AccountMenu() {
   const { t } = useTranslation()
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [avatarError, setAvatarError] = useState(false)
   const containerRef = useRef(null)
@@ -125,7 +126,7 @@ export default function AccountMenu() {
             </Link>
           )}
           <button
-            onClick={() => { setOpen(false); logout() }}
+            onClick={() => { setOpen(false); logout(); navigate('/') }}
             role="menuitem"
             className="w-full text-left px-3.5 py-2 text-sm text-vermillion hover:bg-vermillion-light/60 transition"
           >

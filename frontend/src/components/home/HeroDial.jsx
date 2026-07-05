@@ -6,6 +6,12 @@
 // DailyPanchang fetched, not decorative placeholder arcs. If panchang data
 // isn't loaded yet, the ring renders as a plain neutral circle rather than
 // guessing at segment positions.
+//
+// The colors are real (same Rahu Kaal/Abhijit Muhurta data as the muhurta
+// chips further down the page), but the ring on its own gave no way to
+// decode them — a legend right underneath is cheaper and more honest than
+// either dropping the color-coding or assuming people will scroll down to
+// the Panchang section to work out what red vs green meant here.
 const RADIUS = 112
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
@@ -54,26 +60,34 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
         style={{ background: 'radial-gradient(circle, rgba(217,164,65,0.12), transparent 70%)' }}
       />
       <div className="grid sm:grid-cols-[240px_1fr] gap-8 sm:gap-10 items-center relative">
-        <div className="relative w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] mx-auto">
-          <svg viewBox="0 0 260 260" className="w-full h-full -rotate-90">
-            <circle cx="130" cy="130" r={RADIUS} fill="none" stroke="rgba(248,242,228,0.08)" strokeWidth="16" />
-            {daySpan && m && (
-              <>
-                <Arc startFrac={toFraction(m.gulika_kaal?.start)} endFrac={toFraction(m.gulika_kaal?.end)} color="#A23B3B" />
-                <Arc startFrac={toFraction(m.yamaganda?.start)} endFrac={toFraction(m.yamaganda?.end)} color="#A23B3B" />
-                <Arc startFrac={toFraction(m.rahu_kaal?.start)} endFrac={toFraction(m.rahu_kaal?.end)} color="#A23B3B" />
-                <Arc startFrac={toFraction(m.abhijit_muhurta?.start)} endFrac={toFraction(m.abhijit_muhurta?.end)} color="#5B7A5E" />
-              </>
-            )}
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <p className="font-serif font-semibold text-4xl text-primary-light leading-none">
-              {dayScore?.score ?? '—'}<span className="text-base text-ink-onnight/60 font-normal">/10</span>
-            </p>
-            <p className="text-[11px] tracking-widest uppercase text-ink-onnight/60 mt-1.5">
-              {dayScore?.label ?? 'Loading'}
-            </p>
+        <div>
+          <div className="relative w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] mx-auto">
+            <svg viewBox="0 0 260 260" className="w-full h-full -rotate-90">
+              <circle cx="130" cy="130" r={RADIUS} fill="none" stroke="rgba(248,242,228,0.08)" strokeWidth="16" />
+              {daySpan && m && (
+                <>
+                  <Arc startFrac={toFraction(m.gulika_kaal?.start)} endFrac={toFraction(m.gulika_kaal?.end)} color="#A23B3B" />
+                  <Arc startFrac={toFraction(m.yamaganda?.start)} endFrac={toFraction(m.yamaganda?.end)} color="#A23B3B" />
+                  <Arc startFrac={toFraction(m.rahu_kaal?.start)} endFrac={toFraction(m.rahu_kaal?.end)} color="#A23B3B" />
+                  <Arc startFrac={toFraction(m.abhijit_muhurta?.start)} endFrac={toFraction(m.abhijit_muhurta?.end)} color="#5B7A5E" />
+                </>
+              )}
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <p className="font-serif font-semibold text-4xl text-primary-light leading-none">
+                {dayScore?.score ?? '—'}<span className="text-base text-ink-onnight/60 font-normal">/10</span>
+              </p>
+              <p className="text-[11px] tracking-widest uppercase text-ink-onnight/60 mt-1.5">
+                {dayScore?.label ?? 'Loading'}
+              </p>
+            </div>
           </div>
+          {daySpan && m && (
+            <div className="flex items-center justify-center gap-4 mt-3 text-[10.5px] text-ink-onnight/50">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-vermillion inline-block" /> Avoid window</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sage inline-block" /> Favorable window</span>
+            </div>
+          )}
         </div>
 
         <div className="text-center sm:text-left">

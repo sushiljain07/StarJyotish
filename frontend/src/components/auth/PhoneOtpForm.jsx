@@ -1,11 +1,20 @@
 // frontend/src/components/auth/PhoneOtpForm.jsx
 //
-// Accepts phone number (+91 / bare 10-digit) or email address.
-// Backend detects format and routes to SMS or Resend email accordingly.
+// Accepts phone number (+91 / bare 10-digit) or email address — the
+// backend detects format and routes to SMS or Resend email accordingly,
+// and that dual-mode logic is left fully in place below.
+//
+// PHONE_LOGIN_ENABLED = false is a temporary, deliberate restriction: the
+// SMS provider isn't fully integrated yet (see backend/services/
+// otp_provider.py), so phone entry is hidden from the UI for now rather
+// than left available and silently failing. Flip this back to true once
+// that integration is live — no other code here needs to change.
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { sendOtp } from '../../api/auth'
 import { useAuth } from '../../contexts/AuthContext'
+
+const PHONE_LOGIN_ENABLED = false
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const buttonCls = 'w-full bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold py-2.5 rounded-full transition'
@@ -29,7 +38,12 @@ export default function PhoneOtpForm({ onSuccess }) {
   const [cooldown,   setCooldown]   = useState(0)
   const codeInputRef = useRef(null)
 
-  const emailMode = isEmail(identifier)
+  // While phone login is disabled, treat the field as always-email —
+  // isEmail(identifier) would say false for a half-typed address (no "."
+  // yet), which would flash "We will send a code via SMS" for a
+  // legitimate email in progress. This is purely a UI label decision;
+  // actual validation still runs on the real value at submit time.
+  const emailMode = PHONE_LOGIN_ENABLED ? isEmail(identifier) : true
 
   useEffect(() => {
     if (cooldown <= 0) return
@@ -86,10 +100,10 @@ export default function PhoneOtpForm({ onSuccess }) {
       <form onSubmit={handleSendCode} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-ink mb-1">
-            {t('login_phone_label')}
+            {PHONE_LOGIN_ENABLED ? t('login_phone_label') : t('login_email_label', 'Email address')}
           </label>
           <input
-            type="text"
+            type={PHONE_LOGIN_ENABLED ? 'text' : 'email'}
             inputMode={emailMode ? 'email' : 'tel'}
             required autoFocus
             placeholder={emailMode ? t('login_email_hint') : t('login_phone_hint')}
@@ -97,12 +111,15 @@ export default function PhoneOtpForm({ onSuccess }) {
             onChange={e => setIdentifier(e.target.value)}
             className={inputCls}
           />
-          {identifier.trim().length > 3 && (
+          {PHONE_LOGIN_ENABLED && identifier.trim().length > 3 && (
             <p className="text-xs text-ink-faint mt-1.5">
               {emailMode
                 ? 'We will email a code to this address'
                 : 'We will send a code via SMS'}
             </p>
+          )}
+          {!PHONE_LOGIN_ENABLED && (
+            <p className="text-xs text-ink-faint mt-1.5">We will email a code to this address</p>
           )}
         </div>
         {error && <p className="text-vermillion text-sm">{error}</p>}

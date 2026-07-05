@@ -17,10 +17,6 @@ import { API_BASE } from '../../api/config'
 const STORAGE_KEY = (date) => `sj_journal_feedback_v1:${date}`
 const TODAY = new Date().toISOString().slice(0, 10)
 
-function alreadySubmittedToday() {
-  try { return !!localStorage.getItem(STORAGE_KEY(TODAY)) } catch { return false }
-}
-
 function markSubmittedToday(reaction) {
   try { localStorage.setItem(STORAGE_KEY(TODAY), reaction) } catch { /* best-effort */ }
 }

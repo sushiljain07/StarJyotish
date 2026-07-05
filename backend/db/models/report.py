@@ -30,6 +30,7 @@ class ReportType(str, enum.Enum):
     career = "career"            # /api/career-report
     relationship = "relationship"  # /api/relationship-report
     wealth = "wealth"            # /api/wealth-report
+    health = "health"            # /api/health-report
     ask = "ask"                  # /api/kundli/ask
     rajyoga = "rajyoga"          # /api/rajyogas
 

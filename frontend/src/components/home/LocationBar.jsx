@@ -25,18 +25,18 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
     (location ? `Near ${location.lat.toFixed(1)}°, ${location.lon.toFixed(1)}°` : null)
 
   return (
-    <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-onnight/70">
+    <div className="bg-parchment-card border border-line rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
         {status === 'requesting' && <span>Finding your current location…</span>}
         {status !== 'requesting' && (
           <span>
-            📍 Currently in <b className="text-primary-light font-semibold">{currentLabel ?? 'unknown — set your city'}</b>
+            📍 Currently in <b className="text-primary-dark font-semibold">{currentLabel ?? 'unknown — set your city'}</b>
           </span>
         )}
         {birthPlace && (
           <>
-            <span className="text-white/20">|</span>
-            <span>🪔 Chart cast for <b className="text-primary-light font-semibold">{birthPlace}</b> (birth place — unchanged)</span>
+            <span className="text-ink-faint">|</span>
+            <span>🪔 Chart cast for <b className="text-primary-dark font-semibold">{birthPlace}</b> (birth place — unchanged)</span>
           </>
         )}
       </div>
@@ -44,7 +44,7 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
       {!editing && (
         <button
           onClick={() => setEditing(true)}
-          className="text-xs font-semibold text-primary hover:underline shrink-0 border border-primary/35 rounded-full px-3 py-1.5"
+          className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5"
         >
           {location ? 'Update current city' : 'Set current city'}
         </button>
@@ -57,15 +57,15 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search your current city…"
-            className="w-full border border-white/15 rounded-lg px-3 py-1.5 text-xs bg-night-light text-parchment placeholder:text-ink-onnight/40 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-line rounded-lg px-3 py-1.5 text-xs bg-white text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {matches.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full bg-night-light border border-white/15 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+            <ul className="absolute z-10 mt-1 w-full bg-white border border-line rounded-lg shadow-xl max-h-48 overflow-y-auto">
               {matches.map((m, i) => (
                 <li key={i}>
                   <button
                     onClick={() => pick(m)}
-                    className="w-full text-left px-3 py-2 text-xs text-ink-onnight/85 hover:bg-white/10"
+                    className="w-full text-left px-3 py-2 text-xs text-ink hover:bg-primary-light"
                   >
                     {m.display_name}
                   </button>
@@ -74,10 +74,10 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
             </ul>
           )}
           <div className="flex items-center gap-3 mt-1.5">
-            <button onClick={onRetryGeolocation} className="text-[11px] text-primary hover:underline">
+            <button onClick={onRetryGeolocation} className="text-[11px] text-primary-dark hover:underline">
               Use my device location instead
             </button>
-            <button onClick={() => { setEditing(false); setQuery('') }} className="text-[11px] text-ink-onnight/40 hover:underline">
+            <button onClick={() => { setEditing(false); setQuery('') }} className="text-[11px] text-ink-faint hover:underline">
               Cancel
             </button>
           </div>

@@ -2,15 +2,23 @@
 //
 // The authenticated home page — a daily instrument panel over the
 // person's own chart, not a static readout of their birth chart (that
-// lives one click away via "Full Chart & Analysis", using Result.jsx —
-// see docs/PRODUCT_HOME.md's SJ-009 redesign notes). Three data sources
-// feed this page and are deliberately kept separate:
+// lives one click away via "Full Chart & Analysis", using Result.jsx).
+// Three data sources feed this page and are deliberately kept separate:
 //   - the natal chart (profile.chart) — fixed forever, from birth data
 //   - transit + outlook (hooks/useChartExtras.js) — keyed to birth data,
 //     changes with the sky, not the person's location
 //   - panchang (hooks/usePanchang.js) — keyed to CURRENT location, not
 //     birth place; see services/panchang.py's module docstring
-import { useState, useEffect } from 'react'
+//
+// Layout: light parchment page (matching the rest of the site) with the
+// Hero Dial and eclipse banner kept deliberately dark as the one
+// signature "look up at the stars" moment — see tailwind.config.js's
+// night.deep token comment. Every section renders in one continuous flow;
+// the Today/This Week/This Month bar is anchor navigation, not a
+// show/hide toggle — a Do/Avoid item and a life-area trend are both
+// "today" facts just framed differently, so hiding either behind a tab
+// was removing content people wanted to see, not simplifying anything.
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -55,6 +63,8 @@ function zodiacGuideFor(signName) {
   return { href: '/learn/zodiac', label: `Your ${signName ?? ''} guide`.trim() }
 }
 
+const SECTION_IDS = { today: 'section-today', week: 'section-week', month: 'section-month' }
+
 export default function PersonalHome() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -76,6 +86,12 @@ export default function PersonalHome() {
   const { transit, outlook } = useChartExtras(profile)
 
   const [activeTab, setActiveTab] = useState('today')
+  const sectionRefs = useRef({})
+
+  function scrollToSection(tabId) {
+    setActiveTab(tabId)
+    sectionRefs.current[tabId]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   function openChart(activeSubtab = 'birth_chart', activeTabId = 'kundli') {
     if (!profile) return
@@ -108,7 +124,7 @@ export default function PersonalHome() {
   const loading = !profilesLoaded && !profile
 
   return (
-    <div className="min-h-screen bg-night-deep">
+    <div className="min-h-screen bg-parchment">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
       <ScrollToTop visible={scrolledPast} />
       <SiteHeader scrollProgress={scrollProgress} />
@@ -151,34 +167,34 @@ export default function PersonalHome() {
               <ProfileSelector t={t} profile={profile} profiles={allProfiles} onSwitch={setActiveProfile} />
               <div className="flex flex-wrap items-start justify-between gap-3 mt-4">
                 <div>
-                  <h1 className="font-serif font-semibold text-2xl sm:text-3xl text-primary-light tracking-tight">
+                  <h1 className="font-serif font-semibold text-2xl sm:text-3xl text-ink tracking-tight">
                     {profile.label}
                   </h1>
-                  <p className="text-ink-onnight/50 text-sm mt-1">
+                  <p className="text-ink-muted text-sm mt-1">
                     {formatDate(profile.birth_date)} · {formatTime(profile.birth_time)} · {profile.place}
                   </p>
                 </div>
                 <button
                   onClick={() => openChart('birth_chart', 'kundli')}
-                  className="text-xs font-semibold text-primary hover:underline shrink-0 border border-primary/35 rounded-full px-4 py-2"
+                  className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-4 py-2"
                 >
                   Full Chart &amp; Analysis →
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
-                <span className="bg-primary/15 text-primary-light text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
                   Lagna: {withHindiSign(chart.ascendant.sign)}
                 </span>
                 {moon && (
-                  <span className="bg-mauve/20 text-mauve text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
                     Rashi: {withHindiSign(moon.sign)}
                   </span>
                 )}
-                <span className="bg-vermillion/20 text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
                   Mahadasha: {withHindiPlanet(md.planet)}
                 </span>
                 {ad && (
-                  <span className="bg-sage/20 text-sage text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-sage-light text-sage text-xs font-semibold px-3 py-1 rounded-full">
                     Antardasha: {withHindiPlanet(ad.planet)}
                   </span>
                 )}
@@ -193,96 +209,92 @@ export default function PersonalHome() {
               birthPlace={profile.place}
             />
 
-            <TabsBar active={activeTab} onChange={setActiveTab} />
+            <div className="sticky top-[64px] z-20 -mx-4 px-4 py-2.5 bg-parchment/90 backdrop-blur-sm">
+              <TabsBar active={activeTab} onChange={scrollToSection} />
+            </div>
 
             {/* ── TODAY ── */}
-            {activeTab === 'today' && (
-              <div className="space-y-7">
-                <Reveal delay={0}>
-                  <HeroDial
-                    panchang={panchang.data}
-                    dayScore={dayScore}
-                    eyebrow={`Today · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`}
-                    headline={heroHeadline}
-                    subtext={spotlight?.dashaSpotlight?.text}
-                    chips={heroChips}
-                    recalcNote={
-                      location
-                        ? `Recalculated for ${location.label ?? 'your current location'} · Panchang updates automatically if you travel`
-                        : 'Set your current city below for accurate Panchang timing'
-                    }
-                  />
-                </Reveal>
+            <div ref={el => (sectionRefs.current.today = el)} id={SECTION_IDS.today} className="space-y-7 scroll-mt-32">
+              <Reveal delay={0}>
+                <HeroDial
+                  panchang={panchang.data}
+                  dayScore={dayScore}
+                  eyebrow={`Today · ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                  headline={heroHeadline}
+                  subtext={spotlight?.dashaSpotlight?.text}
+                  chips={heroChips}
+                  recalcNote={
+                    location
+                      ? `Recalculated for ${location.label ?? 'your current location'} · Panchang updates automatically if you travel`
+                      : 'Set your current city below for accurate Panchang timing'
+                  }
+                />
+              </Reveal>
 
-                {doAvoid && (
-                  <Reveal delay={20}>
-                    <DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} />
-                  </Reveal>
-                )}
-
-                <Reveal delay={40}>
-                  <div>
-                    <h2 className="font-serif font-semibold text-lg text-primary-light mb-3">
-                      Today&apos;s Panchang
-                      {location?.label && <span className="text-xs font-sans font-medium text-ink-onnight/40 ml-2">{location.label}</span>}
-                    </h2>
-                    <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
-                  </div>
+              {doAvoid && (
+                <Reveal delay={20}>
+                  <DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} />
                 </Reveal>
-              </div>
-            )}
+              )}
+
+              <Reveal delay={40}>
+                <div>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">
+                    Today&apos;s Panchang
+                    {location?.label && <span className="text-xs font-sans font-medium text-ink-faint ml-2">{location.label}</span>}
+                  </h2>
+                  <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
+                </div>
+              </Reveal>
+            </div>
 
             {/* ── THIS WEEK ── */}
-            {activeTab === 'week' && (
-              <div className="space-y-7">
-                {lifeAreas && (
-                  <Reveal delay={0}>
-                    <div>
-                      <h2 className="font-serif font-semibold text-lg text-primary-light mb-1">This week, by life area</h2>
-                      <p className="text-xs text-ink-onnight/40 mb-3">from your D10, D9, D2/D11 &amp; D6 charts</p>
-                      <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
-                    </div>
-                  </Reveal>
-                )}
-
-                {spotlight && (
-                  <Reveal delay={20}>
-                    <div>
-                      <h2 className="font-serif font-semibold text-lg text-primary-light mb-3">Right now in your chart</h2>
-                      <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
-                    </div>
-                  </Reveal>
-                )}
-              </div>
-            )}
-
-            {/* ── THIS MONTH ── */}
-            {activeTab === 'month' && (
-              <div className="space-y-7">
+            <div ref={el => (sectionRefs.current.week = el)} id={SECTION_IDS.week} className="space-y-7 scroll-mt-32">
+              {lifeAreas && (
                 <Reveal delay={0}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-primary-light mb-3">Coming up for you</h2>
-                    {comingUpEvents.length > 0
-                      ? <ComingUpStrip events={comingUpEvents} />
-                      : <p className="text-sm text-ink-onnight/50">Loading your forward outlook…</p>}
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-1">This week, by life area</h2>
+                    <p className="text-xs text-ink-faint mb-3">from your D10, D9, D2/D11 &amp; D6 charts</p>
+                    <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
                   </div>
                 </Reveal>
+              )}
 
+              {spotlight && (
                 <Reveal delay={20}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-primary-light mb-3">Go deeper</h2>
-                    <GoDeeperCta onOpenFullReading={openFullReading} guideHref={guide.href} guideLabel={guide.label} />
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-3">Right now in your chart</h2>
+                    <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
                   </div>
                 </Reveal>
+              )}
+            </div>
 
-                <Reveal delay={40}>
-                  <div>
-                    <h2 className="font-serif font-semibold text-lg text-primary-light mb-3">Your reports</h2>
-                    <ReportsStrip onOpenReport={openReport} />
-                  </div>
-                </Reveal>
-              </div>
-            )}
+            {/* ── THIS MONTH ── */}
+            <div ref={el => (sectionRefs.current.month = el)} id={SECTION_IDS.month} className="space-y-7 scroll-mt-32">
+              <Reveal delay={0}>
+                <div>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Coming up for you</h2>
+                  {comingUpEvents.length > 0
+                    ? <ComingUpStrip events={comingUpEvents} />
+                    : <p className="text-sm text-ink-muted">Loading your forward outlook…</p>}
+                </div>
+              </Reveal>
+
+              <Reveal delay={20}>
+                <div>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Go deeper</h2>
+                  <GoDeeperCta onOpenFullReading={openFullReading} guideHref={guide.href} guideLabel={guide.label} />
+                </div>
+              </Reveal>
+
+              <Reveal delay={40}>
+                <div>
+                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">Your reports</h2>
+                  <ReportsStrip onOpenReport={openReport} />
+                </div>
+              </Reveal>
+            </div>
 
             <Reveal delay={60}>
               <JournalPrompt />
@@ -297,8 +309,8 @@ export default function PersonalHome() {
       {!loading && !profile && (
         <div className="max-w-3xl mx-auto px-4 pt-24 pb-16">
           <div className="text-center py-20">
-            <p className="font-serif text-2xl text-primary-light mb-3">{t('home_empty_title')}</p>
-            <p className="text-ink-onnight/60 text-sm mb-6 max-w-sm mx-auto">{t('home_empty_body')}</p>
+            <p className="font-serif text-2xl text-ink mb-3">{t('home_empty_title')}</p>
+            <p className="text-ink-muted text-sm mb-6 max-w-sm mx-auto">{t('home_empty_body')}</p>
             <Link
               to="/onboarding"
               className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold px-6 py-3 rounded-full transition"

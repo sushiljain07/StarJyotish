@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ScrollManager from './components/ScrollManager'
+import GlobalScrollToTop from './components/GlobalScrollToTop'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
 import PersonalHome from './pages/PersonalHome'
@@ -36,6 +37,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ScrollManager />
+        <GlobalScrollToTop />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/generate" element={<Home />} />

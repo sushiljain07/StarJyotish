@@ -37,7 +37,7 @@ export default function ErrorFallback({ resetError }) {
             href="/"
             className="px-5 py-2.5 rounded-lg border border-primary-dark/30 text-primary-dark text-sm font-semibold hover:bg-primary-dark/5 transition"
           >
-            Go home
+            ← Back to Home
           </a>
         </div>
       </div>

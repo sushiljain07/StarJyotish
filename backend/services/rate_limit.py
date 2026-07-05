@@ -40,3 +40,9 @@ AUTH_LIMIT = "20/minute"
 # client-side), but capped so this backend stays within Nominatim's own
 # "max 1 request/second" usage policy in aggregate per client.
 PLACES_LIMIT = "60/minute"
+
+# Contact form: costs a real email send (Resend) and has no legitimate
+# reason to be submitted often by the same visitor, so it gets a tight,
+# per-hour limit rather than per-minute — closer to OTP_SEND_LIMIT's
+# "cheap to abuse, annoying if abused" profile than a compute endpoint's.
+CONTACT_LIMIT = "5/hour"

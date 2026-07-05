@@ -23,6 +23,7 @@ from routers.admin import router as admin_router
 from routers.astrologer import router as astrologer_router
 from routers.testimonials import router as testimonials_router
 from routers.panchang import router as panchang_router
+from routers.contact import router as contact_router
 
 init_sentry()
 
@@ -83,6 +84,7 @@ app.include_router(admin_router, prefix="/api")
 app.include_router(astrologer_router, prefix="/api")
 app.include_router(testimonials_router, prefix="/api")
 app.include_router(panchang_router, prefix="/api")
+app.include_router(contact_router, prefix="/api")
 
 @app.get("/health")
 def health():

@@ -218,8 +218,9 @@
     "Pisces": "Pisces"
   },
   "login_title": "Sign in to Star Jyotish",
-  "login_subtitle": "Use your phone number, email, or Google account.",
+  "login_subtitle": "Use your email or Google account. Phone sign-in is coming soon.",
   "login_phone_label": "Phone number or email",
+  "login_email_label": "Email address",
   "login_send_code": "Send OTP",
   "login_sending": "Sending…",
   "login_code_label": "Enter the 6-digit code",

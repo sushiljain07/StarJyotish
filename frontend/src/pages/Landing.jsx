@@ -74,8 +74,8 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-parchment overflow-x-hidden">
       <Seo
-        title="Free Vedic Astrology, AI Kundli & Birth Chart Reading"
-        description="Generate your free Vedic Kundli with Swiss Ephemeris-accurate calculations and an AI-powered reading. Career, relationship, health & wealth insights in English and Hindi — no signup needed."
+        title="Your Personal AI Vedic Astrologer"
+        description="Your personal AI-powered Vedic astrologer. Free birth chart plus daily, personalized guidance on career, wealth, relationships & health. English and Hindi."
         path="/"
       />
       <SiteHeader

@@ -23,6 +23,7 @@ import LifeAreaGrid from '../components/home/LifeAreaGrid'
 import ChartSpotlight from '../components/home/ChartSpotlight'
 import ComingUpStrip from '../components/home/ComingUpStrip'
 import DailyPanchang from '../components/home/DailyPanchang'
+import DailyTimeline from '../components/home/DailyTimeline'
 import GoDeeperCta from '../components/home/GoDeeperCta'
 import ReportsStrip from '../components/home/ReportsStrip'
 import JournalPrompt from '../components/home/JournalPrompt'
@@ -224,7 +225,17 @@ export default function PersonalHome() {
                     {t('home_today_panchang')}
                     {location?.label && <span className="text-xs font-sans font-medium text-ink-faint ml-2">{location.label}</span>}
                   </h2>
-                  <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
+                  {/* Interactive timeline list — shows all muhurta windows as
+                      tap-to-expand rows with do/avoid guidance and a "next good
+                      window" hint when currently in an avoid period. This is the
+                      most actionable view of the same data as the Panchang grid. */}
+                  <DailyTimeline panchang={panchang.data} />
+                  {/* Panchang detail grid for Tithi / Nakshatra / Yoga / Karana /
+                      rise-set times — complementary, not a duplicate: one is
+                      time-action guidance, the other is the classical Panchang facts. */}
+                  <div className="mt-4">
+                    <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
+                  </div>
                 </div>
               </Reveal>
             </div>

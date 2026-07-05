@@ -10,7 +10,10 @@ from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.relationship_analysis import generate_relationship_report
 from services.wealth_analysis import generate_wealth_report
-from services.skill_loader import load_relationship_skills, load_wealth_skills, load_gemstone_remedy_skills
+from services.health_analysis import generate_health_report
+from services.skill_loader import (
+    load_relationship_skills, load_wealth_skills, load_health_skills, load_gemstone_remedy_skills,
+)
 from services.rate_limit import limiter, LLM_LIMIT
 from services.persistence import save_report_if_requested
 from db.models.report import ReportType
@@ -22,6 +25,7 @@ router = APIRouter()
 # career_report.py's _SKILLS_CONTEXT/_GEMSTONE_CONTEXT.
 _RELATIONSHIP_SKILLS_CONTEXT: str = load_relationship_skills()
 _WEALTH_SKILLS_CONTEXT: str = load_wealth_skills()
+_HEALTH_SKILLS_CONTEXT: str = load_health_skills()
 _GEMSTONE_CONTEXT: str = load_gemstone_remedy_skills()
 
 
@@ -131,6 +135,45 @@ def get_wealth_report(request: Request, body: BirthInput, db=Depends(get_db_opti
 
     save_report_if_requested(
         db, user_phone=body.save_for_phone, report_type=ReportType.wealth,
+        content=response.model_dump(), birth_date=body.date, birth_time=body.time,
+        place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
+        language=body.language, llm_provider=response.llm_provider,
+    )
+
+    return response
+
+
+@router.post("/health-report", response_model=TopicReport)
+@limiter.limit(LLM_LIMIT)
+def get_health_report(request: Request, body: BirthInput, db=Depends(get_db_optional)):
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
+
+    chart = calculate_chart(jd_ut, geo.lat, geo.lon)
+    d6    = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, 6)
+
+    dasha = calculate_vimshottari(
+        moon_lon=chart["moon_sidereal_lon"],
+        birth_dt=naive_dt,
+    )
+
+    try:
+        report_data = generate_health_report(
+            chart_data=chart,
+            d6_chart=d6,
+            dasha=dasha,
+            skills_context=_HEALTH_SKILLS_CONTEXT,
+            birth_date=body.date,
+            gemstone_context=_GEMSTONE_CONTEXT,
+            language=body.language,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Health analysis failed: {e}")
+
+    response = _build_topic_report(report_data)
+
+    save_report_if_requested(
+        db, user_phone=body.save_for_phone, report_type=ReportType.health,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,

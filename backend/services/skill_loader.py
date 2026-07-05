@@ -101,6 +101,23 @@ def load_wealth_skills() -> str:
     return _load_skill_files(_WEALTH_FILES, "VEDIC WEALTH & FINANCE KNOWLEDGE BASE", "houses")
 
 
+# ── Health skills ───────────────────────────────────────────────────────────────
+# Same situation as wealth: no dedicated "health" folder — the 6th house
+# and its lord are covered thoroughly inside the general houses reference,
+# so that's the source used here too. See services/health_analysis.py for
+# why disease-timing/naming techniques are deliberately excluded.
+
+_HEALTH_FILES = [
+    "houses/astrology-12-houses/SKILL.md",
+    "houses/house-lords/SKILL.md",
+]
+
+
+def load_health_skills() -> str:
+    """Read the general house-reference skill files used for health analysis."""
+    return _load_skill_files(_HEALTH_FILES, "VEDIC HEALTH & WELLBEING KNOWLEDGE BASE", "houses")
+
+
 def get_topic_system_prompt(topic_label: str, methodology_label: str, skills_context: str) -> str:
     """
     Generic version of get_system_prompt() below — same shape, parameterized
@@ -330,5 +347,38 @@ core wealth and gains directly linked.
 - House 1 = Lagna sign. Count forward for all other houses.
 - Never confuse rashi (sign) number with house number.
 - Do NOT name or claim any specific "Dhana Yoga" combination.
+- Respond ONLY with valid JSON — no markdown outside JSON.
+"""
+
+# Compact system for Groq/LLaMA — avoids 413 Payload Too Large errors
+GROQ_HEALTH_SYSTEM_PROMPT = """You are an expert Vedic astrologer specialising in wellbeing and constitutional analysis. You are NOT a doctor and never diagnose, name, or predict a specific illness or medical event.
+
+## CORE HEALTH RULES
+
+### 6th House (Health & Routine) — Lord Placement → Focus Theme
+6HL in 1st: health-conscious constitution. 2nd: health tied to daily habits/household routine. 3rd: vitality
+via movement/short travel. 4th: wellbeing tied to home environment. 5th: health via creative outlets and joy.
+6th: rewards long-term consistent routine over quick fixes. 7th: wellbeing tied to partnership harmony.
+8th: built for endurance and deep recovery. 9th: supported by belief/purpose/travel. 10th: tied to sense of
+purpose and public role. 11th: supported by community/friends. 12th: suited to rest, retreat, quiet healing.
+
+### D6 Shashthamsha Signal
+Whether the D6 Lagna's own lord is a natural benefic (Jupiter/Venus/Mercury) or malefic (Saturn/Mars/Sun/
+Rahu/Ketu) signals "restorative" (responds well to gentle care) vs "disciplined" (responds well to structure
+and consistent routine) health temperament.
+
+### Health Blessings (only mention if actually present in the chart data given)
+A malefic planet (Saturn/Mars/Sun/Rahu/Ketu) in the 6th house is CLASSICALLY FAVORABLE — it strengthens the
+6th house's own job of overcoming illness/obstacles, giving real resilience. Never frame this as a warning.
+Jupiter in 6th = healing ability and resistance to illness. Lagna lord exalted or in own sign = strong
+constitutional vitality.
+
+## ACCURACY & SAFETY RULES
+- House 1 = Lagna sign. Count forward for all other houses.
+- Never confuse rashi (sign) number with house number.
+- NEVER name, diagnose, or imply a specific disease or medical event, or predict WHEN illness will occur.
+- Describe constitutional tendencies and lifestyle/routine guidance only, never medical advice.
+- The closing section must include: "This is guidance for reflection and routine-building, not medical
+  advice — please consult a qualified doctor for any health concern."
 - Respond ONLY with valid JSON — no markdown outside JSON.
 """

@@ -6,9 +6,9 @@
 // each section fetching /api/panchang separately.
 function Fact({ label, value }) {
   return (
-    <div className="bg-night-light border border-white/10 rounded-lg px-3 py-2.5">
-      <p className="text-[10px] text-ink-onnight/45 uppercase tracking-widest mb-1">{label}</p>
-      <p className="font-serif font-semibold text-sm text-parchment">{value ?? '—'}</p>
+    <div className="bg-parchment-card border border-line rounded-lg px-3 py-2.5">
+      <p className="text-[10px] text-ink-faint uppercase tracking-widest mb-1">{label}</p>
+      <p className="font-serif font-semibold text-sm text-ink">{value ?? '—'}</p>
     </div>
   )
 }
@@ -18,10 +18,10 @@ function MuhurtaChip({ name, window, tone }) {
   const dotColor = tone === 'avoid' ? 'bg-vermillion' : 'bg-sage'
   const textColor = tone === 'avoid' ? 'text-vermillion' : 'text-sage'
   return (
-    <div className="flex items-center gap-2.5 bg-night-light border border-white/10 rounded-lg px-3.5 py-2.5 flex-1 min-w-[160px]">
+    <div className="flex items-center gap-2.5 bg-parchment-card border border-line rounded-lg px-3.5 py-2.5 flex-1 min-w-[160px]">
       <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
       <div>
-        <p className="text-xs font-semibold text-parchment">{name}</p>
+        <p className="text-xs font-semibold text-ink">{name}</p>
         <p className={`text-[11px] font-medium ${textColor}`}>{window.start} – {window.end}</p>
       </div>
     </div>
@@ -31,8 +31,8 @@ function MuhurtaChip({ name, window, tone }) {
 export default function DailyPanchang({ location, data, loading, error }) {
   if (!location) {
     return (
-      <div className="bg-night-light border border-white/10 rounded-xl p-5 text-center">
-        <p className="text-ink-onnight/60 text-sm">
+      <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
+        <p className="text-ink-muted text-sm">
           Set your current city above to see today&apos;s Panchang and auspicious timing.
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function DailyPanchang({ location, data, loading, error }) {
 
   if (loading && !data) {
     return (
-      <div className="bg-night-light border border-white/10 rounded-xl p-5 text-center">
+      <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
         <div className="text-2xl animate-spin inline-block">🪔</div>
       </div>
     )
@@ -49,8 +49,8 @@ export default function DailyPanchang({ location, data, loading, error }) {
 
   if (error) {
     return (
-      <div className="bg-night-light border border-white/10 rounded-xl p-5 text-center">
-        <p className="text-ink-onnight/60 text-sm">Couldn&apos;t load today&apos;s Panchang. Try again shortly.</p>
+      <div className="bg-parchment-card border border-line rounded-xl p-5 text-center">
+        <p className="text-ink-muted text-sm">Couldn&apos;t load today&apos;s Panchang. Try again shortly.</p>
       </div>
     )
   }
@@ -75,7 +75,7 @@ export default function DailyPanchang({ location, data, loading, error }) {
 
       {m && (
         <div>
-          <p className="text-xs font-semibold text-ink-onnight/60 mb-2.5">Auspicious &amp; inauspicious windows today</p>
+          <p className="text-xs font-semibold text-ink-muted mb-2.5">Auspicious &amp; inauspicious windows today</p>
           <div className="flex flex-wrap gap-2.5">
             <MuhurtaChip name="Rahu Kaal" window={m.rahu_kaal} tone="avoid" />
             <MuhurtaChip name="Yamaganda" window={m.yamaganda} tone="avoid" />
@@ -85,9 +85,12 @@ export default function DailyPanchang({ location, data, loading, error }) {
         </div>
       )}
 
-      {/* Eclipse banner — only ever renders when calculate_panchang found one
-          actually visible from this location within the lookahead window,
-          so there is no "no eclipse" empty state to design for. */}
+      {/* Eclipse banner kept deliberately dark — it's a rare, significant
+          event and should read as distinct from routine daily content,
+          the one place on this otherwise-light page where that contrast
+          earns its keep. Only ever renders when calculate_panchang found
+          one actually visible from this location within the lookahead
+          window, so there is no "no eclipse" empty state to design for. */}
       {eclipse && (
         <div
           className="rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3.5 border border-vermillion/30"

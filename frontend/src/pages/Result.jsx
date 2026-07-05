@@ -34,7 +34,6 @@ const ChartReading       = lazy(() => import('../components/ChartReading'))
 const AskChart           = lazy(() => import('../components/AskChart'))
 const RajyogasTab        = lazy(() => import('../components/RajyogasTab'))
 const CareerReportTab    = lazy(() => import('../components/CareerReportTab'))
-const TopicInsightTab    = lazy(() => import('../components/TopicInsightTab'))
 const TopicReportTab     = lazy(() => import('../components/TopicReportTab'))
 
 // ── Suspense fallback ────────────────────────────────────────────────────────
@@ -377,15 +376,9 @@ export default function Result() {
               <CareerReportTab input={input} />
             </div>
 
-            {(topicId === 'relationship' || topicId === 'finance') && (
+            {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (
               <div className={activeInsightSub === topicId ? '' : 'hidden'}>
                 <TopicReportTab topic={topicId} input={input} />
-              </div>
-            )}
-
-            {topicId === 'health' && (
-              <div className={activeInsightSub === topicId ? '' : 'hidden'}>
-                <TopicInsightTab topic={topicId} data={data} />
               </div>
             )}
           </Suspense>

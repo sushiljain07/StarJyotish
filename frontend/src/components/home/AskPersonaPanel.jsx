@@ -110,7 +110,7 @@ export default function AskPersonaPanel({ userId, input }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        className="fixed bottom-24 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
         <span className="w-9 h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary shrink-0">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -125,14 +125,14 @@ export default function AskPersonaPanel({ userId, input }) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 bg-black/55 z-50" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 bg-black/40 z-50" onClick={() => setOpen(false)} />
       )}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 bg-night border-l border-primary/20 flex flex-col transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 bg-parchment border-l border-line flex flex-col shadow-2xl transition-transform duration-300 ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-white/10">
+        <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-line bg-night">
           <span className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-light to-primary shrink-0" />
           <div>
             <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{PERSONA_NAME}</h3>
@@ -143,7 +143,7 @@ export default function AskPersonaPanel({ userId, input }) {
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
           {messages.length === 0 && (
-            <div className="max-w-[92%] bg-night-light rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed text-ink-onnight/85">
+            <div className="max-w-[92%] bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed text-ink-muted">
               Namaste 🙏 I only know your birth chart and today's transits — ask me anything about your career,
               relationships, health, or timing. I can't answer outside your kundli.
             </div>
@@ -154,25 +154,25 @@ export default function AskPersonaPanel({ userId, input }) {
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed ${
                 m.role === 'user'
                   ? 'self-end bg-primary text-night rounded-br-sm font-medium'
-                  : 'self-start bg-night-light text-ink-onnight/85 rounded-bl-sm'
+                  : 'self-start bg-parchment-card border border-line text-ink-muted rounded-bl-sm'
               }`}
             >
               {m.text}
             </div>
           ))}
           {loading && (
-            <div className="self-start bg-night-light rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-              <span className="w-1.5 h-1.5 bg-ink-onnight/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 bg-ink-onnight/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-1.5 h-1.5 bg-ink-onnight/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="self-start bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           )}
           {error && <p className="text-xs text-vermillion text-center">{error}</p>}
           <div ref={bottomRef} />
         </div>
 
-        <div className="px-5 pb-5 pt-3 border-t border-white/10">
-          <p className="text-[11px] text-ink-onnight/50 mb-2">
+        <div className="px-5 pb-5 pt-3 border-t border-line bg-parchment-card">
+          <p className="text-[11px] text-ink-faint mb-2">
             {limitReached
               ? t('ask_limit_reached', { count: MAX_QUESTIONS })
               : t('ask_questions_remaining', { count: remaining })}
@@ -186,17 +186,17 @@ export default function AskPersonaPanel({ userId, input }) {
               maxLength={MAX_CHARS}
               rows={1}
               placeholder={t('ask_placeholder')}
-              className="flex-1 resize-none bg-night-light border border-white/10 rounded-xl px-3 py-2.5 text-[13px] text-parchment placeholder:text-ink-onnight/40 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 resize-none bg-white border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}
               disabled={!value.trim() || limitReached || loading}
-              className="w-11 h-11 rounded-xl bg-primary disabled:bg-white/10 disabled:text-ink-onnight/30 text-night font-bold shrink-0"
+              className="w-11 h-11 rounded-xl bg-primary disabled:bg-line disabled:text-ink-faint text-night font-bold shrink-0"
             >
               ↑
             </button>
           </div>
-          <p className="text-[10px] text-ink-onnight/35 text-right mt-1">{value.length} / {MAX_CHARS}</p>
+          <p className="text-[10px] text-ink-faint text-right mt-1">{value.length} / {MAX_CHARS}</p>
         </div>
       </div>
     </>

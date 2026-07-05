@@ -16,8 +16,8 @@ export default function JournalPrompt() {
   const [picked, setPicked] = useState(null)
 
   return (
-    <div className="border border-dashed border-white/20 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <p className="text-[13.5px] text-ink-onnight/80">
+    <div className="border border-dashed border-line rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-parchment-card">
+      <p className="text-[13.5px] text-ink-muted">
         {picked ? 'Thanks — noted for today.' : 'How did today\u2019s guidance land for you?'}
       </p>
       <div className="flex gap-2">
@@ -28,7 +28,7 @@ export default function JournalPrompt() {
             className={`text-xs font-semibold px-4 py-2 rounded-full border transition ${
               picked === opt.id
                 ? 'bg-primary text-night border-primary'
-                : 'border-white/20 text-ink-onnight/80 hover:border-primary/50'
+                : 'border-line text-ink-muted hover:border-primary/50'
             }`}
           >
             {opt.emoji} {opt.label}

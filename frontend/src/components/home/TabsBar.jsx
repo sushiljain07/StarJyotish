@@ -1,9 +1,11 @@
 // frontend/src/components/home/TabsBar.jsx
 //
-// Unlike the original mockup's tabs (which only toggled a CSS class with
-// no content change), these actually control which section group is
-// shown — see pages/PersonalHome.jsx's TAB_SECTIONS map. A decorative tab
-// bar that does nothing when clicked would be worse than no tab bar.
+// Anchor navigation, not a show/hide toggle — every section on this page
+// is relevant regardless of which "period" the person is thinking about
+// (a Do/Avoid item and a life-area trend are both "today" facts, just
+// framed differently), so hiding sections behind tabs was actively
+// removing content people wanted to see. Clicking a tab now just scrolls
+// to the matching part of one continuous page.
 const TABS = [
   { id: 'today', label: 'Today' },
   { id: 'week', label: 'This Week' },
@@ -19,8 +21,8 @@ export default function TabsBar({ active, onChange }) {
           onClick={() => onChange(tab.id)}
           className={`text-[13px] font-semibold px-4 py-2 rounded-full border transition ${
             active === tab.id
-              ? 'bg-parchment text-night border-parchment'
-              : 'border-white/15 text-ink-onnight/60 hover:border-primary/50 hover:text-primary'
+              ? 'bg-night text-primary-light border-night'
+              : 'border-line text-ink-muted hover:border-primary/50 hover:text-primary-dark'
           }`}
         >
           {tab.label}

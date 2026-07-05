@@ -58,6 +58,26 @@ const TOPIC_CONFIG = {
       { key: 'closing_blessing',      icon: '🌟', style: 'gradient' },
     ],
   },
+  // Never diagnostic — see services/health_analysis.py's module docstring
+  // for why this deliberately avoids disease-naming/timing claims and
+  // sticks to constitution + routine guidance instead.
+  health: {
+    icon: '🌿',
+    endpoint: '/api/health-report',
+    loadingSubtext: '6th House · Lagna Lord · D6 Shashthamsha',
+    sections: [
+      { key: 'health_destiny_brief',           icon: '✨', style: 'gold'     },
+      { key: 'natural_constitution',           icon: '🌱', style: 'gradient' },
+      { key: 'vitality_and_routine',           icon: '🎯', style: 'verdict'  },
+      { key: 'disease_resistance_blessings',   icon: '🛡️', style: 'tinted'   },
+      { key: 'health_timing_window',           icon: '⏳', style: 'plain'    },
+      { key: 'current_phase',                  icon: '🚀', style: 'plain'    },
+      { key: 'gemstone_recommendation',        icon: '💎', style: 'gem'      },
+      { key: 'rudraksha_recommendation',       icon: '🔴', style: 'tinted'   },
+      { key: 'empowering_remedies',            icon: '🙏', style: 'plain'    },
+      { key: 'closing_blessing',               icon: '🌟', style: 'gradient' },
+    ],
+  },
 }
 
 const EFFORT_COLOR = {

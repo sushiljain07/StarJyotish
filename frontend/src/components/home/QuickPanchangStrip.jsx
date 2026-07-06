@@ -15,7 +15,7 @@ import DailyPanchang from './DailyPanchang'
 function SkyItem({ emoji, label, time }) {
   if (!time) return null
   return (
-    <div className="flex items-center gap-1.5 text-[12px]" style={{ color: 'rgba(248,242,228,0.7)' }}>
+    <div className="flex items-center gap-1 text-[10px] sm:text-[11px]" style={{ color: 'rgba(248,242,228,0.7)' }}>
       <span>{emoji}</span>
       <span className="font-medium" style={{ color: 'rgba(248,242,228,0.9)' }}>{time}</span>
       <span style={{ color: 'rgba(248,242,228,0.4)' }}>{label}</span>
@@ -61,12 +61,12 @@ export default function QuickPanchangStrip({ data, loading, location, error }) {
           </div>
 
           {/* Sky times — ☀ for sun, ☽ for moon, explicit rise/set labels */}
-          <div className="hidden lg:flex flex-col gap-0.5 shrink-0 ml-4 mr-3">
-            <div className="flex gap-4">
+          <div className="flex flex-col gap-0.5 shrink-0 ml-2 mr-1">
+            <div className="flex gap-2 sm:gap-4">
               <SkyItem emoji="☀" label={t('sky_sunrise')} time={data.sunrise} />
               <SkyItem emoji="☀" label={t('sky_sunset')} time={data.sunset} />
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-2 sm:gap-4">
               <SkyItem emoji="☽" label={t('sky_moonrise')} time={data.moonrise} />
               <SkyItem emoji="☽" label={t('sky_moonset')} time={data.moonset} />
             </div>

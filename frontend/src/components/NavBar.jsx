@@ -15,7 +15,7 @@ function NavIcon({ icon, className }) {
 
 export default function NavBar({ tabs, activeTab, onTabChange }) {
   return (
-    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-parchment-card border-t border-line pb-safe">
+    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t" style={{ background: "rgba(19,24,58,0.97)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderColor: "rgba(248,242,228,0.12)", paddingBottom: "env(safe-area-inset-bottom,0px)" }}>
       <div className="flex justify-around items-center py-2">
         {tabs.map(tab => (
           <button
@@ -26,7 +26,7 @@ export default function NavBar({ tabs, activeTab, onTabChange }) {
             <NavIcon icon={tab.icon} className="w-[1.125rem] h-[1.125rem] object-contain" />
             {tab.locked && <span className="absolute -top-0.5 right-1 text-[9px]">🔒</span>}
             <span className={`text-[10px] font-medium leading-none truncate ${
-              activeTab === tab.id ? 'text-primary-dark' : 'text-ink-faint'
+              activeTab === tab.id ? 'text-primary' : 'text-white/45'
             }`}>
               {tab.label}
             </span>

@@ -102,7 +102,7 @@ function CosmicRing({ score, tone, mdPlanet, label }) {
       </svg>
       <style>{`
         .sj-ring-fill {
-          animation: sj-ring 1.2s cubic-bezier(0.2,0.8,0.3,1) both;
+          animation: sj-ring 220ms cubic-bezier(0.2,0.8,0.3,1) both;
         }
         @keyframes sj-ring {
           from { stroke-dasharray: 0 ${2 * Math.PI * R}; }
@@ -290,10 +290,10 @@ export default function DailyPatrikaHero({
 
       {/* ── Anticipation strip — same night surface, not parchment ── */}
       {edition?.countdowns?.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           {edition.countdowns.slice(0, 3).map((c, i) => (
             <div key={`${c.planet}-${c.house}`}
-                 className="rounded-2xl px-4 py-3 sj-fade-up"
+                 className="rounded-2xl px-4 py-3 sj-fade-up flex-1 min-w-[45%]"
                  style={{
                    background: 'rgba(23,27,51,0.7)',
                    border: '0.5px solid rgba(248,242,228,0.08)',
@@ -326,7 +326,7 @@ export default function DailyPatrikaHero({
           0%,100% { opacity:0.12; transform:translateY(0); }
           50%      { opacity:0.85; transform:translateY(-2px); }
         }
-        .sj-fade-up { animation: sj-fadeup 0.5s cubic-bezier(0.2,0.7,0.3,1) both; }
+        .sj-fade-up { animation: sj-fadeup 200ms cubic-bezier(0.2,0.7,0.3,1) both; }
         @keyframes sj-fadeup { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .sj-shimmer {
           background: linear-gradient(90deg,rgba(248,242,228,0.05) 25%,rgba(248,242,228,0.12) 50%,rgba(248,242,228,0.05) 75%);
@@ -334,7 +334,7 @@ export default function DailyPatrikaHero({
           animation: sj-shimmer 1.6s ease-in-out infinite;
         }
         @keyframes sj-shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
-        .sj-grow-bar { animation: sj-grow 1s cubic-bezier(0.2,0.8,0.3,1) both; transform-origin:left; }
+        .sj-grow-bar { animation: sj-grow 200ms cubic-bezier(0.2,0.8,0.3,1) both; transform-origin:left; }
         @keyframes sj-grow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
         @media (prefers-reduced-motion:reduce) {
           .sj-star,.sj-fade-up,.sj-shimmer,.sj-grow-bar,.sj-ring-fill { animation:none!important; }

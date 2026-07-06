@@ -9,7 +9,7 @@ export default function ScrollToTop({ visible }) {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Scroll to top"
-      className={`fixed bottom-5 right-5 z-40 w-11 h-11 rounded-full bg-primary hover:bg-primary-dark text-night shadow-lg flex items-center justify-center transition-all duration-300 ${
+      className={`fixed bottom-20 md:bottom-5 right-5 z-40 w-11 h-11 rounded-full bg-primary hover:bg-primary-dark text-night shadow-lg flex items-center justify-center transition-all duration-300 ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
       }`}
     >

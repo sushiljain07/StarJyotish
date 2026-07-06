@@ -57,7 +57,7 @@ export const RASHIS_INTRO = {
 
 export const RASHIS = [
   { id: 'aries',       sanskrit: 'Mesha',       english: 'Aries',       archetype: 'The Pioneer',     tagline: 'Courage begins with the first step.',                           href: '/learn/zodiac/aries', comingSoon: false },
-  { id: 'taurus',      sanskrit: 'Vrishabha',   english: 'Taurus',      archetype: 'The Builder',      tagline: 'What is built slowly rarely falls quickly.' },
+  { id: 'taurus',      sanskrit: 'Vrishabha',   english: 'Taurus',      archetype: 'The Builder',      tagline: 'What is built slowly rarely falls quickly.',                    href: '/learn/zodiac/taurus', comingSoon: false },
   { id: 'gemini',      sanskrit: 'Mithuna',     english: 'Gemini',      archetype: 'The Communicator',  tagline: 'Every idea deserves to be spoken aloud.' },
   { id: 'cancer',      sanskrit: 'Karka',       english: 'Cancer',      archetype: 'The Nurturer',      tagline: 'Home is wherever they choose to protect.' },
   { id: 'leo',         sanskrit: 'Simha',       english: 'Leo',         archetype: 'The Sovereign',     tagline: 'To lead is to be seen, and to be seen is to matter.' },

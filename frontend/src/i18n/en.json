@@ -681,5 +681,18 @@
   "sky_gulika": "Gulika",
   "sky_abhijit": "Abhijit",
   "sky_now": "NOW",
-  "panchang_paksha": "Paksha"
+  "panchang_paksha": "Paksha",
+  "tab_today_v2": "Today",
+  "tab_guidance": "Guidance",
+  "tab_learn": "Learn",
+  "patrika_cosmic_pulse": "Today's cosmic pulse",
+  "patrika_watch": "Watch out",
+  "panchang_sunrise_short": "rise",
+  "panchang_sunset_short": "set",
+  "panchang_moonrise_short": "rise",
+  "panchang_moonset_short": "set",
+  "panchang_expand": "Full Panchang",
+  "capsule_eyebrow": "Today's learning",
+  "capsule_read_time": "{{mins}} min read",
+  "capsule_cta": "Continue"
 }

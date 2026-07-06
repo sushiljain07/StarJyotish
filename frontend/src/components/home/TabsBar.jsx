@@ -1,23 +1,26 @@
 import { useTranslation } from 'react-i18next'
 
-const TAB_IDS = ['today', 'week', 'month']
-const TAB_KEYS = { today: 'tab_today', week: 'tab_this_week', month: 'tab_this_month' }
+const TABS = [
+  { id: 'today', key: 'tab_today_v2' },
+  { id: 'week',  key: 'tab_guidance' },
+  { id: 'month', key: 'tab_learn'    },
+]
 
 export default function TabsBar({ active, onChange }) {
   const { t } = useTranslation()
   return (
-    <div className="flex gap-1.5">
-      {TAB_IDS.map(id => (
+    <div className="flex gap-1">
+      {TABS.map(({ id, key }) => (
         <button
           key={id}
           onClick={() => onChange(id)}
-          className={`text-[13px] font-semibold px-4 py-2 rounded-full border transition ${
+          className={`text-[12px] font-bold tracking-widest uppercase px-5 py-2 rounded-full transition ${
             active === id
-              ? 'bg-night text-primary-light border-night'
-              : 'border-line text-ink-muted hover:border-primary/50 hover:text-primary-dark'
+              ? 'bg-night text-primary-light'
+              : 'text-ink-muted hover:text-ink'
           }`}
         >
-          {t(TAB_KEYS[id])}
+          {t(key)}
         </button>
       ))}
     </div>

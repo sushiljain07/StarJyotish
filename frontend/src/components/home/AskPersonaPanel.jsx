@@ -123,7 +123,7 @@ export default function AskPersonaPanel({ userId, input }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        className="fixed bottom-20 md:bottom-24 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
         <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />
@@ -135,10 +135,10 @@ export default function AskPersonaPanel({ userId, input }) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 bg-black/40 z-50" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 bg-black/40 z-[55]" onClick={() => setOpen(false)} />
       )}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 bg-parchment border-l border-line flex flex-col shadow-2xl transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] z-[60] bg-parchment border-l border-line flex flex-col shadow-2xl transition-transform duration-300 ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -183,7 +183,7 @@ export default function AskPersonaPanel({ userId, input }) {
           <div ref={bottomRef} />
         </div>
 
-        <div className="px-5 pb-5 pt-3 border-t border-line bg-parchment-card">
+        <div className="px-5 pt-3 border-t border-line bg-parchment-card" style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom,0px))" }}>
           <p className="text-[11px] text-ink-faint mb-2">
             {limitReached
               ? t('ask_limit_reached', { count: MAX_QUESTIONS })

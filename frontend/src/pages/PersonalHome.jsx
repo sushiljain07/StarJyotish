@@ -129,7 +129,7 @@ export default function PersonalHome() {
         const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
         return (
-          <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-28 md:pb-16 space-y-7">
+          <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-32 md:pb-16 space-y-7">
 
             {/* Identity */}
             <div>
@@ -228,23 +228,23 @@ export default function PersonalHome() {
               </Reveal>
             </div>
 
-            {/* THIS WEEK */}
+            {/* GUIDANCE — spotlight + life areas (reports are in the month/library section) */}
             <div ref={el => (sectionRefs.current.week = el)} id={SECTION_IDS.week} className="space-y-7 scroll-mt-32">
-              {lifeAreas && (
+              {spotlight && (
                 <Reveal delay={0}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('home_this_week_label')}</h2>
-                    <p className="text-xs text-ink-faint mb-3">{t('home_this_week_subtext')}</p>
-                    <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_right_now_label')}</h2>
+                    <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
                   </div>
                 </Reveal>
               )}
 
-              {spotlight && (
-                <Reveal delay={20}>
+              {lifeAreas && (
+                <Reveal delay={10}>
                   <div>
-                    <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_right_now_label')}</h2>
-                    <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
+                    <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('home_this_week_label')}</h2>
+                    <p className="text-xs text-ink-faint mb-3">{t('home_this_week_subtext')}</p>
+                    <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
                   </div>
                 </Reveal>
               )}

@@ -25,6 +25,7 @@ from routers.testimonials import router as testimonials_router
 from routers.panchang import router as panchang_router
 from routers.contact import router as contact_router
 from routers.daily_editor import router as daily_editor_router
+from routers.feedback import router as feedback_router
 
 init_sentry()
 
@@ -87,6 +88,7 @@ app.include_router(testimonials_router, prefix="/api")
 app.include_router(panchang_router, prefix="/api")
 app.include_router(contact_router, prefix="/api")
 app.include_router(daily_editor_router, prefix="/api")
+app.include_router(feedback_router, prefix="/api")
 
 @app.get("/health")
 def health():

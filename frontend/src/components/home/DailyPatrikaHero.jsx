@@ -19,7 +19,7 @@
 //    the anticipation strip below it uses the same night surface instead
 //    of switching to parchment cards. One material, not two.
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // ── Deterministic star field ─────────────────────────────────────────────────

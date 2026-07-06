@@ -700,5 +700,17 @@
   "nav_library": "लाइब्रेरी",
   "nav_ask": "पूछें",
   "nav_me": "मैं",
-  "nav_bottom_aria": "मुख्य नेविगेशन"
+  "nav_bottom_aria": "मुख्य नेविगेशन",
+  "sky_sunrise": "सूर्योदय",
+  "sky_sunset": "सूर्यास्त",
+  "sky_moonrise": "चंद्रोदय",
+  "sky_moonset": "चंद्रास्त",
+  "report_career_b1": "सक्रिय करियर भाव",
+  "report_career_b2": "D10 + दशा संरेखण",
+  "report_finance_b1": "धन योग विश्लेषण",
+  "report_finance_b2": "द्वितीय व एकादश भाव",
+  "report_relationship_b1": "सप्तम भाव व शुक्र",
+  "report_relationship_b2": "नवमांश अनुकूलता",
+  "report_health_b1": "लग्नेश व षष्ठ भाव",
+  "report_health_b2": "D6 जीवनीशक्ति"
 }

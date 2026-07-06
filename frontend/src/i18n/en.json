@@ -700,5 +700,17 @@
   "nav_library": "Library",
   "nav_ask": "Ask",
   "nav_me": "Me",
-  "nav_bottom_aria": "Main navigation"
+  "nav_bottom_aria": "Main navigation",
+  "sky_sunrise": "Sunrise",
+  "sky_sunset": "Sunset",
+  "sky_moonrise": "Moonrise",
+  "sky_moonset": "Moonset",
+  "report_career_b1": "Strongest career houses active",
+  "report_career_b2": "D10 + current dasha alignment",
+  "report_finance_b1": "Wealth yoga analysis",
+  "report_finance_b2": "2nd & 11th lord transits",
+  "report_relationship_b1": "7th house + Venus strength",
+  "report_relationship_b2": "Navamsa compatibility",
+  "report_health_b1": "Lagna lord & 6th house",
+  "report_health_b2": "D6 vitality indicators"
 }

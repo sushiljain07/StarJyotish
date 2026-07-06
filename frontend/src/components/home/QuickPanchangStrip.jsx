@@ -60,15 +60,15 @@ export default function QuickPanchangStrip({ data, loading, location, error }) {
             <PanchangFact label={t('panchang_karana')} value={data.karana} />
           </div>
 
-          {/* Sky times — hidden on very small screens to keep one row */}
+          {/* Sky times — ☀ for sun, ☽ for moon, explicit rise/set labels */}
           <div className="hidden md:flex flex-col gap-0.5 shrink-0 ml-6 mr-4">
             <div className="flex gap-4">
-              <SkyItem emoji="🌅" label={t('panchang_sunrise_short')} time={data.sunrise} />
-              <SkyItem emoji="🌇" label={t('panchang_sunset_short')} time={data.sunset} />
+              <SkyItem emoji="☀" label={t('sky_sunrise')} time={data.sunrise} />
+              <SkyItem emoji="☀" label={t('sky_sunset')} time={data.sunset} />
             </div>
             <div className="flex gap-4">
-              <SkyItem emoji="🌔" label={t('panchang_moonrise_short')} time={data.moonrise} />
-              <SkyItem emoji="🌘" label={t('panchang_moonset_short')} time={data.moonset} />
+              <SkyItem emoji="☽" label={t('sky_moonrise')} time={data.moonrise} />
+              <SkyItem emoji="☽" label={t('sky_moonset')} time={data.moonset} />
             </div>
           </div>
 

@@ -124,7 +124,8 @@ export default function Pricing() {
       <section className="px-4 py-12">
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {plans.map((plan, i) => (
-            <Reveal key={plan.id} delay={i * 70}>
+            <Reveal key={plan.id} delay={i * 70}
+              className={plan.highlight ? 'sm:order-first lg:order-none' : ''}>
               <PlanCard plan={plan} annual={annual} isHindi={isHindi} onSelect={handleSelect} />
             </Reveal>
           ))}

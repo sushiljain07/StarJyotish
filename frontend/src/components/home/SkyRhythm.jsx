@@ -108,9 +108,6 @@ export default function SkyRhythm({ panchang }) {
 
   if (!panchang?.sunrise) return null
 
-  // Sun is always at BAND_Y on the axis (no arc) unless it's on the arc
-  const sunAxisX = tx(riseMin)
-
   return (
     <div style={{ background: '#13183a', borderRadius: 16, padding: '14px 14px 10px', overflow: 'hidden' }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}

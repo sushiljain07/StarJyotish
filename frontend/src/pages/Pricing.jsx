@@ -116,7 +116,7 @@ export default function Pricing() {
           </button>
           <span className={`text-sm flex items-center gap-1.5 ${annual ? 'text-primary font-semibold' : 'text-ink-onnight'}`}>
             {t('pricing_billing_annual')}
-            <span className="text-[10px] font-bold bg-sage text-white px-1.5 py-0.5 rounded-full">{t('pricing_annual_save')}</span>
+            <span className="text-[10px] font-bold bg-sage text-night px-1.5 py-0.5 rounded-full">{t('pricing_annual_save')}</span>
           </span>
         </Reveal>
       </div>

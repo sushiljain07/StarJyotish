@@ -13,6 +13,7 @@
 // All copy lives in config/zodiacContent.js — this file only composes
 // layout, exactly per the "future proofing" requirement for this page.
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import Seo from '../../components/Seo'
 import SiteHeader from '../../components/SiteHeader'
@@ -78,8 +79,10 @@ function SystemCard({ system, accent = false }) {
 
 export default function ZodiacGuide() {
   const navigate = useNavigate()
+  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
+  const isHindi = i18n.language?.startsWith('hi')
 
   const guide = getGuide('zodiac')
   const learningPathSteps = getLearningPathSteps('zodiac')
@@ -127,6 +130,18 @@ export default function ZodiacGuide() {
 
       {/* Your Learning Path — new this sprint, doesn't touch any existing
           section below */}
+      {isHindi && (
+        <div className="max-w-4xl mx-auto px-4 pt-4">
+          <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
+            <span className="text-lg shrink-0">🌐</span>
+            <p className="text-sm text-primary-dark leading-relaxed">
+              यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है। हिंदी अनुवाद जल्द आएगा।
+              <span className="font-medium"> (This guide is currently available in English only.)</span>
+            </p>
+          </div>
+        </div>
+      )}
+
       <Section maxWidth="max-w-4xl">
         <LearningPath steps={learningPathSteps} />
       </Section>

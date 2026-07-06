@@ -36,7 +36,7 @@ export default function NotFound() {
         </p>
         <Link
           to={isAuthenticated ? '/home' : '/'}
-          className="inline-block mt-2 px-5 py-2.5 rounded-lg bg-primary-dark text-white text-sm font-semibold hover:opacity-90 transition"
+          className="inline-block mt-2 px-5 py-2.5 rounded-full bg-primary-dark text-night text-sm font-semibold hover:opacity-90 transition"
         >
           {t('not_found_cta', 'Go to homepage')}
         </Link>

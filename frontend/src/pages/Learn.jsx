@@ -8,6 +8,7 @@
 // markup, so this file should stay short even as the Knowledge Center
 // grows.
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
@@ -29,8 +30,10 @@ import {
 
 export default function Learn() {
   const navigate = useNavigate()
+  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
+  const isHindi = i18n.language?.startsWith('hi')
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -57,6 +60,22 @@ export default function Learn() {
           { label: 'Knowledge Center' },
         ]}
       />
+
+      {/* Hindi language notice — Knowledge Center content is currently
+          English-only; show a banner so Hindi users know this upfront
+          rather than discovering it mid-article. */}
+      {isHindi && (
+        <div className="max-w-4xl mx-auto px-4 pt-4">
+          <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
+            <span className="text-lg shrink-0">🌐</span>
+            <p className="text-sm text-primary-dark leading-relaxed">
+              ज्ञान केंद्र की सामग्री अभी केवल अंग्रेज़ी में उपलब्ध है।
+              हिंदी अनुवाद जल्द आएगा।{' '}
+              <span className="font-medium">(Knowledge Center is currently available in English only. Hindi translation coming soon.)</span>
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Featured Learning Paths */}
       <Section

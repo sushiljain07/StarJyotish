@@ -1,8 +1,10 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
+import CompactFooter from '../components/CompactFooter'
 import {
   adminListUsers, adminUserReports,
   adminListSettings, adminUpsertSetting,
@@ -302,13 +304,13 @@ function AstrologersTab({ token }) {
                 <div className="flex gap-2 flex-shrink-0">
                   {a.kyc_status !== 'verified' && (
                     <button onClick={() => handleKyc(a.id, 'verified')} disabled={kycLoad[a.id]}
-                      className="px-3 py-1.5 bg-sage text-white text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50">
+                      className="px-3 py-1.5 bg-sage text-parchment-card text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50">
                       {kycLoad[a.id] ? '…' : 'Approve'}
                     </button>
                   )}
                   {a.kyc_status !== 'rejected' && (
                     <button onClick={() => handleKyc(a.id, 'rejected')} disabled={kycLoad[a.id]}
-                      className="px-3 py-1.5 bg-vermillion text-white text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50">
+                      className="px-3 py-1.5 bg-vermillion text-parchment-card text-xs font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50">
                       {kycLoad[a.id] ? '…' : 'Reject'}
                     </button>
                   )}
@@ -919,9 +921,15 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-night text-primary-light">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <div className="font-serif font-semibold text-lg">⚙️ Admin Dashboard</div>
-            <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
+          <div className="flex items-center gap-3">
+            {/* Logo links back to main app */}
+            <Link to="/home" className="flex items-center gap-2 shrink-0 opacity-70 hover:opacity-100 transition">
+              <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
+            </Link>
+            <div>
+              <div className="font-serif font-semibold text-lg">⚙️ Admin Dashboard</div>
+              <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
+            </div>
           </div>
           <AccountMenu />
         </div>
@@ -949,6 +957,7 @@ export default function AdminDashboard() {
         {tab === 'testimonials' && <TestimonialsAdminTab token={accessToken} />}
         {tab === 'audit'        && <AuditTab        token={accessToken} />}
       </div>
+      <CompactFooter />
     </div>
   )
 }

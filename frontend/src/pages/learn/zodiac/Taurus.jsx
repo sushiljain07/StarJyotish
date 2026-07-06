@@ -4,6 +4,7 @@
 // Mirrors Aries.jsx exactly in structure and component usage. All copy
 // lives in config/taurusContent.js; this file only composes layout.
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../../contexts/AuthContext'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
@@ -61,6 +62,8 @@ function QualityList({ items }) {
 }
 
 export default function TaurusGuide() {
+  const { i18n } = useTranslation()
+  const isHindi = i18n.language?.startsWith('hi')
   const guide = getGuide('zodiac-taurus')
   const learningPathSteps = getLearningPathSteps('zodiac')
   const { prev, next } = getSignNavigation('zodiac-taurus')
@@ -101,6 +104,17 @@ export default function TaurusGuide() {
         />
       }
     >
+
+      {/* ── Hindi language notice ─────────────────────────────────────── */}
+      {isHindi && (
+        <div className="mb-8 bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
+          <span className="text-lg shrink-0">🌐</span>
+          <p className="text-sm text-primary-dark leading-relaxed">
+            यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है। हिंदी अनुवाद जल्द आएगा।
+            <span className="font-medium"> (This guide is currently available in English only.)</span>
+          </p>
+        </div>
+      )}
 
       {/* ── Learning path position ─────────────────────────────────────── */}
       <div className="mb-10 pb-8 border-b border-line">

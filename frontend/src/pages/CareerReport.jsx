@@ -76,7 +76,7 @@ function SectionCard({ icon, section, style }) {
     <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-mauve/30">
       <div className="bg-gradient-to-r from-sage to-mauve px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
-        <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
+        <h3 className="font-extrabold text-night text-lg leading-tight">{section.title}</h3>
       </div>
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
@@ -130,19 +130,20 @@ function SectionCard({ icon, section, style }) {
 
 // ── Loading state ─────────────────────────────────────────────────────────────
 function LoadingCard() {
-  const steps = [
-    'Calculating D1 birth chart…',
-    'Building D10 Dasamsa…',
-    'Checking Amatyakaraka…',
-    'Analysing career yogas…',
-    'Generating AI report…',
+  const { t } = useTranslation()
+  const stepKeys = [
+    'career_loading_step1',
+    'career_loading_step2',
+    'career_loading_step3',
+    'career_loading_step4',
+    'career_loading_step5',
   ]
-  const [step] = useState(() => steps[Math.floor(Math.random() * steps.length)])
+  const [stepKey] = useState(() => stepKeys[Math.floor(Math.random() * stepKeys.length)])
   return (
     <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-10 flex flex-col items-center text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="text-primary-dark font-semibold">Analysing your career chart…</p>
-      <p className="text-xs text-ink-faint mt-1">{step}</p>
+      <p className="text-primary-dark font-semibold">{t('career_loading_heading')}</p>
+      <p className="text-xs text-ink-faint mt-1">{t(stepKey)}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
@@ -173,12 +174,12 @@ export default function CareerReport() {
       })
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}))
-        throw new Error(err.detail ?? 'Career analysis failed. Please try again.')
+        throw new Error(err.detail ?? t('career_report_error_generic'))
       }
       setReport(await resp.json())
       setStatus('done')
     } catch (e) {
-      setErrorMsg(e.message || 'Something went wrong. Please try again.')
+      setErrorMsg(e.message || t('error_something_wrong'))
       setStatus('error')
     }
   }
@@ -217,7 +218,7 @@ export default function CareerReport() {
           <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
             <BirthForm onSubmit={handleSubmit} loading={false} />
             {status === 'error' && (
-              <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              <div className="mt-3 text-sm text-vermillion bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2">
                 {errorMsg}
               </div>
             )}

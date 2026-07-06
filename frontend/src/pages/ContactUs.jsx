@@ -69,7 +69,7 @@ export default function ContactUs() {
           <button
             type="button"
             onClick={() => alert('WhatsApp support is coming soon — for now, please use email or the form below.')}
-            className="bg-[#25D366]/10 text-[#1d9c4f] border border-[#25D366]/30 text-xs font-semibold px-3.5 py-2 rounded-full transition hover:bg-[#25D366]/20 shrink-0 self-start sm:self-auto"
+            className="bg-sage-light text-sage border border-sage/30 text-xs font-semibold px-3.5 py-2 rounded-full transition hover:bg-sage/20 shrink-0 self-start sm:self-auto"
           >
             💬 Chat on WhatsApp — coming soon
           </button>

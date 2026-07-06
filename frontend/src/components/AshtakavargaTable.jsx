@@ -69,7 +69,7 @@ export default function AshtakavargaTable({ input }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">⚠️ {error}</div>
+        <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {error}</div>
       )}
       {loading && (
         <div className="flex justify-center py-12">

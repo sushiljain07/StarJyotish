@@ -103,7 +103,7 @@ export default function Home() {
           )}
           <BirthForm onSubmit={handleSubmit} loading={loading} />
           {error && (
-            <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <div className="mt-3 text-sm text-vermillion bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2">
               {error}
             </div>
           )}

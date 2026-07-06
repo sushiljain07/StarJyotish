@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 
 // ── Eager imports ────────────────────────────────────────────────────────────
 // Components the user sees immediately on first render (birth chart tab).
@@ -368,6 +369,11 @@ export default function Result() {
 
       </div>
 
+      {/* CompactFooter sits above the mobile NavBar — desktop users see it
+          at the natural scroll end; mobile users see it above the tab bar.
+          pb-16 on the content div (already present for NavBar clearance)
+          ensures it isn't obscured on small screens. */}
+      <CompactFooter />
       <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={setActiveMain} />
     </div>
   )

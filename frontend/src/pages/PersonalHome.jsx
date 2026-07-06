@@ -35,7 +35,7 @@ import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import { getPrimaryProfile, loadProfiles, listProfiles } from '../services/astrologyProfiles'
 import { withHindiSign, withHindiPlanet } from '../config/hindiNames'
 import {
-  computeDayScore, computeDoAvoid, computeLifeAreas, computeSpotlight, buildComingUpEvents,
+  computeDayScore, computeDoAvoid, computeLifeAreas, computeSpotlight, buildComingUpEvents, computeOneAction,
 } from '../utils/dailyInsights'
 import { formatDate, formatTime } from '../utils/format'
 
@@ -122,6 +122,7 @@ export default function PersonalHome() {
 
         const transitPlanets = transit?.transit_planets ?? null
         const dayScore     = transitPlanets ? computeDayScore(chart, transitPlanets, t)               : null
+        const oneAction    = transitPlanets ? computeOneAction(chart, transitPlanets, dayScore, panchang.data, t) : null
         const doAvoid      = transitPlanets ? computeDoAvoid(chart, transitPlanets, panchang.data, t) : null
         const lifeAreas    = transitPlanets ? computeLifeAreas(chart, transitPlanets, t)              : null
         const spotlight    = transitPlanets ? computeSpotlight(chart, transitPlanets, t)              : null
@@ -199,6 +200,7 @@ export default function PersonalHome() {
                   dayScore={dayScore}
                   panchang={panchang.data}
                   chapterLabelFn={withHindiPlanet}
+                  oneAction={oneAction}
                 />
               </Reveal>
 
@@ -269,7 +271,7 @@ export default function PersonalHome() {
               <Reveal delay={40}>
                 <div>
                   <h2 className="font-serif font-semibold text-lg text-ink mb-3">{t('home_your_reports_label')}</h2>
-                  <ReportsStrip onOpenReport={openReport} />
+                  <ReportsStrip onOpenReport={openReport} featuredId={lifeAreas?.[0]?.topicId ?? 'career'} />
                 </div>
               </Reveal>
             </div>

@@ -200,6 +200,57 @@ export function computeLifeAreas(chart, transitPlanets, t) {
   })
 }
 
+
+// ── One Action Today ─────────────────────────────────────────────────────────
+export function computeOneAction(chart, transitPlanets, dayScore, panchang, t) {
+  if (!transitPlanets || !t) return null
+
+  const transitMoon  = transitPlanets.find(p => p.name === 'Moon') ?? null
+  const ascSignIndex = chart.ascendant.sign_index
+  const mdPlanet     = chart.dasha.current_mahadasha.planet
+  const score        = dayScore?.score ?? 5
+
+  if (score < 4.5) {
+    return {
+      verb:    t('action_protect_verb'),
+      context: t('action_protect_context', { planet: t(`planet_${mdPlanet}`, mdPlanet) }),
+      why:     t('action_protect_why'),
+      tone:    'caution',
+    }
+  }
+
+  const moonHouse = transitMoon
+    ? ((transitMoon.sign_index - ascSignIndex + 12) % 12) + 1
+    : null
+
+  const HOUSE_ACTIONS = {
+    1:  { verb: t('action_h1_verb'),  context: t('action_h1_ctx')  },
+    2:  { verb: t('action_h2_verb'),  context: t('action_h2_ctx')  },
+    3:  { verb: t('action_h3_verb'),  context: t('action_h3_ctx')  },
+    4:  { verb: t('action_h4_verb'),  context: t('action_h4_ctx')  },
+    5:  { verb: t('action_h5_verb'),  context: t('action_h5_ctx')  },
+    6:  { verb: t('action_h6_verb'),  context: t('action_h6_ctx')  },
+    7:  { verb: t('action_h7_verb'),  context: t('action_h7_ctx')  },
+    8:  { verb: t('action_h8_verb'),  context: t('action_h8_ctx')  },
+    9:  { verb: t('action_h9_verb'),  context: t('action_h9_ctx')  },
+    10: { verb: t('action_h10_verb'), context: t('action_h10_ctx') },
+    11: { verb: t('action_h11_verb'), context: t('action_h11_ctx') },
+    12: { verb: t('action_h12_verb'), context: t('action_h12_ctx') },
+  }
+
+  const ha = moonHouse ? HOUSE_ACTIONS[moonHouse] : null
+  const abhijit = panchang?.muhurtas?.abhijit_muhurta
+
+  return {
+    verb:    ha?.verb    ?? t('action_default_verb'),
+    context: ha?.context ?? t('action_default_ctx'),
+    why:     abhijit?.start
+      ? t('action_why_window', { start: abhijit.start, end: abhijit.end })
+      : t('action_why_md', { planet: t(`planet_${mdPlanet}`, mdPlanet) }),
+    tone: score >= 7 ? 'opportunity' : 'steady',
+  }
+}
+
 export function computeSpotlight(chart, transitPlanets, t) {
   const ascSignIndex = chart.ascendant.sign_index
   const transitMoon = findPlanet(transitPlanets, 'Moon')

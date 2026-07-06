@@ -174,10 +174,9 @@ function greetingKey() {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function DailyPatrikaHero({
-  firstName, edition, dayScore, panchang, chapterLabelFn, oneAction,
+  firstName, edition, dayScore, chapterLabelFn, oneAction,
 }) {
   const { t, i18n } = useTranslation()
-  const [whyOpen, setWhyOpen] = useState(false)
 
   const locale = i18n.language?.startsWith('hi') ? 'hi-IN' : 'en-GB'
   const dateStr = useMemo(

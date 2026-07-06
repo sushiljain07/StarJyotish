@@ -221,8 +221,8 @@ export default function DailyPatrikaHero({
                 {firstName}
               </p>
             </div>
-            <div className="text-right shrink-0 ml-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider"
+            <div className="text-right shrink-0 ml-3 min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider truncate"
                  style={{ color: '#D9A441' }}>
                 {t('patrika_eyebrow')}
               </p>

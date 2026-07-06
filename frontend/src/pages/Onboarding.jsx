@@ -14,6 +14,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
+import SiteHeader from '../components/SiteHeader'
+import CompactFooter from '../components/CompactFooter'
 import OnboardingLayout from '../components/onboarding/OnboardingLayout'
 import ProgressIndicator from '../components/onboarding/ProgressIndicator'
 import QuestionCard from '../components/onboarding/QuestionCard'
@@ -148,6 +150,40 @@ export default function Onboarding() {
       review: 'birthPlace',
     }
     return map[currentStep]
+  }
+
+  if (step === 'complete') {
+    return (
+      <div className="min-h-screen bg-parchment flex flex-col">
+        <Seo title={t('onboarding_seo_title')} description={t('onboarding_seo_description')} path="/onboarding" noindex />
+        <SiteHeader />
+        <main className="flex-1 flex items-center justify-center px-4 py-6">
+          <CompletionCelebration
+            t={t}
+            label={createdProfile?.label}
+            onContinue={() => {
+              if (createdProfile && createdProfile.relation !== 'self' && createdProfile.chart) {
+                navigate('/kundli', {
+                  replace: true,
+                  state: {
+                    data: createdProfile.chart,
+                    input: {
+                      date: createdProfile.birth_date,
+                      time: createdProfile.birth_time,
+                      place: createdProfile.place,
+                      name: createdProfile.label,
+                    },
+                  },
+                })
+              } else {
+                navigate('/home', { replace: true })
+              }
+            }}
+          />
+        </main>
+        <CompactFooter />
+      </div>
+    )
   }
 
   return (
@@ -291,34 +327,6 @@ export default function Onboarding() {
 
         {step === 'generating' && <LoadingState t={t} />}
 
-        {step === 'complete' && (
-          <CompletionCelebration
-            t={t}
-            label={createdProfile?.label}
-            onContinue={() => {
-              // For someone else's chart, go straight to the chart viewer so
-              // the user sees the result immediately rather than landing back
-              // on their own home page. For the user's own chart, /home is
-              // the right destination (it shows their chart there already).
-              if (createdProfile && createdProfile.relation !== 'self' && createdProfile.chart) {
-                navigate('/kundli', {
-                  replace: true,
-                  state: {
-                    data: createdProfile.chart,
-                    input: {
-                      date: createdProfile.birth_date,
-                      time: createdProfile.birth_time,
-                      place: createdProfile.place,
-                      name: createdProfile.label,
-                    },
-                  },
-                })
-              } else {
-                navigate('/home', { replace: true })
-              }
-            }}
-          />
-        )}
       </OnboardingLayout>
     </div>
   )

@@ -1,23 +1,20 @@
 // frontend/src/components/home/HeroDial.jsx
 //
-// The ring is a clock — sunrise at 12 o'clock, sunset at 6 o'clock
-// (bottom), Rahu Kaal / Yamaganda / Gulika Kaal red, Abhijit green,
-// gold dot = right now. This is stated on the ring itself (sunrise/
-// sunset anchors, clock tick marks) so users don't have to decode it.
-//
-// Score changed from "5.6/10 MIXED DAY" to a star rating alongside the
-// number — stars communicate the level faster than a number alone, and
-// "Mixed Day" as a label was less useful than showing the stars and
-// letting the number speak. The center is tappable for a score breakdown
-// that explains what drives the number, which builds the trust that a
-// number without an explanation can't earn on its own.
-import { useState } from 'react'
+// The ring is a full 24-hour clock — midnight at top (12 o'clock),
+// 6 AM at left (9 o'clock), noon at bottom (6 o'clock), 6 PM at right
+// (3 o'clock). Sunrise and sunset are pinned as labels at their exact
+// angular positions on the ring. Rahu Kaal / Yamaganda / Gulika Kaal
+// are red arcs; Abhijit Muhurta is green. Gold dot = right now.
+// The Now dot is ALWAYS visible — it doesn't vanish at night.
+
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const RADIUS = 82
 const CX = 100, CY = 100
 const CIRCUM = 2 * Math.PI * RADIUS
 
+// Convert "HH:MM AM/PM" string → total minutes since midnight
 function parseTimeToMinutes(str) {
   if (!str) return null
   const [time, ampm] = str.split(' ')
@@ -28,16 +25,33 @@ function parseTimeToMinutes(str) {
   return h * 60 + m
 }
 
-// Build an SVG arc segment on a circle centered at (CX,CY).
-// The whole <svg> rotates -90deg via CSS so frac=0 sits at the top (12
-// o'clock visual). This must match DailyTimeline's coordinate assumptions.
+// Convert total minutes since midnight → fraction of 24-hour clock (0–1)
+// frac=0 → midnight (top), frac=0.25 → 6 AM (left), frac=0.5 → noon (bottom), frac=0.75 → 6 PM (right)
+function minToFrac(minutes) {
+  if (minutes == null) return null
+  return ((minutes % 1440) + 1440) % 1440 / 1440
+}
+
+// Convert fraction → SVG (x, y) on the ring
+function fracToXY(frac, r = RADIUS) {
+  // frac=0 → top → angle = -π/2
+  const angle = frac * 2 * Math.PI - Math.PI / 2
+  return {
+    x: CX + r * Math.cos(angle),
+    y: CY + r * Math.sin(angle),
+  }
+}
+
+// SVG arc segment — startFrac and endFrac are 0–1 fractions of 24h clock
 function Arc({ startFrac, endFrac, color }) {
   if (startFrac == null || endFrac == null) return null
-  const span = Math.max(0.001, endFrac - startFrac) * CIRCUM
-  const offset = -startFrac * CIRCUM
+  let span = endFrac - startFrac
+  if (span < 0) span += 1 // handle midnight wrap
+  span = Math.max(0.002, span) * CIRCUM
+  const offset = -(startFrac * CIRCUM) + CIRCUM / 4 // +CIRCUM/4 rotates origin to top
   return (
     <circle
-      cx={CX} cy={CY} r={RADIUS} fill="none" stroke={color} strokeWidth="13"
+      cx={CX} cy={CY} r={RADIUS} fill="none" stroke={color} strokeWidth="12"
       strokeDasharray={`${span} ${CIRCUM - span}`}
       strokeDashoffset={offset}
       strokeLinecap="round"
@@ -45,35 +59,95 @@ function Arc({ startFrac, endFrac, color }) {
   )
 }
 
-// Twelve tick marks around the outer edge of the ring, like a clock
-// face. Without these the ring looks like abstract colored arcs; with
-// them it immediately reads as a time-based circular scale.
+// 24 tick marks (one per hour), slightly longer every 6 hours
 function ClockTicks() {
   const ticks = []
-  for (let i = 0; i < 12; i++) {
-    const angle = (i / 12) * 2 * Math.PI - Math.PI / 2
-    const r1 = RADIUS + 8, r2 = RADIUS + 12
+  for (let i = 0; i < 24; i++) {
+    const frac = i / 24
+    const angle = frac * 2 * Math.PI - Math.PI / 2
+    const major = i % 6 === 0
+    const r1 = RADIUS + 7
+    const r2 = RADIUS + (major ? 14 : 10)
     ticks.push(
       <line
         key={i}
         x1={CX + r1 * Math.cos(angle)} y1={CY + r1 * Math.sin(angle)}
         x2={CX + r2 * Math.cos(angle)} y2={CY + r2 * Math.sin(angle)}
-        stroke="rgba(248,242,228,0.15)" strokeWidth="1.5"
+        stroke={major ? 'rgba(248,242,228,0.3)' : 'rgba(248,242,228,0.1)'}
+        strokeWidth={major ? 1.5 : 1}
       />
     )
   }
   return <>{ticks}</>
 }
 
+// Gold "Now" dot on the ring
 function NowMarker({ frac }) {
   if (frac == null) return null
-  const angle = frac * 2 * Math.PI - Math.PI / 2
-  const x = CX + RADIUS * Math.cos(angle)
-  const y = CY + RADIUS * Math.sin(angle)
+  const { x, y } = fracToXY(frac)
   return (
     <>
-      <circle cx={x} cy={y} r="8" fill="rgba(240,203,128,0.2)" />
+      <circle cx={x} cy={y} r="9" fill="rgba(240,203,128,0.18)" />
       <circle cx={x} cy={y} r="4.5" fill="#F0CB80" />
+    </>
+  )
+}
+
+// Small labeled dot for sunrise / sunset pinned to the ring edge
+function SunMarker({ frac, emoji, timeStr, isTop }) {
+  if (frac == null) return null
+  const { x, y } = fracToXY(frac, RADIUS + 22)
+  return (
+    <g>
+      {/* connector line from ring to label */}
+      {(() => {
+        const inner = fracToXY(frac, RADIUS + 8)
+        return <line x1={inner.x} y1={inner.y} x2={x} y2={y} stroke="rgba(248,242,228,0.2)" strokeWidth="1" />
+      })()}
+      <circle cx={fracToXY(frac, RADIUS).x} cy={fracToXY(frac, RADIUS).y} r="3" fill="#D9A441" />
+      <text
+        x={x} y={y}
+        textAnchor="middle"
+        dominantBaseline={isTop ? 'auto' : 'hanging'}
+        fontSize="7"
+        fontWeight="bold"
+        fill="rgba(248,242,228,0.6)"
+        fontFamily="system-ui, sans-serif"
+        letterSpacing="0.5"
+      >
+        {emoji} {timeStr}
+      </text>
+    </g>
+  )
+}
+
+// Tiny compass labels at cardinal points: 12 (midnight), 6A, 12 (noon), 6P
+function CardinalLabels() {
+  const labels = [
+    { frac: 0,    label: '12A', anchor: 'middle',  dy: -10 },
+    { frac: 0.25, label: '6A',  anchor: 'end',     dx: -10, dy: 4 },
+    { frac: 0.5,  label: '12P', anchor: 'middle',  dy: 12 },
+    { frac: 0.75, label: '6P',  anchor: 'start',   dx: 10,  dy: 4 },
+  ]
+  return (
+    <>
+      {labels.map(({ frac, label, anchor, dx = 0, dy = 0 }) => {
+        const { x, y } = fracToXY(frac, RADIUS + 30)
+        return (
+          <text
+            key={label}
+            x={x + dx} y={y + dy}
+            textAnchor={anchor}
+            fontSize="6.5"
+            fill="rgba(248,242,228,0.22)"
+            fontFamily="system-ui, sans-serif"
+            letterSpacing="0.8"
+            fontWeight="bold"
+          >
+            {label}
+          </text>
+        )
+      })}
     </>
   )
 }
@@ -92,24 +166,28 @@ function Stars({ score }) {
 export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtext, chips, recalcNote }) {
   const { t } = useTranslation()
   const [breakdownOpen, setBreakdownOpen] = useState(false)
+  const [nowFrac, setNowFrac] = useState(null)
+
+  // Live clock — update every 30 seconds so the dot moves in real time
+  useEffect(() => {
+    function tick() {
+      const now = new Date()
+      setNowFrac(minToFrac(now.getHours() * 60 + now.getMinutes()))
+    }
+    tick()
+    const id = setInterval(tick, 30_000)
+    return () => clearInterval(id)
+  }, [])
 
   const sunriseMin = parseTimeToMinutes(panchang?.sunrise)
   const sunsetMin  = parseTimeToMinutes(panchang?.sunset)
-  const daySpan = sunriseMin != null && sunsetMin != null ? sunsetMin - sunriseMin : null
-
-  function toFraction(timeStr) {
-    if (!daySpan) return null
-    const min = parseTimeToMinutes(timeStr)
-    if (min == null) return null
-    return Math.max(0, Math.min(1, (min - sunriseMin) / daySpan))
-  }
+  const sunriseFrac = minToFrac(sunriseMin)
+  const sunsetFrac  = minToFrac(sunsetMin)
 
   const m = panchang?.muhurtas
-  const now = new Date()
-  const nowMin = now.getHours() * 60 + now.getMinutes()
-  const nowFrac = daySpan && nowMin >= sunriseMin && nowMin <= sunsetMin
-    ? (nowMin - sunriseMin) / daySpan
-    : null
+
+  // Daytime arc (golden tint behind the day span)
+  const hasDayArc = sunriseFrac != null && sunsetFrac != null
 
   return (
     <div className="bg-gradient-to-br from-night-light to-night border border-primary/20 rounded-3xl p-8 sm:p-10 relative overflow-hidden">
@@ -121,46 +199,41 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
 
         {/* ── Dial column ── */}
         <div>
-          {/* Ring */}
-          <div className="relative w-[200px] h-[200px] mx-auto">
-            {/* Sunrise / Sunset labels outside the SVG, anchored via absolute position */}
-            {daySpan && (
-              <>
-                <span className="absolute top-[-20px] left-1/2 -translate-x-1/2 text-[9.5px] font-bold text-primary/70 uppercase tracking-wide whitespace-nowrap">
-                  🌅 {panchang.sunrise}
-                </span>
-                <span className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 text-[9.5px] font-bold text-primary/70 uppercase tracking-wide whitespace-nowrap">
-                  🌇 {panchang.sunset}
-                </span>
-                <span className="absolute top-1/2 -translate-y-1/2 left-[-28px] text-[8.5px] text-primary/40 uppercase tracking-wide">
-                  AM
-                </span>
-                <span className="absolute top-1/2 -translate-y-1/2 right-[-28px] text-[8.5px] text-primary/40 uppercase tracking-wide">
-                  PM
-                </span>
-              </>
-            )}
-
-            <svg viewBox="0 0 200 200" className="w-full h-full">
+          <div className="relative w-[220px] h-[220px] mx-auto">
+            <svg viewBox="0 0 200 200" className="w-full h-full" overflow="visible">
               {/* Neutral track */}
-              <circle cx={CX} cy={CY} r={RADIUS} fill="none" stroke="rgba(248,242,228,0.07)" strokeWidth="13" />
-              {/* Clock ticks — drawn BEFORE the arcs so arcs sit on top */}
+              <circle cx={CX} cy={CY} r={RADIUS} fill="none" stroke="rgba(248,242,228,0.07)" strokeWidth="12" />
+
+              {/* Daytime band — subtle golden wash between sunrise and sunset */}
+              {hasDayArc && (
+                <Arc startFrac={sunriseFrac} endFrac={sunsetFrac} color="rgba(217,164,65,0.12)" />
+              )}
+
+              {/* Hour ticks */}
               <ClockTicks />
-              {/* Avoid windows — drawn at -90deg orientation so frac=0 is 12 o'clock */}
-              <g style={{ transform: 'rotate(-90deg)', transformOrigin: `${CX}px ${CY}px` }}>
-                {daySpan && m && (
-                  <>
-                    <Arc startFrac={toFraction(m.gulika_kaal?.start)}     endFrac={toFraction(m.gulika_kaal?.end)}     color="#B84040" />
-                    <Arc startFrac={toFraction(m.yamaganda?.start)}        endFrac={toFraction(m.yamaganda?.end)}        color="#B84040" />
-                    <Arc startFrac={toFraction(m.rahu_kaal?.start)}        endFrac={toFraction(m.rahu_kaal?.end)}        color="#B84040" />
-                    <Arc startFrac={toFraction(m.abhijit_muhurta?.start)} endFrac={toFraction(m.abhijit_muhurta?.end)} color="#5B7A5E" />
-                  </>
-                )}
-                <NowMarker frac={nowFrac} />
-              </g>
+
+              {/* Cardinal time labels */}
+              <CardinalLabels />
+
+              {/* Muhurta arcs */}
+              {m && (
+                <>
+                  <Arc startFrac={minToFrac(parseTimeToMinutes(m.gulika_kaal?.start))}     endFrac={minToFrac(parseTimeToMinutes(m.gulika_kaal?.end))}     color="#B84040" />
+                  <Arc startFrac={minToFrac(parseTimeToMinutes(m.yamaganda?.start))}        endFrac={minToFrac(parseTimeToMinutes(m.yamaganda?.end))}        color="#B84040" />
+                  <Arc startFrac={minToFrac(parseTimeToMinutes(m.rahu_kaal?.start))}        endFrac={minToFrac(parseTimeToMinutes(m.rahu_kaal?.end))}        color="#B84040" />
+                  <Arc startFrac={minToFrac(parseTimeToMinutes(m.abhijit_muhurta?.start))} endFrac={minToFrac(parseTimeToMinutes(m.abhijit_muhurta?.end))} color="#5B7A5E" />
+                </>
+              )}
+
+              {/* Sunrise / Sunset pin markers */}
+              <SunMarker frac={sunriseFrac} emoji="🌅" timeStr={panchang?.sunrise} isTop={true} />
+              <SunMarker frac={sunsetFrac}  emoji="🌇" timeStr={panchang?.sunset}  isTop={false} />
+
+              {/* Now dot — always on ring, always visible */}
+              <NowMarker frac={nowFrac} />
             </svg>
 
-            {/* Score center — tappable for breakdown */}
+            {/* Score center */}
             <button
               onClick={() => setBreakdownOpen(o => !o)}
               className="absolute inset-0 flex flex-col items-center justify-center text-center hover:opacity-90 transition-opacity"
@@ -177,7 +250,7 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
             </button>
           </div>
 
-          {/* Score breakdown (shown on tap) */}
+          {/* Score breakdown */}
           {breakdownOpen && (
             <div className="mt-5 text-[11px] leading-relaxed px-1" style={{ color: 'rgba(248,242,228,0.55)' }}>
               <p className="font-semibold mb-2" style={{ color: 'rgba(248,242,228,0.75)' }}>{t('dial_breakdown_title')}</p>
@@ -196,14 +269,12 @@ export default function HeroDial({ panchang, dayScore, eyebrow, headline, subtex
             </div>
           )}
 
-          {/* Compact legend */}
-          {daySpan && m && (
-            <div className="flex items-center justify-center gap-4 mt-4 text-[10px]" style={{ color: 'rgba(248,242,228,0.4)' }}>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block bg-vermillion" /> {t('dial_avoid_window')}</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block bg-sage" /> {t('dial_favorable_window')}</span>
-              {nowFrac != null && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: '#F0CB80' }} /> {t('dial_now')}</span>}
-            </div>
-          )}
+          {/* Legend */}
+          <div className="flex items-center justify-center gap-4 mt-4 text-[10px]" style={{ color: 'rgba(248,242,228,0.4)' }}>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block bg-vermillion" /> {t('dial_avoid_window')}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block bg-sage" /> {t('dial_favorable_window')}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ background: '#F0CB80' }} /> {t('dial_now')}</span>
+          </div>
         </div>
 
         {/* ── Text column ── */}

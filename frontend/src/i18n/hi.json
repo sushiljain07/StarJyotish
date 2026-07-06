@@ -749,5 +749,19 @@
   "action_h12_verb": "विश्राम करें",
   "action_h12_ctx": "एकांत और चिंतन आज उत्पादक है।",
   "patrika_days_remain": "दिन शेष",
-  "nav_profile": "प्रोफ़ाइल"
+  "nav_profile": "प्रोफ़ाइल",
+  "nav_back": "वापस",
+  "blog_cat_all": "सभी",
+  "blog_cat_basics": "मूल बातें",
+  "blog_cat_planets": "ग्रह",
+  "blog_cat_timing": "समय",
+  "blog_cat_remedies": "उपाय",
+  "career_loading_heading": "आपका करियर चार्ट विश्लेषण हो रहा है…",
+  "career_loading_step1": "D1 जन्म कुंडली गणना हो रही है…",
+  "career_loading_step2": "D10 दशमांश बन रहा है…",
+  "career_loading_step3": "अमात्यकारक जाँच हो रही है…",
+  "career_loading_step4": "करियर योग विश्लेषण हो रहा है…",
+  "career_loading_step5": "AI रिपोर्ट तैयार हो रही है…",
+  "career_report_error_generic": "करियर विश्लेषण विफल। कृपया पुनः प्रयास करें।",
+  "error_something_wrong": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।"
 }

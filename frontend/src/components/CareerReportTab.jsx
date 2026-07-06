@@ -286,7 +286,7 @@ export default function CareerReportTab({ input }) {
   if (status === 'error') return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4">⚠️</div>
-      <p className="text-red-600 font-medium mb-4">{errorMsg}</p>
+      <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
       <button
         onClick={() => setStatus('idle')}
         className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"

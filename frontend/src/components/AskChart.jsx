@@ -104,7 +104,7 @@ export default function AskChart({ input, initialQuestion = null }) {
         </div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
           limitReached
-            ? 'bg-red-50 text-red-500'
+            ? 'bg-vermillion-light text-vermillion'
             : remaining === 1
             ? 'bg-vermillion-light text-vermillion'
             : 'bg-primary-light text-primary-dark'
@@ -145,7 +145,7 @@ export default function AskChart({ input, initialQuestion = null }) {
           </div>
         )}
         {errorMsg && (
-          <div className="text-xs text-red-500 text-center">{errorMsg}</div>
+          <div className="text-xs text-vermillion text-center">{errorMsg}</div>
         )}
         {limitReached && (
           <div className="text-center py-3">

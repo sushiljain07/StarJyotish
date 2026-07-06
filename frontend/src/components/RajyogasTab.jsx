@@ -500,7 +500,7 @@ export default function RajyogasTab({ input }) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="text-3xl">⚠️</div>
-        <p className="text-sm text-red-600">{errorMsg}</p>
+        <p className="text-sm text-vermillion">{errorMsg}</p>
         <button onClick={load} className="text-sm text-primary-dark underline">Try again</button>
       </div>
     )

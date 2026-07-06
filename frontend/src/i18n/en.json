@@ -749,5 +749,19 @@
   "action_h12_verb": "Rest",
   "action_h12_ctx": "intentionally — solitude and reflection are productive today.",
   "patrika_days_remain": "d left",
-  "nav_profile": "Profile"
+  "nav_profile": "Profile",
+  "nav_back": "Back",
+  "blog_cat_all": "All",
+  "blog_cat_basics": "Basics",
+  "blog_cat_planets": "Planets",
+  "blog_cat_timing": "Timing",
+  "blog_cat_remedies": "Remedies",
+  "career_loading_heading": "Analysing your career chart…",
+  "career_loading_step1": "Calculating D1 birth chart…",
+  "career_loading_step2": "Building D10 Dasamsa…",
+  "career_loading_step3": "Checking Amatyakaraka…",
+  "career_loading_step4": "Analysing career yogas…",
+  "career_loading_step5": "Generating AI report…",
+  "career_report_error_generic": "Career analysis failed. Please try again.",
+  "error_something_wrong": "Something went wrong. Please try again."
 }

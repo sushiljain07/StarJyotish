@@ -17,7 +17,14 @@ import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
-const CATEGORIES = ['All', 'Basics', 'Planets', 'Timing', 'Remedies']
+// Category values are the English keys used in article data; labels are i18n.
+const CATEGORIES = [
+  { value: 'All',      key: 'blog_cat_all' },
+  { value: 'Basics',   key: 'blog_cat_basics' },
+  { value: 'Planets',  key: 'blog_cat_planets' },
+  { value: 'Timing',   key: 'blog_cat_timing' },
+  { value: 'Remedies', key: 'blog_cat_remedies' },
+]
 const CATEGORY_COLORS = {
   Basics:   'bg-primary-light text-primary-dark',
   Timing:   'bg-mauve-light text-mauve',
@@ -133,9 +140,9 @@ export default function Blog() {
         {/* Category filter */}
         <Reveal className="flex gap-2 overflow-x-auto pb-1 mb-6 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setCategory(cat)}
-              className={`whitespace-nowrap text-xs px-4 py-2 rounded-lg border transition ${category === cat ? 'bg-primary-dark text-night border-primary-dark font-semibold shadow-sm' : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'}`}>
-              {cat}
+            <button key={cat.value} onClick={() => setCategory(cat.value)}
+              className={`whitespace-nowrap text-xs px-4 py-2 rounded-lg border transition ${category === cat.value ? 'bg-primary-dark text-night border-primary-dark font-semibold shadow-sm' : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'}`}>
+              {t(cat.key)}
             </button>
           ))}
         </Reveal>
@@ -184,7 +191,7 @@ export default function Blog() {
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="Your email"
                 className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
-              <button className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-4 py-2.5 rounded-lg transition sm:whitespace-nowrap">
+              <button className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-4 py-2.5 rounded-full transition sm:whitespace-nowrap">
                 {t('blog_notify_cta')}
               </button>
             </div>

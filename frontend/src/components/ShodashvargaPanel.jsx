@@ -131,7 +131,7 @@ export default function ShodashvargaPanel({ input }) {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">⚠️ {error}</div>
+        <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {error}</div>
       )}
 
       {/* Charts display */}
@@ -165,7 +165,7 @@ export default function ShodashvargaPanel({ input }) {
                   <ChartView data={compareData}
                              title={`${compared?.name} — ${compared?.title}`} />
                   <button onClick={() => { setCompareD(null); setCompareData(null) }}
-                          className="mt-2 text-xs text-ink-muted hover:text-red-500">
+                          className="mt-2 text-xs text-ink-muted hover:text-vermillion">
                     ✕ Close comparison
                   </button>
                 </div>

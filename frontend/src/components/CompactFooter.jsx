@@ -11,6 +11,9 @@
 // no new pages, no new copy. `sticky` is intentionally not used: this
 // sits at the natural end of the page's content, the same way Footer.jsx
 // does, rather than pinned to the viewport.
+//
+// Previously had `hidden md:block` which made the footer invisible on
+// mobile — fix: always visible, wraps naturally on small screens.
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -29,7 +32,7 @@ export default function CompactFooter() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="hidden md:block border-t border-white/10 bg-night">
+    <footer className="border-t border-white/10 bg-night">
       <div className="max-w-4xl mx-auto px-4 py-5">
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map(link => (

@@ -60,6 +60,16 @@ export default function Login() {
     >
       <Seo title={t('login_title')} description={t('login_seo_description')} path="/login" noindex />
       <CelestialBackdrop className="text-primary opacity-30 absolute inset-0" />
+      {/* Visible back affordance — the click-outside-to-dismiss pattern is
+          undiscoverable on mobile. A small top-left link makes the escape
+          obvious without breaking the focused card layout. */}
+      <button
+        onClick={e => { e.stopPropagation(); goBackOrHome() }}
+        className="absolute top-4 left-4 text-ink-onnight/60 hover:text-primary text-xs font-medium flex items-center gap-1 transition z-10"
+        aria-label={t('nav_back', '← Back')}
+      >
+        ← {t('nav_back', 'Back')}
+      </button>
 
       <div
         className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8"

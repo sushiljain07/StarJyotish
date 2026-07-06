@@ -1,8 +1,10 @@
 // frontend/src/pages/AstrologerDashboard.jsx
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
+import CompactFooter from '../components/CompactFooter'
 import {
   astrologerGetProfile,
   astrologerUpdateProfile,
@@ -310,9 +312,14 @@ export default function AstrologerDashboard() {
       {/* Header */}
       <div className="bg-night text-primary-light">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <div className="font-serif font-semibold text-lg">🔮 Astrologer Portal</div>
-            <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
+          <div className="flex items-center gap-3">
+            <Link to="/home" className="flex items-center gap-2 shrink-0 opacity-70 hover:opacity-100 transition">
+              <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
+            </Link>
+            <div>
+              <div className="font-serif font-semibold text-lg">🔮 Astrologer Portal</div>
+              <div className="text-xs text-ink-onnight">{user?.name || user?.phone_number}</div>
+            </div>
           </div>
           <AccountMenu />
         </div>
@@ -334,6 +341,7 @@ export default function AstrologerDashboard() {
         {tab === 'bookings' && <BookingsTab token={accessToken} />}
         {tab === 'profile'  && <ProfileTab  token={accessToken} />}
       </div>
+      <CompactFooter />
     </div>
   )
 }

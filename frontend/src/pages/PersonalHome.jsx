@@ -13,17 +13,20 @@ import Reveal from '../components/Reveal'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
+import { useDailyEditor } from '../hooks/useDailyEditor'
 import { useChartExtras } from '../hooks/useChartExtras'
 import ProfileSelector from '../components/home/ProfileSelector'
 import LocationBar from '../components/home/LocationBar'
 import TabsBar from '../components/home/TabsBar'
-import HeroDial from '../components/home/HeroDial'
+import DailyPatrikaHero from '../components/home/DailyPatrikaHero'
+import ReflectionLoop from '../components/home/ReflectionLoop'
 import DoAvoidCards from '../components/home/DoAvoidCards'
 import LifeAreaGrid from '../components/home/LifeAreaGrid'
 import ChartSpotlight from '../components/home/ChartSpotlight'
 import ComingUpStrip from '../components/home/ComingUpStrip'
 import DailyPanchang from '../components/home/DailyPanchang'
 import DailyTimeline from '../components/home/DailyTimeline'
+import SkyRhythm from '../components/home/SkyRhythm'
 import GoDeeperCta from '../components/home/GoDeeperCta'
 import ReportsStrip from '../components/home/ReportsStrip'
 import JournalPrompt from '../components/home/JournalPrompt'
@@ -62,6 +65,8 @@ export default function PersonalHome() {
   const { location, status: locationStatus, retryGeolocation, setManualLocation } = useCurrentLocation()
   const panchang = usePanchang(location)
   const { transit, outlook } = useChartExtras(profile)
+  const editorLang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const { edition } = useDailyEditor(profile, panchang.data, editorLang)
 
   const [activeTab, setActiveTab] = useState('today')
   const sectionRefs = useRef({})
@@ -96,7 +101,6 @@ export default function PersonalHome() {
   }
 
   const loading = !profilesLoaded && !profile
-  const locale = i18n.language?.startsWith('hi') ? 'hi-IN' : 'en-GB'
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -122,19 +126,6 @@ export default function PersonalHome() {
         const lifeAreas    = transitPlanets ? computeLifeAreas(chart, transitPlanets, t)              : null
         const spotlight    = transitPlanets ? computeSpotlight(chart, transitPlanets, t)              : null
         const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
-
-        const heroHeadline = spotlight?.moonSpotlight?.text ?? t('home_reading_loading')
-        const heroChips = [
-          `🌙 ${withHindiSign(moon?.sign ?? '')} → ${t('home_bhava_chip', { house: spotlight?.moonSpotlight?.house ?? '—' })}`,
-          `🪐 ${withHindiPlanet(md.planet)}${ad ? ` / ${withHindiPlanet(ad.planet)}` : ''}`,
-          panchang.data?.muhurtas?.rahu_kaal?.start
-            ? `⏳ ${t('panchang_rahu_kaal')} ${panchang.data.muhurtas.rahu_kaal.start}–${panchang.data.muhurtas.rahu_kaal.end}`
-            : null,
-        ].filter(Boolean)
-
-        const recalcNote = location
-          ? t('dial_recalc_note', { city: location.label ?? t('location_currently_in') })
-          : t('dial_set_city_note')
 
         return (
           <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-16 space-y-7">
@@ -202,15 +193,17 @@ export default function PersonalHome() {
             {/* TODAY */}
             <div ref={el => (sectionRefs.current.today = el)} id={SECTION_IDS.today} className="space-y-7 scroll-mt-32">
               <Reveal delay={0}>
-                <HeroDial
-                  panchang={panchang.data}
+                <DailyPatrikaHero
+                  firstName={profile.label?.split(' ')[0]}
+                  edition={edition}
                   dayScore={dayScore}
-                  eyebrow={`${t('tab_today')} · ${new Date().toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}`}
-                  headline={heroHeadline}
-                  subtext={spotlight?.dashaSpotlight?.text}
-                  chips={heroChips}
-                  recalcNote={recalcNote}
+                  panchang={panchang.data}
+                  chapterLabelFn={withHindiPlanet}
                 />
+              </Reveal>
+
+              <Reveal delay={10}>
+                <ReflectionLoop profile={profile} lang={editorLang} />
               </Reveal>
 
               {doAvoid && (
@@ -225,11 +218,15 @@ export default function PersonalHome() {
                     {t('home_today_panchang')}
                     {location?.label && <span className="text-xs font-sans font-medium text-ink-faint ml-2">{location.label}</span>}
                   </h2>
-                  {/* Interactive timeline list — shows all muhurta windows as
-                      tap-to-expand rows with do/avoid guidance and a "next good
-                      window" hint when currently in an avoid period. This is the
-                      most actionable view of the same data as the Panchang grid. */}
-                  <DailyTimeline panchang={panchang.data} />
+                  {/* The day as a horizontal band — sun arc with live position,
+                      moon rise/set, muhurta windows on the time axis, now needle.
+                      The glanceable view; DailyTimeline below is the actionable one. */}
+                  <SkyRhythm panchang={panchang.data} />
+                  {/* Interactive timeline list — tap-to-expand muhurta rows with
+                      do/avoid guidance and a "next good window" hint. */}
+                  <div className="mt-4">
+                    <DailyTimeline panchang={panchang.data} />
+                  </div>
                   {/* Panchang detail grid for Tithi / Nakshatra / Yoga / Karana /
                       rise-set times — complementary, not a duplicate: one is
                       time-action guidance, the other is the classical Panchang facts. */}

@@ -1,75 +1,182 @@
-// frontend/src/components/home/DailyPatrikaHero.jsx
+// frontend/src/components/home/DailyPatrikaHero.jsx  —  Sprint 2
 //
-// "Today's Patrika" — replaces HeroDial as the page's opening moment.
-// Design intent (docs/vision/PRODUCT_HOME.md applies):
+// Three design decisions that changed from Sprint 1:
 //
-//   The hero is a *front page*, not a dashboard. One editorial headline
-//   chosen by the backend's daily_editor engine (the most interesting
-//   astronomical event for THIS chart TODAY), spoken to the person by
-//   name with a time-of-day salutation — the page starts a conversation
-//   instead of printing a profile label.
+// 1. COSMIC RING replaces the filled bar.
+//    A bar says "how much." A ring says "wholeness / energy."
+//    The Activity ring is the most recognized health UI ever built —
+//    not because it's novel but because a circle completing itself is
+//    emotionally satisfying in a way a rectangle filling is not.
+//    The ring color shifts with tone: gold (opportunity), sage (steady),
+//    vermillion (caution) — one glance, no reading required.
 //
-//   The anticipation layer (countdown cards) and the chapter bar (dasha
-//   as an unfolding season of life) are what make tomorrow's page
-//   different from today's — they are the return mechanic.
+// 2. ONE ACTION TODAY is the centerpiece below the headline.
+//    One verb. One sentence. Tappable to ask Jyoti why.
+//    The page's single primary CTA — not best window, not score,
+//    not rarity chip. Everything else is secondary.
 //
-//   Signature visual: a slowly drifting star field inside the night card.
-//   Pure CSS, ~2KB, honors prefers-reduced-motion. Everything else stays
-//   quiet so this one element carries the atmosphere.
-//
-// The day score survives as a small tappable chip, not the centerpiece —
-// "5.6/10" is a statistic; "the pressure lifts at 2:14 PM" is a story.
-import { useMemo, useState } from 'react'
+// 3. UNIFIED VISUAL LANGUAGE — the hero is still dark/immersive but
+//    the anticipation strip below it uses the same night surface instead
+//    of switching to parchment cards. One material, not two.
+
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-// Deterministic pseudo-random star positions — stable across re-renders
-// (seeded by index, not Math.random) so the sky doesn't jump on state
-// changes. 26 stars, three sizes, two drift speeds.
-const STARS = Array.from({ length: 26 }, (_, i) => {
+// ── Deterministic star field ─────────────────────────────────────────────────
+const STARS = Array.from({ length: 22 }, (_, i) => {
   const h = (i * 2654435761) % 1000
   return {
-    left: (h % 100),
-    top: ((h >> 3) % 90) + 5,
-    size: i % 7 === 0 ? 2.5 : i % 3 === 0 ? 1.8 : 1.2,
-    dur: 4 + (i % 5) * 1.7,
-    delay: (i % 9) * 0.6,
+    left: h % 100,
+    top: ((h >> 3) % 85) + 5,
+    size: i % 7 === 0 ? 2.2 : i % 3 === 0 ? 1.6 : 1.1,
+    dur: 4 + (i % 5) * 1.8,
+    delay: (i % 9) * 0.7,
   }
 })
 
+// ── Cosmic Ring SVG ──────────────────────────────────────────────────────────
+const RING_COLORS = {
+  opportunity: { track: 'rgba(240,203,128,0.12)', fill: 'url(#ringGold)',   glyph: 'rgba(240,203,128,0.9)' },
+  steady:      { track: 'rgba(91,122,94,0.18)',   fill: 'url(#ringSage)',   glyph: 'rgba(159,199,162,0.9)' },
+  caution:     { track: 'rgba(162,59,59,0.18)',   fill: 'url(#ringVerm)',   glyph: 'rgba(224,144,144,0.9)' },
+}
+
+const PLANET_GLYPHS = {
+  Sun:'☉', Moon:'☽', Mercury:'☿', Venus:'♀', Mars:'♂',
+  Jupiter:'♃', Saturn:'♄', Rahu:'☊', Ketu:'☋',
+}
+
+function CosmicRing({ score, tone, mdPlanet, label }) {
+  const R = 52, cx = 60, cy = 60, lw = 7
+  const circ = 2 * Math.PI * R
+  const filled = score != null ? (score / 10) * circ : 0
+  const colors = RING_COLORS[tone] || RING_COLORS.steady
+  const glyph = PLANET_GLYPHS[mdPlanet] || '✦'
+
+  return (
+    <div style={{ width: 120, height: 120, flexShrink: 0, position: 'relative' }}>
+      <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#D9A441"/>
+            <stop offset="100%" stopColor="#F0CB80"/>
+          </linearGradient>
+          <linearGradient id="ringSage" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#5B7A5E"/>
+            <stop offset="100%" stopColor="#9FC7A2"/>
+          </linearGradient>
+          <linearGradient id="ringVerm" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#A23B3B"/>
+            <stop offset="100%" stopColor="#E09090"/>
+          </linearGradient>
+        </defs>
+        {/* Track */}
+        <circle cx={cx} cy={cy} r={R} fill="none"
+                stroke={colors.track} strokeWidth={lw} />
+        {/* Filled arc — starts at top (-90°) */}
+        {score != null && (
+          <circle cx={cx} cy={cy} r={R} fill="none"
+                  stroke={colors.fill} strokeWidth={lw}
+                  strokeLinecap="round"
+                  strokeDasharray={`${filled} ${circ - filled}`}
+                  strokeDashoffset={circ / 4}
+                  className="sj-ring-fill" />
+        )}
+        {/* Score number */}
+        <text x={cx} y={cy - 6} textAnchor="middle" dominantBaseline="middle"
+              fontSize="20" fontWeight="700" fill="rgba(248,242,228,0.95)"
+              fontFamily="Georgia,serif">
+          {score ?? '—'}
+        </text>
+        {/* Label below score */}
+        <text x={cx} y={cy + 14} textAnchor="middle"
+              fontSize="8.5" fontWeight="600" fill="rgba(248,242,228,0.45)"
+              fontFamily="system-ui,sans-serif" letterSpacing="0.8">
+          {label?.toUpperCase() ?? ''}
+        </text>
+        {/* Planet glyph — tiny, bottom of ring */}
+        <text x={cx} y={cy + R - 4} textAnchor="middle"
+              fontSize="10" fill={colors.glyph} fontFamily="Georgia,serif">
+          {glyph}
+        </text>
+      </svg>
+      <style>{`
+        .sj-ring-fill {
+          animation: sj-ring 1.2s cubic-bezier(0.2,0.8,0.3,1) both;
+        }
+        @keyframes sj-ring {
+          from { stroke-dasharray: 0 ${2 * Math.PI * R}; }
+        }
+        @media (prefers-reduced-motion: reduce) { .sj-ring-fill { animation: none; } }
+      `}</style>
+    </div>
+  )
+}
+
+// ── One Action Today ─────────────────────────────────────────────────────────
+function OneAction({ action }) {
+  const { t } = useTranslation()
+  if (!action) return null
+
+  const toneStyle = {
+    opportunity: { bg: 'rgba(91,122,94,0.22)', border: 'rgba(91,122,94,0.45)', accent: '#9FC7A2' },
+    steady:      { bg: 'rgba(217,164,65,0.12)', border: 'rgba(217,164,65,0.3)', accent: '#F0CB80' },
+    caution:     { bg: 'rgba(184,64,64,0.16)', border: 'rgba(184,64,64,0.35)', accent: '#E09090' },
+  }[action.tone] || {}
+
+  function openJyoti() {
+    window.dispatchEvent(new CustomEvent('sj:open-jyoti', {
+      detail: { prefill: t('action_jyoti_prefill', { verb: action.verb, context: action.context }) }
+    }))
+  }
+
+  return (
+    <div className="sj-fade-up" style={{ animationDelay: '100ms' }}>
+      <p className="text-[10px] uppercase tracking-widest font-bold mb-2"
+         style={{ color: 'rgba(248,242,228,0.4)' }}>
+        {t('action_eyebrow')}
+      </p>
+      <div className="rounded-2xl px-4 py-3.5 flex items-center gap-3"
+           style={{ background: toneStyle.bg, border: `0.5px solid ${toneStyle.border}` }}>
+        <div className="flex-1 min-w-0">
+          <p className="font-serif font-semibold leading-snug"
+             style={{ fontSize: 'clamp(15px,1.8vw,17px)', color: 'rgba(248,242,228,0.95)' }}>
+            <span style={{ color: toneStyle.accent }}>{action.verb}</span>{' '}
+            {action.context}
+          </p>
+          <p className="text-[11px] mt-1" style={{ color: 'rgba(248,242,228,0.45)' }}>
+            {action.why}
+          </p>
+        </div>
+        <button
+          onClick={openJyoti}
+          className="shrink-0 text-[11px] font-bold rounded-full px-3 py-1.5 transition"
+          style={{ background: 'rgba(248,242,228,0.08)', color: toneStyle.accent,
+                   border: `0.5px solid ${toneStyle.border}` }}
+          aria-label={t('action_why_aria')}
+        >
+          {t('action_why_btn')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Greeting ─────────────────────────────────────────────────────────────────
 function greetingKey() {
   const h = new Date().getHours()
-  if (h < 5) return 'patrika_greeting_night'
+  if (h < 5)  return 'patrika_greeting_night'
   if (h < 12) return 'patrika_greeting_morning'
   if (h < 17) return 'patrika_greeting_afternoon'
   if (h < 21) return 'patrika_greeting_evening'
   return 'patrika_greeting_night'
 }
 
-function greetingEmoji() {
-  const h = new Date().getHours()
-  if (h < 5) return '🌙'
-  if (h < 12) return '🌅'
-  if (h < 17) return '☀️'
-  if (h < 21) return '🌇'
-  return '🌙'
-}
-
-function Stars({ score }) {
-  const full = Math.round(score / 2)
-  return (
-    <span className="inline-flex gap-0.5 ml-1.5 align-middle">
-      {[1, 2, 3, 4, 5].map(i => (
-        <span key={i} style={{ fontSize: '10px', color: i <= full ? '#D9A441' : 'rgba(248,242,228,0.2)' }}>★</span>
-      ))}
-    </span>
-  )
-}
-
+// ── Main component ────────────────────────────────────────────────────────────
 export default function DailyPatrikaHero({
-  firstName, edition, dayScore, panchang, chapterLabelFn,
+  firstName, edition, dayScore, chapterLabelFn, oneAction,
 }) {
   const { t, i18n } = useTranslation()
-  const [scoreOpen, setScoreOpen] = useState(false)
 
   const locale = i18n.language?.startsWith('hi') ? 'hi-IN' : 'en-GB'
   const dateStr = useMemo(
@@ -77,216 +184,160 @@ export default function DailyPatrikaHero({
     [locale],
   )
 
-  const abhijit = panchang?.muhurtas?.abhijit_muhurta
-  const rahu = panchang?.muhurtas?.rahu_kaal
   const chapter = edition?.chapter
+  const mdPlanet = chapter?.md
+  const tone = dayScore?.score >= 7 ? 'opportunity' : dayScore?.score >= 4.5 ? 'steady' : 'caution'
 
   return (
     <div>
-      {/* ── Night card: greeting + headline ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-night-light to-night px-7 py-8 sm:px-9 sm:py-9">
+      {/* ── Night card ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-primary/20"
+           style={{ background: 'linear-gradient(135deg, #1e2247 0%, #171B33 60%, #0F1226 100%)' }}>
 
-        {/* Drifting star field — the card's living sky */}
+        {/* Star field */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {STARS.map((s, i) => (
-            <span
-              key={i}
-              className="sj-star"
-              style={{
-                left: `${s.left}%`, top: `${s.top}%`,
-                width: s.size, height: s.size,
-                animationDuration: `${s.dur}s`,
-                animationDelay: `${s.delay}s`,
-              }}
-            />
+            <span key={i} className="sj-star" style={{
+              left: `${s.left}%`, top: `${s.top}%`,
+              width: s.size, height: s.size,
+              animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s`,
+            }} />
           ))}
-          <div
-            className="absolute -top-32 -right-24 w-[360px] h-[360px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(217,164,65,0.12), transparent 70%)' }}
-          />
+          <div className="absolute -top-24 -right-20 w-72 h-72 rounded-full pointer-events-none"
+               style={{ background: 'radial-gradient(circle, rgba(217,164,65,0.1), transparent 70%)' }} />
         </div>
 
-        <div className="relative">
-          {/* Greeting line — the page speaks first */}
-          <p className="font-serif text-lg sm:text-xl mb-1" style={{ color: 'rgba(248,242,228,0.92)' }}>
-            {greetingEmoji()} {t(greetingKey(), { name: firstName })}
-          </p>
-          <p className="text-[11px] tracking-widest uppercase font-bold mb-5" style={{ color: '#D9A441' }}>
-            {t('patrika_eyebrow')} · {dateStr}
-            {chapter && (
-              <span className="normal-case tracking-normal font-medium ml-2" style={{ color: 'rgba(248,242,228,0.4)' }}>
-                · {t('patrika_chapter_day', { day: chapter.day, md: chapterLabelFn ? chapterLabelFn(chapter.md) : chapter.md })}
-              </span>
-            )}
-          </p>
+        <div className="relative px-6 py-7 sm:px-8 sm:py-8">
 
-          {/* THE headline — one editorial thought, serif, generous */}
-          {edition?.headline ? (
-            <p
-              className="font-serif leading-relaxed max-w-2xl mb-5 sj-fade-up"
-              style={{ fontSize: 'clamp(18px, 2.4vw, 25px)', color: 'rgba(248,242,228,0.95)' }}
-            >
-              {edition.headline}
-            </p>
-          ) : (
-            <div className="max-w-2xl mb-5 space-y-2.5" aria-hidden="true">
-              <div className="h-5 rounded-full sj-shimmer" style={{ width: '92%' }} />
-              <div className="h-5 rounded-full sj-shimmer" style={{ width: '70%' }} />
+          {/* Row 1: greeting + date */}
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <p className="font-serif text-base sm:text-lg"
+                 style={{ color: 'rgba(248,242,228,0.55)' }}>
+                {t(greetingKey())}
+              </p>
+              <p className="font-serif font-semibold text-2xl sm:text-3xl leading-tight"
+                 style={{ color: 'rgba(248,242,228,0.95)' }}>
+                {firstName}
+              </p>
             </div>
-          )}
-
-          {/* Cosmic Pulse bar */}
-          {dayScore?.score != null && (
-            <button onClick={() => setScoreOpen(o => !o)} className="w-full text-left mb-5 sj-fade-up group" style={{ animationDelay: '80ms' }}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(248,242,228,0.45)' }}>
-                  {t('patrika_cosmic_pulse')}
-                </span>
-                <span className="text-[11px] font-bold" style={{ color: '#F0CB80' }}>
-                  {dayScore.score}/10 <Stars score={dayScore.score} />
-                </span>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,242,228,0.1)' }}>
-                <div className="h-full rounded-full sj-grow-bar" style={{ width: `${dayScore.score * 10}%`, background: 'linear-gradient(90deg, #D9A441, #F0CB80)' }} />
-              </div>
-            </button>
-          )}
-
-          {/* Best Window + Watch rows */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-4 sj-fade-up" style={{ animationDelay: '120ms' }}>
-            {abhijit?.start && (
-              <div className="flex items-center gap-2.5 flex-1 rounded-xl px-3.5 py-2.5"
-                   style={{ background: 'rgba(91,122,94,0.2)', border: '0.5px solid rgba(91,122,94,0.4)' }}>
-                <span>⭐</span>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: '#9FC7A2' }}>{t('patrika_best_window')}</p>
-                  <p className="text-[13px] font-semibold" style={{ color: 'rgba(248,242,228,0.92)' }}>{abhijit.start} – {abhijit.end}</p>
-                </div>
-              </div>
-            )}
-            {rahu?.start && (
-              <div className="flex items-center gap-2.5 flex-1 rounded-xl px-3.5 py-2.5"
-                   style={{ background: 'rgba(184,64,64,0.18)', border: '0.5px solid rgba(184,64,64,0.35)' }}>
-                <span>⚠</span>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: '#E09090' }}>{t('patrika_watch')}</p>
-                  <p className="text-[13px] font-semibold" style={{ color: 'rgba(248,242,228,0.92)' }}>{t('panchang_rahu_kaal')} {rahu.start}–{rahu.end}</p>
-                </div>
-              </div>
-            )}
+            <div className="text-right shrink-0 ml-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider"
+                 style={{ color: '#D9A441' }}>
+                {t('patrika_eyebrow')}
+              </p>
+              <p className="text-[11px]" style={{ color: 'rgba(248,242,228,0.35)' }}>
+                {dateStr}
+              </p>
+              {chapter && (
+                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(248,242,228,0.25)' }}>
+                  {t('patrika_chapter_day', { day: chapter.day, md: chapterLabelFn?.(chapter.md) ?? chapter.md })}
+                </p>
+              )}
+            </div>
           </div>
 
-          {edition?.rarity && (
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(240,203,128,0.12)', color: '#F0CB80' }}>
-                ✦ {t('patrika_rarity', { rarity: edition.rarity })}
-              </span>
-            </div>
-          )}
-
-          {/* Score breakdown — same weights as before, now on demand */}
-          {scoreOpen && (
-            <div className="mt-4 max-w-sm text-[11px] leading-relaxed rounded-xl px-4 py-3 sj-fade-up"
-                 style={{ background: 'rgba(248,242,228,0.05)', color: 'rgba(248,242,228,0.6)' }}>
-              {[
-                { pct: '35%', key: 'dial_breakdown_moon' },
-                { pct: '25%', key: 'dial_breakdown_dasha' },
-                { pct: '20%', key: 'dial_breakdown_dignity' },
-                { pct: '10%', key: 'dial_breakdown_panchang' },
-                { pct: '10%', key: 'dial_breakdown_abhijit' },
-              ].map(row => (
-                <div key={row.key} className="flex justify-between gap-2 py-0.5">
-                  <span>{t(row.key)}</span>
-                  <span className="font-semibold shrink-0" style={{ color: '#F0CB80' }}>{row.pct}</span>
+          {/* Row 2: ring + headline side by side */}
+          <div className="flex items-center gap-5 mb-5">
+            <CosmicRing
+              score={dayScore?.score}
+              tone={tone}
+              mdPlanet={mdPlanet}
+              label={dayScore?.label}
+            />
+            <div className="flex-1 min-w-0">
+              {edition?.headline ? (
+                <p className="font-serif leading-relaxed sj-fade-up"
+                   style={{ fontSize: 'clamp(15px,2vw,20px)', color: 'rgba(248,242,228,0.95)' }}>
+                  {edition.headline}
+                </p>
+              ) : (
+                <div className="space-y-2" aria-hidden="true">
+                  <div className="h-4 rounded-full sj-shimmer" style={{ width: '95%' }} />
+                  <div className="h-4 rounded-full sj-shimmer" style={{ width: '75%' }} />
+                  <div className="h-4 rounded-full sj-shimmer" style={{ width: '55%' }} />
                 </div>
-              ))}
+              )}
+            </div>
+          </div>
+
+          {/* Row 3: One Action Today — THE primary CTA */}
+          <OneAction action={oneAction} />
+
+          {/* Row 4: chapter progress — subtle, below the fold of attention */}
+          {chapter && (
+            <div className="mt-4 sj-fade-up" style={{ animationDelay: '200ms' }}>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[10px] uppercase tracking-widest font-bold"
+                   style={{ color: 'rgba(248,242,228,0.3)' }}>
+                  {chapterLabelFn?.(chapter.md) ?? chapter.md}
+                  {chapter.ad ? ` · ${chapterLabelFn?.(chapter.ad) ?? chapter.ad}` : ''}
+                  {' '}{t('patrika_chapter_label').toLowerCase()}
+                </p>
+                <p className="text-[10px]" style={{ color: 'rgba(248,242,228,0.25)' }}>
+                  {chapter.pct}% · {chapter.days_remaining}{t('patrika_days_remain')}
+                </p>
+              </div>
+              <div className="h-0.5 rounded-full overflow-hidden"
+                   style={{ background: 'rgba(248,242,228,0.08)' }}>
+                <div className="h-full rounded-full sj-grow-bar"
+                     style={{ width: `${chapter.pct}%`, background: 'rgba(217,164,65,0.5)' }} />
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Anticipation strip: countdowns + chapter progress ── */}
-      {(edition?.countdowns?.length > 0 || chapter) && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3">
-          {(edition?.countdowns ?? []).slice(0, 3).map((c, i) => (
-            <div
-              key={`${c.planet}-${c.house}`}
-              className="bg-parchment-card border border-line rounded-2xl px-4 py-3.5 sj-fade-up"
-              style={{ animationDelay: `${i * 90}ms` }}
-            >
-              <p className="text-[10px] uppercase tracking-wider font-bold text-primary-dark mb-1">
+      {/* ── Anticipation strip — same night surface, not parchment ── */}
+      {edition?.countdowns?.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+          {edition.countdowns.slice(0, 3).map((c, i) => (
+            <div key={`${c.planet}-${c.house}`}
+                 className="rounded-2xl px-4 py-3 sj-fade-up"
+                 style={{
+                   background: 'rgba(23,27,51,0.7)',
+                   border: '0.5px solid rgba(248,242,228,0.08)',
+                   animationDelay: `${250 + i * 80}ms`,
+                 }}>
+              <p className="text-[10px] uppercase tracking-wider font-bold mb-0.5"
+                 style={{ color: '#D9A441' }}>
                 {t('patrika_in_days', { count: c.days })}
               </p>
-              <p className="text-[13px] font-semibold text-ink leading-snug">
-                {chapterLabelFn ? chapterLabelFn(c.planet) : c.planet} → {t('patrika_house_n', { house: c.house })}
+              <p className="text-[12px] font-semibold leading-snug"
+                 style={{ color: 'rgba(248,242,228,0.8)' }}>
+                {chapterLabelFn?.(c.planet) ?? c.planet} → {t('patrika_house_n', { house: c.house })}
               </p>
-              <p className="text-[11px] text-ink-muted mt-0.5 leading-snug">{c.theme}</p>
+              <p className="text-[10px] mt-0.5 leading-snug"
+                 style={{ color: 'rgba(248,242,228,0.35)' }}>
+                {c.theme}
+              </p>
             </div>
           ))}
-          {chapter && (
-            <div
-              className="bg-parchment-card border border-line rounded-2xl px-4 py-3.5 sj-fade-up"
-              style={{ animationDelay: '270ms' }}
-            >
-              <p className="text-[10px] uppercase tracking-wider font-bold text-primary-dark mb-1">
-                {t('patrika_chapter_label')}
-              </p>
-              <p className="text-[13px] font-semibold text-ink leading-snug">
-                {chapterLabelFn ? chapterLabelFn(chapter.md) : chapter.md}
-                {chapter.ad ? ` · ${chapterLabelFn ? chapterLabelFn(chapter.ad) : chapter.ad}` : ''}
-              </p>
-              <div className="mt-2 h-1.5 rounded-full bg-line overflow-hidden">
-                <div
-                  className="h-full rounded-full sj-grow-bar"
-                  style={{ width: `${chapter.pct}%`, background: 'linear-gradient(90deg, #D9A441, #F0CB80)' }}
-                />
-              </div>
-              <p className="text-[10px] text-ink-faint mt-1.5">
-                {t('patrika_chapter_progress', { pct: chapter.pct, days: chapter.days_remaining })}
-              </p>
-            </div>
-          )}
         </div>
       )}
 
-      {/* Component-scoped animation styles */}
       <style>{`
         .sj-star {
-          position: absolute;
-          border-radius: 9999px;
-          background: rgba(240, 203, 128, 0.85);
+          position: absolute; border-radius: 9999px;
+          background: rgba(240,203,128,0.8);
           animation: sj-twinkle linear infinite;
         }
         @keyframes sj-twinkle {
-          0%, 100% { opacity: 0.15; transform: translateY(0); }
-          50% { opacity: 0.9; transform: translateY(-3px); }
+          0%,100% { opacity:0.12; transform:translateY(0); }
+          50%      { opacity:0.85; transform:translateY(-2px); }
         }
-        .sj-fade-up {
-          animation: sj-fade-up 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-        }
-        @keyframes sj-fade-up {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        .sj-fade-up { animation: sj-fadeup 0.5s cubic-bezier(0.2,0.7,0.3,1) both; }
+        @keyframes sj-fadeup { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .sj-shimmer {
-          background: linear-gradient(90deg, rgba(248,242,228,0.06) 25%, rgba(248,242,228,0.14) 50%, rgba(248,242,228,0.06) 75%);
+          background: linear-gradient(90deg,rgba(248,242,228,0.05) 25%,rgba(248,242,228,0.12) 50%,rgba(248,242,228,0.05) 75%);
           background-size: 200% 100%;
           animation: sj-shimmer 1.6s ease-in-out infinite;
         }
-        @keyframes sj-shimmer {
-          from { background-position: 200% 0; }
-          to { background-position: -200% 0; }
-        }
-        .sj-grow-bar {
-          animation: sj-grow 1s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-          transform-origin: left;
-        }
-        @keyframes sj-grow {
-          from { transform: scaleX(0); }
-          to { transform: scaleX(1); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .sj-star, .sj-fade-up, .sj-shimmer, .sj-grow-bar { animation: none !important; }
+        @keyframes sj-shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+        .sj-grow-bar { animation: sj-grow 1s cubic-bezier(0.2,0.8,0.3,1) both; transform-origin:left; }
+        @keyframes sj-grow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        @media (prefers-reduced-motion:reduce) {
+          .sj-star,.sj-fade-up,.sj-shimmer,.sj-grow-bar,.sj-ring-fill { animation:none!important; }
         }
       `}</style>
     </div>

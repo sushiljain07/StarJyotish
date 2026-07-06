@@ -30,7 +30,8 @@ import BlogArticle from './pages/BlogArticle'
 import TestimonialsPage from './pages/TestimonialsPage'
 import Learn from './pages/Learn'
 import ZodiacGuide from './pages/learn/Zodiac'
-import AriesGuide from './pages/learn/zodiac/Aries'
+import AriesGuide  from './pages/learn/zodiac/Aries'
+import TaurusGuide from './pages/learn/zodiac/Taurus'
 
 export default function App() {
   return (
@@ -62,7 +63,8 @@ export default function App() {
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/zodiac" element={<ZodiacGuide />} />
-          <Route path="/learn/zodiac/aries" element={<AriesGuide />} />
+          <Route path="/learn/zodiac/aries"  element={<AriesGuide />} />
+          <Route path="/learn/zodiac/taurus" element={<TaurusGuide />} />
           {/* Must stay last: React Router matches routes in declaration
               order, so anything above this always wins first. */}
           <Route path="*" element={<NotFound />} />

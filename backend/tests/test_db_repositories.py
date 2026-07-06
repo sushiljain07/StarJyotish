@@ -41,7 +41,11 @@ def db():
     session = SessionLocal()
     yield session
     session.close()
-    Base.metadata.drop_all(engine)
+    # Tables were created by alembic upgrade head in CI — do not drop them here.
+    # Calling drop_all wipes the schema for every test file that runs afterward
+    # (pytest collects alphabetically, so test_feedback.py comes after this file)
+    # causing "relation does not exist" failures in those tests.
+    # Base.metadata.drop_all(engine)
 
 
 def _unique_phone() -> str:

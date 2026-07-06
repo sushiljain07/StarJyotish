@@ -54,7 +54,12 @@ export function requestBrowserLocation() {
       return
     }
     navigator.geolocation.getCurrentPosition(
-      pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+      pos => resolve({
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        // Derive timezone from the browser — always correct, no round-trip needed.
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
       err => reject(err),
       { timeout: 10000, maximumAge: STALE_AFTER_MS }
     )

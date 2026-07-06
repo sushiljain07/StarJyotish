@@ -694,5 +694,11 @@
   "panchang_expand": "पूर्ण पंचांग",
   "capsule_eyebrow": "आज का ज्ञान",
   "capsule_read_time": "{{mins}} मिनट पढ़ें",
-  "capsule_cta": "आगे पढ़ें"
+  "capsule_cta": "आगे पढ़ें",
+  "nav_today": "आज",
+  "nav_learn": "सीखें",
+  "nav_library": "लाइब्रेरी",
+  "nav_ask": "पूछें",
+  "nav_me": "मैं",
+  "nav_bottom_aria": "मुख्य नेविगेशन"
 }

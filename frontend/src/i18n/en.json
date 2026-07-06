@@ -694,5 +694,11 @@
   "panchang_expand": "Full Panchang",
   "capsule_eyebrow": "Today's learning",
   "capsule_read_time": "{{mins}} min read",
-  "capsule_cta": "Continue"
+  "capsule_cta": "Continue",
+  "nav_today": "Today",
+  "nav_learn": "Learn",
+  "nav_library": "Library",
+  "nav_ask": "Ask",
+  "nav_me": "Me",
+  "nav_bottom_aria": "Main navigation"
 }

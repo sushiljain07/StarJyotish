@@ -135,34 +135,54 @@ export default function DailyPatrikaHero({
             </div>
           )}
 
-          {/* Chips: windows + rarity + score */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Cosmic Pulse bar */}
+          {dayScore?.score != null && (
+            <button onClick={() => setScoreOpen(o => !o)} className="w-full text-left mb-5 sj-fade-up group" style={{ animationDelay: '80ms' }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(248,242,228,0.45)' }}>
+                  {t('patrika_cosmic_pulse')}
+                </span>
+                <span className="text-[11px] font-bold" style={{ color: '#F0CB80' }}>
+                  {dayScore.score}/10 <Stars score={dayScore.score} />
+                </span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(248,242,228,0.1)' }}>
+                <div className="h-full rounded-full sj-grow-bar" style={{ width: `${dayScore.score * 10}%`, background: 'linear-gradient(90deg, #D9A441, #F0CB80)' }} />
+              </div>
+            </button>
+          )}
+
+          {/* Best Window + Watch rows */}
+          <div className="flex flex-col sm:flex-row gap-2 mb-4 sj-fade-up" style={{ animationDelay: '120ms' }}>
             {abhijit?.start && (
-              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(91,122,94,0.25)', color: '#9FC7A2' }}>
-                ✓ {t('patrika_best_window')} {abhijit.start}–{abhijit.end}
-              </span>
+              <div className="flex items-center gap-2.5 flex-1 rounded-xl px-3.5 py-2.5"
+                   style={{ background: 'rgba(91,122,94,0.2)', border: '0.5px solid rgba(91,122,94,0.4)' }}>
+                <span>⭐</span>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: '#9FC7A2' }}>{t('patrika_best_window')}</p>
+                  <p className="text-[13px] font-semibold" style={{ color: 'rgba(248,242,228,0.92)' }}>{abhijit.start} – {abhijit.end}</p>
+                </div>
+              </div>
             )}
             {rahu?.start && (
-              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(184,64,64,0.22)', color: '#E09090' }}>
-                ⏳ {t('panchang_rahu_kaal')} {rahu.start}–{rahu.end}
-              </span>
-            )}
-            {edition?.rarity && (
-              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(240,203,128,0.15)', color: '#F0CB80' }}>
-                ✦ {t('patrika_rarity', { rarity: edition.rarity })}
-              </span>
-            )}
-            {dayScore?.score && (
-              <button
-                onClick={() => setScoreOpen(o => !o)}
-                className="text-xs px-3 py-1.5 rounded-full border transition hover:border-primary/50"
-                style={{ borderColor: 'rgba(248,242,228,0.15)', color: 'rgba(248,242,228,0.75)' }}
-              >
-                {t('patrika_day_score')}: <span className="font-semibold" style={{ color: '#F0CB80' }}>{dayScore.score}/10</span>
-                <Stars score={dayScore.score} />
-              </button>
+              <div className="flex items-center gap-2.5 flex-1 rounded-xl px-3.5 py-2.5"
+                   style={{ background: 'rgba(184,64,64,0.18)', border: '0.5px solid rgba(184,64,64,0.35)' }}>
+                <span>⚠</span>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: '#E09090' }}>{t('patrika_watch')}</p>
+                  <p className="text-[13px] font-semibold" style={{ color: 'rgba(248,242,228,0.92)' }}>{t('panchang_rahu_kaal')} {rahu.start}–{rahu.end}</p>
+                </div>
+              </div>
             )}
           </div>
+
+          {edition?.rarity && (
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'rgba(240,203,128,0.12)', color: '#F0CB80' }}>
+                ✦ {t('patrika_rarity', { rarity: edition.rarity })}
+              </span>
+            </div>
+          )}
 
           {/* Score breakdown — same weights as before, now on demand */}
           {scoreOpen && (

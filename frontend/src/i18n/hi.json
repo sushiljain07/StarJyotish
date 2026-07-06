@@ -681,5 +681,18 @@
   "sky_gulika": "गुलिक",
   "sky_abhijit": "अभिजीत",
   "sky_now": "अभी",
-  "panchang_paksha": "पक्ष"
+  "panchang_paksha": "पक्ष",
+  "tab_today_v2": "आज",
+  "tab_guidance": "मार्गदर्शन",
+  "tab_learn": "सीखें",
+  "patrika_cosmic_pulse": "आज की ब्रह्मांडीय ऊर्जा",
+  "patrika_watch": "सावधान रहें",
+  "panchang_sunrise_short": "उदय",
+  "panchang_sunset_short": "अस्त",
+  "panchang_moonrise_short": "उदय",
+  "panchang_moonset_short": "अस्त",
+  "panchang_expand": "पूर्ण पंचांग",
+  "capsule_eyebrow": "आज का ज्ञान",
+  "capsule_read_time": "{{mins}} मिनट पढ़ें",
+  "capsule_cta": "आगे पढ़ें"
 }

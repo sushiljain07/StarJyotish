@@ -24,9 +24,8 @@ import DoAvoidCards from '../components/home/DoAvoidCards'
 import LifeAreaGrid from '../components/home/LifeAreaGrid'
 import ChartSpotlight from '../components/home/ChartSpotlight'
 import ComingUpStrip from '../components/home/ComingUpStrip'
-import DailyPanchang from '../components/home/DailyPanchang'
-import DailyTimeline from '../components/home/DailyTimeline'
-import SkyRhythm from '../components/home/SkyRhythm'
+import QuickPanchangStrip from '../components/home/QuickPanchangStrip'
+import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
 import GoDeeperCta from '../components/home/GoDeeperCta'
 import ReportsStrip from '../components/home/ReportsStrip'
 import JournalPrompt from '../components/home/JournalPrompt'
@@ -190,8 +189,8 @@ export default function PersonalHome() {
               <TabsBar active={activeTab} onChange={scrollToSection} />
             </div>
 
-            {/* TODAY */}
-            <div ref={el => (sectionRefs.current.today = el)} id={SECTION_IDS.today} className="space-y-7 scroll-mt-32">
+            {/* TODAY — PR-001 order: Hero → Panchang → DoAvoid → Knowledge → Reflection */}
+            <div ref={el => (sectionRefs.current.today = el)} id={SECTION_IDS.today} className="space-y-5 scroll-mt-32">
               <Reveal delay={0}>
                 <DailyPatrikaHero
                   firstName={profile.label?.split(' ')[0]}
@@ -203,7 +202,12 @@ export default function PersonalHome() {
               </Reveal>
 
               <Reveal delay={10}>
-                <ReflectionLoop profile={profile} lang={editorLang} />
+                <QuickPanchangStrip
+                  data={panchang.data}
+                  loading={panchang.loading}
+                  location={location}
+                  error={panchang.error}
+                />
               </Reveal>
 
               {doAvoid && (
@@ -212,28 +216,12 @@ export default function PersonalHome() {
                 </Reveal>
               )}
 
+              <Reveal delay={30}>
+                <KnowledgeCapsule edition={edition} />
+              </Reveal>
+
               <Reveal delay={40}>
-                <div>
-                  <h2 className="font-serif font-semibold text-lg text-ink mb-3">
-                    {t('home_today_panchang')}
-                    {location?.label && <span className="text-xs font-sans font-medium text-ink-faint ml-2">{location.label}</span>}
-                  </h2>
-                  {/* The day as a horizontal band — sun arc with live position,
-                      moon rise/set, muhurta windows on the time axis, now needle.
-                      The glanceable view; DailyTimeline below is the actionable one. */}
-                  <SkyRhythm panchang={panchang.data} />
-                  {/* Interactive timeline list — tap-to-expand muhurta rows with
-                      do/avoid guidance and a "next good window" hint. */}
-                  <div className="mt-4">
-                    <DailyTimeline panchang={panchang.data} />
-                  </div>
-                  {/* Panchang detail grid for Tithi / Nakshatra / Yoga / Karana /
-                      rise-set times — complementary, not a duplicate: one is
-                      time-action guidance, the other is the classical Panchang facts. */}
-                  <div className="mt-4">
-                    <DailyPanchang location={location} data={panchang.data} loading={panchang.loading} error={panchang.error} />
-                  </div>
-                </div>
+                <ReflectionLoop profile={profile} lang={editorLang} />
               </Reveal>
             </div>
 

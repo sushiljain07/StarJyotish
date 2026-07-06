@@ -63,6 +63,18 @@ export default function AskPersonaPanel({ userId, input }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  // ReflectionLoop (and any future card) can open this panel with a
+  // pre-filled draft via a window event — keeps the panel decoupled from
+  // its openers without prop-drilling through PersonalHome.
+  useEffect(() => {
+    function onOpen(e) {
+      setOpen(true)
+      if (e.detail?.prefill) setValue(e.detail.prefill)
+    }
+    window.addEventListener('sj:open-jyoti', onOpen)
+    return () => window.removeEventListener('sj:open-jyoti', onOpen)
+  }, [])
+
   const remaining = MAX_QUESTIONS - count
   const limitReached = remaining <= 0
 

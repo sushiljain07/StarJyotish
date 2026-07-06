@@ -18,6 +18,7 @@ import { useChartExtras } from '../hooks/useChartExtras'
 import ProfileSelector from '../components/home/ProfileSelector'
 import LocationBar from '../components/home/LocationBar'
 import TabsBar from '../components/home/TabsBar'
+import BottomNav from '../components/home/BottomNav'
 import DailyPatrikaHero from '../components/home/DailyPatrikaHero'
 import ReflectionLoop from '../components/home/ReflectionLoop'
 import DoAvoidCards from '../components/home/DoAvoidCards'
@@ -127,7 +128,7 @@ export default function PersonalHome() {
         const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
         return (
-          <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-16 space-y-7">
+          <div className="max-w-5xl mx-auto px-4 pt-24 sm:pt-28 pb-28 md:pb-16 space-y-7">
 
             {/* Identity */}
             <div>
@@ -185,7 +186,7 @@ export default function PersonalHome() {
               birthPlace={profile.place}
             />
 
-            <div className="sticky top-[64px] z-20 -mx-4 px-4 py-2.5 bg-parchment/90 backdrop-blur-sm">
+            <div className="hidden md:block sticky top-[64px] z-20 -mx-4 px-4 py-2.5 bg-parchment/90 backdrop-blur-sm">
               <TabsBar active={activeTab} onChange={scrollToSection} />
             </div>
 
@@ -304,6 +305,7 @@ export default function PersonalHome() {
         />
       )}
 
+      <BottomNav />
       <CompactFooter />
     </div>
   )

@@ -1,91 +1,67 @@
-// frontend/src/components/home/SkyRhythm.jsx
-//
-// The day as a horizontal score — replaces the circular-dial idea for
-// showing sunrise/sunset/moonrise/moonset and the muhurta windows.
-//
-// Why horizontal: time reads left-to-right, window lengths become
-// visually comparable, the sun's height maps to its real altitude arc,
-// and the whole thing is glanceable in a second on both mobile and
-// desktop. The band spans 4 AM → midnight (20h) rather than a full 24h,
-// because 12 AM–4 AM is dead space that would compress the interesting
-// daytime hours.
-//
-// Layers, bottom to top:
-//   1. Golden daylight wash between sunrise and sunset
-//   2. The sun's altitude arc (a sine hump over the daylight span) with
-//      the sun disc at its true current position along it
-//   3. Muhurta window blocks on the time axis (red avoid / green Abhijit)
-//   4. Moonrise / moonset markers
-//   5. The "now" needle — a live vertical line, updating each minute
-//
-// All times come as "H:MM AM/PM" strings from /api/panchang (IST-correct
-// after this sprint's timezone work); this component only does geometry.
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const START_H = 4          // band starts 4 AM
-const END_H = 24           // ...ends midnight
+const START_H = 4
+const END_H = 24
 const SPAN_MIN = (END_H - START_H) * 60
-const W = 720              // viewBox width
-const H = 120              // viewBox height
-const BAND_Y = 86          // y of the time axis
-const ARC_PEAK = 26        // sun arc peak height above axis
+const W = 720
+const H = 130
+const BAND_Y = 90
+const ARC_PEAK = 28
 
 function parseMin(str) {
   if (!str) return null
-  const [time, ampm] = str.split(' ')
+  const parts = str.trim().split(' ')
+  if (parts.length < 2) return null
+  const [time, ampm] = parts
   const [h0, m] = time.split(':').map(Number)
   let h = h0
   if (ampm === 'PM' && h !== 12) h += 12
   if (ampm === 'AM' && h === 12) h = 0
-  return h * 60 + m
+  return h * 60 + (m || 0)
 }
 
-function x(min) {
+function tx(min) {
   if (min == null) return null
   const clamped = Math.max(START_H * 60, Math.min(END_H * 60, min))
   return ((clamped - START_H * 60) / SPAN_MIN) * W
 }
 
 function fmtHour(h) {
-  if (h === 12) return '12P'
-  if (h === 24 || h === 0) return '12A'
-  return h < 12 ? `${h}A` : `${h - 12}P`
+  const labels = { 4: '4 AM', 8: '8 AM', 12: '12 PM', 16: '4 PM', 20: '8 PM', 24: '12 AM' }
+  return labels[h] || ''
 }
 
-// Sun altitude arc: sine hump between sunrise and sunset
 function sunArcPath(riseMin, setMin) {
-  const steps = 40
   const pts = []
-  for (let i = 0; i <= steps; i++) {
-    const frac = i / steps
+  for (let i = 0; i <= 50; i++) {
+    const frac = i / 50
     const min = riseMin + frac * (setMin - riseMin)
-    const px = x(min)
     const py = BAND_Y - Math.sin(frac * Math.PI) * ARC_PEAK
-    pts.push(`${i === 0 ? 'M' : 'L'}${px.toFixed(1)},${py.toFixed(1)}`)
+    pts.push(`${i === 0 ? 'M' : 'L'}${tx(min).toFixed(1)},${py.toFixed(1)}`)
   }
   return pts.join(' ')
 }
 
-function sunPosNow(riseMin, setMin, nowMin) {
+function sunPos(riseMin, setMin, nowMin) {
   if (nowMin < riseMin || nowMin > setMin) return null
   const frac = (nowMin - riseMin) / (setMin - riseMin)
   return {
-    x: x(riseMin + frac * (setMin - riseMin)),
+    x: tx(riseMin + frac * (setMin - riseMin)),
     y: BAND_Y - Math.sin(frac * Math.PI) * ARC_PEAK,
   }
 }
 
 function Window({ start, end, color, label }) {
-  const x1 = x(parseMin(start))
-  const x2 = x(parseMin(end))
+  const x1 = tx(parseMin(start))
+  const x2 = tx(parseMin(end))
   if (x1 == null || x2 == null || x2 <= x1) return null
   return (
     <g>
-      <rect x={x1} y={BAND_Y - 7} width={x2 - x1} height={14} rx={4} fill={color} opacity="0.85" />
-      {x2 - x1 > 56 && (
-        <text x={(x1 + x2) / 2} y={BAND_Y + 3.5} textAnchor="middle" fontSize="8"
-              fontWeight="700" fill="#F8F2E4" style={{ letterSpacing: '0.3px' }}>
+      <rect x={x1} y={BAND_Y - 8} width={x2 - x1} height={16} rx={5} fill={color} opacity="0.88" />
+      {x2 - x1 > 60 && (
+        <text x={(x1 + x2) / 2} y={BAND_Y + 4} textAnchor="middle"
+              fontSize="9" fontWeight="700" fill="#fff">
           {label}
         </text>
       )}
@@ -106,131 +82,149 @@ export default function SkyRhythm({ panchang }) {
     return () => clearInterval(id)
   }, [])
 
-  const riseMin = parseMin(panchang?.sunrise)
-  const setMin = parseMin(panchang?.sunset)
+  const riseMin     = parseMin(panchang?.sunrise)
+  const setMin      = parseMin(panchang?.sunset)
   const moonriseMin = parseMin(panchang?.moonrise)
-  const moonsetMin = parseMin(panchang?.moonset)
+  const moonsetMin  = parseMin(panchang?.moonset)
   const m = panchang?.muhurtas
 
   const arcPath = useMemo(
-    () => (riseMin != null && setMin != null ? sunArcPath(riseMin, setMin) : null),
+    () => riseMin != null && setMin != null ? sunArcPath(riseMin, setMin) : null,
     [riseMin, setMin],
   )
-  const sun = riseMin != null && setMin != null ? sunPosNow(riseMin, setMin, nowMin) : null
-  const nowX = x(nowMin)
+
+  const sunOnArc = riseMin != null && setMin != null ? sunPos(riseMin, setMin, nowMin) : null
+  const nowX = tx(nowMin)
+  const isDaytime = riseMin != null && setMin != null && nowMin >= riseMin && nowMin <= setMin
 
   if (!panchang?.sunrise) return null
 
   return (
-    <div className="bg-gradient-to-br from-night-light to-night border border-primary/20 rounded-2xl px-4 pt-4 pb-3 overflow-hidden">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto block" role="img"
-           aria-label={t('sky_rhythm_aria')}>
+    <div style={{ background: '#13183a', borderRadius: 16, padding: '14px 14px 10px', overflow: 'hidden' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}
+           role="img" aria-label={t('sky_rhythm_aria')}>
 
-        {/* Daylight wash */}
         {riseMin != null && setMin != null && (
-          <rect x={x(riseMin)} y={12} width={x(setMin) - x(riseMin)} height={BAND_Y - 12}
-                fill="rgba(217,164,65,0.08)" rx="6" />
+          <rect x={tx(riseMin)} y={18} width={tx(setMin) - tx(riseMin)}
+                height={BAND_Y - 18} fill="rgba(240,203,128,0.07)" rx="6" />
         )}
 
-        {/* Hour ticks + labels every 4 hours */}
-        {Array.from({ length: (END_H - START_H) / 4 + 1 }, (_, i) => START_H + i * 4).map(h => (
-          <g key={h}>
-            <line x1={x(h * 60)} y1={BAND_Y - 4} x2={x(h * 60)} y2={BAND_Y + 4}
-                  stroke="rgba(248,242,228,0.22)" strokeWidth="1" />
-            <text x={x(h * 60)} y={BAND_Y + 17} textAnchor="middle" fontSize="8.5"
-                  fill="rgba(248,242,228,0.35)" fontWeight="600">{fmtHour(h)}</text>
-          </g>
-        ))}
+        {[4, 8, 12, 16, 20, 24].map(h => {
+          const lbl = fmtHour(h)
+          if (!lbl) return null
+          return (
+            <g key={h}>
+              <line x1={tx(h * 60)} y1={BAND_Y - 5} x2={tx(h * 60)} y2={BAND_Y + 5}
+                    stroke="rgba(248,242,228,0.2)" strokeWidth="1" />
+              <text x={tx(h * 60)} y={BAND_Y + 18} textAnchor="middle"
+                    fontSize="9" fill="rgba(248,242,228,0.35)" fontWeight="600">
+                {lbl}
+              </text>
+            </g>
+          )
+        })}
 
-        {/* Time axis */}
-        <line x1={0} y1={BAND_Y} x2={W} y2={BAND_Y} stroke="rgba(248,242,228,0.14)" strokeWidth="1" />
+        <line x1={0} y1={BAND_Y} x2={W} y2={BAND_Y}
+              stroke="rgba(248,242,228,0.12)" strokeWidth="1" />
 
-        {/* Sun altitude arc */}
         {arcPath && (
-          <path d={arcPath} fill="none" stroke="rgba(240,203,128,0.4)" strokeWidth="1.5"
-                strokeDasharray="3 3" />
+          <path d={arcPath} fill="none" stroke="rgba(240,203,128,0.35)"
+                strokeWidth="1.5" strokeDasharray="4 4" />
         )}
 
-        {/* Muhurta windows on the axis */}
         {m && (
           <>
-            <Window start={m.gulika_kaal?.start} end={m.gulika_kaal?.end} color="#B84040" label={t('sky_gulika')} />
-            <Window start={m.yamaganda?.start} end={m.yamaganda?.end} color="#B84040" label={t('sky_yamaganda')} />
-            <Window start={m.rahu_kaal?.start} end={m.rahu_kaal?.end} color="#B84040" label={t('sky_rahu')} />
-            <Window start={m.abhijit_muhurta?.start} end={m.abhijit_muhurta?.end} color="#5B7A5E" label={t('sky_abhijit')} />
+            <Window start={m.rahu_kaal?.start}      end={m.rahu_kaal?.end}      color="#C0392B" label={t('sky_rahu')} />
+            <Window start={m.yamaganda?.start}       end={m.yamaganda?.end}       color="#C0392B" label={t('sky_yamaganda')} />
+            <Window start={m.gulika_kaal?.start}     end={m.gulika_kaal?.end}     color="#C0392B" label={t('sky_gulika')} />
+            <Window start={m.abhijit_muhurta?.start} end={m.abhijit_muhurta?.end} color="#2E7D5E" label={t('sky_abhijit')} />
           </>
         )}
 
-        {/* Sunrise / sunset markers */}
         {riseMin != null && (
           <g>
-            <circle cx={x(riseMin)} cy={BAND_Y} r="3" fill="#D9A441" />
-            <text x={x(riseMin)} y={BAND_Y + 30} textAnchor="middle" fontSize="9"
-                  fill="rgba(248,242,228,0.65)" fontWeight="600">🌅 {panchang.sunrise}</text>
+            <circle cx={tx(riseMin)} cy={BAND_Y} r="4" fill="#F0CB80" />
+            <text x={tx(riseMin)} y={BAND_Y + 32} textAnchor="middle"
+                  fontSize="9" fill="rgba(248,242,228,0.6)" fontWeight="600">
+              {'\u{1F305}'} {panchang.sunrise}
+            </text>
           </g>
         )}
+
         {setMin != null && (
           <g>
-            <circle cx={x(setMin)} cy={BAND_Y} r="3" fill="#D9A441" />
-            <text x={x(setMin)} y={BAND_Y + 30} textAnchor="middle" fontSize="9"
-                  fill="rgba(248,242,228,0.65)" fontWeight="600">🌇 {panchang.sunset}</text>
+            <circle cx={tx(setMin)} cy={BAND_Y} r="4" fill="#F0CB80" />
+            <text x={tx(setMin)} y={BAND_Y + 32} textAnchor="middle"
+                  fontSize="9" fill="rgba(248,242,228,0.6)" fontWeight="600">
+              {'\u{1F307}'} {panchang.sunset}
+            </text>
           </g>
         )}
 
-        {/* Moon rise/set markers above the axis */}
         {moonriseMin != null && (
           <g>
-            <text x={x(moonriseMin)} y={26} textAnchor="middle" fontSize="10">🌔</text>
-            <line x1={x(moonriseMin)} y1={30} x2={x(moonriseMin)} y2={BAND_Y - 8}
-                  stroke="rgba(175,169,236,0.35)" strokeWidth="1" strokeDasharray="2 3" />
-            <text x={x(moonriseMin)} y={40} textAnchor="middle" fontSize="7.5"
-                  fill="rgba(175,169,236,0.8)" fontWeight="600">{panchang.moonrise}</text>
+            <line x1={tx(moonriseMin)} y1={8} x2={tx(moonriseMin)} y2={BAND_Y - 10}
+                  stroke="rgba(175,169,236,0.3)" strokeWidth="1" strokeDasharray="2 3" />
+            <circle cx={tx(moonriseMin)} cy={BAND_Y} r="3" fill="rgba(175,169,236,0.6)" />
+            <text x={tx(moonriseMin)} y={7} textAnchor="middle" fontSize="11" dominantBaseline="auto">
+              {'\u{1F314}'}
+            </text>
+            <text x={tx(moonriseMin)} y={20} textAnchor="middle"
+                  fontSize="8" fill="rgba(175,169,236,0.75)" fontWeight="600">
+              {panchang.moonrise}
+            </text>
           </g>
         )}
+
         {moonsetMin != null && (
           <g>
-            <text x={x(moonsetMin)} y={26} textAnchor="middle" fontSize="10">🌘</text>
-            <line x1={x(moonsetMin)} y1={30} x2={x(moonsetMin)} y2={BAND_Y - 8}
-                  stroke="rgba(175,169,236,0.35)" strokeWidth="1" strokeDasharray="2 3" />
-            <text x={x(moonsetMin)} y={40} textAnchor="middle" fontSize="7.5"
-                  fill="rgba(175,169,236,0.8)" fontWeight="600">{panchang.moonset}</text>
+            <line x1={tx(moonsetMin)} y1={8} x2={tx(moonsetMin)} y2={BAND_Y - 10}
+                  stroke="rgba(175,169,236,0.3)" strokeWidth="1" strokeDasharray="2 3" />
+            <circle cx={tx(moonsetMin)} cy={BAND_Y} r="3" fill="rgba(175,169,236,0.6)" />
+            <text x={tx(moonsetMin)} y={7} textAnchor="middle" fontSize="11" dominantBaseline="auto">
+              {'\u{1F318}'}
+            </text>
+            <text x={tx(moonsetMin)} y={20} textAnchor="middle"
+                  fontSize="8" fill="rgba(175,169,236,0.75)" fontWeight="600">
+              {panchang.moonset}
+            </text>
           </g>
         )}
 
-        {/* The sun, at its true position along the arc right now */}
-        {sun && (
+        {sunOnArc && (
           <g>
-            <circle cx={sun.x} cy={sun.y} r="10" fill="rgba(240,203,128,0.18)" />
-            <circle cx={sun.x} cy={sun.y} r="5.5" fill="#F0CB80" />
+            <circle cx={sunOnArc.x} cy={sunOnArc.y} r="11" fill="rgba(240,203,128,0.15)" />
+            <circle cx={sunOnArc.x} cy={sunOnArc.y} r="6"  fill="#F0CB80" />
           </g>
         )}
 
-        {/* Now needle */}
         {nowX != null && (
           <g>
-            <line x1={nowX} y1={16} x2={nowX} y2={BAND_Y + 6}
-                  stroke="#F0CB80" strokeWidth="1.5" opacity="0.9" />
-            <rect x={nowX - 16} y={2} width={32} height={13} rx={6.5}
-                  fill="#F0CB80" />
-            <text x={nowX} y={11.5} textAnchor="middle" fontSize="8" fontWeight="700"
-                  fill="#131836">{t('sky_now')}</text>
+            <line x1={nowX} y1={14} x2={nowX} y2={BAND_Y + 8}
+                  stroke={isDaytime ? '#F0CB80' : 'rgba(175,169,236,0.8)'}
+                  strokeWidth="1.5" />
+            <rect x={nowX - 18} y={0} width={36} height={14} rx={7}
+                  fill={isDaytime ? '#F0CB80' : 'rgba(175,169,236,0.8)'} />
+            <text x={nowX} y={10} textAnchor="middle" fontSize="8"
+                  fontWeight="700" fill="#13183a">
+              {t('sky_now')}
+            </text>
           </g>
         )}
       </svg>
 
-      {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-1 text-[10px]"
-           style={{ color: 'rgba(248,242,228,0.45)' }}>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-sm inline-block" style={{ background: '#B84040' }} />
+      <div style={{ display:'flex', justifyContent:'center', gap:16, marginTop:4,
+                    fontSize:10, color:'rgba(248,242,228,0.4)' }}>
+        <span style={{ display:'flex', alignItems:'center', gap:5 }}>
+          <span style={{ width:8, height:8, borderRadius:2, background:'#C0392B', display:'inline-block' }} />
           {t('dial_avoid_window')}
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-sm inline-block" style={{ background: '#5B7A5E' }} />
+        <span style={{ display:'flex', alignItems:'center', gap:5 }}>
+          <span style={{ width:8, height:8, borderRadius:2, background:'#2E7D5E', display:'inline-block' }} />
           {t('dial_favorable_window')}
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full inline-block" style={{ background: '#F0CB80' }} />
+        <span style={{ display:'flex', alignItems:'center', gap:5 }}>
+          <span style={{ width:8, height:8, borderRadius:'50%', background:'#F0CB80', display:'inline-block' }} />
           {t('dial_now')}
         </span>
       </div>

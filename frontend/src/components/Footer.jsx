@@ -1,3 +1,4 @@
+import React from 'react'
 // frontend/src/components/Footer.jsx
 //
 // Site-wide footer. Cleaned up in SJ-009:

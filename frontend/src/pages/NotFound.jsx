@@ -34,12 +34,26 @@ export default function NotFound() {
             "The link you followed may be broken, or the page may have moved. Let's get you back on track."
           )}
         </p>
-        <Link
-          to={isAuthenticated ? '/home' : '/'}
-          className="inline-block mt-2 px-5 py-2.5 rounded-full bg-primary-dark text-night text-sm font-semibold hover:opacity-90 transition"
-        >
-          {t('not_found_cta', 'Go to homepage')}
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            to={isAuthenticated ? '/home' : '/'}
+            className="inline-block px-5 py-2.5 rounded-full bg-primary-dark text-night text-sm font-semibold hover:opacity-90 transition"
+          >
+            {t('not_found_cta', 'Go to homepage')}
+          </Link>
+          <Link
+            to="/generate"
+            className="inline-block px-5 py-2.5 rounded-full border border-primary/40 text-primary-dark text-sm font-semibold hover:bg-primary-light transition"
+          >
+            {t('not_found_generate', 'Generate a chart')}
+          </Link>
+          <Link
+            to="/learn"
+            className="inline-block px-5 py-2.5 rounded-full border border-line text-ink-muted text-sm font-semibold hover:bg-parchment-card transition"
+          >
+            {t('not_found_learn', 'Browse Knowledge Center')}
+          </Link>
+        </div>
       </StaticPageLayout>
     </>
   )

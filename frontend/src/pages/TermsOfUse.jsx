@@ -18,6 +18,14 @@ export default function TermsOfUse() {
         path="/terms"
       />
       <StaticPageLayout title="Terms of Use" maxWidth="max-w-3xl">
+        <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
+          <ul className="space-y-1.5 text-sm text-ink">
+            <li>✦ You must be 13+ to use this service. Readings are for personal guidance only.</li>
+            <li>✦ AI-generated content is not a substitute for professional advice — medical, legal, or financial.</li>
+            <li>✦ Free tier is free. Paid features (when live) are clearly labelled. Refunds follow our refund policy.</li>
+          </ul>
+        </div>
         <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
 
         <p>

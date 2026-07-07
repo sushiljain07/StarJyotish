@@ -27,9 +27,10 @@ const LINKS = [
   { to: '/refund-policy', key: 'footer_bottom_refund' },
 ]
 
+const FOOTER_YEAR = new Date().getFullYear()
+
 export default function CompactFooter() {
   const { t } = useTranslation()
-  const year = new Date().getFullYear()
 
   return (
     <footer className="border-t border-white/10 bg-night mb-16 sm:mb-0">
@@ -46,7 +47,7 @@ export default function CompactFooter() {
           ))}
         </nav>
         <p className="text-ink-onnight/40 text-xs text-center mt-3">
-          {t('footer_copyright', { year })}
+          {t('footer_copyright', { year: FOOTER_YEAR })}
         </p>
       </div>
     </footer>

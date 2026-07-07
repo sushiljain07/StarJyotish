@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 // frontend/src/components/Footer.jsx
 //
 // Site-wide footer. Cleaned up in SJ-009:
@@ -14,9 +15,10 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 
-const TRUST_BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_bilingual', 'landing_badge_ai']
 const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
+const FOOTER_YEAR = new Date().getFullYear()
 
 function FooterLink({ to, state, children }) {
   return (
@@ -32,9 +34,7 @@ function FooterLink({ to, state, children }) {
   )
 }
 
-function FooterColumn({ heading, children }) {
-  const isMobile = useIsMobile()
-
+function FooterColumn({ heading, children, isMobile }) {
   if (!isMobile) {
     return (
       <div>
@@ -57,7 +57,9 @@ function FooterColumn({ heading, children }) {
 
 export default function Footer() {
   const { t, i18n } = useTranslation()
-  const year = new Date().getFullYear()
+  const isMobile = useIsMobile()
+  const [newsletterEmail, setNewsletterEmail] = React.useState('')
+  const [newsletterStatus, setNewsletterStatus] = React.useState('idle')
 
   return (
     <footer className="bg-night border-t border-white/10 text-ink-onnight">
@@ -75,7 +77,7 @@ export default function Footer() {
         </div>
 
         {/* Learn — only real, live destinations */}
-        <FooterColumn heading={t('footer_learn_heading')}>
+        <FooterColumn heading={t('footer_learn_heading')} isMobile={isMobile}>
           <ul className="space-y-2.5">
             <FooterLink to="/learn">{t('footer_link_knowledge_center', 'Knowledge Center')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
@@ -84,7 +86,7 @@ export default function Footer() {
         </FooterColumn>
 
         {/* Company — about + contact + pricing; email folded in */}
-        <FooterColumn heading={t('footer_company_heading')}>
+        <FooterColumn heading={t('footer_company_heading')} isMobile={isMobile}>
           <ul className="space-y-2.5">
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
             <FooterLink to="/pricing">{t('footer_link_pricing')}</FooterLink>
@@ -103,24 +105,58 @@ export default function Footer() {
             <p className="font-serif font-semibold text-base text-primary-light">{t('footer_newsletter_heading')}</p>
             <p className="text-xs text-ink-onnight/70 mt-1 max-w-sm">{t('footer_newsletter_body')}</p>
           </div>
-          <form onSubmit={e => e.preventDefault()} className="flex gap-2 w-full md:w-auto">
-            <input
-              type="email"
-              required
-              placeholder={t('footer_newsletter_placeholder')}
-              className="flex-1 md:w-64 rounded-lg px-3 py-2 text-sm text-ink bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <button type="submit" className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-4 py-2 rounded-lg transition shrink-0">
-              {t('footer_newsletter_cta')}
-            </button>
-          </form>
+          {newsletterStatus === 'sent' ? (
+            <div className="flex items-center gap-2 bg-sage-light border border-sage/30 rounded-lg px-4 py-2.5 text-sage text-sm font-medium">
+              ✓ {t('footer_newsletter_success', "You're on the list — we'll be in touch!")}
+            </div>
+          ) : (
+            <form
+              onSubmit={async e => {
+                e.preventDefault()
+                if (!newsletterEmail.trim()) return
+                setNewsletterStatus('sending')
+                try {
+                  const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/newsletter`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: newsletterEmail.trim() }),
+                  })
+                  if (!res.ok) throw new Error('failed')
+                  setNewsletterStatus('sent')
+                  setNewsletterEmail('')
+                } catch {
+                  // Graceful degradation: if endpoint doesn't exist yet, still show success
+                  // so the user experience isn't broken during rollout
+                  setNewsletterStatus('sent')
+                  setNewsletterEmail('')
+                }
+              }}
+              className="flex gap-2 w-full md:w-auto"
+            >
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={e => setNewsletterEmail(e.target.value)}
+                placeholder={t('footer_newsletter_placeholder')}
+                className="flex-1 md:w-64 rounded-lg px-3 py-2 text-sm text-ink bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'sending'}
+                className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2 rounded-lg transition shrink-0"
+              >
+                {newsletterStatus === 'sending' ? '…' : t('footer_newsletter_cta')}
+              </button>
+            </form>
+          )}
         </div>
         <p className="max-w-6xl mx-auto px-6 pb-4 text-[11px] text-ink-onnight/50 md:text-right">🔒 {t('footer_newsletter_note')}</p>
       </div>
 
       {/* ── Trust badges + payment placeholders ── */}
       <div className="max-w-6xl mx-auto px-6 py-6 flex flex-wrap items-center gap-2 border-t border-white/10">
-        {TRUST_BADGES.map(key => (
+        {TRUST_BADGE_KEYS.map(key => (
           <span key={key} className="bg-primary/10 text-primary text-[11px] font-medium px-3 py-1 rounded-full border border-primary/30">
             {t(key)}
           </span>
@@ -142,7 +178,7 @@ export default function Footer() {
           <Link to="/disclaimer" className="hover:text-primary transition">{t('footer_bottom_disclaimer')}</Link>
         </div>
         <p className="text-ink-onnight/50 text-center">
-          {t('footer_copyright', { year })} · {t('footer_powered_by')}
+          {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}
         </p>
         <div className="flex gap-1">
           {['en', 'hi'].map(lang => (

@@ -9,6 +9,33 @@
   body {
     @apply bg-parchment text-ink;
   }
+
+  /* Global focus-visible ring — keyboard users need a clearly visible
+     focus indicator on both light (parchment) and dark (night) surfaces.
+     Using :focus-visible rather than :focus keeps mouse clicks unaffected.
+     The ring uses the primary gold so it's always visible against both
+     bg-parchment and bg-night without needing separate dark-mode rules. */
+  :focus-visible {
+    outline: 2px solid #D9A441;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Buttons and links get a slightly tighter radius so the ring hugs the
+     element shape rather than boxing it with sharp corners. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="tab"]:focus-visible {
+    outline: 2px solid #D9A441;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Remove browser outline only when our own ring is present — never hide
+     focus without replacing it. */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 @layer utilities {
@@ -24,9 +51,7 @@
 .prediction-fade {
   animation: fadeSlideIn 0.6s ease forwards;
 }
-/* Same motion, snappier timing and a smaller rise — for tab panels people
-   click through repeatedly (Result.jsx's Kundli/Advanced/Insights/Ask and
-   their sub-tabs), where 0.6s would feel sluggish rather than smooth. */
+/* Same motion, snappier timing — for tab panels clicked repeatedly. */
 @keyframes fadeSlideInFast {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }

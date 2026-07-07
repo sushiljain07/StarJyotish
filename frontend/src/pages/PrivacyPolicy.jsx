@@ -27,6 +27,14 @@ export default function PrivacyPolicy() {
         path="/privacy"
       />
       <StaticPageLayout title="Privacy Policy" maxWidth="max-w-3xl">
+        <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
+          <ul className="space-y-1.5 text-sm text-ink">
+            <li>✦ We only collect what we need: your birth details to generate charts, and your phone/email to secure your account.</li>
+            <li>✦ We never sell your data. Birth details are used only for calculations.</li>
+            <li>✦ You can delete your account and all associated data at any time from your profile.</li>
+          </ul>
+        </div>
         <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
 
         <p>

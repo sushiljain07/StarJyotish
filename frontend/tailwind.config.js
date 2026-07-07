@@ -59,6 +59,14 @@ export default {
         // Standard hairline border/divider color on parchment surfaces.
         line: '#EAE1CC',
       },
+      fontSize: {
+        // Extend the scale for UI metadata, captions, and badge labels
+        // that currently use text-[10px] / text-[9px] arbitrary values.
+        // Adding these two steps keeps the design system closed rather
+        // than open-ended.
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],   // 11px — replaces text-[11px]
+        '3xs': ['0.625rem',  { lineHeight: '0.875rem' }], // 10px — replaces text-[10px]
+      },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         // Headline-only serif — see index.html for the Fraunces import.

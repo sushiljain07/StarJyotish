@@ -75,6 +75,7 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
           key={tab.id}
           ref={el => { buttonRefs.current[tab.id] = el }}
           onClick={() => onChange(tab.id)}
+          aria-current={active === tab.id ? 'true' : undefined}
           className={
             isUnderline
               ? `relative z-10 whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${

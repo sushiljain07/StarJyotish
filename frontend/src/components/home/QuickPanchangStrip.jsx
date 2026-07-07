@@ -1,95 +1,117 @@
 // frontend/src/components/home/QuickPanchangStrip.jsx
 //
-// The compact Panchang entry point. Shows the 4 classical limbs + the 4
-// sky times in a single row — saves ~60% vertical space vs. the full
-// DailyPanchang card. A <details> expands inline to MobileTimelineCard +
-// DailyTimeline + DailyPanchang for users who want more.
+// Compact Panchang strip with an expandable MobileTimelineCard.
 //
-// Apple principle applied: start with the summary, let the user pull
-// the detail. Never push everything upfront.
+// Design: Two-row header.
+//   Row 1 — 4 classical limbs (Tithi / Nakshatra / Yoga / Karana) + expand chevron.
+//   Row 2 — 4 sky-rhythm times as coloured pills (Sunrise, Sunset, Moonrise, Moonset).
 //
-// SkyRhythm replaced by MobileTimelineCard — the SVG arc is beautiful on
-// desktop but collapses to an unreadable tangle on 375px mobile screens.
-// MobileTimelineCard delivers the same information as 4 scannable zones.
+// Expanding reveals MobileTimelineCard only. That component already covers:
+//   • Current status card  • Bar timeline  • Window list  • AI insight strip
+// DailyTimeline and DailyPanchang have been removed — they were duplicating
+// all of that content.
 import { useTranslation } from 'react-i18next'
 import MobileTimelineCard from './MobileTimelineCard'
-import DailyTimeline from './DailyTimeline'
-import DailyPanchang from './DailyPanchang'
 
-function SkyItem({ emoji, label, time }) {
+// ─── Sky pill ─────────────────────────────────────────────────────────────────
+
+const SKY_META = {
+  sunrise:  { emoji: '🌅', color: '#FFAA44', labelKey: 'sky_sunrise'  },
+  sunset:   { emoji: '🌇', color: '#FF6B35', labelKey: 'sky_sunset'   },
+  moonrise: { emoji: '🌕', color: '#90CAF9', labelKey: 'sky_moonrise' },
+  moonset:  { emoji: '🌑', color: '#7B8FC0', labelKey: 'sky_moonset'  },
+}
+
+function SkyPill({ id, time, t }) {
   if (!time) return null
+  const { emoji, color, labelKey } = SKY_META[id]
   return (
-    <div className="flex items-center gap-1 text-[10px] sm:text-[11px]" style={{ color: 'rgba(248,242,228,0.7)' }}>
-      <span>{emoji}</span>
-      <span className="font-medium" style={{ color: 'rgba(248,242,228,0.9)' }}>{time}</span>
-      <span style={{ color: 'rgba(248,242,228,0.4)' }}>{label}</span>
+    <div className="flex items-center gap-1.5 min-w-0">
+      <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>{emoji}</span>
+      <div className="min-w-0">
+        <p
+          className="text-[9px] uppercase tracking-wide font-bold leading-none truncate"
+          style={{ color, opacity: 0.7 }}
+        >
+          {t(labelKey)}
+        </p>
+        <p
+          className="text-[12px] font-semibold tabular-nums leading-tight"
+          style={{ color }}
+        >
+          {time}
+        </p>
+      </div>
     </div>
   )
 }
 
+// ─── Panchang fact ────────────────────────────────────────────────────────────
+
 function PanchangFact({ label, value }) {
   return (
     <div className="min-w-0">
-      <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: '#D9A441' }}>{label}</p>
-      <p className="font-serif font-semibold text-[13px] leading-tight" style={{ color: 'rgba(248,242,228,0.92)' }}>
+      <p className="text-[9px] uppercase tracking-wider font-bold leading-none mb-0.5" style={{ color: '#D9A441' }}>
+        {label}
+      </p>
+      <p className="font-serif font-semibold text-[13px] leading-tight truncate" style={{ color: 'rgba(248,242,228,0.92)' }}>
         {value ?? '—'}
       </p>
     </div>
   )
 }
 
-export default function QuickPanchangStrip({ data, loading, location, error }) {
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
+export default function QuickPanchangStrip({ data, loading }) {
   const { t } = useTranslation()
 
   if (!data && loading) {
-    return (
-      <div className="rounded-2xl border border-primary/20 px-5 py-3 bg-night-light animate-pulse h-14" />
-    )
+    return <div className="rounded-2xl border border-primary/20 bg-night-light animate-pulse h-[72px]" />
   }
   if (!data) return null
 
-  const nakName = typeof data.nakshatra === 'object' ? data.nakshatra?.name : data.nakshatra
+  const nakName   = typeof data.nakshatra === 'object' ? data.nakshatra?.name : data.nakshatra
   const tithiName = data.tithi?.name ?? data.tithi
 
   return (
     <details className="group rounded-2xl border border-primary/20 bg-night-light overflow-hidden">
-      <summary className="list-none cursor-pointer">
-        <div className="flex items-center gap-0 px-4 py-3 sm:px-5">
+      <summary className="list-none cursor-pointer select-none">
+        <div className="px-4 py-3 sm:px-5 space-y-2.5">
 
-          {/* 4 classical limbs */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 flex-1 min-w-0">
-            <PanchangFact label={t('panchang_tithi')} value={tithiName} />
-            <PanchangFact label={t('panchang_nakshatra')} value={nakName} />
-            <PanchangFact label={t('panchang_yoga')} value={data.yoga} />
-            <PanchangFact label={t('panchang_karana')} value={data.karana} />
+          {/* Row 1 — 4 classical limbs + expand affordance */}
+          <div className="flex items-start gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 flex-1 min-w-0">
+              <PanchangFact label={t('panchang_tithi')}     value={tithiName} />
+              <PanchangFact label={t('panchang_nakshatra')} value={nakName}   />
+              <PanchangFact label={t('panchang_yoga')}      value={data.yoga}    />
+              <PanchangFact label={t('panchang_karana')}    value={data.karana}  />
+            </div>
+            <span
+              className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider pt-0.5"
+              style={{ color: 'rgba(248,242,228,0.3)' }}
+            >
+              {t('panchang_expand')}
+              <span className="inline-block transition-transform duration-200 group-open:rotate-180">▾</span>
+            </span>
           </div>
 
-          {/* Sky times */}
-          <div className="flex flex-col gap-0.5 shrink-0 ml-2 mr-1">
-            <div className="flex gap-2 sm:gap-4">
-              <SkyItem emoji="☀" label={t('sky_sunrise')} time={data.sunrise} />
-              <SkyItem emoji="☀" label={t('sky_sunset')} time={data.sunset} />
-            </div>
-            <div className="flex gap-2 sm:gap-4">
-              <SkyItem emoji="☽" label={t('sky_moonrise')} time={data.moonrise} />
-              <SkyItem emoji="☽" label={t('sky_moonset')} time={data.moonset} />
-            </div>
+          {/* Row 2 — sky-rhythm times */}
+          <div
+            className="grid gap-x-2 gap-y-1 pt-2"
+            style={{ gridTemplateColumns: 'repeat(4,minmax(0,1fr))', borderTop: '0.5px solid rgba(248,242,228,0.08)' }}
+          >
+            <SkyPill id="sunrise"  time={data.sunrise}  t={t} />
+            <SkyPill id="sunset"   time={data.sunset}   t={t} />
+            <SkyPill id="moonrise" time={data.moonrise} t={t} />
+            <SkyPill id="moonset"  time={data.moonset}  t={t} />
           </div>
-
-          {/* Chevron */}
-          <span className="text-[10px] font-bold uppercase tracking-wider shrink-0 flex items-center gap-1"
-                style={{ color: 'rgba(248,242,228,0.4)' }}>
-            {t('panchang_expand')}
-            <span className="inline-block transition-transform group-open:rotate-180">▾</span>
-          </span>
         </div>
       </summary>
 
-      {/* Progressive disclosure: mobile timeline card + classic list + panchang facts */}
-      <div className="border-t border-primary/10 px-4 pb-4 pt-3 sm:px-5 space-y-4">
+      {/* Expanded detail — MobileTimelineCard only */}
+      <div className="px-3 pb-4 pt-2 sm:px-4" style={{ borderTop: '0.5px solid rgba(248,242,228,0.08)' }}>
         <MobileTimelineCard panchang={data} />
-        <DailyTimeline panchang={data} />
-        <DailyPanchang location={location} data={data} loading={false} error={error} />
       </div>
     </details>
   )

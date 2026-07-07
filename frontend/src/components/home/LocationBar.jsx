@@ -1,3 +1,8 @@
+// frontend/src/components/home/LocationBar.jsx
+//
+// One-line bar showing the current location used for Panchang calculations
+// and the chart's birth place. Inline editing opens a Nominatim-backed
+// typeahead; "Use my location" re-triggers device geolocation.
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaceMatches } from '../../hooks/usePlaceMatches'
@@ -5,7 +10,7 @@ import { usePlaceMatches } from '../../hooks/usePlaceMatches'
 export default function LocationBar({ location, status, onRetryGeolocation, onSetManualLocation, birthPlace }) {
   const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
-  const [query, setQuery] = useState('')
+  const [query, setQuery]     = useState('')
   const matches = usePlaceMatches(query)
 
   function pick(place) {
@@ -19,7 +24,7 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
     (location ? `Near ${location.lat.toFixed(1)}°, ${location.lon.toFixed(1)}°` : null)
 
   return (
-    <div className="bg-parchment-card border border-line rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <div className="bg-parchment-card border border-line rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
         {status === 'requesting' && <span>{t('location_finding')}</span>}
         {status !== 'requesting' && (
@@ -38,7 +43,7 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
       {!editing && (
         <button
           onClick={() => setEditing(true)}
-          className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5"
+          className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5 transition hover:bg-primary-light/40"
         >
           {location ? t('location_update_city') : t('location_set_city')}
         </button>
@@ -51,15 +56,15 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={t('location_search_placeholder')}
-            className="w-full border border-line rounded-lg px-3 py-1.5 text-xs bg-white text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-line rounded-xl px-3 py-1.5 text-xs bg-parchment text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {matches.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full bg-white border border-line rounded-lg shadow-xl max-h-48 overflow-y-auto">
+            <ul className="absolute z-10 mt-1 w-full bg-parchment-card border border-line rounded-2xl shadow-xl max-h-48 overflow-y-auto">
               {matches.map((m, i) => (
                 <li key={i}>
                   <button
                     onClick={() => pick(m)}
-                    className="w-full text-left px-3 py-2 text-xs text-ink hover:bg-primary-light"
+                    className="w-full text-left px-3 py-2 text-xs text-ink hover:bg-primary-light transition"
                   >
                     {m.display_name}
                   </button>

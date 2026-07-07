@@ -2,13 +2,17 @@
 //
 // The compact Panchang entry point. Shows the 4 classical limbs + the 4
 // sky times in a single row — saves ~60% vertical space vs. the full
-// DailyPanchang card. A <details> expands inline to SkyRhythm +
+// DailyPanchang card. A <details> expands inline to MobileTimelineCard +
 // DailyTimeline + DailyPanchang for users who want more.
 //
 // Apple principle applied: start with the summary, let the user pull
 // the detail. Never push everything upfront.
+//
+// SkyRhythm replaced by MobileTimelineCard — the SVG arc is beautiful on
+// desktop but collapses to an unreadable tangle on 375px mobile screens.
+// MobileTimelineCard delivers the same information as 4 scannable zones.
 import { useTranslation } from 'react-i18next'
-import SkyRhythm from './SkyRhythm'
+import MobileTimelineCard from './MobileTimelineCard'
 import DailyTimeline from './DailyTimeline'
 import DailyPanchang from './DailyPanchang'
 
@@ -60,7 +64,7 @@ export default function QuickPanchangStrip({ data, loading, location, error }) {
             <PanchangFact label={t('panchang_karana')} value={data.karana} />
           </div>
 
-          {/* Sky times — ☀ for sun, ☽ for moon, explicit rise/set labels */}
+          {/* Sky times */}
           <div className="flex flex-col gap-0.5 shrink-0 ml-2 mr-1">
             <div className="flex gap-2 sm:gap-4">
               <SkyItem emoji="☀" label={t('sky_sunrise')} time={data.sunrise} />
@@ -81,9 +85,9 @@ export default function QuickPanchangStrip({ data, loading, location, error }) {
         </div>
       </summary>
 
-      {/* Progressive disclosure: the full sky band + timeline + Panchang facts */}
+      {/* Progressive disclosure: mobile timeline card + classic list + panchang facts */}
       <div className="border-t border-primary/10 px-4 pb-4 pt-3 sm:px-5 space-y-4">
-        <SkyRhythm panchang={data} />
+        <MobileTimelineCard panchang={data} />
         <DailyTimeline panchang={data} />
         <DailyPanchang location={location} data={data} loading={false} error={error} />
       </div>

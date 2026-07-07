@@ -763,5 +763,17 @@
   "career_loading_step4": "करियर योग विश्लेषण हो रहा है…",
   "career_loading_step5": "AI रिपोर्ट तैयार हो रही है…",
   "career_report_error_generic": "करियर विश्लेषण विफल। कृपया पुनः प्रयास करें।",
-  "error_something_wrong": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।"
+  "error_something_wrong": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+  "status_current_time": "अभी का समय",
+  "status_favorable": "शुभ",
+  "status_avoid": "इस समय बचें",
+  "status_neutral": "सामान्य",
+  "status_card_next_event": "अगला समय",
+  "timeline_windows_heading": "आज के समय",
+  "ai_insight_label": "आपके लिए AI सुझाव",
+  "ai_insight_good": "{{window}} {{end}} तक सक्रिय है — महत्वपूर्ण निर्णयों के लिए उत्तम समय।",
+  "ai_insight_avoid": "अभी अशुभ समय है। अगला शुभ मुहूर्त {{window}} — {{time}} से।",
+  "ai_insight_avoid_no_next": "अभी अशुभ समय है। केवल नियमित काम करें।",
+  "ai_insight_neutral": "अभी सामान्य समय है। {{window}} {{time}} से शुरू होगा।",
+  "ai_insight_default": "नीचे दिए समय के अनुसार दिनचर्या की योजना बनाएं।"
 }

@@ -95,7 +95,7 @@ export default function AskChart({ input, initialQuestion = null }) {
   }
 
   return (
-    <div className="flex flex-col h-[60vh] min-h-[400px] bg-parchment-card rounded-xl shadow-sm border border-line overflow-hidden">
+    <div className="flex flex-col h-[calc(60vh-4rem)] sm:h-[60vh] min-h-[360px] bg-parchment-card rounded-xl shadow-sm border border-line overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-line flex items-center justify-between bg-night/[0.03]">
         <div>

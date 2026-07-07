@@ -123,7 +123,7 @@ export default function AskPersonaPanel({ userId, input }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 md:bottom-24 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        className="fixed bottom-24 md:bottom-28 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
         <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />
@@ -198,7 +198,7 @@ export default function AskPersonaPanel({ userId, input }) {
               maxLength={MAX_CHARS}
               rows={1}
               placeholder={t('ask_placeholder')}
-              className="flex-1 resize-none bg-white border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}

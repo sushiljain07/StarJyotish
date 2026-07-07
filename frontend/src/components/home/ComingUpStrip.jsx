@@ -1,3 +1,8 @@
+// frontend/src/components/home/ComingUpStrip.jsx
+//
+// Upcoming transit events over the next 30 days — shown in the "This Month"
+// section. Uses the night-surface card language to visually separate upcoming
+// events from the current-day parchment cards above.
 export default function ComingUpStrip({ events }) {
   if (!events?.length) return null
   return (

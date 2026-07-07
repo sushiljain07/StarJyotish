@@ -1,9 +1,8 @@
 // frontend/src/components/home/ProfileSelector.jsx
 //
-// Shows which Astrology Profile is currently active and, when the user
-// has more than one, lets them switch between them. With one profile the
-// dropdown is still shown (not hidden) so the UI stays predictable —
-// it just has only one option, no hint text.
+// Shows the active Astrology Profile and, when the user has more than
+// one, lets them switch via a dropdown. With a single profile the button
+// is rendered but non-interactive — the UI stays predictable.
 import { useState, useRef, useEffect } from 'react'
 import HomeIcon from './HomeIcons'
 
@@ -40,7 +39,7 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
           onClick={() => hasMany && setOpen(o => !o)}
           aria-haspopup={hasMany ? 'listbox' : undefined}
           aria-expanded={hasMany ? open : undefined}
-          className={`inline-flex items-center gap-1.5 bg-white border border-primary/25 shadow-sm rounded-full pl-3 pr-2.5 py-1.5 text-sm font-semibold text-ink transition ${
+          className={`inline-flex items-center gap-1.5 bg-parchment-card border border-line shadow-sm rounded-full pl-3 pr-2.5 py-1.5 text-sm font-semibold text-ink transition ${
             hasMany
               ? 'cursor-pointer hover:border-primary/60 hover:bg-primary-light/40'
               : 'cursor-default'
@@ -62,7 +61,7 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
         {open && hasMany && (
           <ul
             role="listbox"
-            className="absolute left-0 top-full mt-1.5 w-48 bg-parchment-card rounded-xl shadow-xl border border-line py-1.5 z-50"
+            className="absolute left-0 top-full mt-1.5 w-48 bg-parchment-card rounded-2xl shadow-xl border border-line py-1.5 z-50"
           >
             {profiles.map(p => (
               <li key={p.id}>

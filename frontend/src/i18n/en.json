@@ -763,5 +763,17 @@
   "career_loading_step4": "Analysing career yogas…",
   "career_loading_step5": "Generating AI report…",
   "career_report_error_generic": "Career analysis failed. Please try again.",
-  "error_something_wrong": "Something went wrong. Please try again."
+  "error_something_wrong": "Something went wrong. Please try again.",
+  "status_current_time": "Current time",
+  "status_favorable": "Favorable",
+  "status_avoid": "Avoid this window",
+  "status_neutral": "Neutral",
+  "status_card_next_event": "Next event",
+  "timeline_windows_heading": "Today's windows",
+  "ai_insight_label": "AI Insight for you",
+  "ai_insight_good": "{{window}} is active until {{end}} — a strong window for important decisions, conversations, and new starts.",
+  "ai_insight_avoid": "Current window is inauspicious. The next favorable window is {{window}} starting at {{time}}.",
+  "ai_insight_avoid_no_next": "Current window is inauspicious. Use this time for routine tasks and avoid new commitments.",
+  "ai_insight_neutral": "Neutral period now. {{window}} starts at {{time}} — plan your key activities for then.",
+  "ai_insight_default": "Check today's windows below to plan your activities around the most auspicious times."
 }

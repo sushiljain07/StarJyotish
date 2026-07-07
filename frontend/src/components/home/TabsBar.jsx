@@ -20,6 +20,7 @@ export default function TabsBar({ active, onChange }) {
         <button
           key={id}
           onClick={() => onChange(id)}
+          aria-current={active === id ? 'true' : undefined}
           className={`text-[11px] font-bold tracking-widest uppercase px-5 py-2 rounded-full transition-all ${
             active === id
               ? 'bg-night text-primary-light shadow-sm'

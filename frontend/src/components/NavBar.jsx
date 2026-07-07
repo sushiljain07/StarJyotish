@@ -16,7 +16,7 @@ function NavIcon({ icon, className, style }) {
 export default function NavBar({ tabs, activeTab, onTabChange }) {
   return (
     <nav
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
       style={{
         background: "rgba(19,24,58,0.97)",
         backdropFilter: "blur(20px)",

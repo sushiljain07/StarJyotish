@@ -32,7 +32,7 @@ export default function CompactFooter() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-white/10 bg-night">
+    <footer className="border-t border-white/10 bg-night mb-16 sm:mb-0">
       <div className="max-w-4xl mx-auto px-4 py-5">
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map(link => (

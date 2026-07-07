@@ -291,7 +291,6 @@ function WindowRow({ slot, isNow, t }) {
 
   const badgeBg    = isNow ? '#4A4010' : slot.kind === 'good' ? '#1A3B2F' : slot.kind === 'avoid' ? '#3B1A1A' : '#2A2240'
   const badgeColor = isNow ? '#D9A441' : slot.kind === 'good' ? '#7FCFA0' : slot.kind === 'avoid' ? '#E08080' : '#9AA8D8'
-  const dotColor   = slot.kind === 'good' ? '#4CAF7D' : slot.kind === 'avoid' ? '#E05555' : '#D9A441'
 
   return (
     <div>
@@ -406,7 +405,7 @@ function WindowRow({ slot, isNow, t }) {
 
 // ─── Zone 4: AI Insight strip ─────────────────────────────────────────────────
 
-function AiInsightStrip({ slot, nextGood, nowMin, t }) {
+function AiInsightStrip({ slot, nextGood, t }) {
   let msg = ''
   if (!slot || slot.kind === 'anchor') {
     msg = nextGood
@@ -502,7 +501,7 @@ export default function MobileTimelineCard({ panchang }) {
       </div>
 
       {/* Zone 4 — AI Insight */}
-      <AiInsightStrip slot={active} nextGood={nextGood} nowMin={nowMin} t={t} />
+      <AiInsightStrip slot={active} nextGood={nextGood} t={t} />
     </div>
   )
 }

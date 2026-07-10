@@ -1,49 +1,39 @@
 // frontend/src/components/home/DoAvoidCards.jsx
 //
-// Today's personalized guidance cards, elevated to match the premium
-// dashboard language while keeping the same do/avoid data.
+// Today's personalised Do / Avoid guidance, derived from transit planets
+// over the natal chart. Two equal cards side by side.
 import { useTranslation } from 'react-i18next'
-
-function GuidanceList({ title, items, accent, tone, symbol }) {
-  return (
-    <div className={`rounded-[28px] border p-5 shadow-[0_18px_50px_rgba(53,37,16,0.08)] ${tone}`}>
-      <div className="flex items-center gap-3">
-        <span className={`flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-bold ${accent}`}>
-          {symbol}
-        </span>
-        <h3 className="font-serif text-lg font-semibold text-ink">{title}</h3>
-      </div>
-      <ul className="mt-4 space-y-3">
-        {items.map((item, index) => (
-          <li key={index} className="flex gap-3 rounded-2xl border border-black/5 bg-white/65 px-4 py-3 text-sm leading-relaxed text-ink-muted">
-            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-current opacity-70" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
 
 export default function DoAvoidCards({ doItems, avoidItems }) {
   const { t } = useTranslation()
-
   return (
-    <div className="grid gap-4 2xl:grid-cols-2">
-      <GuidanceList
-        title={t('do_today_heading')}
-        items={doItems}
-        symbol="✓"
-        accent="bg-sage-light text-sage"
-        tone="border-sage/15 bg-[linear-gradient(180deg,rgba(159,199,162,0.18)_0%,rgba(255,255,255,0.96)_48%,rgba(255,255,255,1)_100%)]"
-      />
-      <GuidanceList
-        title={t('avoid_today_heading')}
-        items={avoidItems}
-        symbol="!"
-        accent="bg-vermillion-light text-vermillion"
-        tone="border-vermillion/15 bg-[linear-gradient(180deg,rgba(224,144,144,0.16)_0%,rgba(255,255,255,0.96)_48%,rgba(255,255,255,1)_100%)]"
-      />
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div className="bg-parchment-card border border-line rounded-2xl p-5 sm:p-6">
+        <div className="flex items-center gap-2.5 mb-3.5">
+          <span className="w-7 h-7 rounded-full bg-sage-light flex items-center justify-center text-sage text-sm shrink-0">✓</span>
+          <h3 className="font-serif font-semibold text-base text-ink">{t('do_today_heading')}</h3>
+        </div>
+        <ul className="space-y-0">
+          {doItems.map((item, i) => (
+            <li key={i} className={`text-[13.5px] text-ink-muted leading-relaxed py-2.5 ${i > 0 ? 'border-t border-line' : ''}`}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="bg-parchment-card border border-line rounded-2xl p-5 sm:p-6">
+        <div className="flex items-center gap-2.5 mb-3.5">
+          <span className="w-7 h-7 rounded-full bg-vermillion-light flex items-center justify-center text-vermillion text-sm shrink-0">✗</span>
+          <h3 className="font-serif font-semibold text-base text-ink">{t('avoid_today_heading')}</h3>
+        </div>
+        <ul className="space-y-0">
+          {avoidItems.map((item, i) => (
+            <li key={i} className={`text-[13.5px] text-ink-muted leading-relaxed py-2.5 ${i > 0 ? 'border-t border-line' : ''}`}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

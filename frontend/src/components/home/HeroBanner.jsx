@@ -10,7 +10,7 @@
 // - Desktop: side-by-side layout. Mobile: stacked, wheel hidden
 
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+//import { useTranslation } from 'react-i18next'
 import { formatDate, formatTime } from '../../utils/format'
 
 // Zodiac sign symbols

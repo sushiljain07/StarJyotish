@@ -77,7 +77,7 @@ export default function PersonalHome() {
     loadProfiles(user, accessToken).then(() => setProfilesLoaded(true))
   }, [user?.id]) // eslint-disable-line
 
-  const [activeProfile, setActiveProfile] = useState(null)
+  const [activeProfile] = useState(null)
   const profile = activeProfile ?? getPrimaryProfile(user)
 
   const { location, status: locationStatus, retryGeolocation, setManualLocation } = useCurrentLocation()
@@ -140,9 +140,9 @@ export default function PersonalHome() {
   }
 
   const { chart } = profile
-  const moon = chart.planets.find(p => p.name === 'Moon')
-  const md   = chart.dasha.current_mahadasha
-  const ad   = chart.dasha.current_antardasha
+  //const moon = chart.planets.find(p => p.name === 'Moon')
+  //const md   = chart.dasha.current_mahadasha
+  //const ad   = chart.dasha.current_antardasha
   const guide = zodiacGuideFor(chart.ascendant.sign, t)
 
   const transitPlanets = transit?.transit_planets ?? null

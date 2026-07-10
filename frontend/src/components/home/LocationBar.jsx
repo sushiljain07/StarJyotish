@@ -1,16 +1,23 @@
 // frontend/src/components/home/LocationBar.jsx
 //
-// One-line bar showing the current location used for Panchang calculations
-// and the chart's birth place. Inline editing opens a Nominatim-backed
-// typeahead; "Use my location" re-triggers device geolocation.
+// Premium location card for the authenticated dashboard. Still controls the
+// same panchang location flow, but presents the current city and chart city
+// with stronger hierarchy so it can sit alongside other hero utility cards.
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaceMatches } from '../../hooks/usePlaceMatches'
+import HomeIcon from './HomeIcons'
+
+function currentLabel(location) {
+  if (location?.label) return location.label
+  if (!location) return null
+  return `Near ${location.lat.toFixed(1)}, ${location.lon.toFixed(1)}`
+}
 
 export default function LocationBar({ location, status, onRetryGeolocation, onSetManualLocation, birthPlace }) {
   const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
-  const [query, setQuery]     = useState('')
+  const [query, setQuery] = useState('')
   const matches = usePlaceMatches(query)
 
   function pick(place) {
@@ -19,64 +26,83 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
     setQuery('')
   }
 
-  const currentLabel =
-    location?.label ??
-    (location ? `Near ${location.lat.toFixed(1)}°, ${location.lon.toFixed(1)}°` : null)
+  const label = currentLabel(location)
 
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
-        {status === 'requesting' && <span>{t('location_finding')}</span>}
-        {status !== 'requesting' && (
-          <span>
-            📍 {t('location_currently_in')}: <b className="text-primary-dark font-semibold">{currentLabel ?? t('location_set_city')}</b>
-          </span>
-        )}
-        {birthPlace && (
-          <>
-            <span className="text-ink-faint">|</span>
-            <span>🪔 {t('location_chart_cast_for')} <b className="text-primary-dark font-semibold">{birthPlace}</b> {t('location_birth_place_label')}</span>
-          </>
+    <div className="relative h-full overflow-visible rounded-[28px] border border-white/80 bg-white/85 p-5 shadow-[0_18px_60px_rgba(53,37,16,0.08)] sm:p-6">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-primary-dark/75">
+            {t('location_currently_in')}
+          </p>
+          <div className="mt-3 flex items-start gap-3">
+            <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-light/55 text-primary-dark">
+              <HomeIcon id="compass" className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-serif text-lg font-semibold leading-tight text-ink sm:text-[1.35rem]">
+                {status === 'requesting' ? t('location_finding') : label ?? t('location_set_city')}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                {birthPlace
+                  ? `${t('location_chart_cast_for')} ${birthPlace}`
+                  : t('location_birth_place_label')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {!editing && (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="shrink-0 rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary-dark shadow-sm transition hover:border-primary/45 hover:bg-primary-light/35"
+          >
+            {location ? t('location_update_city') : t('location_set_city')}
+          </button>
         )}
       </div>
 
-      {!editing && (
-        <button
-          onClick={() => setEditing(true)}
-          className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5 transition hover:bg-primary-light/40"
-        >
-          {location ? t('location_update_city') : t('location_set_city')}
-        </button>
-      )}
-
       {editing && (
-        <div className="relative w-full sm:w-64">
+        <div className="relative mt-5 w-full max-w-md">
           <input
             autoFocus
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={t('location_search_placeholder')}
-            className="w-full border border-line rounded-xl px-3 py-1.5 text-xs bg-parchment text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-2xl border border-line bg-parchment px-4 py-3 text-sm text-ink placeholder:text-ink-faint"
           />
+
           {matches.length > 0 && (
-            <ul className="absolute z-10 mt-1 w-full bg-parchment-card border border-line rounded-2xl shadow-xl max-h-48 overflow-y-auto">
-              {matches.map((m, i) => (
-                <li key={i}>
+            <ul className="absolute z-10 mt-2 max-h-56 w-full overflow-y-auto rounded-[24px] border border-line bg-white shadow-2xl">
+              {matches.map((match, index) => (
+                <li key={index}>
                   <button
-                    onClick={() => pick(m)}
-                    className="w-full text-left px-3 py-2 text-xs text-ink hover:bg-primary-light transition"
+                    type="button"
+                    onClick={() => pick(match)}
+                    className="w-full px-4 py-3 text-left text-sm text-ink transition hover:bg-primary-light/35"
                   >
-                    {m.display_name}
+                    {match.display_name}
                   </button>
                 </li>
               ))}
             </ul>
           )}
-          <div className="flex items-center gap-3 mt-1.5">
-            <button onClick={onRetryGeolocation} className="text-[11px] text-primary-dark hover:underline">
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button type="button" onClick={onRetryGeolocation} className="text-xs font-semibold text-primary-dark hover:underline">
               {t('location_use_device')}
             </button>
-            <button onClick={() => { setEditing(false); setQuery('') }} className="text-[11px] text-ink-faint hover:underline">
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(false)
+                setQuery('')
+              }}
+              className="text-xs font-semibold text-ink-faint hover:text-ink-muted"
+            >
               {t('location_cancel')}
             </button>
           </div>

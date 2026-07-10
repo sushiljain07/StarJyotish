@@ -1,19 +1,21 @@
-// LifeAreaGrid — Fix 4: richer cards with house lord insight + action CTA.
-// Shows: area name, trend, score bar, the key planet driving it today,
-// and a one-line "why" that teaches astrology naturally inline.
+// frontend/src/components/home/LifeAreaGrid.jsx
+//
+// Premium life-area cards that surface the strongest current themes while
+// keeping report navigation intact.
 import { useTranslation } from 'react-i18next'
 
-const AREA_EMOJI = { career: '💼', wealth: '💰', relationship: '💞', health: '🌿' }
+const AREA_EMOJI = { career: 'Career', wealth: 'Wealth', relationship: 'Bond', health: 'Wellbeing' }
 
 const BAR_COLOR = {
-  up:   'linear-gradient(90deg, #5B7A5E, #9FC7A2)',
+  up: 'linear-gradient(90deg, #5B7A5E, #9FC7A2)',
   down: 'linear-gradient(90deg, #A23B3B, #E09090)',
   flat: 'linear-gradient(90deg, #BD8A2E, #F0CB80)',
 }
+
 const TREND_STYLE = {
-  up:   { color: '#5B7A5E', label: '▲ Up' },
-  down: { color: '#A23B3B', label: '▼ Down' },
-  flat: { color: '#BD8A2E', label: '— Steady' },
+  up: { color: '#5B7A5E', label: 'Up' },
+  down: { color: '#A23B3B', label: 'Down' },
+  flat: { color: '#BD8A2E', label: 'Steady' },
 }
 
 export default function LifeAreaGrid({ areas, onOpenReport }) {
@@ -21,45 +23,43 @@ export default function LifeAreaGrid({ areas, onOpenReport }) {
   if (!areas?.length) return null
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {areas.map(area => {
-        const ts = TREND_STYLE[area.trend] || TREND_STYLE.flat
-        const emoji = AREA_EMOJI[area.id] || '✦'
+        const trend = TREND_STYLE[area.trend] || TREND_STYLE.flat
+        const emoji = AREA_EMOJI[area.id] || 'Insight'
         return (
           <button
             key={area.id}
+            type="button"
             onClick={() => onOpenReport(area.topicId)}
-            className="text-left bg-parchment-card border border-line rounded-2xl p-4 transition hover:border-primary/40 hover:shadow-sm group flex flex-col gap-2"
+            className="group flex h-full flex-col rounded-[26px] border border-primary/12 bg-[linear-gradient(180deg,rgba(255,255,255,1)_0%,rgba(248,243,234,0.92)_100%)] p-4 text-left shadow-[0_16px_36px_rgba(53,37,16,0.07)] transition hover:-translate-y-0.5 hover:border-primary/35"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <span className="text-base">{emoji}</span>
-              <span className="text-[10px] font-bold" style={{ color: ts.color }}>
-                {t(`life_trend_${area.trend}`, ts.label)}
+            <div className="flex items-start justify-between gap-3">
+              <span className="rounded-2xl bg-primary-light/45 px-3 py-1 text-[11px] font-semibold text-primary-dark">
+                {emoji}
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: trend.color }}>
+                {t(`life_trend_${area.trend}`, trend.label)}
               </span>
             </div>
 
-            {/* Area name */}
-            <p className="font-serif font-semibold text-[14px] text-ink leading-tight">
+            <p className="mt-4 font-serif text-[1.05rem] font-semibold leading-snug text-ink">
               {t(`life_area_${area.id}`, area.label)}
             </p>
 
-            {/* Score bar */}
-            <div className="h-1.5 bg-line rounded-full overflow-hidden w-full">
+            <div className="mt-4 h-1.5 rounded-full bg-line">
               <div className="h-full rounded-full" style={{ width: `${area.pct}%`, background: BAR_COLOR[area.trend] }} />
             </div>
 
-            {/* Insight line — lord + house */}
             {area.nugget && (
-              <p className="text-[11px] text-ink-faint leading-snug line-clamp-2">
+              <p className="mt-4 line-clamp-3 text-[12.5px] leading-relaxed text-ink-muted">
                 {area.nugget}
               </p>
             )}
 
-            {/* CTA */}
-            <p className="text-[11px] font-bold text-primary-dark mt-auto group-hover:underline">
+            <span className="mt-auto pt-5 text-xs font-semibold text-primary-dark group-hover:underline">
               {t('report_open')} →
-            </p>
+            </span>
           </button>
         )
       })}

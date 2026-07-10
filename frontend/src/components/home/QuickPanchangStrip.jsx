@@ -1,95 +1,117 @@
 // frontend/src/components/home/QuickPanchangStrip.jsx
 //
-// Premium panchang card with a compact dashboard summary and expandable
-// timeline details for the mobile-first day view.
+// Compact Panchang strip with an expandable MobileTimelineCard.
+//
+// Design: Two-row header.
+//   Row 1 — 4 classical limbs (Tithi / Nakshatra / Yoga / Karana) + expand chevron.
+//   Row 2 — 4 sky-rhythm times as coloured pills (Sunrise, Sunset, Moonrise, Moonset).
+//
+// Expanding reveals MobileTimelineCard only. That component already covers:
+//   • Current status card  • Bar timeline  • Window list  • AI insight strip
+// DailyTimeline and DailyPanchang have been removed — they were duplicating
+// all of that content.
 import { useTranslation } from 'react-i18next'
 import MobileTimelineCard from './MobileTimelineCard'
 
+// ─── Sky pill ─────────────────────────────────────────────────────────────────
+
 const SKY_META = {
-  sunrise: { emoji: 'Sunrise', labelKey: 'sky_sunrise' },
-  sunset: { emoji: 'Sunset', labelKey: 'sky_sunset' },
-  moonrise: { emoji: 'Moonrise', labelKey: 'sky_moonrise' },
-  moonset: { emoji: 'Moonset', labelKey: 'sky_moonset' },
-}
-
-function skyLabel(location) {
-  if (!location?.label) return null
-  return location.label.split(',')[0]
-}
-
-function PanchangFact({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-light/70">{label}</p>
-      <p className="mt-1.5 font-serif text-[15px] font-semibold leading-tight text-parchment">{value ?? '—'}</p>
-    </div>
-  )
+  sunrise:  { emoji: '🌅', color: '#FFAA44', labelKey: 'sky_sunrise'  },
+  sunset:   { emoji: '🌇', color: '#FF6B35', labelKey: 'sky_sunset'   },
+  moonrise: { emoji: '🌕', color: '#90CAF9', labelKey: 'sky_moonrise' },
+  moonset:  { emoji: '🌑', color: '#7B8FC0', labelKey: 'sky_moonset'  },
 }
 
 function SkyPill({ id, time, t }) {
   if (!time) return null
-  const meta = SKY_META[id]
+  const { emoji, color, labelKey } = SKY_META[id]
   return (
-    <div className="rounded-2xl border border-primary/10 bg-white/80 px-3.5 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-dark/75">{t(meta.labelKey)}</p>
-      <p className="mt-1 text-sm font-semibold text-ink">{time}</p>
-      <p className="mt-1 text-[11px] text-ink-faint">{meta.emoji}</p>
+    <div className="flex items-center gap-1.5 min-w-0">
+      <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>{emoji}</span>
+      <div className="min-w-0">
+        <p
+          className="text-[9px] uppercase tracking-wide font-bold leading-none truncate"
+          style={{ color, opacity: 0.7 }}
+        >
+          {t(labelKey)}
+        </p>
+        <p
+          className="text-[12px] font-semibold tabular-nums leading-tight"
+          style={{ color }}
+        >
+          {time}
+        </p>
+      </div>
     </div>
   )
 }
 
-export default function QuickPanchangStrip({ data, loading, location }) {
+// ─── Panchang fact ────────────────────────────────────────────────────────────
+
+function PanchangFact({ label, value }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[9px] uppercase tracking-wider font-bold leading-none mb-0.5" style={{ color: '#D9A441' }}>
+        {label}
+      </p>
+      <p className="font-serif font-semibold text-[13px] leading-tight truncate" style={{ color: 'rgba(248,242,228,0.92)' }}>
+        {value ?? '—'}
+      </p>
+    </div>
+  )
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
+export default function QuickPanchangStrip({ data, loading }) {
   const { t } = useTranslation()
 
   if (!data && loading) {
-    return <div className="h-[96px] animate-pulse rounded-[30px] border border-primary/20 bg-night-light" />
+    return <div className="rounded-2xl border border-primary/20 bg-night-light animate-pulse h-[72px]" />
   }
   if (!data) return null
 
-  const nakshatraName = typeof data.nakshatra === 'object' ? data.nakshatra?.name : data.nakshatra
+  const nakName   = typeof data.nakshatra === 'object' ? data.nakshatra?.name : data.nakshatra
   const tithiName = data.tithi?.name ?? data.tithi
 
   return (
-    <details className="group overflow-hidden rounded-[30px] border border-primary/20 bg-[linear-gradient(135deg,#261f5f_0%,#1b1f41_62%,#12172f_100%)] shadow-[0_24px_70px_rgba(26,19,64,0.32)]">
+    <details className="group rounded-2xl border border-primary/20 bg-night-light overflow-hidden">
       <summary className="list-none cursor-pointer select-none">
-        <div className="px-5 py-5 sm:px-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary-light/72">
-                {t('home_today_panchang')}
-              </p>
-              <p className="mt-2 font-serif text-xl font-semibold text-parchment">{tithiName ?? '—'}</p>
-              <p className="mt-1 text-sm text-ink-onnight/65">
-                {nakshatraName ?? '—'}
-                {skyLabel(location) ? ` · ${skyLabel(location)}` : ''}
-              </p>
-            </div>
+        <div className="px-4 py-3 sm:px-5 space-y-2.5">
 
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-primary-light/75">
+          {/* Row 1 — 4 classical limbs + expand affordance */}
+          <div className="flex items-start gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 flex-1 min-w-0">
+              <PanchangFact label={t('panchang_tithi')}     value={tithiName} />
+              <PanchangFact label={t('panchang_nakshatra')} value={nakName}   />
+              <PanchangFact label={t('panchang_yoga')}      value={data.yoga}    />
+              <PanchangFact label={t('panchang_karana')}    value={data.karana}  />
+            </div>
+            <span
+              className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider pt-0.5"
+              style={{ color: 'rgba(248,242,228,0.3)' }}
+            >
               {t('panchang_expand')}
               <span className="inline-block transition-transform duration-200 group-open:rotate-180">▾</span>
             </span>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <PanchangFact label={t('panchang_tithi')} value={tithiName} />
-            <PanchangFact label={t('panchang_nakshatra')} value={nakshatraName} />
-            <PanchangFact label={t('panchang_yoga')} value={data.yoga} />
-            <PanchangFact label={t('panchang_karana')} value={data.karana} />
+          {/* Row 2 — sky-rhythm times */}
+          <div
+            className="grid gap-x-2 gap-y-1 pt-2"
+            style={{ gridTemplateColumns: 'repeat(4,minmax(0,1fr))', borderTop: '0.5px solid rgba(248,242,228,0.08)' }}
+          >
+            <SkyPill id="sunrise"  time={data.sunrise}  t={t} />
+            <SkyPill id="sunset"   time={data.sunset}   t={t} />
+            <SkyPill id="moonrise" time={data.moonrise} t={t} />
+            <SkyPill id="moonset"  time={data.moonset}  t={t} />
           </div>
         </div>
       </summary>
 
-      <div className="border-t border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.02)_100%)] px-4 py-4 sm:px-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <SkyPill id="sunrise" time={data.sunrise} t={t} />
-          <SkyPill id="sunset" time={data.sunset} t={t} />
-          <SkyPill id="moonrise" time={data.moonrise} t={t} />
-          <SkyPill id="moonset" time={data.moonset} t={t} />
-        </div>
-        <div className="mt-4 rounded-[26px] border border-white/8 bg-night/35 p-3">
-          <MobileTimelineCard panchang={data} />
-        </div>
+      {/* Expanded detail — MobileTimelineCard only */}
+      <div className="px-3 pb-4 pt-2 sm:px-4" style={{ borderTop: '0.5px solid rgba(248,242,228,0.08)' }}>
+        <MobileTimelineCard panchang={data} />
       </div>
     </details>
   )

@@ -16,6 +16,3 @@ frontend/dist/
 
 # Superpowers brainstorm mockups
 .superpowers/
-
-# Local git worktrees
-.worktrees/

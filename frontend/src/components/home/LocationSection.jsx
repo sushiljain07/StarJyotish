@@ -38,7 +38,7 @@ function CitySilhouette({ dark = false }) {
   )
 }
 
-export default function LocationSection({ location, status, onRetryGeolocation, onSetManualLocation, birthPlace }) {
+export default function LocationSection({ location, onRetryGeolocation, onSetManualLocation, birthPlace }) {
   const [editing, setEditing] = useState(false)
   const [query, setQuery]     = useState('')
   const matches = usePlaceMatches(query)

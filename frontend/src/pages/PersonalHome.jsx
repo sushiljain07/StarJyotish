@@ -16,7 +16,7 @@
 //     g. JournalPrompt | DisclaimerBlock
 //  3. AskPersonaPanel FAB  4. BottomNav  5. CompactFooter
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -52,13 +52,13 @@ import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import ReflectionLoop from '../components/home/ReflectionLoop'
 import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
 
-import { getPrimaryProfile, loadProfiles, listProfiles } from '../services/astrologyProfiles'
-import { withHindiSign, withHindiPlanet } from '../config/hindiNames'
+import { getPrimaryProfile, loadProfiles} from '../services/astrologyProfiles'
+import { withHindiPlanet } from '../config/hindiNames'
 import {
   computeDayScore, computeDoAvoid, computeLifeAreas, computeSpotlight,
   buildComingUpEvents, computeOneAction,
 } from '../utils/dailyInsights'
-import { formatDate, formatTime } from '../utils/format'
+import { formatDate } from '../utils/format'
 
 function zodiacGuideFor(signName, t) {
   const slug = signName?.toLowerCase()

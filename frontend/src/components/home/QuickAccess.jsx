@@ -57,7 +57,7 @@ const TILES = [
   },
 ]
 
-export default function QuickAccess({ profile, onNavigate }) {
+export default function QuickAccess({ profile }) {
   const navigate = useNavigate()
 
   function handleTile(tile) {

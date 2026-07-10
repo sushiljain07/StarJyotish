@@ -79,7 +79,7 @@ function ZodiacWheelSVG() {
 }
 
 export default function HeroBanner({ profile, user, onOpenChart }) {
-  const { t } = useTranslation()
+  //const { t } = useTranslation()
   if (!profile) return null
 
   const { chart } = profile

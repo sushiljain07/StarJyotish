@@ -83,7 +83,7 @@ function CosmicRing({ score, tone, mdPlanet, label, pulse }) {
 }
 
 // ── Single Insight Card ────────────────────────────────────────────────────────
-function InsightCard({ card, onReaction, reacted, variation }) {
+function InsightCard({ card, onReaction, reacted }) {
   const cfg = CARD_CFG[card.type] || CARD_CFG.HEADLINE
   const isQ = card.type === "QUESTION"
 
@@ -156,7 +156,7 @@ function CardStack({ cards, onReaction, reactions, variation, onRefresh }) {
 
   if (!cards.length) return null
   const card = cards[active]
-  const cfg = CARD_CFG[card.type] || CARD_CFG.HEADLINE
+  //const cfg = CARD_CFG[card.type] || CARD_CFG.HEADLINE
 
   return (
     <div className="sj-stack" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>

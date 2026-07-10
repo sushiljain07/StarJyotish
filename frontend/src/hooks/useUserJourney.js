@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { API_BASE } from '../api/config'
 
 const LOCAL_REACTIONS_KEY = 'sj_journey_reactions_v1'
-const LOCAL_STREAK_KEY = 'sj_journey_streak_v1'
+//const LOCAL_STREAK_KEY = 'sj_journey_streak_v1'
 
 function loadLocalReactions() {
   try {

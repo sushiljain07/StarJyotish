@@ -28,7 +28,9 @@ function yesterdayHeadline(profileKey, lang) {
   d.setDate(d.getDate() - 1)
   const day = d.toISOString().slice(0, 10)
   try {
-    const raw = localStorage.getItem(`sj_daily_edition_v1:${profileKey}:${lang}:${day}`)
+    // Try v2 key first, fall back to v1 for backwards compat
+    const raw = localStorage.getItem(`sj_daily_ed_v2:${profileKey}:${lang}:${day}`)
+              || localStorage.getItem(`sj_daily_edition_v1:${profileKey}:${lang}:${day}`)
     return raw ? JSON.parse(raw)?.headline ?? null : null
   } catch {
     return null

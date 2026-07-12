@@ -137,10 +137,21 @@ def _kaal_window(sunrise: datetime, sunset: datetime, segment_1indexed: int) -> 
     return {"start": _fmt(start_dt), "end": _fmt(end_dt)}
 
 
-def calculate_panchang(lat: float, lon: float, tz_name: str) -> dict[str, Any]:
-    """Today's Panchang for a given place. Distinct from the natal chart:
-    this needs the person's CURRENT location, not their birth place."""
-    now_utc = datetime.now(dt_timezone.utc)
+_WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def calculate_panchang(lat: float, lon: float, tz_name: str,
+                        target_date: Optional[datetime] = None) -> dict[str, Any]:
+    """Panchang for a given place, on a given day. Distinct from the natal
+    chart: this needs the person's CURRENT location, not their birth place.
+
+    target_date is a UTC-aware datetime for the day to compute; the time
+    component is ignored beyond picking the calendar day (rise/set search
+    starts from that day's midnight). Defaults to right now, which is what
+    every existing caller wants — /api/panchang/week is the only caller
+    that passes an explicit date, one per day in the range.
+    """
+    now_utc = target_date or datetime.now(dt_timezone.utc)
     jd_now = swe.julday(now_utc.year, now_utc.month, now_utc.day,
                          now_utc.hour + now_utc.minute / 60.0)
     jd_midnight = swe.julday(now_utc.year, now_utc.month, now_utc.day, 0.0)
@@ -155,6 +166,8 @@ def calculate_panchang(lat: float, lon: float, tz_name: str) -> dict[str, Any]:
     moonset  = _jd_to_local(_rise_set(jd_midnight, swe.MOON, swe.CALC_SET, geopos), tz_name)
 
     result = {
+        "date": now_utc.date().isoformat(),
+        "weekday": _WEEKDAY_NAMES[now_utc.weekday()],
         "tithi": _tithi(sun_lon, moon_lon),
         "nakshatra": _nakshatra_of(moon_lon),
         "yoga": _yoga(sun_lon, moon_lon),

@@ -74,3 +74,10 @@ export async function fetchPlaceMatches(query) {
 export function fetchPanchang({ lat, lon, timezone }) {
   return postJson('/api/panchang', { lat, lon, timezone })
 }
+
+// Today plus the next (days-1) days of Panchang for the same location —
+// powers the home page's "This week" strip and the full week view.
+// Same location semantics as fetchPanchang: current location, not birth place.
+export function fetchPanchangWeek({ lat, lon, timezone, days = 7 }) {
+  return postJson('/api/panchang/week', { lat, lon, timezone, days })
+}

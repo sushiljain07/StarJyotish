@@ -6,6 +6,8 @@ import GlobalScrollToTop from './components/GlobalScrollToTop'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
 import PersonalHome from './pages/PersonalHome'
+import PanchangDetail from './pages/PanchangDetail'
+import WeekAhead from './pages/WeekAhead'
 import Onboarding from './pages/Onboarding'
 import OnboardingGate from './components/OnboardingGate'
 import Result from './pages/Result'
@@ -43,6 +45,8 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/generate" element={<Home />} />
           <Route path="/home" element={<ProtectedRoute><OnboardingGate><PersonalHome /></OnboardingGate></ProtectedRoute>} />
+          <Route path="/panchang" element={<ProtectedRoute><OnboardingGate><PanchangDetail /></OnboardingGate></ProtectedRoute>} />
+          <Route path="/week-ahead" element={<ProtectedRoute><OnboardingGate><WeekAhead /></OnboardingGate></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/kundli" element={<Result />} />
           <Route path="/career-report" element={<CareerReport />} />

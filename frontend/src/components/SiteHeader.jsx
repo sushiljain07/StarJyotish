@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { label: 'Charts',      to: '/kundli' },
   { label: 'Predictions', to: '/kundli' },
   { label: 'Remedies',    to: '/kundli' },
-  { label: 'Panchang',    to: '/home',   hash: '#sj-panchang-section' },
+  { label: 'Panchang',    to: '/panchang' },
   { label: 'Insights',    to: '/kundli' },
 ]
 
@@ -29,14 +29,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const borderAlpha = 0.06 + p * 0.08
 
   function handleNav(link) {
-    if (link.hash) {
-      navigate(link.to)
-      setTimeout(() => {
-        document.getElementById('sj-panchang-section')?.scrollIntoView({ behavior:'smooth' })
-      }, 100)
-    } else {
-      navigate(link.to)
-    }
+    navigate(link.to)
   }
 
   return (

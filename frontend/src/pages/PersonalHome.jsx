@@ -51,6 +51,8 @@ import DisclaimerBlock from '../components/home/DisclaimerBlock'
 import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import ReflectionLoop from '../components/home/ReflectionLoop'
 import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
+import WeekStrip from '../components/home/WeekStrip'
+import ChartsStrip from '../components/home/ChartsStrip'
 
 import { getPrimaryProfile, loadProfiles} from '../services/astrologyProfiles'
 import { withHindiPlanet } from '../config/hindiNames'
@@ -251,7 +253,7 @@ export default function PersonalHome() {
             </div>
             <button
               className="sj-view-full-btn"
-              onClick={() => navigate('/home', { state: { tab: 'panchang' } })}
+              onClick={() => navigate('/panchang')}
             >
               View full Panchang →
             </button>
@@ -263,6 +265,21 @@ export default function PersonalHome() {
               location={location}
               error={panchang.error}
             />
+          </Reveal>
+        </div>
+
+        {/* ── Row 3b: This week (real per-day panchang, not invented copy) ── */}
+        <div style={{ marginTop: 24 }}>
+          <div className="sj-section-header">
+            <div>
+              <h2 className="sj-section-title">{t('home_week_strip_label')}</h2>
+            </div>
+            <button className="sj-view-full-btn" onClick={() => navigate('/week-ahead')}>
+              {t('home_week_strip_cta')}
+            </button>
+          </div>
+          <Reveal delay={0}>
+            <WeekStrip location={location} />
           </Reveal>
         </div>
 
@@ -306,6 +323,24 @@ export default function PersonalHome() {
             )}
           </div>
         )}
+
+        {/* ── Row 5b: Your charts — teaser into the existing 16-chart panel ── */}
+        <div style={{ marginTop: 24 }}>
+          <div className="sj-section-header">
+            <div>
+              <h2 className="sj-section-title">{t('home_charts_strip_label')}</h2>
+            </div>
+            <button
+              className="sj-view-full-btn"
+              onClick={() => openChart('divisional', 'kundli')}
+            >
+              {t('home_charts_strip_cta')}
+            </button>
+          </div>
+          <Reveal delay={0}>
+            <ChartsStrip profile={profile} />
+          </Reveal>
+        </div>
 
         {/* ── Row 6: Knowledge capsule ── */}
         <div style={{ marginTop: 24 }}>
@@ -361,7 +396,7 @@ export default function PersonalHome() {
         input={{ date: profile.birth_date, time: profile.birth_time, place: profile.place }}
       />
 
-      <BottomNav />
+      <BottomNav profile={profile} />
       <CompactFooter />
 
       <style>{`

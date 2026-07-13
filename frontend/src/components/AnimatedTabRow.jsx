@@ -53,7 +53,9 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
     // active sub-tab isn't the first one (landing directly on
     // 'divisional', say), it needs to be scrolled into view rather than
     // sitting off-screen with no visual hint it's there.
-    activeBtn.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+    // Only scroll horizontally — block:'nearest' was scrolling the whole
+    // page and hiding the pill row behind the sticky context bar.
+    activeBtn.scrollIntoView?.({ block: 'nearest', inline: 'center' })
     // Tab label widths/wrapping can change with viewport, so keep the
     // indicator honest on resize rather than freezing it at the wrong spot.
     window.addEventListener('resize', measure)

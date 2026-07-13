@@ -275,6 +275,16 @@ export default function Result() {
               ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
               : <TabIcon id={tab.icon} className="w-4 h-4" />}
           />
+          {/* Sub-tab pill row — always in sticky bar so it's never hidden under it */}
+          {activeMain === 'kundli' && (
+            <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
+          )}
+          {activeMain === 'advanced' && (
+            <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
+          )}
+          {activeMain === 'insights' && INSIGHT_SUBTABS.length > 1 && (
+            <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
+          )}
         </div>
       </div>
 
@@ -283,7 +293,6 @@ export default function Result() {
 
         {/* ══════════════ KUNDLI ══════════════ */}
         <div className={activeMain === 'kundli' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
 
           <div className={activeKundliSub === 'birth_chart' ? 'tab-fade' : 'hidden'}>
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
@@ -316,7 +325,6 @@ export default function Result() {
 
         {/* ══════════════ ADVANCED ══════════════ */}
         <div className={activeMain === 'advanced' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeAdvancedSub === 'bhava' ? 'tab-fade' : 'hidden'}>
@@ -337,7 +345,6 @@ export default function Result() {
 
         {/* ══════════════ INSIGHTS ══════════════ */}
         <div className={activeMain === 'insights' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeInsightSub === 'reading' ? 'tab-fade' : 'hidden'}>

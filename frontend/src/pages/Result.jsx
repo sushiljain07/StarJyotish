@@ -275,15 +275,21 @@ export default function Result() {
               ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
               : <TabIcon id={tab.icon} className="w-4 h-4" />}
           />
-          {/* Sub-tab pill row — always in sticky bar so it's never hidden under it */}
-          {activeMain === 'kundli' && (
-            <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
-          )}
-          {activeMain === 'advanced' && (
-            <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
-          )}
-          {activeMain === 'insights' && INSIGHT_SUBTABS.length > 1 && (
-            <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
+          {/* Sub-tab pill row — always in sticky bar so it's never hidden under it.
+              Shown only when the active main tab has sub-tabs to display.
+              Thin top border visually separates pill row from main tab row. */}
+          {(activeMain === 'kundli' || activeMain === 'advanced' || (activeMain === 'insights' && INSIGHT_SUBTABS.length > 1)) && (
+            <div className="border-t border-line/60 pt-2 pb-2">
+              {activeMain === 'kundli' && (
+                <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
+              )}
+              {activeMain === 'advanced' && (
+                <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
+              )}
+              {activeMain === 'insights' && (
+                <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
+              )}
+            </div>
           )}
         </div>
       </div>

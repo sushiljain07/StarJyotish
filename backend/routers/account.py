@@ -163,6 +163,9 @@ def save_my_birth_profile(
         lon=ctx.geo.lon,
         timezone=ctx.geo.timezone,
         label=body.label,
+        current_lat=body.current_lat,
+        current_lon=body.current_lon,
+        current_location_label=body.current_location_label,
     )
     db.commit()
     db.refresh(profile)

@@ -67,6 +67,22 @@ export async function fetchPlaceMatches(query) {
   return data.places ?? []
 }
 
+// GPS coordinates -> a human-readable label. Used right after the browser
+// grants geolocation (Onboarding.jsx's currentLocation step, and Profile.
+// jsx's astrology-profile edit form) — a raw lat/lon pair isn't something
+// to show in a pill. Returns null (not a throw) on any failure, matching
+// the backend's own degrade-gracefully behavior for this endpoint.
+export async function fetchReverseGeocode(lat, lon) {
+  try {
+    const resp = await fetch(`${API_BASE}/api/places/reverse?lat=${lat}&lon=${lon}`)
+    if (!resp.ok) return null
+    const data = await resp.json()
+    return data.label ?? null
+  } catch {
+    return null
+  }
+}
+
 // Today's Panchang for a given CURRENT location — deliberately separate
 // from fetchTransit above, which is keyed to birth data. lat/lon here
 // come from browser geolocation or a manually chosen city, never from an

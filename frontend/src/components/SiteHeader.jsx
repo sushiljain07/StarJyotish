@@ -8,28 +8,49 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AccountMenu from './AccountMenu'
+import { getPrimaryProfile } from '../services/astrologyProfiles'
 
+// Each link's activeTab/activeSubtab matches what Result.jsx (the /kundli
+// page) expects in navigation state — see BottomNav.jsx's onGuidanceClick
+// for the same pattern. Without this state, /kundli has no chart to show,
+// which is why these links looked "broken": they navigated, but to an
+// empty page.
+//
+// "Remedies" is deliberately removed rather than pointed at /kundli like
+// the rest — there's no remedies feature in the app yet (no route, no
+// tab, no content), so linking it anywhere would just be a second broken
+// link with better styling. Real fix is building that feature, not faking
+// a destination for it.
 const NAV_LINKS = [
   { label: 'Home',        to: '/home' },
-  { label: 'Charts',      to: '/kundli' },
-  { label: 'Predictions', to: '/kundli' },
-  { label: 'Remedies',    to: '/kundli' },
+  { label: 'Charts',      to: '/kundli', activeTab: 'kundli',   activeSubtab: 'birth_chart' },
+  { label: 'Predictions', to: '/kundli', activeTab: 'insights', activeSubtab: 'reading' },
   { label: 'Panchang',    to: '/panchang' },
-  { label: 'Insights',    to: '/kundli' },
+  { label: 'Insights',    to: '/kundli', activeTab: 'insights', activeSubtab: 'reading' },
 ]
 
 export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuth()
+  const profile = isAuthenticated ? getPrimaryProfile(user) : null
 
   const p = Math.min(1, Math.max(0, scrollProgress))
   const blurPx      = 6 + p * 6
   const borderAlpha = 0.06 + p * 0.08
 
   function handleNav(link) {
-    navigate(link.to)
+    if (!link.activeTab) { navigate(link.to); return }
+    if (!profile) { navigate('/generate'); return }
+    navigate(link.to, {
+      state: {
+        data: profile.chart,
+        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
+        activeTab: link.activeTab,
+        activeSubtab: link.activeSubtab,
+      },
+    })
   }
 
   return (

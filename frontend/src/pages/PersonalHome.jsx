@@ -175,8 +175,6 @@ export default function PersonalHome() {
   const spotlight   = transitPlanets ? computeSpotlight(chart, transitPlanets, t) : null
   const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
-  const headlineText = edition?.cards?.[0]?.text || edition?.headline || null
-
   return (
     <div className="min-h-screen bg-night-deep">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
@@ -188,7 +186,6 @@ export default function PersonalHome() {
           profiles={allProfiles}
           location={location}
           panchang={panchang.data}
-          headlineText={headlineText}
           dashaTags={spotlight?.dashaSpotlight}
         />
       </div>

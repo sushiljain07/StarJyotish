@@ -15,29 +15,29 @@ export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
     : ''
   return (
     <div className="grid sm:grid-cols-2 gap-4">
-      <div className="bg-parchment-card border border-line rounded-2xl p-5 sm:p-6">
+      <div className="bg-white/[0.045] border border-white/[0.09] rounded-2xl p-5 sm:p-6">
         <div className="flex items-center gap-2.5 mb-2.5">
           <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-serif font-semibold text-night text-sm">☾</span>
           <div>
-            <h3 className="font-serif font-semibold text-[15px] text-ink">{t('spotlight_moon_title')}</h3>
-            <p className="text-[11px] text-ink-faint mt-0.5">
+            <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_moon_title')}</h3>
+            <p className="text-[11px] text-ink-onnight/45 mt-0.5">
               {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ?? '—', house: house ? `${house}${ordinalSuffix(house)}` : '—' })}
             </p>
           </div>
         </div>
-        <p className="text-[13.5px] text-ink-muted leading-relaxed">{moonSpotlight?.text}</p>
+        <p className="text-[13.5px] text-ink-onnight/75 leading-relaxed">{moonSpotlight?.text}</p>
       </div>
-      <div className="bg-parchment-card border border-line rounded-2xl p-5 sm:p-6">
+      <div className="bg-white/[0.045] border border-white/[0.09] rounded-2xl p-5 sm:p-6">
         <div className="flex items-center gap-2.5 mb-2.5">
           <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-serif font-semibold text-night text-sm">♀</span>
           <div>
-            <h3 className="font-serif font-semibold text-[15px] text-ink">{t('spotlight_dasha_title')}</h3>
-            <p className="text-[11px] text-ink-faint mt-0.5">
+            <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_dasha_title')}</h3>
+            <p className="text-[11px] text-ink-onnight/45 mt-0.5">
               {t('spotlight_dasha_subtitle', { mahadasha: dashaSpotlight?.mahadasha ?? '—', antardasha: antardashaStr })}
             </p>
           </div>
         </div>
-        <p className="text-[13.5px] text-ink-muted leading-relaxed">{dashaSpotlight?.text}</p>
+        <p className="text-[13.5px] text-ink-onnight/75 leading-relaxed">{dashaSpotlight?.text}</p>
       </div>
     </div>
   )

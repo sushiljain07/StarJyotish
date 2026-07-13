@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -57,16 +57,16 @@ function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
   const md = data.dasha.current_mahadasha
   return (
-    <div className="flex flex-wrap gap-2 py-2">
-      <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
+    <div className="flex gap-1.5 py-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <span className="shrink-0 bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
         Lagna: {data.ascendant.sign}
       </span>
       {moon && (
-        <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
+        <span className="shrink-0 bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
           Rashi: {moon.sign}
         </span>
       )}
-      <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
+      <span className="shrink-0 bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
         Mahadasha: {md.planet}
       </span>
     </div>
@@ -180,6 +180,16 @@ export default function Result() {
   )
   const [chartStyle, setChartStyle] = useState('north')
 
+  // Measure sticky bar height dynamically so content is never hidden beneath it.
+  // Must be declared before any early returns (Rules of Hooks).
+  const stickyRef = useRef(null)
+  const [stickyH, setStickyH] = useState(0)
+  useEffect(() => {
+    if (!stickyRef.current) return
+    const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
+    ro.observe(stickyRef.current)
+    return () => ro.disconnect()
+  }, [])
 
   if (!state?.data) {
     navigate(homeDestination)
@@ -223,39 +233,34 @@ export default function Result() {
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
-      {/* This route only ever renders with data handed off from Home.jsx's
-          router state (see the early-return guard above) — there's no
-          canonical, shareable URL for a search engine to land on, so it's
-          excluded from indexing rather than given a generic/misleading
-          title+description that wouldn't match what a crawler would
-          actually see. */}
       <Seo title="Your Kundli" description="Your personalized Vedic Kundli and AI reading." path="/kundli" noindex />
 
-      {/* Shared brand header — same as every other page */}
       <SiteHeader />
 
-      {/* Chart context bar — deliberately different background from the brand
-          SiteHeader above (bg-night-light vs bg-night) so the two layers read
-          as distinct: the top bar is the app, this bar is the chart. */}
-      <div className="bg-parchment-card border-b border-line sticky top-[52px] z-30">
+      {/* ── Sticky context bar ───────────────────────────────────────────
+          Sits just below SiteHeader (top-[60px] = SiteHeader's height).
+          Contains: identity row · chips · main tabs · sub-tabs.
+          Height is measured via ResizeObserver so the content div below
+          can use it as padding-top — zero overlap on any screen size.   */}
+      <div ref={stickyRef} className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
-          {/* Identity row: person details + Home button */}
-          <div className="flex items-center justify-between py-2.5 gap-3">
-            <div className="min-w-0">
+
+          {/* Row 1 — identity + Home button, single compact line.
+              Date/time hidden on mobile (shown in chips row). */}
+          <div className="flex items-center justify-between py-1.5 gap-3">
+            <div className="min-w-0 flex items-center gap-2 overflow-hidden">
               {input.name && (
-                <div className="font-bold text-sm text-ink leading-tight truncate">{input.name}</div>
+                <span className="font-bold text-sm text-ink leading-none truncate">{input.name}</span>
               )}
-              <div className="text-ink-muted text-xs leading-tight truncate">
-                {input.place}
-              </div>
-              <div className="text-ink-faint text-xs flex items-center gap-2 flex-wrap mt-0.5">
+              <span className="text-ink-faint text-xs leading-none hidden sm:inline shrink-0">·</span>
+              <span className="text-ink-faint text-xs leading-none hidden sm:inline truncate">
                 {formatDate(input.date)} · {formatTime(input.time)}
-                {topic && (
-                  <span className="inline-flex items-center gap-1 bg-primary-light text-primary-dark rounded-full px-2 py-0.5 text-[11px] font-medium">
-                    <TopicIcon id={topic.id} className="w-3 h-3" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
-                  </span>
-                )}
-              </div>
+              </span>
+              {topic && (
+                <span className="hidden sm:inline-flex shrink-0 items-center gap-1 bg-primary-light text-primary-dark rounded-full px-2 py-0.5 text-[11px] font-medium">
+                  <TopicIcon id={topic.id} className="w-3 h-3" /> {t(`landing_topic_${topic.id}_label`)}
+                </span>
+              )}
             </div>
             <button
               onClick={() => navigate(homeDestination)}
@@ -264,9 +269,11 @@ export default function Result() {
               {t('nav_back_home', 'Home')}
             </button>
           </div>
-          {/* Lagna/Rashi/Mahadasha chips — moved inside context bar so they're always visible */}
+
+          {/* Row 2 — Lagna / Rashi / Mahadasha chips (single scrollable row, no wrap) */}
           <SummaryChips data={data} />
-          {/* Tab bar — desktop only */}
+
+          {/* Row 3 — main tabs (desktop) */}
           <AnimatedTabRow
             tabs={MAIN_TABS}
             active={activeMain}
@@ -275,15 +282,34 @@ export default function Result() {
               ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
               : <TabIcon id={tab.icon} className="w-4 h-4" />}
           />
+
+          {/* Row 4 — sub-tab pills, only when the active tab has sub-tabs */}
+          {(activeMain === 'kundli' || activeMain === 'advanced' || (activeMain === 'insights' && INSIGHT_SUBTABS.length > 1)) && (
+            <div className="border-t border-line/50 py-1.5">
+              {activeMain === 'kundli' && (
+                <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
+              )}
+              {activeMain === 'advanced' && (
+                <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
+              )}
+              {activeMain === 'insights' && (
+                <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 pb-24 sm:pb-4">
+      {/* Content — paddingTop = fixed header (60px) + sticky bar height + 16px gap.
+          ResizeObserver fires synchronously after paint so stickyH is always
+          accurate; the 200px fallback covers the first-render flash on mobile. */}
+      <div
+        className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
+        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '200px' }}
+      >
 
         {/* ══════════════ KUNDLI ══════════════ */}
         <div className={activeMain === 'kundli' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
 
           <div className={activeKundliSub === 'birth_chart' ? 'tab-fade' : 'hidden'}>
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
@@ -316,7 +342,6 @@ export default function Result() {
 
         {/* ══════════════ ADVANCED ══════════════ */}
         <div className={activeMain === 'advanced' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeAdvancedSub === 'bhava' ? 'tab-fade' : 'hidden'}>
@@ -337,7 +362,6 @@ export default function Result() {
 
         {/* ══════════════ INSIGHTS ══════════════ */}
         <div className={activeMain === 'insights' ? 'tab-fade' : 'hidden'}>
-          <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeInsightSub === 'reading' ? 'tab-fade' : 'hidden'}>

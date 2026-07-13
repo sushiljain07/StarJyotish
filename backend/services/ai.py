@@ -1190,6 +1190,95 @@ def generate_reading(
 # Ask prompt
 # ─────────────────────────────────────────────────────────────────────────────
 
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Chart Highlight — per-chart AI insight (2-3 sentences, light/quick)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_CHART_HIGHLIGHT_META = {
+    "D1":  ("Lagna Chart (D1)",       "overall personality, health, and life path"),
+    "D2":  ("Hora Chart (D2)",        "wealth accumulation, income sources, and financial karma"),
+    "D3":  ("Drekkana Chart (D3)",    "courage, siblings, communication, and short journeys"),
+    "D4":  ("Chaturthamsha (D4)",     "fixed assets, home, property, and general fortune"),
+    "D6":  ("Shashthamsha (D6)",      "health, immunity, service, and enemies"),
+    "D7":  ("Saptamsha (D7)",         "children, creativity, and progeny"),
+    "D9":  ("Navamsha Chart (D9)",    "marriage, dharma, deeper soul purpose, and post-30 life"),
+    "D10": ("Dashamsha Chart (D10)",  "career, profession, public reputation, and ambition"),
+    "D12": ("Dwadashamsha (D12)",     "parents, ancestral karma, and lineage"),
+    "D16": ("Shodashamsha (D16)",     "vehicles, comforts, and material pleasures"),
+    "D20": ("Vimshamsha (D20)",       "spiritual progress and religious inclinations"),
+    "D24": ("Siddhamsha (D24)",       "education, learning, and intellectual capacity"),
+    "D27": ("Nakshatramsha (D27)",    "physical strength, vitality, and fighting spirit"),
+    "D30": ("Trimshamsha (D30)",      "misfortunes, chronic issues, and karmic debts"),
+    "D40": ("Khavedamsha (D40)",      "auspicious and inauspicious patterns from the mother's lineage"),
+    "D45": ("Akshavedamsha (D45)",    "general well-being and character"),
+    "D60": ("Shashtiamsha (D60)",     "past-life karma and deep soul imprints"),
+}
+
+
+def generate_chart_highlight(
+    chart: dict,
+    chart_type: str,
+    language: str = "en",
+) -> tuple[str, str]:
+    """
+    Generate a 2-3 sentence insight for a specific divisional chart.
+    chart_type: "D1", "D9", "D10", etc.
+    Returns (highlight_text, provider_label).
+    """
+    meta = _CHART_HIGHLIGHT_META.get(chart_type, (chart_type, "this area of your life"))
+    chart_name, life_area = meta
+
+    asc = chart.get("ascendant", {})
+    planets = chart.get("planets", [])
+
+    # Build a concise planet summary for the prompt
+    planet_lines = []
+    for p in planets:
+        if not p.get("name"):
+            continue
+        dignity = ""
+        sign_idx = p.get("sign_index", -1)
+        pname = p.get("name", "")
+        exalted_signs = {"Sun": 0, "Moon": 1, "Mars": 9, "Mercury": 5, "Jupiter": 3, "Venus": 11, "Saturn": 6}
+        debil_signs   = {"Sun": 6, "Moon": 7, "Mars": 3, "Mercury": 11, "Jupiter": 9, "Venus": 5, "Saturn": 0}
+        if exalted_signs.get(pname) == sign_idx:
+            dignity = " (Exalted)"
+        elif debil_signs.get(pname) == sign_idx:
+            dignity = " (Debilitated)"
+        planet_lines.append(f"  {pname} in {p.get('sign','?')} H{p.get('house','?')}{dignity}")
+
+    planet_summary = "\n".join(planet_lines[:10]) if planet_lines else "  (no planet data)"
+
+    lang_instruction = (
+        "Respond in Hindi (Devanagari script)." if language.startswith("hi")
+        else "Respond in clear, warm English."
+    )
+
+    prompt = f"""You are Jyotish Guru, a wise and encouraging Vedic astrology guide on Star Jyotish.
+
+A user is viewing their {chart_name}, which reveals {life_area}.
+
+Chart ascendant: {asc.get("sign", "Unknown")} ({asc.get("degree", 0):.1f}°)
+Key planets in this chart:
+{planet_summary}
+
+Write exactly 2-3 sentences that:
+1. Identify the single most important pattern or standout placement in this specific chart
+2. Explain what it means for the user in plain, non-jargon language about {life_area}
+3. End with one gentle, actionable or hopeful note
+
+Rules:
+- No bullet points. Pure flowing prose.
+- Warm, personal, second-person ("your chart shows…", "you carry…")
+- Never use the words: debilitated, weak, afflicted, malefic, neecha, fallen, bad, difficult, 6th house, 8th house, 12th house
+- Keep under 80 words total
+- {lang_instruction}"""
+
+    text, provider = _call_llm([{"role": "user", "content": prompt}])
+    return text.strip(), provider
+
 def ask_chart(
     chart: dict,
     dasha: dict,

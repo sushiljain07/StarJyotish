@@ -138,9 +138,15 @@ export default function ChartReading({ input, onSwitchToCareer }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated])
 
-  // Exit intent — fire once when mouse moves toward browser top
+  // Exit intent — fire once when mouse moves toward browser top. Anonymous-
+  // funnel only: this is a "don't leave without seeing your Raj Yogas"
+  // conversion nudge for someone who hasn't committed to an account yet.
+  // For a signed-in person it has no purpose (they already have full
+  // access) and was firing anyway any time their cursor simply passed
+  // near the top nav — e.g. clicking "Insights" in SiteHeader's tab row,
+  // which sits well within the first 50px of viewport height.
   useEffect(() => {
-    if (status !== 'done') return
+    if (status !== 'done' || isAuthenticated) return
     function onMove(e) {
       if (!exitShown.current && e.clientY < 50) {
         exitShown.current = true
@@ -149,7 +155,7 @@ export default function ChartReading({ input, onSwitchToCareer }) {
     }
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
-  }, [status])
+  }, [status, isAuthenticated])
 
   function handleWaSubmit() {
     if (waNumber.trim()) {

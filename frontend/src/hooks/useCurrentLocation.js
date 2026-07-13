@@ -7,14 +7,24 @@
 // born in but don't live in is the exact bug this hook exists to avoid.
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { getPrimaryProfile } from '../services/astrologyProfiles'
 import {
   getCurrentLocation, setCurrentLocation, isLocationStale, requestBrowserLocation,
 } from '../services/currentLocation'
 
 export function useCurrentLocation() {
   const { user } = useAuth()
-  const [location, setLocation] = useState(() => getCurrentLocation(user?.id))
-  const [status, setStatus] = useState('idle') // idle | requesting | denied | ready
+  // Current location lives on the astrology profile (see db/models/
+  // birth_profile.py), not the user account — it's "where the person
+  // this chart belongs to is right now," which only makes sense in the
+  // context of a profile, and there's only ever one per account.
+  const profile = getPrimaryProfile(user)
+  const profileLocation = (profile?.current_lat != null && profile?.current_lon != null)
+    ? { lat: profile.current_lat, lon: profile.current_lon, label: profile.current_location_label, source: 'profile' }
+    : null
+
+  const [location, setLocation] = useState(() => profileLocation ?? getCurrentLocation(user?.id))
+  const [status, setStatus] = useState(profileLocation ? 'ready' : 'idle') // idle | requesting | denied | ready
 
   const tryGeolocation = useCallback(async () => {
     setStatus('requesting')
@@ -32,6 +42,14 @@ export function useCurrentLocation() {
   }, [user?.id])
 
   useEffect(() => {
+    // The profile's saved location (signup or the profile page's edit
+    // form) wins whenever it's present — it's the person's deliberate,
+    // cross-device choice, not a one-off per-browser geolocation grant.
+    if (profileLocation) {
+      setLocation(profileLocation)
+      setStatus('ready')
+      return
+    }
     const saved = getCurrentLocation(user?.id)
     if (saved && !isLocationStale(saved)) {
       setLocation(saved)
@@ -42,7 +60,7 @@ export function useCurrentLocation() {
     // status becomes 'denied' and LocationBar shows the manual picker.
     tryGeolocation()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id])
+  }, [user?.id, profile?.current_lat, profile?.current_lon])
 
   const setManualLocation = useCallback(({ lat, lon, label }) => {
     const saved = setCurrentLocation(user?.id, { lat, lon, label, source: 'manual' })

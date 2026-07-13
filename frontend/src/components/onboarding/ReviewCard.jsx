@@ -29,8 +29,6 @@ export default function ReviewCard({ t, draft, onEdit }) {
 
   return (
     <div>
-      <Row label={t('onboarding_review_whose')} value={draft.relation === 'self' ? t('onboarding_whose_mine') : t('onboarding_whose_other')} editLabel={edit} onEdit={() => onEdit('profileType')} />
-      <Row label={t('onboarding_review_name')} value={draft.label} editLabel={edit} onEdit={() => onEdit('label')} />
       <Row label={t('onboarding_review_date')} value={formatDate(draft.birthDate)} editLabel={edit} onEdit={() => onEdit('birthDate')} />
       <Row label={t('onboarding_review_time')} value={timeLabel} editLabel={edit} onEdit={() => onEdit('birthTime')} />
       <Row label={t('onboarding_review_place')} value={draft.place} editLabel={edit} onEdit={() => onEdit('birthPlace')} />

@@ -90,7 +90,7 @@ async function apiFetchProfiles(accessToken) {
   return resp.json()
 }
 
-async function apiSaveProfile(accessToken, { label, birth_date, birth_time, place }) {
+async function apiSaveProfile(accessToken, { label, birth_date, birth_time, place, current_lat, current_lon, current_location_label }) {
   const resp = await fetch(`${API_BASE}/api/account/birth-profiles/me`, {
     method: 'POST',
     headers: {
@@ -98,7 +98,7 @@ async function apiSaveProfile(accessToken, { label, birth_date, birth_time, plac
       Authorization: `Bearer ${accessToken}`,
     },
     credentials: 'include',
-    body: JSON.stringify({ label, birth_date, birth_time, place }),
+    body: JSON.stringify({ label, birth_date, birth_time, place, current_lat, current_lon, current_location_label }),
   })
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}))
@@ -155,6 +155,9 @@ async function enrichProfile(user, apiProfile) {
     birth_time_accuracy: 'exact',  // legacy field; assume exact for API profiles
     place: apiProfile.place,
     is_primary: apiProfile.is_primary,
+    current_lat: apiProfile.current_lat ?? null,
+    current_lon: apiProfile.current_lon ?? null,
+    current_location_label: apiProfile.current_location_label ?? null,
     created_at: null,
     chart,
   }
@@ -214,13 +217,22 @@ export async function loadProfiles(user, accessToken) {
   }
 }
 
-// Creates a profile. If authenticated, saves to the API (cross-device).
-// Always saves to localStorage as a warm cache.
-export async function createProfile(user, accessToken, { relation, label, birthDate, birthTime, birthTimeAccuracy, place }) {
+// Creates OR updates the account's one profile — see get_or_create_for_chart
+// on the backend, which upserts by (user_id, label) rather than always
+// inserting. Called both by Onboarding.jsx (first save) and Profile.jsx's
+// edit form (subsequent saves) — same function, since the backend already
+// treats "Self" as a stable slot rather than a new row each time.
+export async function createProfile(user, accessToken, {
+  relation, label, birthDate, birthTime, birthTimeAccuracy, place,
+  currentLat = null, currentLon = null, currentLocationLabel = null,
+}) {
   const chart = await fetchKundli({ date: birthDate, time: birthTime, place })
 
   let profileId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
   let is_primary = !hasAnyProfile(user)
+  let resolvedCurrentLat = currentLat
+  let resolvedCurrentLon = currentLon
+  let resolvedCurrentLocationLabel = currentLocationLabel
 
   // Try to persist to the backend
   if (accessToken) {
@@ -230,9 +242,19 @@ export async function createProfile(user, accessToken, { relation, label, birthD
         birth_date: birthDate,
         birth_time: birthTime,
         place,
+        current_lat: currentLat,
+        current_lon: currentLon,
+        current_location_label: currentLocationLabel,
       })
       profileId = String(saved.id)
       is_primary = saved.is_primary
+      // The backend only overwrites current-location when a new value was
+      // sent (see get_or_create_for_chart's location_updates guard) — if
+      // this save didn't touch location, reflect what's actually saved
+      // server-side rather than the null we sent.
+      resolvedCurrentLat = saved.current_lat ?? currentLat
+      resolvedCurrentLon = saved.current_lon ?? currentLon
+      resolvedCurrentLocationLabel = saved.current_location_label ?? currentLocationLabel
     } catch {
       // Backend unavailable — keep the local id, continue with localStorage-only
     }
@@ -247,6 +269,9 @@ export async function createProfile(user, accessToken, { relation, label, birthD
     birth_time_accuracy: birthTimeAccuracy,
     place,
     is_primary,
+    current_lat: resolvedCurrentLat,
+    current_lon: resolvedCurrentLon,
+    current_location_label: resolvedCurrentLocationLabel,
     created_at: new Date().toISOString(),
     chart,
   }
@@ -254,7 +279,11 @@ export async function createProfile(user, accessToken, { relation, label, birthD
   // Always cache chart data locally (backend doesn't store chart results)
   writeChartCache(user, profileId, chart)
 
-  // Update the legacy localStorage profile list
+  // Update the legacy localStorage profile list. Editing an existing
+  // profile (Profile.jsx's edit form) re-saves under the SAME server id,
+  // so this replaces that entry — it does not append a second one, even
+  // though the account can now only ever have one profile server-side
+  // anyway (migration 0009's unique constraint).
   const all = readAllLegacy()
   const key = accountKey(user)
   // Replace if same id already exists (idempotent re-save), else append

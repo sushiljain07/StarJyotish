@@ -17,6 +17,9 @@ class BirthProfileOut(_ORMModel):
     place: str
     is_primary: bool
     marital_status: Optional[str] = None
+    current_lat: Optional[float] = None
+    current_lon: Optional[float] = None
+    current_location_label: Optional[str] = None
 
 
 class BirthProfileCreate(BaseModel):
@@ -26,6 +29,9 @@ class BirthProfileCreate(BaseModel):
     birth_time: str   # "HH:MM"
     place: str = Field(max_length=200)
     birth_time_accuracy: Optional[str] = None  # 'exact' | 'approximate' | 'unknown' — stored in relation field
+    current_lat: Optional[float] = Field(default=None, ge=-90, le=90)
+    current_lon: Optional[float] = Field(default=None, ge=-180, le=180)
+    current_location_label: Optional[str] = Field(default=None, max_length=200)
 
 
 class ReportSummaryOut(_ORMModel):

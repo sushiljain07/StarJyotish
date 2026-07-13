@@ -1,12 +1,10 @@
 // frontend/src/components/home/HomeMasthead.jsx
 //
-// Replaces HeroBanner + LocationSection + QuickAccess + CosmicSnapshot as
-// the top of PersonalHome. This is the "sky" from the agreed redesign
-// (starjyotish-home-v4.html): a night-sky band whose tone genuinely shifts
-// with the time of day (computed from the real sunrise/sunset in
-// panchang.data, not a demo toggle), carrying the day's real headline from
-// useDailyEditor and a compact panchang preview that hands off to the new
-// /panchang page.
+// Purely the "sky" — ambient scene-setting only. Does NOT show the day's
+// headline text; DailyPatrikaHero (the first beat right below, with its
+// reactions and day-score ring) is the sole owner of that content. Showing
+// it in both places was a real bug in the previous round — same sentence,
+// twice, one screen apart.
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -35,43 +33,45 @@ function currentBucket(sunrise, sunset) {
   return 'night'
 }
 
+// PAGE_BG must match the page body's actual background exactly
+// (bg-night-deep in tailwind.config = #0F1226) — the gradient always ends
+// on this color regardless of time-of-day bucket, so the masthead fades
+// into the page instead of cutting off with a visible seam. Only the top
+// of the gradient (sky1) and the celestial body's color vary by bucket.
+const PAGE_BG = '#0F1226'
 const SKY = {
-  dawn:  { sky1: '#241F3F', sky2: '#4E3A4E', bodyColor: '#E8A874', body: 'sun' },
-  day:   { sky1: '#1D2C56', sky2: '#3A4E86', bodyColor: '#F2C94C', body: 'sun' },
-  dusk:  { sky1: '#1E1938', sky2: '#4A2F4C', bodyColor: '#C05B3C', body: 'sun' },
-  night: { sky1: '#0A0E1C', sky2: '#12102A', bodyColor: '#F7C877', body: 'moon' },
+  dawn:  { sky1: '#33294F', bodyColor: '#E8A874', body: 'sun' },
+  day:   { sky1: '#1D2C56', bodyColor: '#F2C94C', body: 'sun' },
+  dusk:  { sky1: '#2A1F42', bodyColor: '#C05B3C', body: 'sun' },
+  night: { sky1: '#131233', bodyColor: '#F7C877', body: 'moon' },
 }
 
-// Body x/y position along the arc, per bucket — dawn low-left, day high,
-// dusk low-right, night high (moon doesn't track the sun's arc).
+// Body position along the arc, as a % of the band's width/height — dawn
+// low-left, day high-center, dusk low-right, night high (moon doesn't
+// track the sun's arc). Rendered as a real HTML circle (see below), not
+// an SVG shape stretched by preserveAspectRatio="none" — that stretch is
+// what turned the sun into a flat ellipse in the previous round.
 const BODY_POS = {
-  dawn:  { x: 15, y: 68 },
-  day:   { x: 50, y: 16 },
-  dusk:  { x: 85, y: 64 },
-  night: { x: 50, y: 22 },
+  dawn:  { left: '15%', top: '68%' },
+  day:   { left: '50%', top: '18%' },
+  dusk:  { left: '85%', top: '64%' },
+  night: { left: '50%', top: '24%' },
 }
 
-function CelestialBody({ bucket, color }) {
-  const { x, y } = BODY_POS[bucket]
-  const r = bucket === 'day' ? 15 : 13
-  if (SKY[bucket].body === 'sun') {
-    return <circle cx={x} cy={y} r={r} fill={color} />
-  }
-  return (
-    <path
-      d={`M ${x} ${y - r} a ${r} ${r} 0 100 ${r * 2} a ${r * 0.72} ${r * 0.72} 0 11${-r * 0.2} ${-r * 2}z`}
-      fill={color}
-    />
-  )
+function shortLocation(label) {
+  // "Hyderabad, Telangana, India" -> "Hyderabad" — the full geocoded
+  // string is precise but reads as noise in a pill; the city is the part
+  // that's actually useful to see at a glance. Full detail is still on
+  // the profile page.
+  if (!label) return null
+  return label.split(',')[0].trim()
 }
 
 function initials(label) {
   return (label || '?').trim().charAt(0).toUpperCase()
 }
 
-export default function HomeMasthead({
-  profile, profiles = [], location, panchang, headlineText, dashaTags,
-}) {
+export default function HomeMasthead({ profile, profiles = [], location, panchang, dashaTags }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -80,16 +80,19 @@ export default function HomeMasthead({
     [panchang?.sunrise, panchang?.sunset],
   )
   const sky = SKY[bucket]
+  const pos = BODY_POS[bucket]
   const firstName = profile?.label?.split(' ')[0]
+  const currentCity = shortLocation(location?.label)
+  const birthCity = shortLocation(profile?.place)
 
   return (
     <div
-      className="relative overflow-hidden px-4 sm:px-6 pt-5 pb-7 transition-[background] duration-1000"
-      style={{ background: `linear-gradient(175deg, ${sky.sky1} 0%, ${sky.sky2} 78%)` }}
+      className="relative overflow-hidden px-4 sm:px-6 pt-5 pb-8 transition-[background] duration-1000"
+      style={{ background: `linear-gradient(180deg, ${sky.sky1} 0%, ${PAGE_BG} 100%)` }}
     >
       {(bucket === 'night' || bucket === 'dusk') && (
         <div className="absolute inset-0 opacity-70 pointer-events-none" aria-hidden="true">
-          {Array.from({ length: 34 }).map((_, i) => (
+          {Array.from({ length: 28 }).map((_, i) => (
             <span
               key={i}
               className="absolute rounded-full bg-white"
@@ -97,7 +100,7 @@ export default function HomeMasthead({
                 width: Math.random() * 1.6 + 0.6,
                 height: Math.random() * 1.6 + 0.6,
                 left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 65}%`,
+                top: `${Math.random() * 55}%`,
                 opacity: Math.random() * 0.6 + 0.3,
               }}
             />
@@ -106,7 +109,6 @@ export default function HomeMasthead({
       )}
 
       <div className="relative max-w-2xl mx-auto">
-        {/* Profile chips — which chart this home page is reading right now */}
         {profiles.length > 0 && (
           <div className="flex gap-1.5 flex-wrap mb-4">
             {profiles.slice(0, 4).map(p => (
@@ -130,35 +132,40 @@ export default function HomeMasthead({
         <p className="font-serif text-lg font-medium text-primary-light">
           {t('home_greeting', { name: firstName ?? '' })}
         </p>
-        <div className="flex gap-2 mt-1.5">
-          {location?.label && (
+        <div className="flex gap-2 mt-1.5 flex-wrap">
+          {currentCity && (
             <span className="text-[10.5px] font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-              {location.label}
+              Current: {currentCity}
             </span>
           )}
-          {profile?.place && (
+          {birthCity && (
             <span className="text-[10.5px] font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-              born {profile.place}
+              Birth: {birthCity}
             </span>
           )}
         </div>
 
-        {/* Time-of-day arc */}
-        <div className="relative h-20 mt-4 -mb-1">
-          <svg viewBox="0 0 100 92" preserveAspectRatio="none" className="w-full h-full" aria-hidden="true">
-            <path d="M 3 86 Q 50 -12 97 86" fill="none" stroke="rgba(237,234,224,0.18)" strokeWidth="0.5" strokeDasharray="1.4 2.6" />
-            <CelestialBody bucket={bucket} color={sky.bodyColor} />
+        {/* Time-of-day arc — line stretches fine visually; the body itself
+            is a fixed-aspect HTML circle overlaid on top so it can never
+            distort into an ellipse. */}
+        <div className="relative h-16 mt-5">
+          <svg viewBox="0 0 100 60" preserveAspectRatio="none" className="w-full h-full absolute inset-0" aria-hidden="true">
+            <path d="M 3 56 Q 50 -14 97 56" fill="none" stroke="rgba(237,234,224,0.16)" strokeWidth="0.5" strokeDasharray="1.4 2.6" />
           </svg>
+          <span
+            className="absolute rounded-full"
+            style={{
+              left: pos.left, top: pos.top,
+              width: 22, height: 22,
+              transform: 'translate(-50%, -50%)',
+              background: sky.bodyColor,
+              boxShadow: sky.body === 'moon' ? 'inset -5px -2px 0 0 rgba(15,18,38,0.65)' : `0 0 18px 2px ${sky.bodyColor}55`,
+            }}
+          />
         </div>
-
-        {headlineText && (
-          <p className="font-serif text-[21px] sm:text-[23px] font-medium leading-snug text-primary-light -mt-1">
-            {headlineText}
-          </p>
-        )}
 
         {dashaTags && (dashaTags.mahadasha || dashaTags.antardasha) && (
-          <div className="flex gap-2 flex-wrap mt-4">
+          <div className="flex gap-2 flex-wrap mt-3">
             {dashaTags.mahadasha && (
               <span className="text-[10.5px] font-mono text-indigo-200 bg-indigo-400/[0.14] border border-indigo-300/20 px-2.5 py-1 rounded-full">
                 Mahadasha · {dashaTags.mahadasha}

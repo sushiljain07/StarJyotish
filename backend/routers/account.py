@@ -142,10 +142,24 @@ def save_my_birth_profile(
     user: User = Depends(get_current_user),
     db=Depends(get_db),
 ):
-    """Save a birth profile for the authenticated user. Geocodes the place to resolve lat/lon/tz,
-    then calls get_or_create_for_chart so re-saving the same details is idempotent rather than
-    duplicating rows. Returns the saved (or matched) profile."""
+    """Save THE birth profile for the authenticated user (there's only ever
+    one — see migration 0009's unique constraint on birth_profiles.user_id).
+    Geocodes the place to resolve lat/lon/tz, then calls get_or_create_for_
+    chart, which updates the existing "Self" row in place rather than
+    inserting a new one whenever the label matches (see that function's own
+    docstring) — so this endpoint is really "create-or-edit," not "create."
+
+    The IntegrityError catch below is a safety net, not the normal path:
+    every current caller (Onboarding.jsx, Profile.jsx's edit form) always
+    sends label="Self" for the label this account already has, so
+    get_or_create_for_chart's update-in-place branch is what actually
+    fires. This only triggers for a stale client or a hand-crafted request
+    sending a label the account doesn't have yet while already owning a
+    profile — without this catch, that case surfaces as an unhandled 500
+    instead of a clean, explainable 409.
+    """
     from datetime import date as date_, time as time_
+    from sqlalchemy.exc import IntegrityError
     from services.chart_context import resolve_birth_context
     from fastapi import HTTPException as _HTTPException
 
@@ -154,17 +168,27 @@ def save_my_birth_profile(
     except _HTTPException:
         raise HTTPException(status_code=400, detail=f"Could not geocode place: {body.place!r}. Try a more specific name, e.g. 'Raipur, Chhattisgarh, India'.")
 
-    profile = BirthProfileRepository(db).get_or_create_for_chart(
-        user.id,
-        birth_date=date_.fromisoformat(body.birth_date),
-        birth_time=time_.fromisoformat(body.birth_time),
-        place=body.place,
-        lat=ctx.geo.lat,
-        lon=ctx.geo.lon,
-        timezone=ctx.geo.timezone,
-        label=body.label,
-    )
-    db.commit()
+    try:
+        profile = BirthProfileRepository(db).get_or_create_for_chart(
+            user.id,
+            birth_date=date_.fromisoformat(body.birth_date),
+            birth_time=time_.fromisoformat(body.birth_time),
+            place=body.place,
+            lat=ctx.geo.lat,
+            lon=ctx.geo.lon,
+            timezone=ctx.geo.timezone,
+            label=body.label,
+            current_lat=body.current_lat,
+            current_lon=body.current_lon,
+            current_location_label=body.current_location_label,
+        )
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="This account already has an astrology profile. Edit it instead of creating a new one.",
+        )
     db.refresh(profile)
     return profile
 

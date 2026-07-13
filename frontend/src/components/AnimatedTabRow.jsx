@@ -49,6 +49,11 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
       })
     }
     measure()
+    // Pill rows scroll horizontally now (see className below) — if the
+    // active sub-tab isn't the first one (landing directly on
+    // 'divisional', say), it needs to be scrolled into view rather than
+    // sitting off-screen with no visual hint it's there.
+    activeBtn.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
     // Tab label widths/wrapping can change with viewport, so keep the
     // indicator honest on resize rather than freezing it at the wrong spot.
     window.addEventListener('resize', measure)
@@ -60,7 +65,17 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
   return (
     <div
       ref={containerRef}
-      className={`relative flex gap-1 flex-wrap ${isUnderline ? 'hidden sm:flex mt-1' : 'mb-4'} ${className}`}
+      className={`relative flex gap-1 ${
+        isUnderline
+          ? 'flex-wrap hidden sm:flex mt-1'
+          // Pill rows (SubTabBar) can hold up to six English-language
+          // labels — too wide to fit one line on a phone. flex-wrap used
+          // to be here, but a wrapped second line was ending up clipped
+          // (screenshots showed only the last 1-2 of 6 pills visible on
+          // mobile). Horizontal scroll sidesteps that entirely and is
+          // the more common mobile pattern for this many tabs anyway.
+          : 'flex-nowrap overflow-x-auto -mx-1 px-1 mb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+      } ${className}`}
     >
       <div
         className={`absolute top-0 left-0 transition-all duration-300 ease-out ${
@@ -81,7 +96,7 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
               ? `relative z-10 whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
                   active === tab.id ? 'text-primary-dark' : 'text-ink-muted hover:text-ink'
                 }`
-              : `relative z-10 text-xs px-3 py-1.5 rounded-lg border transition-colors duration-200 ${
+              : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-lg border transition-colors duration-200 ${
                   active === tab.id
                     ? `${PILL_ACCENT_TEXT[accent]} font-medium border-transparent`
                     : 'text-ink-muted hover:text-ink border-line hover:border-primary/50'

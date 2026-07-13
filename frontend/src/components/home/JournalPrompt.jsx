@@ -58,8 +58,8 @@ export default function JournalPrompt() {
   const submitted = status === 'done'
 
   return (
-    <div className="border border-dashed border-line rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-parchment-card">
-      <p className="text-[13.5px] text-ink-muted">
+    <div className="border border-dashed border-white/[0.16] rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/[0.03]">
+      <p className="text-[13.5px] text-ink-onnight/70">
         {submitted ? t('journal_thanks') : t('journal_question')}
       </p>
       <div className="flex gap-2">
@@ -72,8 +72,8 @@ export default function JournalPrompt() {
               picked === opt.id
                 ? 'bg-primary text-night border-primary'
                 : submitted
-                  ? 'border-line text-ink-faint opacity-40 cursor-default'
-                  : 'border-line text-ink-muted hover:border-primary/50'
+                  ? 'border-white/[0.14] text-ink-onnight/35 opacity-40 cursor-default'
+                  : 'border-white/[0.14] text-ink-onnight/70 hover:border-primary/50'
             }`}
           >
             {status === 'sending' && picked === opt.id ? '…' : `${opt.emoji} ${t(opt.key)}`}

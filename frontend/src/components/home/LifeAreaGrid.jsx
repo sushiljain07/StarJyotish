@@ -29,7 +29,7 @@ export default function LifeAreaGrid({ areas, onOpenReport }) {
           <button
             key={area.id}
             onClick={() => onOpenReport(area.topicId)}
-            className="text-left bg-parchment-card border border-line rounded-2xl p-4 transition hover:border-primary/40 hover:shadow-sm group flex flex-col gap-2"
+            className="text-left bg-white/[0.045] border border-white/[0.09] rounded-2xl p-4 transition hover:border-primary/40 group flex flex-col gap-2"
           >
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -40,24 +40,24 @@ export default function LifeAreaGrid({ areas, onOpenReport }) {
             </div>
 
             {/* Area name */}
-            <p className="font-serif font-semibold text-[14px] text-ink leading-tight">
+            <p className="font-serif font-semibold text-[14px] text-primary-light leading-tight">
               {t(`life_area_${area.id}`, area.label)}
             </p>
 
             {/* Score bar */}
-            <div className="h-1.5 bg-line rounded-full overflow-hidden w-full">
+            <div className="h-1.5 bg-white/[0.08] rounded-full overflow-hidden w-full">
               <div className="h-full rounded-full" style={{ width: `${area.pct}%`, background: BAR_COLOR[area.trend] }} />
             </div>
 
             {/* Insight line — lord + house */}
             {area.nugget && (
-              <p className="text-[11px] text-ink-faint leading-snug line-clamp-2">
+              <p className="text-[11px] text-ink-onnight/45 leading-snug line-clamp-2">
                 {area.nugget}
               </p>
             )}
 
             {/* CTA */}
-            <p className="text-[11px] font-bold text-primary-dark mt-auto group-hover:underline">
+            <p className="text-[11px] font-bold text-primary mt-auto group-hover:underline">
               {t('report_open')} →
             </p>
           </button>

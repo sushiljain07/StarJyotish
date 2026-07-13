@@ -47,18 +47,38 @@ class BirthProfileRepository(BaseRepository[BirthProfile]):
         timezone: str,
         label: str = "Self",
         marital_status: Optional[str] = None,
+        current_lat: Optional[float] = None,
+        current_lon: Optional[float] = None,
+        current_location_label: Optional[str] = None,
     ) -> BirthProfile:
+        # current_lat/current_lon arriving as None means "the caller didn't
+        # send a current-location update this time" (e.g. editing birth
+        # details without touching location) — not "clear the saved
+        # location." Only overwrite when a value is actually provided.
+        location_updates = {}
+        if current_lat is not None and current_lon is not None:
+            location_updates = {
+                "current_lat": current_lat,
+                "current_lon": current_lon,
+                "current_location_label": current_location_label,
+            }
+
         # 1. Same birth details already saved under any label -> reuse it,
         #    regardless of which label this particular request asked for.
         existing = self.find_matching(user_id, birth_date, birth_time, lat, lon)
         if existing is not None:
+            if location_updates:
+                return self.update(existing, **location_updates)
             return existing
 
         # 2. This label exists but with different details (e.g. the user
         #    corrected their birth time). Treat `label` as a stable slot —
         #    "Self" should always mean "this user's own chart" — and update
         #    it in place rather than violate the (user_id, label) uniqueness
-        #    constraint by trying to insert a second "Self" row.
+        #    constraint by trying to insert a second "Self" row. This is
+        #    also the path a deliberate "edit my profile" action from the
+        #    profile page takes, now that only one profile per user is
+        #    ever allowed (see migration 0009).
         existing_label = self.get_by_label(user_id, label)
         if existing_label is not None:
             return self.update(
@@ -70,10 +90,13 @@ class BirthProfileRepository(BaseRepository[BirthProfile]):
                 lon=lon,
                 timezone=timezone,
                 marital_status=marital_status or existing_label.marital_status,
+                **location_updates,
             )
 
-        # 3. Genuinely new profile.
-        is_first = len(self.list_for_user(user_id)) == 0
+        # 3. Genuinely new profile. Only reachable for an account with zero
+        #    profiles today — migration 0009's unique constraint on
+        #    user_id means a second row here would fail at the database
+        #    level, which is the real enforcement of "one profile."
         return self.create(
             user_id=user_id,
             label=label,
@@ -84,5 +107,6 @@ class BirthProfileRepository(BaseRepository[BirthProfile]):
             lon=lon,
             timezone=timezone,
             marital_status=marital_status,
-            is_primary=is_first,
+            is_primary=True,
+            **location_updates,
         )

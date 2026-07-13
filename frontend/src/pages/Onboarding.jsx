@@ -10,7 +10,7 @@
 // logic* (generating and saving the chart) — this file never talks to
 // fetchKundli or localStorage directly.
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -19,12 +19,14 @@ import CompactFooter from '../components/CompactFooter'
 import OnboardingLayout from '../components/onboarding/OnboardingLayout'
 import ProgressIndicator from '../components/onboarding/ProgressIndicator'
 import QuestionCard from '../components/onboarding/QuestionCard'
-import ProfileTypeSelector from '../components/onboarding/ProfileTypeSelector'
 import BirthTimeSelector from '../components/onboarding/BirthTimeSelector'
 import ReviewCard from '../components/onboarding/ReviewCard'
 import LoadingState from '../components/onboarding/LoadingState'
 import CompletionCelebration from '../components/onboarding/CompletionCelebration'
 import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
+import { usePlaceMatches } from '../hooks/usePlaceMatches'
+import { requestBrowserLocation } from '../services/currentLocation'
+import { fetchReverseGeocode } from '../api/astro'
 import {
   hasAnyProfile,
   markOnboardingSkipped,
@@ -32,10 +34,16 @@ import {
   UNKNOWN_BIRTH_TIME_DEFAULT,
 } from '../services/astrologyProfiles'
 
-// The six real questions, in order — Welcome and Generating bookend this
-// list but aren't questions themselves, so ProgressIndicator only ever
-// counts these six (see OnboardingLayout.jsx's comment).
-const QUESTION_STEPS = ['profileType', 'label', 'birthDate', 'birthTime', 'birthPlace', 'review']
+// Four questions now, not six — this account has exactly one astrology
+// profile (migration 0009 enforces that with a unique constraint on
+// birth_profiles.user_id), always "self", so there's no "whose chart is
+// this" step and no separate "what should we call it" step; the label is
+// just derived from the account's own name. Welcome and Generating
+// bookend this list but aren't questions themselves, so ProgressIndicator
+// only ever counts these four (see OnboardingLayout.jsx's comment).
+// currentLocation isn't in this list either — it's an extra, uncounted
+// step after Review, same as Generating/Complete.
+const QUESTION_STEPS = ['birthDate', 'birthTime', 'birthPlace', 'review']
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 const currentYear = new Date().getFullYear()
@@ -54,36 +62,38 @@ function to24Hour(hour, ampm) {
 export default function Onboarding() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const location = useLocation()
   const { user, accessToken } = useAuth()
-
-  // Allow re-entry when the user explicitly chose "Add another chart"
-  // (Profile.jsx links here with state { addAnother: true }).
-  // Without this flag, hasAnyProfile() would bounce them straight back
-  // to /home before they could add a second profile.
-  const addingAnother = Boolean(location.state?.addAnother)
 
   const [step, setStep] = useState('welcome')
   const [draft, setDraft] = useState({
-    relation: null,
-    label: '',
     day: '', month: '', year: '',
     birthDate: '',
     birthTimeAccuracy: null,
     hour: '', minute: '', ampm: '',
     place: '',
+    // "Where are you right now" — distinct from `place` (birth place)
+    // above, and saved onto the same astrology profile alongside it (see
+    // the 'currentLocation' step and generate() below).
+    currentLat: null,
+    currentLon: null,
+    currentLocationLabel: '',
   })
+  const [locationStatus, setLocationStatus] = useState('idle') // idle | requesting | denied
+  const [manualLocationQuery, setManualLocationQuery] = useState('')
+  const manualLocationMatches = usePlaceMatches(manualLocationQuery)
   const [placeQuery, setPlaceQuery] = useState('')
   const [showPlaceSuggestions, setShowPlaceSuggestions] = useState(false)
   const [generationError, setGenerationError] = useState(null)
   const [createdProfile, setCreatedProfile] = useState(null)
   const placeSuggestions = usePlaceSuggestions(placeQuery)
 
-  // Returning users with an existing profile skip onboarding unless they
-  // explicitly arrived via "Add another chart" (addingAnother flag above).
+  // One profile per account (see migration 0009) — a returning user with
+  // a profile already always skips straight to /home. There's no
+  // "add another chart" re-entry any more; editing happens on the
+  // profile page instead (see Profile.jsx).
   useEffect(() => {
-    if (!addingAnother && hasAnyProfile(user)) navigate('/home', { replace: true })
-  }, [user, navigate, addingAnother])
+    if (hasAnyProfile(user)) navigate('/home', { replace: true })
+  }, [user, navigate])
 
   function update(patch) {
     setDraft(d => ({ ...d, ...patch }))
@@ -94,17 +104,29 @@ export default function Onboarding() {
     navigate('/home', { replace: true })
   }
 
-  function goToProfileType() {
-    setStep('profileType')
+  // Only ever offered for this account's one profile. Reverse-geocoding
+  // failure still keeps the coordinates (a nameless pin is still useful
+  // for panchang math); only the pretty label is best-effort.
+  async function useMyLocation() {
+    setLocationStatus('requesting')
+    try {
+      const { lat, lon } = await requestBrowserLocation()
+      const label = await fetchReverseGeocode(lat, lon)
+      update({ currentLat: lat, currentLon: lon, currentLocationLabel: label ?? '' })
+      setLocationStatus('granted')
+    } catch {
+      setLocationStatus('denied')
+    }
   }
 
-  // Relation is chosen and the step advances in one tap — no separate
-  // "Continue" button for this screen, since a single selection is
-  // already a complete answer.
+  function chooseManualLocation(match) {
+    update({ currentLat: match.lat, currentLon: match.lon, currentLocationLabel: match.display_name })
+    setLocationStatus('granted')
+    setManualLocationQuery('')
+  }
 
-  function chooseRelation(relation) {
-    update({ relation, label: relation === 'self' ? (user?.name?.split(' ')[0] ?? '') : draft.label })
-    setStep('label')
+  function proceedFromReview() {
+    setStep('currentLocation')
   }
 
   async function generate() {
@@ -117,12 +139,15 @@ export default function Onboarding() {
         : UNKNOWN_BIRTH_TIME_DEFAULT
 
       const profile = await createProfile(user, accessToken, {
-        relation: draft.relation,
-        label: draft.label,
+        relation: 'self',
+        label: user?.name?.split(' ')[0] || 'Self',
         birthDate: draft.birthDate,
         birthTime,
         birthTimeAccuracy: draft.birthTimeAccuracy,
         place: draft.place,
+        currentLat: draft.currentLat,
+        currentLon: draft.currentLon,
+        currentLocationLabel: draft.currentLocationLabel || null,
       })
       setCreatedProfile(profile)
       setStep('complete')
@@ -142,12 +167,11 @@ export default function Onboarding() {
 
   function backFrom(currentStep) {
     const map = {
-      profileType: 'welcome',
-      label: 'profileType',
-      birthDate: 'label',
+      birthDate: 'welcome',
       birthTime: 'birthDate',
       birthPlace: 'birthTime',
       review: 'birthPlace',
+      currentLocation: 'review',
     }
     return map[currentStep]
   }
@@ -161,24 +185,7 @@ export default function Onboarding() {
           <CompletionCelebration
             t={t}
             label={createdProfile?.label}
-            onContinue={() => {
-              if (createdProfile && createdProfile.relation !== 'self' && createdProfile.chart) {
-                navigate('/kundli', {
-                  replace: true,
-                  state: {
-                    data: createdProfile.chart,
-                    input: {
-                      date: createdProfile.birth_date,
-                      time: createdProfile.birth_time,
-                      place: createdProfile.place,
-                      name: createdProfile.label,
-                    },
-                  },
-                })
-              } else {
-                navigate('/home', { replace: true })
-              }
-            }}
+            onContinue={() => navigate('/home', { replace: true })}
           />
         </main>
         <CompactFooter />
@@ -201,32 +208,8 @@ export default function Onboarding() {
             title={t('onboarding_welcome_title')}
             helperText={t('onboarding_welcome_body')}
             primaryLabel={t('onboarding_welcome_cta')}
-            onPrimary={goToProfileType}
-          />
-        )}
-
-        {step === 'profileType' && (
-          <QuestionCard title={t('onboarding_whose_title')}>
-            <ProfileTypeSelector t={t} value={draft.relation} onChange={chooseRelation} />
-          </QuestionCard>
-        )}
-
-        {step === 'label' && (
-          <QuestionCard
-            title={draft.relation === 'self' ? t('onboarding_label_title_self') : t('onboarding_label_title_other')}
-            primaryLabel={t('onboarding_continue')}
-            primaryDisabled={!draft.label.trim()}
             onPrimary={() => setStep('birthDate')}
-          >
-            <input
-              type="text"
-              autoFocus
-              value={draft.label}
-              onChange={e => update({ label: e.target.value })}
-              placeholder={draft.relation === 'self' ? t('onboarding_label_placeholder_self') : t('onboarding_label_placeholder_other')}
-              className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </QuestionCard>
+          />
         )}
 
         {step === 'birthDate' && (
@@ -314,7 +297,7 @@ export default function Onboarding() {
           <QuestionCard
             title={t('onboarding_review_title')}
             primaryLabel={t('onboarding_review_cta')}
-            onPrimary={generate}
+            onPrimary={proceedFromReview}
           >
             <ReviewCard t={t} draft={draft} onEdit={setStep} />
             {generationError && (
@@ -322,6 +305,71 @@ export default function Onboarding() {
                 {generationError}
               </p>
             )}
+          </QuestionCard>
+        )}
+
+        {step === 'currentLocation' && (
+          <QuestionCard
+            title={t('onboarding_current_location_title')}
+            helperText={t('onboarding_current_location_body')}
+            primaryLabel={t('onboarding_continue')}
+            primaryDisabled={false}
+            onPrimary={generate}
+          >
+            <div className="space-y-3">
+              {draft.currentLat != null ? (
+                <div className="border border-primary/40 bg-primary-light/30 rounded-xl px-4 py-3 text-sm text-ink flex items-center justify-between gap-3">
+                  <span>📍 {draft.currentLocationLabel || `${draft.currentLat.toFixed(2)}, ${draft.currentLon.toFixed(2)}`}</span>
+                  <button
+                    type="button"
+                    onClick={() => { update({ currentLat: null, currentLon: null, currentLocationLabel: '' }); setLocationStatus('idle') }}
+                    className="text-xs text-ink-muted underline shrink-0"
+                  >
+                    {t('onboarding_current_location_change')}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={useMyLocation}
+                    disabled={locationStatus === 'requesting'}
+                    className="w-full border border-primary rounded-xl px-4 py-3 bg-primary text-night font-semibold text-sm disabled:opacity-60"
+                  >
+                    {locationStatus === 'requesting'
+                      ? t('onboarding_current_location_requesting')
+                      : t('onboarding_current_location_use_gps')}
+                  </button>
+
+                  {locationStatus === 'denied' && (
+                    <p className="text-xs text-vermillion text-center">{t('onboarding_current_location_denied')}</p>
+                  )}
+
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={manualLocationQuery}
+                      onChange={e => setManualLocationQuery(e.target.value)}
+                      placeholder={t('onboarding_current_location_manual_placeholder')}
+                      className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    {manualLocationMatches.length > 0 && (
+                      <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto text-left">
+                        {manualLocationMatches.map((m, i) => (
+                          <li key={i} onMouseDown={() => chooseManualLocation(m)}
+                              className="px-4 py-2.5 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
+                            {m.display_name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </>
+              )}
+              <button type="button" onClick={generate} className="w-full text-xs text-ink-muted underline pt-1">
+                {t('onboarding_current_location_skip')}
+              </button>
+            </div>
           </QuestionCard>
         )}
 

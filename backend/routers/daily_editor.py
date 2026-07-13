@@ -1,25 +1,29 @@
 """
 POST /api/daily-edition — the Patrika hero's content.
 
-Takes birth data (same shape as /kundli) plus the dasha context the
-frontend already has from the saved chart, so we don't recompute the full
-Vimshottari tree here — the chart is the source of truth the frontend
-already trusts; this endpoint only adds what changes daily (transit
-events, headline, countdowns).
-
-The frontend caches the response per profile per day in localStorage
-(useDailyEditor.js), so this endpoint — and its one LLM call — fires at
-most once per profile per day per device.
+v2 changes:
+- Accepts `variation` (int, default 0) — lets frontend request a fresh
+  card on each session open without exhausting the daily LLM budget.
+  variation=0 is the daily baseline; variation=1,2,3… produce alternate
+  card types drawn from the next-best astronomical events.
+- Accepts `natal_planets` (list) — passed from the chart the frontend
+  already holds, used to detect natal-return transits without recomputing.
 """
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 from services.chart_context import resolve_birth_context
 from services.daily_editor import compose_daily_edition
 from services.rate_limit import limiter, LLM_LIMIT
 
 router = APIRouter()
+
+
+class PlanetData(BaseModel):
+    name: str
+    sign_index: int
+    degree: float = 0.0
 
 
 class DailyEditionInput(BaseModel):
@@ -34,6 +38,8 @@ class DailyEditionInput(BaseModel):
     abhijit_start: Optional[str] = None
     abhijit_end: Optional[str] = None
     language: str = Field("en", pattern="^(en|hi)$")
+    variation: int = Field(0, ge=0, le=99, description="Content rotation index — 0=daily baseline, 1+=fresh card")
+    natal_planets: Optional[List[PlanetData]] = Field(None, description="Natal planet positions for return detection")
 
 
 @router.post("/daily-edition")
@@ -45,6 +51,7 @@ def get_daily_edition(request: Request, body: DailyEditionInput):
         {"start": body.abhijit_start, "end": body.abhijit_end}
         if body.abhijit_start and body.abhijit_end else None
     )
+    natal_list = [p.dict() for p in body.natal_planets] if body.natal_planets else None
     return compose_daily_edition(
         natal_jd=jd, lat=lat, lon=lon,
         label=body.label,
@@ -52,4 +59,6 @@ def get_daily_edition(request: Request, body: DailyEditionInput):
         md_start=body.md_start, md_end=body.md_end,
         abhijit=abhijit,
         language=body.language,
+        variation=body.variation,
+        natal_planets=natal_list,
     )

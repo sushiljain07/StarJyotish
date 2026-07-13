@@ -28,7 +28,9 @@ function yesterdayHeadline(profileKey, lang) {
   d.setDate(d.getDate() - 1)
   const day = d.toISOString().slice(0, 10)
   try {
-    const raw = localStorage.getItem(`sj_daily_edition_v1:${profileKey}:${lang}:${day}`)
+    // Try v2 key first, fall back to v1 for backwards compat
+    const raw = localStorage.getItem(`sj_daily_ed_v2:${profileKey}:${lang}:${day}`)
+              || localStorage.getItem(`sj_daily_edition_v1:${profileKey}:${lang}:${day}`)
     return raw ? JSON.parse(raw)?.headline ?? null : null
   } catch {
     return null
@@ -84,7 +86,7 @@ export default function ReflectionLoop({ profile, lang = 'en' }) {
   }
 
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl px-5 py-4">
+    <div className="bg-white/[0.045] border border-white/[0.09] rounded-2xl px-5 py-4">
       <div className="flex items-start gap-3.5">
         <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/30 mt-0.5">
           <JyotiAvatar />
@@ -92,45 +94,45 @@ export default function ReflectionLoop({ profile, lang = 'en' }) {
 
         <div className="flex-1 min-w-0">
           {thanked ? (
-            <p className="text-sm text-ink leading-relaxed">
+            <p className="text-sm text-ink-onnight/80 leading-relaxed">
               {t('reflection_thanks')}{' '}
-              <button onClick={tellJyoti} className="text-primary-dark font-semibold hover:underline">
+              <button onClick={tellJyoti} className="text-primary font-semibold hover:underline">
                 {t('reflection_tell_more')}
               </button>
             </p>
           ) : isEvening ? (
             <>
-              <p className="text-sm text-ink leading-relaxed mb-2.5">{t('reflection_evening_prompt')}</p>
+              <p className="text-sm text-ink-onnight/80 leading-relaxed mb-2.5">{t('reflection_evening_prompt')}</p>
               <button
                 onClick={tellJyoti}
-                className="text-xs font-semibold bg-night text-parchment rounded-full px-4 py-2 hover:bg-night-light transition"
+                className="text-xs font-semibold bg-primary text-night rounded-full px-4 py-2 hover:bg-primary-dark transition"
               >
                 {t('reflection_evening_cta')}
               </button>
             </>
           ) : (
             <>
-              <p className="text-[11px] uppercase tracking-wider font-bold text-primary-dark mb-1">
+              <p className="text-[11px] uppercase tracking-wider font-bold text-primary mb-1">
                 {t('reflection_yesterday_label')}
               </p>
-              <p className="text-[13px] text-ink-muted italic leading-snug mb-2.5 line-clamp-2">
+              <p className="text-[13px] text-ink-onnight/70 italic leading-snug mb-2.5 line-clamp-2">
                 “{yHeadline}”
               </p>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[13px] text-ink font-medium mr-1">{t('reflection_how_did_it_go')}</span>
+                <span className="text-[13px] text-ink-onnight/85 font-medium mr-1">{t('reflection_how_did_it_go')}</span>
                 {REACTIONS.map(r => (
                   <button
                     key={r.id}
                     onClick={() => react(r)}
                     disabled={reacted}
-                    className="text-xs border border-line rounded-full px-3 py-1.5 hover:border-primary/50 hover:bg-primary-light/40 transition disabled:opacity-40"
+                    className="text-xs border border-white/[0.14] rounded-full px-3 py-1.5 hover:border-primary/50 hover:bg-primary/10 transition disabled:opacity-40"
                   >
                     {r.emoji} {t(`reflection_${r.id}`)}
                   </button>
                 ))}
                 <button
                   onClick={tellJyoti}
-                  className="text-xs text-primary-dark font-semibold hover:underline ml-1"
+                  className="text-xs text-primary font-semibold hover:underline ml-1"
                 >
                   {t('reflection_tell_jyoti')} →
                 </button>

@@ -231,16 +231,6 @@ export default function Result() {
     return null
   }
 
-  // Measure sticky bar height dynamically so content is never hidden beneath it.
-  const stickyRef = useRef(null)
-  const [stickyH, setStickyH] = useState(0)
-  useEffect(() => {
-    if (!stickyRef.current) return
-    const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
-    ro.observe(stickyRef.current)
-    return () => ro.disconnect()
-  }, [])
-
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
       <Seo title="Your Kundli" description="Your personalized Vedic Kundli and AI reading." path="/kundli" noindex />

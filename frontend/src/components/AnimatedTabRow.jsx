@@ -1,19 +1,15 @@
 // frontend/src/components/AnimatedTabRow.jsx
 //
-// Replaces Result.jsx's old plain tab buttons (instant color swap) with a
-// sliding background indicator that animates to the clicked tab — paired
-// with the `prediction-fade` class on each tab's content panel (see
-// index.css), so switching tabs now reads as one connected motion instead
-// of the previous abrupt "hidden" toggle. Measures the active button's
-// position via a ref map and animates a single absolutely-positioned
-// indicator underneath the (transparent-background) buttons, rather than
-// pulling in an animation library — this app has none installed, and one
-// element sliding between a handful of fixed buttons doesn't need one.
+// Two variants:
+//   - 'underline': top-level Kundli/Advanced/Insights/Ask row.
+//     Sliding background indicator that looks like the active tab's
+//     own card background + top-border.
+//   - 'pill': SubTabBar's filled accent-colored pills. Horizontally
+//     scrollable on mobile to accommodate up to 6 labels.
 //
-// Two variants, matching the two tab styles already in Result.jsx:
-//   - 'underline': the top-level Kundli/Advanced/Insights/Ask row —
-//     indicator looks like the active tab's own background+top-border.
-//   - 'pill': SubTabBar's filled accent-colored pills.
+// Indicator positioning uses offsetLeft/offsetTop (container-relative)
+// rather than getBoundingClientRect (viewport-relative) so it stays
+// correct inside scrollable or sticky containers.
 import { useEffect, useRef, useState } from 'react'
 
 const PILL_ACCENT_BG = {
@@ -28,39 +24,41 @@ const PILL_ACCENT_TEXT = {
   sage:    'text-white',
 }
 
-export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, variant = 'underline', accent = 'primary', className = '' }) {
+export default function AnimatedTabRow({
+  tabs, active, onChange, renderIcon,
+  variant = 'underline', accent = 'primary', className = ''
+}) {
   const containerRef = useRef(null)
-  const buttonRefs = useRef({})
+  const buttonRefs  = useRef({})
   const [indicatorStyle, setIndicatorStyle] = useState({ opacity: 0 })
 
   useEffect(() => {
-    const container = containerRef.current
     const activeBtn = buttonRefs.current[active]
-    if (!container || !activeBtn) return
+    if (!activeBtn) return
 
     function measure() {
-      const containerRect = container.getBoundingClientRect()
-      const btnRect = activeBtn.getBoundingClientRect()
+      // offsetLeft/offsetTop are relative to offsetParent (the container
+      // div with position:relative), so they're unaffected by page scroll
+      // or the container's own horizontal scroll position.
       setIndicatorStyle({
-        opacity: 1,
-        transform: `translate(${btnRect.left - containerRect.left}px, ${btnRect.top - containerRect.top}px)`,
-        width: `${btnRect.width}px`,
-        height: `${btnRect.height}px`,
+        opacity:   1,
+        transform: `translate(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px)`,
+        width:     `${activeBtn.offsetWidth}px`,
+        height:    `${activeBtn.offsetHeight}px`,
       })
     }
+
     measure()
-    // Pill rows scroll horizontally now (see className below) — if the
-    // active sub-tab isn't the first one (landing directly on
-    // 'divisional', say), it needs to be scrolled into view rather than
-    // sitting off-screen with no visual hint it's there.
-    // Only scroll horizontally — block:'nearest' was scrolling the whole
-    // page and hiding the pill row behind the sticky context bar.
-    activeBtn.scrollIntoView?.({ block: 'nearest', inline: 'center' })
-    // Tab label widths/wrapping can change with viewport, so keep the
-    // indicator honest on resize rather than freezing it at the wrong spot.
+
+    // For pill rows (horizontal scroll): scroll the active pill into
+    // view within the row — inline only, never touch vertical page scroll.
+    if (variant === 'pill') {
+      activeBtn.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+    }
+
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
-  }, [active, tabs])
+  }, [active, tabs, variant])
 
   const isUnderline = variant === 'underline'
 
@@ -70,13 +68,7 @@ export default function AnimatedTabRow({ tabs, active, onChange, renderIcon, var
       className={`relative flex gap-1 ${
         isUnderline
           ? 'flex-wrap hidden sm:flex mt-1'
-          // Pill rows (SubTabBar) can hold up to six English-language
-          // labels — too wide to fit one line on a phone. flex-wrap used
-          // to be here, but a wrapped second line was ending up clipped
-          // (screenshots showed only the last 1-2 of 6 pills visible on
-          // mobile). Horizontal scroll sidesteps that entirely and is
-          // the more common mobile pattern for this many tabs anyway.
-          : 'flex-nowrap overflow-x-auto -mx-1 px-1 mb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+          : 'flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       } ${className}`}
     >
       <div

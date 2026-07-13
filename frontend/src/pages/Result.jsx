@@ -17,6 +17,7 @@ import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
+import ChartHighlight from '../components/ChartHighlight'
 import TopicIcon from '../components/TopicIcon'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -208,15 +209,20 @@ export default function Result() {
   function renderBirthChart() {
     if (chartStyle === 'north') {
       return (
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
-          <div className="w-full sm:w-[460px]">
-            <KundliChart planets={data.planets} ascendant={data.ascendant}
-                         navamsaPlanets={data.navamsa_planets}
-                         title={t('tab_birth_chart', 'Lagna Chart')} />
-          </div>
-          <div className="w-full sm:w-[460px]">
-            <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
-                         title={t('tab_navamsa', 'Navamsa (D9)')} />
+        <div className="space-y-6">
+          {/* D1 Lagna + AI insight */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
+            <div className="w-full sm:w-[460px] space-y-1">
+              <KundliChart planets={data.planets} ascendant={data.ascendant}
+                           navamsaPlanets={data.navamsa_planets}
+                           title={t('tab_birth_chart', 'Lagna Chart')} />
+              <ChartHighlight input={input} chartType="D1" autoLoad />
+            </div>
+            <div className="w-full sm:w-[460px] space-y-1">
+              <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
+                           title={t('tab_navamsa', 'Navamsa (D9)')} />
+              <ChartHighlight input={input} chartType="D9" />
+            </div>
           </div>
         </div>
       )
@@ -317,10 +323,31 @@ export default function Result() {
           </div>
 
           <div className={activeKundliSub === 'planets' ? 'tab-fade' : 'hidden'}>
+            {/* Context banner */}
+            <div className="mb-4 relative overflow-hidden rounded-xl px-4 py-3"
+                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
+                 style={{ color: 'rgba(212,175,55,0.55)' }}>Planet Positions</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
+                Every planet's sign, house, nakshatra, and dignity at the moment of your birth.
+                Retrograde (R) planets express their energy inward — more reflective, sometimes delayed, always deep.
+              </p>
+            </div>
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
 
           <div className={activeKundliSub === 'dasha' ? 'tab-fade' : 'hidden'}>
+            {/* Context banner */}
+            <div className="mb-4 relative overflow-hidden rounded-xl px-4 py-3"
+                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
+                 style={{ color: 'rgba(212,175,55,0.55)' }}>Vimshottari Dasha</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
+                Your life unfolds in planetary time cycles called Dashas — each ruled by a planet whose themes
+                dominate that period. Your active Mahadasha shapes the decade; Antardasha refines the year.
+                The highlighted row is your present period.
+              </p>
+            </div>
             <DashaTable dasha={data.dasha} />
           </div>
 

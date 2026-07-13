@@ -11,7 +11,7 @@ from services.chart_context import resolve_birth_context
 from services.astro_calc import calculate_chart
 from services.divisional_charts import calculate_divisional_chart
 from services.dasha import calculate_vimshottari
-from services.ai import generate_reading, ask_chart
+from services.ai import generate_reading, ask_chart, generate_chart_highlight
 from services.ashtakavarga import calculate_ashtakavarga
 from services.career_analysis import check_all_yogas
 from services.kp_system import enrich_planets_kp
@@ -260,3 +260,26 @@ def get_divisional_chart(request: Request, body: BirthInput, division: int = 1):
 
     result = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, division)
     return result
+
+class ChartHighlightRequest(BirthInput):
+    chart_type: str = "D1"   # "D1", "D9", "D10", …
+    language: str = "en"
+
+
+@router.post("/kundli/chart-highlight")
+@limiter.limit(LLM_LIMIT)
+def get_chart_highlight(request: Request, body: ChartHighlightRequest):
+    """
+    Return a 2-3 sentence AI highlight for a specific divisional chart.
+    Used by the Kundli page to surface a brief, contextual insight under each chart.
+    """
+    ctx = resolve_birth_context(body.place, body.date, body.time)
+    geo, jd_ut = ctx.geo, ctx.jd_ut
+
+    from services.divisional_charts import calculate_divisional_chart
+    division = int(body.chart_type.lstrip("D") or 1)
+    chart = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, division)
+
+    highlight, provider = generate_chart_highlight(chart, body.chart_type, body.language)
+    return {"highlight": highlight, "llm_provider": provider}
+

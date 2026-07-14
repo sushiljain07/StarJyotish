@@ -4,7 +4,7 @@
 // Receives chart state via router location (same shape as Result.jsx).
 // Accessed via /insights — promoted from a tab inside /kundli.
 
-import { useState, lazy, Suspense, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, lazy, Suspense, useRef, useLayoutEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'

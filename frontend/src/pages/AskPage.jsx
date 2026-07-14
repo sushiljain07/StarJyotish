@@ -5,7 +5,7 @@
 // linked directly (e.g. from landing page AI persona spotlight) and keeps
 // a clean back-link to /kundli.
 
-import { lazy, Suspense, useRef, useEffect, useState } from 'react'
+import { lazy, Suspense, useRef, useLayoutEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import SiteHeader from '../components/SiteHeader'

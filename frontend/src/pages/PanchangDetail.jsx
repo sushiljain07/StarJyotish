@@ -8,7 +8,6 @@
 // Layout matches Knowledge Center / Privacy Policy: SiteHeader (opaque
 // bg-night) + parchment body + Footer.
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
@@ -16,7 +15,6 @@ import Footer from '../components/Footer'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
-import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { requestBrowserLocation, setCurrentLocation, getCurrentLocation, isLocationStale } from '../services/currentLocation'
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -230,7 +228,6 @@ function LocationPrompt({ onSetLocation }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function PanchangDetail() {
-  const { t } = useTranslation()
   const { user } = useAuth()
 
   // For logged-in users, useCurrentLocation pulls from their profile + localStorage.

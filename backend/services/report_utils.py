@@ -65,19 +65,27 @@ def call_llm(
                     "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
                 },
                 json={
-                    "model": "anthropic/claude-sonnet-4.6",
+                    "model": "anthropic/claude-sonnet-4-5",
                     "max_tokens": 7000,
                     "messages": or_messages,
                 },
                 timeout=90,
             )
-            resp.raise_for_status()
-            text = resp.json()["choices"][0]["message"]["content"]
-            return extract_json(text), "Claude"
+            if resp.status_code in (402, 403):
+                try:
+                    detail = resp.json().get("error", {}).get("message", resp.text[:200])
+                except Exception:
+                    detail = resp.text[:200]
+                logger.warning("[%s] OpenRouter %s (%s) — falling back to Groq.", log_prefix, resp.status_code, detail)
+            else:
+                resp.raise_for_status()
+                text = resp.json()["choices"][0]["message"]["content"]
+                return extract_json(text), "Claude"
         except json.JSONDecodeError as e:
             raise RuntimeError(f"Claude (via OpenRouter) returned non-JSON: {e}") from e
         except Exception as e:
             logger.warning("[%s] Claude via OpenRouter error (%s: %s), falling back to Groq.", log_prefix, type(e).__name__, e)
+        # fall through to Groq
     elif anthropic_key:
         import anthropic as _anthropic
         client = _anthropic.Anthropic(api_key=anthropic_key)

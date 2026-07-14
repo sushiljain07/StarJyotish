@@ -25,7 +25,7 @@ const LIFE_AREAS = [
     code: 'D9',
     d: 9,
     emoji: '❤️',
-    governs: 'Marriage, long-term partnerships, dharma, and the soul's deeper purpose. The D9 is considered equally important as the birth chart — a strong Navamsa protects and elevates.',
+    governs: `Marriage, long-term partnerships, dharma, and the soul's deeper purpose. The D9 is considered equally important as the birth chart — a strong Navamsa protects and elevates.`,
   },
   {
     area: 'Career',
@@ -33,7 +33,7 @@ const LIFE_AREAS = [
     code: 'D10',
     d: 10,
     emoji: '💼',
-    governs: 'Profession, status, reputation, and achievements in the outer world. The D10 reveals what you are here to build — and which planetary periods accelerate it.',
+    governs: `Profession, status, reputation, and achievements in the outer world. The D10 reveals what you are here to build — and which planetary periods accelerate it.`,
   },
   {
     area: 'Wealth',
@@ -41,7 +41,7 @@ const LIFE_AREAS = [
     code: 'D2',
     d: 2,
     emoji: '💰',
-    governs: 'Income, money flow, and material accumulation. The D2 shows whether your wealth comes through Sun-ruled effort or Moon-ruled inheritance and flow.',
+    governs: `Income, money flow, and material accumulation. The D2 shows whether your wealth comes through Sun-ruled effort or Moon-ruled inheritance and flow.`,
   },
   {
     area: 'Children',
@@ -49,7 +49,7 @@ const LIFE_AREAS = [
     code: 'D7',
     d: 7,
     emoji: '👶',
-    governs: 'Children, progeny, and creative output. The D7 is consulted for timing of childbirth and the nature of the parent-child relationship.',
+    governs: `Children, progeny, and creative output. The D7 is consulted for timing of childbirth and the nature of the parent-child relationship.`,
   },
   {
     area: 'Education',
@@ -57,7 +57,7 @@ const LIFE_AREAS = [
     code: 'D24',
     d: 24,
     emoji: '📚',
-    governs: 'Formal learning, intellect, skill acquisition, and academic success. The D24 reveals the depth and direction of your intellectual potential.',
+    governs: `Formal learning, intellect, skill acquisition, and academic success. The D24 reveals the depth and direction of your intellectual potential.`,
   },
   {
     area: 'Property',
@@ -65,7 +65,7 @@ const LIFE_AREAS = [
     code: 'D4',
     d: 4,
     emoji: '🏡',
-    governs: 'Home, fixed assets, land, and immovable property. The D4 is the chart of roots — where you settle and what you accumulate in terms of physical foundation.',
+    governs: `Home, fixed assets, land, and immovable property. The D4 is the chart of roots — where you settle and what you accumulate in terms of physical foundation.`,
   },
   {
     area: 'Spiritual',
@@ -73,7 +73,7 @@ const LIFE_AREAS = [
     code: 'D20',
     d: 20,
     emoji: '🙏',
-    governs: 'Spiritual progress, devotion, and sadhana. The D20 shows the quality of your inner practice and which deity or path is naturally aligned with your soul.',
+    governs: `Spiritual progress, devotion, and sadhana. The D20 shows the quality of your inner practice and which deity or path is naturally aligned with your soul.`,
   },
   {
     area: 'Past Karma',
@@ -81,7 +81,7 @@ const LIFE_AREAS = [
     code: 'D60',
     d: 60,
     emoji: '♾️',
-    governs: 'Deep past-life imprints and karmic residues carried into this life. The D60 is the subtlest chart — used by advanced practitioners to trace unexplained patterns.',
+    governs: `Deep past-life imprints and karmic residues carried into this life. The D60 is the subtlest chart — used by advanced practitioners to trace unexplained patterns.`,
   },
   {
     area: 'Health',
@@ -89,7 +89,7 @@ const LIFE_AREAS = [
     code: 'D6',
     d: 6,
     emoji: '💚',
-    governs: 'Physical health, immunity, service, and the nature of illnesses. The D6 reveals constitutional strengths and vulnerabilities at the cellular level.',
+    governs: `Physical health, immunity, service, and the nature of illnesses. The D6 reveals constitutional strengths and vulnerabilities at the cellular level.`,
   },
 ]
 

@@ -63,7 +63,7 @@ function SummaryChips({ data }) {
 // 4 main tabs that map to the 4 facets of the Kundli experience.
 // Insights and Ask have been promoted to their own pages (/insights, /ask)
 // so this page is purely the chart — the data layer.
-function mainTabs(t) {
+function mainTabs() {
   return [
     { id: 'birth_chart', label: 'Birth Chart',    icon: '/starjyotish.svg' },
     { id: 'divisional',  label: 'Life Areas',     icon: 'insights' },
@@ -109,7 +109,6 @@ export default function Result() {
   const homeDestination = isAuthenticated ? '/home' : '/'
 
   // Support deep-links from PersonalHome
-  const landToAsk      = Boolean(state?.landToAsk || state?.presetQuestion)
   const initTab        = state?.activeTab    ?? 'birth_chart'
   const initBirthSub   = state?.activeSubtab ?? 'chart'
 
@@ -161,7 +160,7 @@ export default function Result() {
   const { data, input, presetQuestion = null } = state
   const topic = getTopic(input.topic)
 
-  const MAIN_TABS      = mainTabs(t)
+  const MAIN_TABS      = mainTabs()
   const BIRTH_SUBTABS  = birthSubtabs()
   const ANALYSIS_SUBTABS = analysisSubtabs()
 

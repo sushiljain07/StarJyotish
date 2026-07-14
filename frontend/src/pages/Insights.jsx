@@ -2,8 +2,7 @@
 //
 // Standalone page for AI-powered chart readings, reports, and Rajyogas.
 // Receives chart state via router location (same shape as Result.jsx).
-// Accessed via /insights — promoted from a tab inside /kundli so it has
-// its own URL, its own focus, and its own back-navigation story.
+// Accessed via /insights — promoted from a tab inside /kundli.
 
 import { useState, lazy, Suspense, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -13,7 +12,6 @@ import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import TopicIcon from '../components/TopicIcon'
-import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
@@ -53,8 +51,11 @@ export default function Insights() {
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
+  // All hooks must be called before any early returns
   const stickyRef = useRef(null)
   const [stickyH, setStickyH] = useState(0)
+  const [activeSub, setActiveSub] = useState('reading')
+
   useEffect(() => {
     if (!stickyRef.current) return
     const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
@@ -62,17 +63,16 @@ export default function Insights() {
     return () => ro.disconnect()
   }, [])
 
-  if (!state?.data && !state?.input) {
+  if (!state?.input) {
     navigate(homeDestination)
     return null
   }
 
-  const { data, input } = state
+  const { input } = state
   const topic   = getTopic(input?.topic)
   const topicId = topic?.id ?? null
 
   const SUBTABS = insightSubtabs(t, topicId)
-  const [activeSub, setActiveSub] = useState('reading')
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
@@ -105,7 +105,7 @@ export default function Insights() {
             </button>
           </div>
 
-          {/* Page title */}
+          {/* Page label */}
           <div className="py-1.5">
             <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(212,175,55,0.6)' }}>
               Insights

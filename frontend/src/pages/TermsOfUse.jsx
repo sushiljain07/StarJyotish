@@ -50,6 +50,7 @@ export default function TermsOfUse() {
             <li><a href="#acceptable-use" className="hover:underline">Acceptable use</a></li>
             <li><a href="#ip" className="hover:underline">Intellectual property</a></li>
             <li><a href="#fees" className="hover:underline">Fees &amp; payments</a></li>
+            <li><a href="#subscriptions" className="hover:underline">Subscriptions</a></li>
             <li><a href="#third-party" className="hover:underline">Third-party services</a></li>
             <li><a href="#warranty" className="hover:underline">Disclaimer of warranties</a></li>
             <li><a href="#liability" className="hover:underline">Limitation of liability</a></li>
@@ -116,17 +117,38 @@ export default function TermsOfUse() {
           cancellations are governed by our <Link to="/refund-policy" className="text-primary-dark hover:underline">Refund
           & Cancellation Policy</Link>.</p>
 
-        <h2 id="third-party" className={h2}>8. Third-party services</h2>
+        <h2 id="subscriptions" className={h2}>8. Subscriptions — once available</h2>
+        <p>We may offer subscription plans (monthly or annual) that give access to premium features for a
+          recurring fee. The following terms will apply when subscriptions launch:</p>
+        <ul className={ul}>
+          <li><strong className="text-ink">Billing.</strong> Your chosen payment method will be charged
+            automatically at the start of each billing cycle. The price shown at sign-up is your price for that
+            cycle; we'll give at least 30 days' notice before increasing the price of an active subscription.</li>
+          <li><strong className="text-ink">Cancellation.</strong> You may cancel at any time from your account
+            settings. Cancellation takes effect at the end of the current paid period — you retain access to
+            premium features until then and are not charged for the next cycle.</li>
+          <li><strong className="text-ink">No partial-period refunds.</strong> We do not pro-rate or refund the
+            unused portion of a subscription period after cancellation, except where required by applicable law
+            or our <Link to="/refund-policy" className="text-primary-dark hover:underline">Refund &amp;
+            Cancellation Policy</Link> (e.g. a technical failure on our end).</li>
+          <li><strong className="text-ink">Plan changes.</strong> Upgrading to a higher tier takes effect
+            immediately and is charged on a pro-rated basis. Downgrading takes effect at the next renewal date.</li>
+          <li><strong className="text-ink">Free trials.</strong> If a free trial is offered, it will convert
+            automatically to a paid subscription at the end of the trial period unless you cancel beforehand. We
+            will remind you before the trial ends.</li>
+        </ul>
+
+        <h2 id="third-party" className={h2}>9. Third-party services</h2>
         <p>The Platform relies on third-party services (AI providers, geocoding, hosting, and — once live —
           payments) described in our Privacy Policy. We are not responsible for the availability, content, or
           practices of these third parties beyond our agreements with them.</p>
 
-        <h2 id="warranty" className={h2}>9. Disclaimer of warranties</h2>
+        <h2 id="warranty" className={h2}>10. Disclaimer of warranties</h2>
         <p>The Platform is provided "as is" and "as available," without warranties of any kind, express or
           implied, including fitness for a particular purpose or non-infringement. We do not warrant that the
           Platform will be uninterrupted, error-free, or available at all times.</p>
 
-        <h2 id="liability" className={h2}>10. Limitation of liability</h2>
+        <h2 id="liability" className={h2}>11. Limitation of liability</h2>
         <p>To the maximum extent permitted by Indian law, Star Jyotish shall not be liable for any indirect,
           incidental, special, or consequential damages arising from your use of the Platform, including
           decisions made in reliance on astrological content. Where liability cannot be excluded, our total
@@ -135,26 +157,26 @@ export default function TermsOfUse() {
           Terms limits liability that cannot lawfully be limited, such as liability for fraud or gross
           negligence.</p>
 
-        <h2 id="indemnification" className={h2}>11. Indemnification</h2>
+        <h2 id="indemnification" className={h2}>12. Indemnification</h2>
         <p>You agree to indemnify and hold Star Jyotish harmless from claims, losses, or expenses (including
           reasonable legal fees) arising from your violation of these Terms or misuse of the Platform.</p>
 
-        <h2 id="termination" className={h2}>12. Termination</h2>
+        <h2 id="termination" className={h2}>13. Termination</h2>
         <p>We may suspend or terminate your access to the Platform at any time for violation of these Terms, or
           to comply with legal obligations. You may stop using the Platform at any time; once accounts exist,
           you'll be able to request account deletion as described in our Privacy Policy.</p>
 
-        <h2 id="governing-law" className={h2}>13. Governing law & jurisdiction</h2>
+        <h2 id="governing-law" className={h2}>14. Governing law & jurisdiction</h2>
         <p>These Terms are governed by the laws of India. Subject to applicable consumer-protection law, courts
           at <em className="text-ink-faint">Raigarh, Chhattisgarh, India [to be updated to match the company's
           registered office once incorporated]</em> shall have exclusive jurisdiction over any dispute arising
           from these Terms.</p>
 
-        <h2 id="changes" className={h2}>14. Changes to these Terms</h2>
+        <h2 id="changes" className={h2}>15. Changes to these Terms</h2>
         <p>We may update these Terms from time to time; continued use of the Platform after an update
           constitutes acceptance of the revised Terms. We'll update the "Last updated" date above whenever we do.</p>
 
-        <h2 id="contact" className={h2}>15. Contact</h2>
+        <h2 id="contact" className={h2}>16. Contact</h2>
         <p>Questions about these Terms can be sent to{' '}
           <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>.</p>
       </StaticPageLayout>

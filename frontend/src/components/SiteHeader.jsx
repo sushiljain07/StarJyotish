@@ -23,10 +23,10 @@ import { getPrimaryProfile } from '../services/astrologyProfiles'
 // a destination for it.
 const NAV_LINKS = [
   { label: 'Home',        to: '/home' },
-  { label: 'Charts',      to: '/kundli', activeTab: 'birth_chart', activeSubtab: 'chart' },
-  { label: 'Predictions', to: '/insights' },
+  { label: 'My Charts',   to: '/kundli',   activeTab: 'birth_chart', activeSubtab: 'chart' },
+  { label: 'AI Guidance', to: '/insights' },
+  { label: 'Explore',     to: '/learn' },
   { label: 'Panchang',    to: '/panchang' },
-  { label: 'Insights',    to: '/insights' },
 ]
 
 export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {

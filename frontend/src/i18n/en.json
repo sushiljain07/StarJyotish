@@ -814,5 +814,10 @@
   "ai_insight_avoid": "Current window is inauspicious. The next favorable window is {{window}} starting at {{time}}.",
   "ai_insight_avoid_no_next": "Current window is inauspicious. Use this time for routine tasks and avoid new commitments.",
   "ai_insight_neutral": "Neutral period now. {{window}} starts at {{time}} — plan your key activities for then.",
-  "ai_insight_default": "Check today's windows below to plan your activities around the most auspicious times."
+  "ai_insight_default": "Check today's windows below to plan your activities around the most auspicious times.",
+  "nav_home_tab": "Home",
+  "nav_my_charts": "My Charts",
+  "nav_ai_guidance": "AI Guidance",
+  "nav_explore": "Explore",
+  "nav_panchang_tab": "Panchang"
 }

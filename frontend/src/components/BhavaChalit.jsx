@@ -151,11 +151,12 @@ export default function BhavaChalit({ input }) {
                     <tr className="bg-night/5 text-ink-muted">
                       <th className="p-2.5 text-left border-b border-line">Planet</th>
                       <th className="p-2.5 text-left border-b border-line">Sign</th>
-                      <th className="p-2.5 text-right border-b border-line">Degree</th>
-                      <th className="p-2.5 text-left border-b border-line">Nakshatra</th>
+                      {/* Degree hidden on mobile — too narrow for 7 cols */}
+                      <th className="p-2.5 text-right border-b border-line hidden sm:table-cell">Degree</th>
+                      <th className="p-2.5 text-left border-b border-line hidden sm:table-cell">Nakshatra</th>
                       <th className="p-2.5 text-center border-b border-line">Rashi H</th>
                       <th className="p-2.5 text-center border-b border-line">Bhava H</th>
-                      <th className="p-2.5 text-center border-b border-line">Shift</th>
+                      <th className="p-2.5 text-center border-b border-line whitespace-nowrap">Shift</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -169,17 +170,17 @@ export default function BhavaChalit({ input }) {
                           {p.name}
                         </td>
                         <td className="p-2.5 border-b border-line text-ink">{p.sign}</td>
-                        <td className="p-2.5 border-b border-line text-right tabular-nums text-ink-muted">
+                        <td className="p-2.5 border-b border-line text-right tabular-nums text-ink-muted hidden sm:table-cell">
                           {p.degree.toFixed(2)}°
                         </td>
-                        <td className="p-2.5 border-b border-line text-ink-muted">{p.nakshatra}</td>
+                        <td className="p-2.5 border-b border-line text-ink-muted hidden sm:table-cell">{p.nakshatra}</td>
                         <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
                           {p.rashi_house}
                         </td>
                         <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
                           {p.bhava_house}
                         </td>
-                        <td className="p-2.5 border-b border-line text-center">
+                        <td className="p-2.5 border-b border-line text-center whitespace-nowrap">
                           {p.changed
                             ? <span className="font-semibold" style={{ color: '#D9A441' }}>H{p.rashi_house}→H{p.bhava_house}</span>
                             : <span className="text-sage font-medium">Same</span>}

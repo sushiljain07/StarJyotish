@@ -814,5 +814,10 @@
   "ai_insight_avoid": "अभी अशुभ समय है। अगला शुभ मुहूर्त {{window}} — {{time}} से।",
   "ai_insight_avoid_no_next": "अभी अशुभ समय है। केवल नियमित काम करें।",
   "ai_insight_neutral": "अभी सामान्य समय है। {{window}} {{time}} से शुरू होगा।",
-  "ai_insight_default": "नीचे दिए समय के अनुसार दिनचर्या की योजना बनाएं।"
+  "ai_insight_default": "नीचे दिए समय के अनुसार दिनचर्या की योजना बनाएं।",
+  "nav_home_tab": "होम",
+  "nav_my_charts": "मेरी कुंडली",
+  "nav_ai_guidance": "AI मार्गदर्शन",
+  "nav_explore": "एक्सप्लोर",
+  "nav_panchang_tab": "पंचांग"
 }

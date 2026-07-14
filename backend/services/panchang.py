@@ -101,6 +101,51 @@ def _nakshatra_of(lon: float) -> str:
     return NAKSHATRAS[idx]
 
 
+def _next_boundary_jd(jd_start: float, span_deg: float, current_value: float) -> float:
+    """Binary-search for the next time the relevant lunar arc crosses the next
+    multiple of span_deg degrees past current_value.
+
+    span_deg=12 → Tithi boundary (each tithi is 12° of Moon-Sun arc)
+    span_deg=360/27 → Nakshatra boundary (each nakshatra is 13°20' of Moon lon)
+
+    Returns a Julian Day (UT). Search window is capped at 3 days, which is
+    safely wider than any tithi or nakshatra (fastest tithi ~19h; slowest ~26h;
+    nakshatra ~24h typical).
+    """
+    target = (int(current_value / span_deg) + 1) * span_deg  # next boundary
+
+    def arc(jd: float) -> float:
+        ayanamsa = swe.get_ayanamsa_ut(jd)
+        if span_deg == 12:  # tithi: Moon–Sun arc
+            sun_lon = (swe.calc_ut(jd, swe.SUN, CALC_FLAGS)[0][0] - ayanamsa) % 360
+            moon_lon = (swe.calc_ut(jd, swe.MOON, CALC_FLAGS)[0][0] - ayanamsa) % 360
+            return (moon_lon - sun_lon) % 360
+        else:  # nakshatra: Moon longitude only
+            return (swe.calc_ut(jd, swe.MOON, CALC_FLAGS)[0][0] - ayanamsa) % 360
+
+    lo, hi = jd_start, jd_start + 3.0  # 3-day cap
+    for _ in range(52):  # 52 bisections → sub-second precision
+        mid = (lo + hi) / 2
+        val = arc(mid)
+        # Handle the wrap-around at 360→0 by checking distance to target
+        dist_lo = (arc(lo) - target) % 360
+        dist_mid = (val - target) % 360
+        # If the midpoint is "past" the target (small distance mod 360), move hi
+        if dist_mid < dist_lo:
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
+
+
+def _end_time_str(jd_boundary: float, tz_name: str) -> Optional[str]:
+    """Convert a JD boundary to a local time string, or None on failure."""
+    try:
+        return _fmt(_jd_to_local(jd_boundary, tz_name))
+    except Exception:
+        return None
+
+
 def _jd_to_local(jd_ut: float, tz_name: str) -> Optional[datetime]:
     """Convert a Julian Day (UT) to a localized datetime, or None if the
     rise/set search failed to find an event (can happen near the poles)."""
@@ -165,11 +210,22 @@ def calculate_panchang(lat: float, lon: float, tz_name: str,
     moonrise = _jd_to_local(_rise_set(jd_midnight, swe.MOON, swe.CALC_RISE, geopos), tz_name)
     moonset  = _jd_to_local(_rise_set(jd_midnight, swe.MOON, swe.CALC_SET, geopos), tz_name)
 
+    # Tithi end: find when Moon–Sun arc next crosses the next 12° boundary
+    tithi_arc = (moon_lon - sun_lon) % 360
+    tithi_end_jd = _next_boundary_jd(jd_now, 12.0, tithi_arc)
+    tithi_data = _tithi(sun_lon, moon_lon)
+    tithi_data["ends_at"] = _end_time_str(tithi_end_jd, tz_name)
+
+    # Nakshatra end: find when Moon longitude next crosses the next 13°20' boundary
+    nak_span = 360 / 27
+    nak_end_jd = _next_boundary_jd(jd_now, nak_span, moon_lon % 360)
+    nakshatra_name = _nakshatra_of(moon_lon)
+
     result = {
         "date": now_utc.date().isoformat(),
         "weekday": _WEEKDAY_NAMES[now_utc.weekday()],
-        "tithi": _tithi(sun_lon, moon_lon),
-        "nakshatra": _nakshatra_of(moon_lon),
+        "tithi": tithi_data,
+        "nakshatra": {"name": nakshatra_name, "ends_at": _end_time_str(nak_end_jd, tz_name)},
         "yoga": _yoga(sun_lon, moon_lon),
         "karana": _karana(sun_lon, moon_lon),
         "sunrise": _fmt(sunrise),

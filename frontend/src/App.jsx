@@ -45,7 +45,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/generate" element={<Home />} />
           <Route path="/home" element={<ProtectedRoute><OnboardingGate><PersonalHome /></OnboardingGate></ProtectedRoute>} />
-          <Route path="/panchang" element={<ProtectedRoute><OnboardingGate><PanchangDetail /></OnboardingGate></ProtectedRoute>} />
+          <Route path="/panchang" element={<PanchangDetail />} />
           <Route path="/week-ahead" element={<ProtectedRoute><OnboardingGate><WeekAhead /></OnboardingGate></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/kundli" element={<Result />} />

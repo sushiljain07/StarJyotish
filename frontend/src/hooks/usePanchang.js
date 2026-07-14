@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react'
 import { fetchPanchang } from '../api/astro'
 
-export function usePanchang(location) {
+export function usePanchang(location, date) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -17,12 +17,12 @@ export function usePanchang(location) {
     let cancelled = false
     setLoading(true)
     setError(false)
-    fetchPanchang({ lat: location.lat, lon: location.lon, timezone: location.timezone })
+    fetchPanchang({ lat: location.lat, lon: location.lon, timezone: location.timezone, date })
       .then(res => { if (!cancelled) setData(res) })
       .catch(() => { if (!cancelled) setError(true) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [location?.lat, location?.lon])
+  }, [location?.lat, location?.lon, date])
 
   return { data, loading, error }
 }

@@ -87,8 +87,8 @@ export async function fetchReverseGeocode(lat, lon) {
 // from fetchTransit above, which is keyed to birth data. lat/lon here
 // come from browser geolocation or a manually chosen city, never from an
 // Astrology Profile's birth place.
-export function fetchPanchang({ lat, lon, timezone }) {
-  return postJson('/api/panchang', { lat, lon, timezone })
+export function fetchPanchang({ lat, lon, timezone, date }) {
+  return postJson('/api/panchang', { lat, lon, timezone, date })
 }
 
 // Today plus the next (days-1) days of Panchang for the same location —

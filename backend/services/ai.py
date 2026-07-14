@@ -808,27 +808,44 @@ def _call_claude_via_openrouter(
     json_mode: bool = False,
 ) -> str:
     """
-    Call Claude Sonnet 4.6 through OpenRouter's OpenAI-compatible endpoint.
-    OpenRouter bills/proxies the request but the model itself is still
-    Anthropic's Claude — only the transport changes.
+    Call Claude via OpenRouter. Raises RuntimeError (not HTTPException) on
+    any failure so _call_llm's fallback to Groq always triggers correctly.
+    Credit exhaustion (402/403) is logged explicitly before raising.
     """
     payload: dict = {"model": _OPENROUTER_MODEL, "messages": messages, "max_tokens": 4096}
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
-    resp = requests.post(
-        _OPENROUTER_URL,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            # Optional, but OpenRouter recommends these for attribution/rankings.
-            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://starjyotish.app"),
-            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
-        },
-        json=payload,
-        timeout=60,
-    )
-    resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"]
+    try:
+        resp = requests.post(
+            _OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://starjyotish.app"),
+                "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
+            },
+            json=payload,
+            timeout=60,
+        )
+        if resp.status_code in (402, 403):
+            # 402 = insufficient credits, 403 = forbidden (bad key / model access)
+            try:
+                detail = resp.json().get("error", {}).get("message", resp.text[:200])
+            except Exception:
+                detail = resp.text[:200]
+            logger.warning(
+                "OpenRouter %s — %s. Falling back to Groq.",
+                resp.status_code,
+                detail,
+            )
+            raise RuntimeError(f"OpenRouter {resp.status_code}: {detail}")
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+    except RuntimeError:
+        raise  # re-raise our own RuntimeError unchanged
+    except Exception as exc:
+        logger.warning("OpenRouter request failed (%s: %s). Falling back to Groq.", type(exc).__name__, exc)
+        raise RuntimeError(f"OpenRouter error: {exc}") from exc
 
 
 def _call_groq(
@@ -844,7 +861,7 @@ def _call_groq(
     payload: dict = {"model": _GROQ_MODEL, "messages": messages}
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
-    last_exc: Exception = RuntimeError("no attempts")
+    last_exc: Exception = RuntimeError("no attempts made")
     for attempt in range(retries):
         try:
             resp = requests.post(
@@ -855,6 +872,7 @@ def _call_groq(
                 timeout=30,
             )
             if resp.status_code == 429:
+                logger.warning("Groq rate limited (attempt %d/%d), retrying…", attempt + 1, retries)
                 time.sleep(2 ** attempt)
                 continue
             resp.raise_for_status()
@@ -863,6 +881,7 @@ def _call_groq(
             raise
         except Exception as exc:
             last_exc = exc
+            logger.warning("Groq attempt %d/%d failed: %s: %s", attempt + 1, retries, type(exc).__name__, exc)
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)
     raise HTTPException(status_code=503, detail=f"Groq API error: {last_exc}") from last_exc
@@ -890,11 +909,14 @@ def _call_llm(messages: list[dict], json_mode: bool = False) -> tuple[str, str]:
     try:
         return _call_groq(messages, json_mode), "Groq · Llama"
     except HTTPException as exc:
-        # Both providers failed — show why each one failed, not just the fallback's
-        # error, so a misconfigured primary key doesn't get masked by Groq's message.
         raise HTTPException(
             status_code=503,
             detail=f"AI unavailable — Claude: {claude_reason}; Groq: {exc.detail}",
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"AI unavailable — Claude: {claude_reason}; Groq: {exc}",
         ) from exc
 
 

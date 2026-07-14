@@ -47,7 +47,28 @@ export default function RefundPolicy() {
             own verification process)</li>
         </ul>
 
-        <h2 className={h2}>2. Live astrologer consultations (chat/call) — once available</h2>
+        <h2 className={h2}>2. Subscription plans — once available</h2>
+        <p>When recurring subscription plans launch, the following refund and cancellation terms apply:</p>
+        <ul className={ul}>
+          <li><strong className="text-ink">Cancellation.</strong> You may cancel your subscription at any time
+            from account settings. Access continues until the end of the current paid billing period; you will
+            not be charged for the next cycle.</li>
+          <li><strong className="text-ink">No mid-cycle refunds.</strong> We do not pro-rate or refund the
+            remaining days of a billing period after cancellation, except as required by applicable law.</li>
+          <li><strong className="text-ink">Refund within 7 days of first charge.</strong> If you subscribed for
+            the first time and have not used any premium features, you may request a full refund within 7
+            calendar days of your initial subscription charge by contacting us at the address below.</li>
+          <li><strong className="text-ink">Free-trial conversions.</strong> If your subscription began as a
+            free trial, the 7-day refund window starts from the date the trial converts to a paid plan.</li>
+          <li><strong className="text-ink">Duplicate or erroneous charges.</strong> If you were charged twice in
+            one billing cycle, or charged after a confirmed cancellation, you are entitled to a full refund of
+            the duplicate/erroneous amount.</li>
+          <li><strong className="text-ink">Prolonged platform outage.</strong> If the Platform is unavailable
+            for more than 72 consecutive hours during your subscription period due to issues on our end, you
+            may request a pro-rated credit for the affected days.</li>
+        </ul>
+
+        <h2 className={h2}>3. Live astrologer consultations (chat/call) — once available</h2>
         <p>For paid one-on-one sessions with an astrologer on the marketplace (not yet live):</p>
         <ul className={ul}>
           <li><strong className="text-ink">Before the session starts:</strong> you may cancel for a full refund if
@@ -60,14 +81,14 @@ export default function RefundPolicy() {
             it is non-refundable — you are paying for the astrologer's time, which has been delivered</li>
         </ul>
 
-        <h2 className={h2}>3. Wallet balance — once available</h2>
+        <h2 className={h2}>4. Wallet balance — once available</h2>
         <p>If we introduce a prepaid wallet for consultations, any unused balance will remain available for
           future use and will not expire arbitrarily. Wallet balances are intended to be spent within the
           Platform on consultations and reports; cash withdrawal/refund of an unused wallet balance, where
           offered, will be processed back to your original payment method, less any non-recoverable payment
           gateway fees, in line with RBI guidelines applicable to prepaid instruments at that time.</p>
 
-        <h2 className={h2}>4. How to request a refund</h2>
+        <h2 className={h2}>5. How to request a refund</h2>
         <p>Email <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>{' '}
           with your payment receipt/transaction ID and a short description of the issue. We aim to:</p>
         <ul className={ul}>
@@ -79,13 +100,13 @@ export default function RefundPolicy() {
             own processing timelines once it leaves our system</li>
         </ul>
 
-        <h2 className={h2}>5. Grievance redressal</h2>
+        <h2 className={h2}>6. Grievance redressal</h2>
         <p>If you're unsatisfied with how a refund request was handled, you can escalate it to our Grievance
           Officer at the same email above. See our <Link to="/terms" className="text-primary-dark hover:underline">Terms
           of Use</Link> and <Link to="/privacy" className="text-primary-dark hover:underline">Privacy Policy</Link> for
           related terms.</p>
 
-        <h2 className={h2}>6. Changes to this policy</h2>
+        <h2 className={h2}>7. Changes to this policy</h2>
         <p>We'll update this page as new payment features launch, and will update the "Last updated" date above
           whenever we do. The version shown to you at the time of your purchase governs that transaction.</p>
       </StaticPageLayout>

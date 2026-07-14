@@ -35,8 +35,9 @@ export default function AskPage() {
 
   const stickyRef = useRef(null)
   const [stickyH, setStickyH] = useState(0)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!stickyRef.current) return
+    setStickyH(stickyRef.current.getBoundingClientRect().height)
     const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
     ro.observe(stickyRef.current)
     return () => ro.disconnect()
@@ -84,7 +85,7 @@ export default function AskPage() {
 
       <div
         className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
-        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '160px' }}
+        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '130px' }}
       >
         <Suspense fallback={<TabLoader />}>
           <AskChart input={input} initialQuestion={presetQuestion} />

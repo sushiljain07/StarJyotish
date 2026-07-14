@@ -23,10 +23,10 @@ import { getPrimaryProfile } from '../services/astrologyProfiles'
 // a destination for it.
 const NAV_LINKS = [
   { label: 'Home',        to: '/home' },
-  { label: 'Charts',      to: '/kundli', activeTab: 'kundli',   activeSubtab: 'birth_chart' },
-  { label: 'Predictions', to: '/kundli', activeTab: 'insights', activeSubtab: 'reading' },
+  { label: 'Charts',      to: '/kundli', activeTab: 'birth_chart', activeSubtab: 'chart' },
+  { label: 'Predictions', to: '/insights' },
   { label: 'Panchang',    to: '/panchang' },
-  { label: 'Insights',    to: '/kundli', activeTab: 'insights', activeSubtab: 'reading' },
+  { label: 'Insights',    to: '/insights' },
 ]
 
 export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
@@ -41,16 +41,20 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const borderAlpha = 0.06 + p * 0.08
 
   function handleNav(link) {
-    if (!link.activeTab) { navigate(link.to); return }
+    // Plain links (Panchang, Home) — no chart state needed
+    if (link.to !== '/kundli' && link.to !== '/insights') {
+      navigate(link.to)
+      return
+    }
+    // Chart-linked pages require a profile
     if (!profile) { navigate('/generate'); return }
-    navigate(link.to, {
-      state: {
-        data: profile.chart,
-        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
-        activeTab: link.activeTab,
-        activeSubtab: link.activeSubtab,
-      },
-    })
+    const chartState = {
+      data: profile.chart,
+      input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
+      activeTab: link.activeTab,
+      activeSubtab: link.activeSubtab,
+    }
+    navigate(link.to, { state: chartState })
   }
 
   return (

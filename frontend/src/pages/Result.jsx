@@ -5,10 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 
-// ── Eager imports ────────────────────────────────────────────────────────────
-// Components the user sees immediately on first render (birth chart tab).
-// Everything else is lazy so the initial JS bundle the landing page downloads
-// doesn't include 2,700+ lines of chart/AI/report code nobody has asked for yet.
+// ── Eager imports ─────────────────────────────────────────────────────────────
 import KundliChart     from '../components/KundliChart'
 import DashaTable      from '../components/DashaTable'
 import PlanetTable     from '../components/PlanetTable'
@@ -22,10 +19,7 @@ import TopicIcon from '../components/TopicIcon'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
 
-// ── Lazy imports ─────────────────────────────────────────────────────────────
-// Loaded on first access of the tab that needs them. Vite automatically splits
-// each of these into a separate chunk, so a user who only ever looks at the
-// birth chart and planets never downloads the AI reading or advanced chart code.
+// ── Lazy imports ──────────────────────────────────────────────────────────────
 const KPChart            = lazy(() => import('../components/KPChart'))
 const DivisionalCharts   = lazy(() => import('../components/DivisionalCharts'))
 const TransitPanel       = lazy(() => import('../components/TransitPanel'))
@@ -33,16 +27,7 @@ const KundliDownload     = lazy(() => import('../components/KundliDownload'))
 const BhavaChalit        = lazy(() => import('../components/BhavaChalit'))
 const AshtakavargaTable  = lazy(() => import('../components/AshtakavargaTable'))
 const SarvatobhadraChakra = lazy(() => import('../components/SarvatobhadraChakra'))
-const ChartReading       = lazy(() => import('../components/ChartReading'))
-const AskChart           = lazy(() => import('../components/AskChart'))
-const RajyogasTab        = lazy(() => import('../components/RajyogasTab'))
-const CareerReportTab    = lazy(() => import('../components/CareerReportTab'))
-const TopicReportTab     = lazy(() => import('../components/TopicReportTab'))
 
-// ── Suspense fallback ────────────────────────────────────────────────────────
-// Matches the existing spinner aesthetic used elsewhere in the app
-// (rotating planet emoji + pulsing progress bar in ChartReading.jsx /
-// CareerReport.jsx) so tab transitions feel intentional, not broken.
 function TabLoader() {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
@@ -74,57 +59,36 @@ function SummaryChips({ data }) {
   )
 }
 
-// ── Top-level structure ──────────────────────────────────────────────────
-// 4 main tabs — Kundli (everyday essentials), Advanced (specialist
-// techniques most casual users won't recognize), Insights (Reading +
-// whatever's relevant to the chosen topic), Ask (standalone, always).
-// All 4 fit the mobile bottom nav directly; no overflow/"More" sheet needed.
-
+// ── Tab structure ─────────────────────────────────────────────────────────────
+// 4 main tabs that map to the 4 facets of the Kundli experience.
+// Insights and Ask have been promoted to their own pages (/insights, /ask)
+// so this page is purely the chart — the data layer.
 function mainTabs(t) {
   return [
-    { id: 'kundli',   label: t('nav_kundli'),   icon: '/starjyotish.svg' },
-    { id: 'advanced', label: t('nav_advanced'), icon: 'advanced' },
-    { id: 'insights', label: t('tab_reading'),  icon: 'insights' },
-    { id: 'ask',      label: t('tab_ask'),      icon: 'ask' },
+    { id: 'birth_chart', label: 'Birth Chart',    icon: '/starjyotish.svg' },
+    { id: 'divisional',  label: 'Life Areas',     icon: 'insights' },
+    { id: 'analysis',    label: 'Analysis',       icon: 'advanced' },
+    { id: 'download',    label: 'Download',       icon: 'ask' },
   ]
 }
 
-// Kundli — the things any visitor immediately recognizes and wants on day
-// one. Same regardless of topic.
-function kundliSubtabs(t) {
+// Birth Chart sub-tabs
+function birthSubtabs() {
   return [
-    { id: 'birth_chart', label: t('tab_birth_chart') },
-    { id: 'divisional',  label: t('nav_divisional') },
-    { id: 'planets',     label: t('tab_planets') },
-    { id: 'dasha',       label: t('tab_dasha') },
-    { id: 'transit',     label: t('nav_transit') },
-    { id: 'download',    label: t('nav_download') },
+    { id: 'chart',   label: 'Chart' },
+    { id: 'planets', label: 'Planets' },
+    { id: 'dasha',   label: 'Dasha' },
+    { id: 'transit', label: 'Transit' },
   ]
 }
 
-// Advanced — specialist Vedic techniques most casual users won't know what
-// to do with on day one; given their own home rather than cluttering Kundli.
-function advancedSubtabs(t) {
+// Analysis sub-tabs (was "Advanced") — renamed to be descriptive
+function analysisSubtabs() {
   return [
-    { id: 'bhava',         label: t('nav_bhava') },
-    { id: 'ashtakavarga',  label: t('nav_ashtakavarga') },
-    { id: 'sarvatobhadra', label: t('nav_sarvatobhadra') },
+    { id: 'bhava',         label: 'Bhava Chalit' },
+    { id: 'ashtakavarga',  label: 'Ashtakavarga' },
+    { id: 'sarvatobhadra', label: 'Sarvatobhadra' },
   ]
-}
-
-// Insights' sub-tabs depend on topic: Career gets Rajyogas + the Career
-// Report alongside Reading (they serve different purposes); every other
-// topic gets Reading + its one dedicated snapshot page; no topic at all
-// gets just Reading.
-function insightSubtabs(t, topicId) {
-  const reading = { id: 'reading', label: t('nav_reading') }
-  if (topicId === 'career') {
-    return [reading, { id: 'rajyogas', label: t('nav_rajyogas') }, { id: 'career', label: t('nav_career') }]
-  }
-  if (topicId === 'health' || topicId === 'relationship' || topicId === 'finance') {
-    return [reading, { id: topicId, label: t(`nav_${topicId}`) }]
-  }
-  return [reading]
 }
 
 const CHART_STYLES = [
@@ -132,15 +96,9 @@ const CHART_STYLES = [
   { id: 'kp',    label: 'KP' },
 ]
 
-// Navigation pills — bold, filled, used for "which view am I looking at."
 function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
   return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} />
 }
-
-// Deliberately distinct from SubTabBar — a small labeled segmented control
-// for "how should the current view render," not "which view." Shares
-// SubTabBar's filled-pill look (see SegmentedToggle.jsx for why), just with
-// fewer, denser options.
 
 export default function Result() {
   const { t } = useTranslation()
@@ -148,41 +106,36 @@ export default function Result() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
 
-  // Where "go back to where I came from" means for this visitor — their
-  // own workspace if they're signed in, the marketing page otherwise.
-  // Used both by the missing-state guard right below (a stale link or a
-  // hard refresh loses router state entirely) and by the header's own
-  // logo/back link further down, so the two can never disagree.
   const homeDestination = isAuthenticated ? '/home' : '/'
 
-  // Carried over from the landing page's AI persona spotlight (see
-  // Landing.jsx → Home.jsx) — read straight off the raw location state,
-  // before the early-return guard below, since it has to seed the initial
-  // tab and hook initializers must run unconditionally on every render.
-  const landToAsk = Boolean(state?.landToAsk || state?.presetQuestion)
-  // activeTab/activeSubtab: passed from PersonalHome's "deep dive" links so
-  // the user lands directly on the right section (e.g. Dasha, Planets, Rajyogas).
-  const initTab    = state?.activeTab    ?? (landToAsk ? 'ask' : 'kundli')
-  const initSub    = state?.activeSubtab ?? 'birth_chart'
+  // Support deep-links from PersonalHome
+  const landToAsk      = Boolean(state?.landToAsk || state?.presetQuestion)
+  const initTab        = state?.activeTab    ?? 'birth_chart'
+  const initBirthSub   = state?.activeSubtab ?? 'chart'
 
-  const [activeMain, setActiveMain]           = useState(initTab)
-  const [activeKundliSub, setActiveKundliSub] = useState(
-    ['birth_chart','divisional','planets','dasha','transit','download'].includes(initSub) ? initSub : 'birth_chart'
-  )
-  const [activeAdvancedSub, setActiveAdvancedSub] = useState('bhava')
-  // 'health'/'relationship'/'finance' are valid activeInsightSub values
-  // whenever input.topic matches (see the topicId-gated tabs below) — they
-  // were missing from this whitelist, so a deep-link straight to e.g. the
-  // Wealth report silently fell back to 'reading' instead. Kundli's own
-  // subtab whitelist above already lists every valid id explicitly, this
-  // just matches that pattern for Insights.
-  const [activeInsightSub, setActiveInsightSub]   = useState(
-    ['reading', 'rajyogas', 'career', 'health', 'relationship', 'finance'].includes(initSub) ? initSub : 'reading'
-  )
-  const [chartStyle, setChartStyle] = useState('north')
+  // Map legacy subtab ids from old nav to new structure
+  const legacyBirthMap = { birth_chart: 'chart', planets: 'planets', dasha: 'dasha', transit: 'transit' }
+  const resolvedBirthSub = legacyBirthMap[initBirthSub] ?? initBirthSub
 
-  // Measure sticky bar height dynamically so content is never hidden beneath it.
-  // Must be declared before any early returns (Rules of Hooks).
+  // Map legacy main tabs — if someone lands on 'insights' or 'ask', redirect
+  const legacyMainMap = {
+    kundli: 'birth_chart',
+    advanced: 'analysis',
+    birth_chart: 'birth_chart',
+    divisional: 'divisional',
+    analysis: 'analysis',
+    download: 'download',
+  }
+  const resolvedMain = legacyMainMap[initTab] ?? 'birth_chart'
+
+  const [activeMain, setActiveMain]         = useState(resolvedMain)
+  const [activeBirthSub, setActiveBirthSub] = useState(
+    ['chart','planets','dasha','transit'].includes(resolvedBirthSub) ? resolvedBirthSub : 'chart'
+  )
+  const [activeAnalysisSub, setActiveAnalysisSub] = useState('bhava')
+  const [chartStyle, setChartStyle]               = useState('north')
+
+  // Sticky bar measurement
   const stickyRef = useRef(null)
   const [stickyH, setStickyH] = useState(0)
   useEffect(() => {
@@ -192,6 +145,14 @@ export default function Result() {
     return () => ro.disconnect()
   }, [])
 
+  // Redirect to /insights or /ask if landed there via legacy links
+  useEffect(() => {
+    if (initTab === 'insights' || initTab === 'ask') {
+      const dest = initTab === 'ask' ? '/ask' : '/insights'
+      navigate(dest, { state, replace: true })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!state?.data) {
     navigate(homeDestination)
     return null
@@ -199,18 +160,15 @@ export default function Result() {
 
   const { data, input, presetQuestion = null } = state
   const topic = getTopic(input.topic)
-  const topicId = topic?.id ?? null
 
-  const MAIN_TABS = mainTabs(t)
-  const KUNDLI_SUBTABS = kundliSubtabs(t)
-  const ADVANCED_SUBTABS = advancedSubtabs(t)
-  const INSIGHT_SUBTABS = insightSubtabs(t, topicId)
+  const MAIN_TABS      = mainTabs(t)
+  const BIRTH_SUBTABS  = birthSubtabs()
+  const ANALYSIS_SUBTABS = analysisSubtabs()
 
   function renderBirthChart() {
     if (chartStyle === 'north') {
       return (
         <div className="space-y-6">
-          {/* D1 Lagna + AI insight */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
             <div className="w-full sm:w-[460px] space-y-1">
               <KundliChart planets={data.planets} ascendant={data.ascendant}
@@ -237,22 +195,58 @@ export default function Result() {
     return null
   }
 
+  // ── Insight & Ask entry points rendered as CTA cards ─────────────────────
+  function InsightsAskEntry() {
+    return (
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button
+          onClick={() => navigate('/insights', { state })}
+          className="group text-left rounded-2xl p-5 transition-all duration-200"
+          style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}
+        >
+          <div className="text-2xl mb-2">✨</div>
+          <h3 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
+            Insights & Reading
+          </h3>
+          <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(232,220,200,0.55)' }}>
+            AI-powered reading of your chart — career, relationships, wealth and more.
+          </p>
+          <span className="text-xs font-semibold" style={{ color: '#D4AF37' }}>
+            Open Insights →
+          </span>
+        </button>
+
+        <button
+          onClick={() => navigate('/ask', { state: { ...state, presetQuestion } })}
+          className="group text-left rounded-2xl p-5 transition-all duration-200"
+          style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}
+        >
+          <div className="text-2xl mb-2">💬</div>
+          <h3 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
+            Ask a Question
+          </h3>
+          <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(232,220,200,0.55)' }}>
+            Ask anything about your chart — timing, decisions, relationships.
+          </p>
+          <span className="text-xs font-semibold" style={{ color: '#D4AF37' }}>
+            Start Asking →
+          </span>
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
       <Seo title="Your Kundli" description="Your personalized Vedic Kundli and AI reading." path="/kundli" noindex />
 
       <SiteHeader />
 
-      {/* ── Sticky context bar ───────────────────────────────────────────
-          Sits just below SiteHeader (top-[60px] = SiteHeader's height).
-          Contains: identity row · chips · main tabs · sub-tabs.
-          Height is measured via ResizeObserver so the content div below
-          can use it as padding-top — zero overlap on any screen size.   */}
+      {/* ── Sticky context bar ──────────────────────────────────────────── */}
       <div ref={stickyRef} className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
 
-          {/* Row 1 — identity + Home button, single compact line.
-              Date/time hidden on mobile (shown in chips row). */}
+          {/* Row 1 — identity */}
           <div className="flex items-center justify-between py-1.5 gap-3">
             <div className="min-w-0 flex items-center gap-2 overflow-hidden">
               {input.name && (
@@ -276,10 +270,10 @@ export default function Result() {
             </button>
           </div>
 
-          {/* Row 2 — Lagna / Rashi / Mahadasha chips (single scrollable row, no wrap) */}
+          {/* Row 2 — chips */}
           <SummaryChips data={data} />
 
-          {/* Row 3 — main tabs (desktop) */}
+          {/* Row 3 — main tabs */}
           <AnimatedTabRow
             tabs={MAIN_TABS}
             active={activeMain}
@@ -289,41 +283,36 @@ export default function Result() {
               : <TabIcon id={tab.icon} className="w-4 h-4" />}
           />
 
-          {/* Row 4 — sub-tab pills, only when the active tab has sub-tabs */}
-          {(activeMain === 'kundli' || activeMain === 'advanced' || (activeMain === 'insights' && INSIGHT_SUBTABS.length > 1)) && (
+          {/* Row 4 — sub-tabs */}
+          {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
             <div className="border-t border-line/50 py-1.5">
-              {activeMain === 'kundli' && (
-                <SubTabBar subtabs={KUNDLI_SUBTABS} active={activeKundliSub} onChange={setActiveKundliSub} />
+              {activeMain === 'birth_chart' && (
+                <SubTabBar subtabs={BIRTH_SUBTABS} active={activeBirthSub} onChange={setActiveBirthSub} />
               )}
-              {activeMain === 'advanced' && (
-                <SubTabBar subtabs={ADVANCED_SUBTABS} active={activeAdvancedSub} onChange={setActiveAdvancedSub} accent="sage" />
-              )}
-              {activeMain === 'insights' && (
-                <SubTabBar subtabs={INSIGHT_SUBTABS} active={activeInsightSub} onChange={setActiveInsightSub} accent="mauve" />
+              {activeMain === 'analysis' && (
+                <SubTabBar subtabs={ANALYSIS_SUBTABS} active={activeAnalysisSub} onChange={setActiveAnalysisSub} accent="sage" />
               )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Content — paddingTop = fixed header (60px) + sticky bar height + 16px gap.
-          ResizeObserver fires synchronously after paint so stickyH is always
-          accurate; the 200px fallback covers the first-render flash on mobile. */}
+      {/* Content */}
       <div
         className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
         style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '200px' }}
       >
 
-        {/* ══════════════ KUNDLI ══════════════ */}
-        <div className={activeMain === 'kundli' ? 'tab-fade' : 'hidden'}>
+        {/* ══════════ BIRTH CHART ══════════ */}
+        <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
 
-          <div className={activeKundliSub === 'birth_chart' ? 'tab-fade' : 'hidden'}>
+          <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
+            <InsightsAskEntry />
           </div>
 
-          <div className={activeKundliSub === 'planets' ? 'tab-fade' : 'hidden'}>
-            {/* Context banner */}
+          <div className={activeBirthSub === 'planets' ? 'tab-fade' : 'hidden'}>
             <div className="mb-4 relative overflow-hidden rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
@@ -336,8 +325,7 @@ export default function Result() {
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
 
-          <div className={activeKundliSub === 'dasha' ? 'tab-fade' : 'hidden'}>
-            {/* Context banner */}
+          <div className={activeBirthSub === 'dasha' ? 'tab-fade' : 'hidden'}>
             <div className="mb-4 relative overflow-hidden rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
@@ -351,79 +339,46 @@ export default function Result() {
             <DashaTable dasha={data.dasha} />
           </div>
 
-          {/* Lazy sub-tabs — loaded on first access */}
           <Suspense fallback={<TabLoader />}>
-            <div className={activeKundliSub === 'divisional' ? 'tab-fade' : 'hidden'}>
-              <DivisionalCharts input={input} defaultDivision={topic?.division} />
-            </div>
-
-            <div className={activeKundliSub === 'transit' ? 'tab-fade' : 'hidden'}>
+            <div className={activeBirthSub === 'transit' ? 'tab-fade' : 'hidden'}>
               <TransitPanel input={input} natalData={data} />
-            </div>
-
-            <div className={activeKundliSub === 'download' ? 'tab-fade' : 'hidden'}>
-              <KundliDownload data={data} input={input} />
             </div>
           </Suspense>
         </div>
 
-        {/* ══════════════ ADVANCED ══════════════ */}
-        <div className={activeMain === 'advanced' ? 'tab-fade' : 'hidden'}>
-
+        {/* ══════════ LIFE AREAS (DIVISIONAL) ══════════ */}
+        <div className={activeMain === 'divisional' ? 'tab-fade' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <div className={activeAdvancedSub === 'bhava' ? 'tab-fade' : 'hidden'}>
+            <DivisionalCharts input={input} defaultDivision={topic?.division} />
+          </Suspense>
+        </div>
+
+        {/* ══════════ ANALYSIS (was ADVANCED) ══════════ */}
+        <div className={activeMain === 'analysis' ? 'tab-fade' : 'hidden'}>
+          <Suspense fallback={<TabLoader />}>
+            <div className={activeAnalysisSub === 'bhava' ? 'tab-fade' : 'hidden'}>
               <BhavaChalit input={input} />
             </div>
 
-            <div className={activeAdvancedSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
               <AshtakavargaTable input={input} />
             </div>
 
-            <div className={activeAdvancedSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
-              {/* Note: pre-existing gap, not introduced here — natal-only view
-                  until something actually feeds live transit data in. */}
+            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
               <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
             </div>
           </Suspense>
         </div>
 
-        {/* ══════════════ INSIGHTS ══════════════ */}
-        <div className={activeMain === 'insights' ? 'tab-fade' : 'hidden'}>
-
+        {/* ══════════ DOWNLOAD ══════════ */}
+        <div className={activeMain === 'download' ? 'tab-fade' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <div className={activeInsightSub === 'reading' ? 'tab-fade' : 'hidden'}>
-              <ChartReading input={input} onSwitchToCareer={() => setActiveInsightSub('career')} />
-            </div>
-
-            <div className={activeInsightSub === 'rajyogas' ? 'tab-fade' : 'hidden'}>
-              <RajyogasTab input={input} />
-            </div>
-
-            <div className={activeInsightSub === 'career' ? 'tab-fade' : 'hidden'}>
-              <CareerReportTab input={input} />
-            </div>
-
-            {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (
-              <div className={activeInsightSub === topicId ? 'tab-fade' : 'hidden'}>
-                <TopicReportTab topic={topicId} input={input} />
-              </div>
-            )}
-          </Suspense>
-        </div>
-
-        {/* ══════════════ ASK ══════════════ */}
-        <div className={activeMain === 'ask' ? 'tab-fade' : 'hidden'}>
-          <Suspense fallback={<TabLoader />}>
-            <AskChart input={input} initialQuestion={presetQuestion} />
+            <KundliDownload data={data} input={input} />
           </Suspense>
         </div>
 
       </div>
 
-      {/* CompactFooter sits above the mobile NavBar — desktop users see it
-          at the natural scroll end; mobile users see it above the tab bar.
-          pb-16 on the content div (already present for NavBar clearance)
-          ensures it isn't obscured on small screens. */}
       <CompactFooter />
       <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={setActiveMain} />
     </div>

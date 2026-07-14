@@ -1,10 +1,7 @@
 // frontend/src/pages/Insights.jsx
-//
-// Standalone page for AI-powered chart readings, reports, and Rajyogas.
-// Receives chart state via router location (same shape as Result.jsx).
-// Accessed via /insights — promoted from a tab inside /kundli.
-
-import { useState, lazy, Suspense, useRef, useLayoutEffect } from 'react'
+// Standalone page for AI readings, Rajyogas, and topic reports.
+// Promoted from the old "Insights" tab inside /kundli to its own URL.
+import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -12,7 +9,7 @@ import SiteHeader from '../components/SiteHeader'
 import CompactFooter from '../components/CompactFooter'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import TopicIcon from '../components/TopicIcon'
-import Seo       from '../components/Seo'
+import Seo from '../components/Seo'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
 
@@ -32,58 +29,45 @@ function TabLoader() {
   )
 }
 
-function insightSubtabs(t, topicId) {
+function buildSubtabs(t, topicId) {
   const reading = { id: 'reading', label: t('nav_reading', 'Reading') }
   if (topicId === 'career') {
-    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: t('nav_career', 'Career') }]
+    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: 'Career' }]
   }
   if (topicId === 'health' || topicId === 'relationship' || topicId === 'finance') {
-    return [reading, { id: topicId, label: t(`nav_${topicId}`, topicId) }]
+    return [reading, { id: topicId, label: topicId.charAt(0).toUpperCase() + topicId.slice(1) }]
   }
   return [reading]
 }
 
 export default function Insights() {
   const { t } = useTranslation()
-  const { state } = useLocation()
-  const navigate  = useNavigate()
+  const { state }   = useLocation()
+  const navigate    = useNavigate()
   const { isAuthenticated } = useAuth()
+
+  // All hooks before any early return
+  const [activeSub, setActiveSub] = useState('reading')
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
-  // All hooks must be called before any early returns
-  const stickyRef = useRef(null)
-  const [stickyH, setStickyH] = useState(0)
-  const [activeSub, setActiveSub] = useState('reading')
-
-  useLayoutEffect(() => {
-    if (!stickyRef.current) return
-    setStickyH(stickyRef.current.getBoundingClientRect().height)
-    const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
-    ro.observe(stickyRef.current)
-    return () => ro.disconnect()
-  }, [])
-
-  if (!state?.input) {
-    navigate(homeDestination)
-    return null
-  }
+  if (!state?.input) { navigate(homeDestination); return null }
 
   const { input } = state
   const topic   = getTopic(input?.topic)
   const topicId = topic?.id ?? null
-
-  const SUBTABS = insightSubtabs(t, topicId)
+  const SUBTABS = buildSubtabs(t, topicId)
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
       <Seo title="Chart Insights" description="AI-powered reading of your Vedic birth chart." path="/insights" noindex />
       <SiteHeader />
+      <div className="h-[60px] shrink-0" />
 
-      <div ref={stickyRef} className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
+      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
           {/* Identity row */}
-          <div className="flex items-center justify-between py-1.5 gap-3">
+          <div className="flex items-center justify-between py-2.5 gap-3">
             <div className="min-w-0 flex items-center gap-2 overflow-hidden">
               {input?.name && (
                 <span className="font-bold text-sm text-ink leading-none truncate">{input.name}</span>
@@ -106,39 +90,31 @@ export default function Insights() {
             </button>
           </div>
 
-          {/* Page label */}
-          <div className="py-1.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(212,175,55,0.6)' }}>
+          <div className="border-t border-line/40 pt-1 pb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
               Insights
             </p>
           </div>
 
-          {/* Sub-tabs */}
           {SUBTABS.length > 1 && (
-            <div className="border-t border-line/50 py-1.5">
+            <div className="border-t border-line/40 py-2">
               <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={setActiveSub} variant="pill" accent="mauve" />
             </div>
           )}
         </div>
       </div>
 
-      <div
-        className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
-        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '140px' }}
-      >
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-24 sm:pb-4">
         <Suspense fallback={<TabLoader />}>
           <div className={activeSub === 'reading' ? 'tab-fade' : 'hidden'}>
             <ChartReading input={input} onSwitchToCareer={() => setActiveSub('career')} />
           </div>
-
           <div className={activeSub === 'rajyogas' ? 'tab-fade' : 'hidden'}>
             <RajyogasTab input={input} />
           </div>
-
           <div className={activeSub === 'career' ? 'tab-fade' : 'hidden'}>
             <CareerReportTab input={input} />
           </div>
-
           {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (
             <div className={activeSub === topicId ? 'tab-fade' : 'hidden'}>
               <TopicReportTab topic={topicId} input={input} />

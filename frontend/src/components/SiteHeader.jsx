@@ -41,20 +41,16 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const borderAlpha = 0.06 + p * 0.08
 
   function handleNav(link) {
-    // Plain links (Panchang, Home) — no chart state needed
-    if (link.to !== '/kundli' && link.to !== '/insights') {
-      navigate(link.to)
-      return
-    }
-    // Chart-linked pages require a profile
+    if (link.to !== '/kundli' && link.to !== '/insights') { navigate(link.to); return }
     if (!profile) { navigate('/generate'); return }
-    const chartState = {
-      data: profile.chart,
-      input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
-      activeTab: link.activeTab,
-      activeSubtab: link.activeSubtab,
-    }
-    navigate(link.to, { state: chartState })
+    navigate(link.to, {
+      state: {
+        data: profile.chart,
+        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
+        activeTab: link.activeTab,
+        activeSubtab: link.activeSubtab,
+      },
+    })
   }
 
   return (

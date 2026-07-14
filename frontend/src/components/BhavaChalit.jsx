@@ -63,27 +63,19 @@ export default function BhavaChalit({ input }) {
     <div className="space-y-5">
 
       {/* ── Intro ──────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl px-5 py-5"
-           style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.25)' }}>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-          {['top-2 right-8','top-5 right-24'].map((pos, i) => (
-            <div key={i} className={`absolute ${pos} text-[8px]`}
-                 style={{ color: 'rgba(212,175,55,0.35)' }}>✦</div>
-          ))}
-        </div>
-        <div className="relative z-10">
-          <p className="text-[10px] font-semibold uppercase tracking-widest mb-1"
-             style={{ color: 'rgba(212,175,55,0.6)' }}>Bhava Chalit</p>
-          <h2 className="font-serif font-bold text-lg mb-2" style={{ color: '#E8DCC8' }}>
-            How your planets actually behave.
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
-            Unlike the birth chart, Bhava Chalit shows where your planets truly operate.
-            It divides the sky into equal 30° segments centred on your exact ascendant degree —
-            which means some planets shift to a different house than they appear in the Rashi chart.
-            Those shifts matter.
-          </p>
-        </div>
+      <div className="pb-4 mb-1" style={{ borderBottom: '2px solid #EAE1CC' }}>
+        <p className="text-[11px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#D9A441' }}>
+          Bhava Chalit
+        </p>
+        <h2 className="font-serif font-bold text-xl text-ink mb-2">
+          How your planets actually behave.
+        </h2>
+        <p className="text-sm leading-relaxed text-ink-muted">
+          Unlike the birth chart, Bhava Chalit shows where your planets truly operate.
+          It divides the sky into equal 30° segments centred on your exact ascendant degree —
+          which means some planets shift to a different house than they appear in the Rashi chart.
+          Those shifts matter.
+        </p>
       </div>
 
       {/* ── Loading ─────────────────────────────────────────────────────── */}
@@ -109,8 +101,8 @@ export default function BhavaChalit({ input }) {
         <>
           {/* Ascendant context */}
           <div className="flex items-center gap-2 px-1">
-            <span className="text-xs font-semibold" style={{ color: 'rgba(212,175,55,0.7)' }}>Ascendant</span>
-            <span className="text-sm font-bold" style={{ color: '#E8DCC8' }}>
+            <span className="text-xs font-semibold" style={{ color: '#D9A441' }}>Ascendant</span>
+            <span className="text-sm font-bold text-ink">
               {data.ascendant.sign} {data.ascendant.degree.toFixed(1)}°
             </span>
           </div>
@@ -118,14 +110,14 @@ export default function BhavaChalit({ input }) {
           {/* Summary headline */}
           <div className="rounded-xl px-4 py-4"
                style={{ background: 'rgba(212,175,55,0.05)', border: '1px solid rgba(212,175,55,0.15)' }}>
-            <p className="text-sm font-bold mb-3" style={{ color: '#E8DCC8' }}>
+            <p className="text-sm font-bold text-ink mb-3">
               {shifted.length === 0
                 ? 'All planets remain in their Rashi houses.'
                 : `${shifted.length} planet${shifted.length > 1 ? 's' : ''} shifted ${shifted.length > 1 ? 'houses' : 'house'}.`}
             </p>
 
             {shifted.length === 0 && (
-              <p className="text-xs" style={{ color: 'rgba(232,220,200,0.55)' }}>
+              <p className="text-xs text-ink-muted">
                 Your Bhava Chalit and Rashi charts are in perfect alignment — planets
                 operate exactly where they appear in the birth chart.
               </p>
@@ -143,7 +135,7 @@ export default function BhavaChalit({ input }) {
                   </span>
                 </div>
                 {shiftNote(p.name, p.rashi_house, p.bhava_house) && (
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.6)' }}>
+                  <p className="text-xs leading-relaxed text-ink-muted">
                     {shiftNote(p.name, p.rashi_house, p.bhava_house)}
                   </p>
                 )}
@@ -162,47 +154,47 @@ export default function BhavaChalit({ input }) {
             </button>
 
             {showFull && (
-              <div className="mt-3 rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(212,175,55,0.15)' }}>
-                <div className="px-4 py-2.5" style={{ background: '#171B33' }}>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(212,175,55,0.55)' }}>
+              <div className="mt-3 rounded-xl border overflow-hidden border-line">
+                <div className="px-4 py-2.5 bg-parchment-card border-b border-line">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
                     All Planets — Rashi vs Bhava House
                   </p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr style={{ background: 'rgba(23,27,51,0.6)', color: 'rgba(232,220,200,0.45)' }}>
-                        <th className="p-2.5 text-left border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Planet</th>
-                        <th className="p-2.5 text-left border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Sign</th>
-                        <th className="p-2.5 text-right border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Degree</th>
-                        <th className="p-2.5 text-left border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Nakshatra</th>
-                        <th className="p-2.5 text-center border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Rashi</th>
-                        <th className="p-2.5 text-center border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Bhava</th>
-                        <th className="p-2.5 text-center border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>Shift</th>
+                      <tr className="bg-night/5 text-ink-muted">
+                        <th className="p-2.5 text-left border-b border-line">Planet</th>
+                        <th className="p-2.5 text-left border-b border-line">Sign</th>
+                        <th className="p-2.5 text-right border-b border-line">Degree</th>
+                        <th className="p-2.5 text-left border-b border-line">Nakshatra</th>
+                        <th className="p-2.5 text-center border-b border-line">Rashi H</th>
+                        <th className="p-2.5 text-center border-b border-line">Bhava H</th>
+                        <th className="p-2.5 text-center border-b border-line">Shift</th>
                       </tr>
                     </thead>
                     <tbody>
                       {data.planets.map((p, i) => (
                         <tr key={p.name}
-                            style={{ background: p.changed ? 'rgba(212,175,55,0.06)' : (i % 2 === 0 ? 'transparent' : 'rgba(23,27,51,0.2)') }}>
-                          <td className="p-2.5 border-b font-bold" style={{ borderColor: 'rgba(212,175,55,0.08)', color: PLANET_COLORS[p.name] ?? '#E8DCC8' }}>
+                            className={p.changed ? 'bg-primary-light/40' : (i % 2 === 0 ? '' : 'bg-night/[0.03]')}>
+                          <td className="p-2.5 border-b border-line font-bold" style={{ color: PLANET_COLORS[p.name] ?? '#2A2724' }}>
                             {p.name}
                           </td>
-                          <td className="p-2.5 border-b" style={{ borderColor: 'rgba(212,175,55,0.08)', color: '#E8DCC8' }}>{p.sign}</td>
-                          <td className="p-2.5 border-b text-right tabular-nums" style={{ borderColor: 'rgba(212,175,55,0.08)', color: 'rgba(232,220,200,0.6)' }}>
+                          <td className="p-2.5 border-b border-line text-ink">{p.sign}</td>
+                          <td className="p-2.5 border-b border-line text-right tabular-nums text-ink-muted">
                             {p.degree.toFixed(2)}°
                           </td>
-                          <td className="p-2.5 border-b" style={{ borderColor: 'rgba(212,175,55,0.08)', color: 'rgba(232,220,200,0.55)' }}>{p.nakshatra}</td>
-                          <td className="p-2.5 border-b text-center font-bold" style={{ borderColor: 'rgba(212,175,55,0.08)', color: '#D4AF37' }}>
+                          <td className="p-2.5 border-b border-line text-ink-muted">{p.nakshatra}</td>
+                          <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
                             {p.rashi_house}
                           </td>
-                          <td className="p-2.5 border-b text-center font-bold" style={{ borderColor: 'rgba(212,175,55,0.08)', color: '#D4AF37' }}>
+                          <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
                             {p.bhava_house}
                           </td>
-                          <td className="p-2.5 border-b text-center text-xs" style={{ borderColor: 'rgba(212,175,55,0.08)' }}>
+                          <td className="p-2.5 border-b border-line text-center text-xs">
                             {p.changed
-                              ? <span style={{ color: '#D4AF37', fontWeight: 600 }}>H{p.rashi_house}→H{p.bhava_house}</span>
-                              : <span style={{ color: 'rgba(100,200,120,0.7)' }}>Same</span>
+                              ? <span className="font-semibold" style={{ color: '#D9A441' }}>H{p.rashi_house}→H{p.bhava_house}</span>
+                              : <span className="text-sage font-medium">Same</span>
                             }
                           </td>
                         </tr>

@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense, useRef, useEffect } from 'react'
+import { useState, lazy, Suspense, useRef, useEffect, useLayoutEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -14,9 +14,8 @@ import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
-import ChartHighlight from '../components/ChartHighlight'
-import TopicIcon from '../components/TopicIcon'
 import TabIcon   from '../components/TabIcon'
+import TopicIcon from '../components/TopicIcon'
 import Seo       from '../components/Seo'
 
 // ── Lazy imports ──────────────────────────────────────────────────────────────
@@ -137,8 +136,10 @@ export default function Result() {
   // Sticky bar measurement
   const stickyRef = useRef(null)
   const [stickyH, setStickyH] = useState(0)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!stickyRef.current) return
+    // Measure immediately on mount (synchronous) so first paint has correct padding
+    setStickyH(stickyRef.current.getBoundingClientRect().height)
     const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
     ro.observe(stickyRef.current)
     return () => ro.disconnect()
@@ -169,16 +170,14 @@ export default function Result() {
       return (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
-            <div className="w-full sm:w-[460px] space-y-1">
+            <div className="w-full sm:w-[460px]">
               <KundliChart planets={data.planets} ascendant={data.ascendant}
                            navamsaPlanets={data.navamsa_planets}
                            title={t('tab_birth_chart', 'Lagna Chart')} />
-              <ChartHighlight input={input} chartType="D1" autoLoad />
             </div>
-            <div className="w-full sm:w-[460px] space-y-1">
+            <div className="w-full sm:w-[460px]">
               <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
                            title={t('tab_navamsa', 'Navamsa (D9)')} />
-              <ChartHighlight input={input} chartType="D9" />
             </div>
           </div>
         </div>
@@ -194,42 +193,38 @@ export default function Result() {
     return null
   }
 
-  // ── Insight & Ask entry points rendered as CTA cards ─────────────────────
+  // ── Inline CTA strip — light, doesn't compete with the charts ────────────
   function InsightsAskEntry() {
     return (
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t pt-6" style={{ borderColor: '#EAE1CC' }}>
         <button
           onClick={() => navigate('/insights', { state })}
-          className="group text-left rounded-2xl p-5 transition-all duration-200"
-          style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}
+          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
+          style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
-          <div className="text-2xl mb-2">✨</div>
-          <h3 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
-            Insights & Reading
-          </h3>
-          <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(232,220,200,0.55)' }}>
-            AI-powered reading of your chart — career, relationships, wealth and more.
-          </p>
-          <span className="text-xs font-semibold" style={{ color: '#D4AF37' }}>
-            Open Insights →
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xl">✨</span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-ink">Insights & Reading</p>
+              <p className="text-xs text-ink-muted">AI reading of your chart</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>Open →</span>
         </button>
 
         <button
           onClick={() => navigate('/ask', { state: { ...state, presetQuestion } })}
-          className="group text-left rounded-2xl p-5 transition-all duration-200"
-          style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}
+          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
+          style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
-          <div className="text-2xl mb-2">💬</div>
-          <h3 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
-            Ask a Question
-          </h3>
-          <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(232,220,200,0.55)' }}>
-            Ask anything about your chart — timing, decisions, relationships.
-          </p>
-          <span className="text-xs font-semibold" style={{ color: '#D4AF37' }}>
-            Start Asking →
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xl">💬</span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-ink">Ask a Question</p>
+              <p className="text-xs text-ink-muted">Timing, decisions, anything</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>Ask →</span>
         </button>
       </div>
     )
@@ -299,7 +294,7 @@ export default function Result() {
       {/* Content */}
       <div
         className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
-        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '200px' }}
+        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '140px' }}
       >
 
         {/* ══════════ BIRTH CHART ══════════ */}

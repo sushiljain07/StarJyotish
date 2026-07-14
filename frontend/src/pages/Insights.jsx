@@ -4,7 +4,7 @@
 // Receives chart state via router location (same shape as Result.jsx).
 // Accessed via /insights — promoted from a tab inside /kundli.
 
-import { useState, lazy, Suspense, useRef, useEffect } from 'react'
+import { useState, lazy, Suspense, useRef, useLayoutEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -56,8 +56,9 @@ export default function Insights() {
   const [stickyH, setStickyH] = useState(0)
   const [activeSub, setActiveSub] = useState('reading')
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!stickyRef.current) return
+    setStickyH(stickyRef.current.getBoundingClientRect().height)
     const ro = new ResizeObserver(entries => setStickyH(entries[0].contentRect.height))
     ro.observe(stickyRef.current)
     return () => ro.disconnect()
@@ -123,7 +124,7 @@ export default function Insights() {
 
       <div
         className="flex-1 max-w-5xl mx-auto w-full px-4 pb-24 sm:pb-4"
-        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '180px' }}
+        style={{ paddingTop: stickyH > 0 ? `${60 + stickyH + 16}px` : '140px' }}
       >
         <Suspense fallback={<TabLoader />}>
           <div className={activeSub === 'reading' ? 'tab-fade' : 'hidden'}>

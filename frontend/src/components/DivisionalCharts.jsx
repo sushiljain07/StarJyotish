@@ -1,73 +1,119 @@
-// frontend/src/components/DivisionalCharts.jsx  v2
+// frontend/src/components/DivisionalCharts.jsx  v3
 //
-// Redesigned from a raw button grid + blank chart area into a story-driven
-// experience: thematic groups, rich selection cards, chart display with AI
-// insight underneath, and dark night styling that matches the home page.
+// Life-area card gallery. The entry screen shows 9 life domains — not raw
+// chart codes. Clicking a domain reveals the chart with a human-readable
+// description of what it governs, then the AI highlight below.
 //
 // Structure:
-//  1. Intro context banner  — "What are divisional charts?"
-//  2. Thematic group tabs   — Life, Career, Spirit, Body, Family, More
-//  3. Chart selection cards — icon + name + one-line desc, highlight on active
-//  4. Chart display area    — KundliChart + ChartHighlight (AI insight)
+//   1. Life-area cards  — emoji + area name + chart code + one-liner
+//   2. Chart view       — full-width chart + "what this chart governs" prose
+//   3. AI Highlight     — ChartHighlight (loaded on demand)
 
 import { useState, useEffect } from 'react'
 import KundliChart from './KundliChart'
 import ChartHighlight from './ChartHighlight'
 import { API_BASE } from '../api/config'
 
-// ── Chart catalogue ──────────────────────────────────────────────────────────
-// Each entry: division number, display name, one-line life-area description,
-// icon, and the thematic group it belongs to.
-const DIVISIONS = [
-  { d:  1, name:'D1',  title:'Lagna',          desc:'Personality & overall life path',     icon:'🌅', group:'life'   },
-  { d:  9, name:'D9',  title:'Navamsha',        desc:'Marriage, dharma & soul purpose',     icon:'💍', group:'life'   },
-  { d: 10, name:'D10', title:'Dashamsha',       desc:'Career, profession & reputation',     icon:'🏆', group:'career' },
-  { d:  2, name:'D2',  title:'Hora',            desc:'Wealth, income & money flow',         icon:'💰', group:'career' },
-  { d: 24, name:'D24', title:'Siddhamsha',      desc:'Education, intellect & skills',       icon:'📚', group:'career' },
-  { d:  6, name:'D6',  title:'Shashthamsha',    desc:'Health, immunity & service',          icon:'💚', group:'body'   },
-  { d: 27, name:'D27', title:'Nakshatramsha',   desc:'Physical strength & vitality',        icon:'💪', group:'body'   },
-  { d:  7, name:'D7',  title:'Saptamsha',       desc:'Children, creativity & progeny',      icon:'👶', group:'family' },
-  { d: 12, name:'D12', title:'Dwadashamsha',    desc:'Parents, lineage & ancestral karma',  icon:'🌳', group:'family' },
-  { d:  3, name:'D3',  title:'Drekkana',        desc:'Courage, siblings & short journeys',  icon:'⚔️',  group:'family' },
-  { d:  4, name:'D4',  title:'Chaturthamsha',   desc:'Home, property & fixed assets',       icon:'🏠', group:'family' },
-  { d: 20, name:'D20', title:'Vimshamsha',      desc:'Spiritual progress & devotion',       icon:'🕉️',  group:'spirit' },
-  { d: 60, name:'D60', title:'Shashtiamsha',    desc:'Past-life karma & deep soul imprints',icon:'♾️',  group:'spirit' },
-  { d: 16, name:'D16', title:'Shodashamsha',    desc:'Vehicles, comforts & pleasures',      icon:'🚗', group:'more'   },
-  { d: 30, name:'D30', title:'Trimshamsha',     desc:'Misfortunes & karmic debts',          icon:'🔮', group:'more'   },
-  { d: 40, name:'D40', title:'Khavedamsha',     desc:'Auspicious patterns from lineage',    icon:'✨', group:'more'   },
-  { d: 45, name:'D45', title:'Akshavedamsha',   desc:'General well-being & character',      icon:'⚖️',  group:'more'   },
-]
-
-const GROUPS = [
-  { id: 'life',   label: '🌟 Life',    sub: 'Core' },
-  { id: 'career', label: '🏆 Career',  sub: 'Wealth' },
-  { id: 'body',   label: '💚 Health',  sub: 'Body' },
-  { id: 'family', label: '🏠 Family',  sub: 'Kin' },
-  { id: 'spirit', label: '🕉️ Spirit',  sub: 'Karma' },
-  { id: 'more',   label: '✦ More',    sub: 'Advanced' },
+// ── Life-area catalogue ───────────────────────────────────────────────────────
+// Ordered by the most recognisable life domains first.
+// Each entry: display area, chart code (shown after click), division number,
+// governing description shown in the chart view, emoji, and group.
+const LIFE_AREAS = [
+  {
+    area: 'Relationships',
+    chart: 'Navamsa',
+    code: 'D9',
+    d: 9,
+    emoji: '❤️',
+    governs: `Marriage, long-term partnerships, dharma, and the soul's deeper purpose. The D9 is considered equally important as the birth chart — a strong Navamsa protects and elevates.`,
+  },
+  {
+    area: 'Career',
+    chart: 'Dasamsa',
+    code: 'D10',
+    d: 10,
+    emoji: '💼',
+    governs: `Profession, status, reputation, and achievements in the outer world. The D10 reveals what you are here to build — and which planetary periods accelerate it.`,
+  },
+  {
+    area: 'Wealth',
+    chart: 'Hora',
+    code: 'D2',
+    d: 2,
+    emoji: '💰',
+    governs: `Income, money flow, and material accumulation. The D2 shows whether your wealth comes through Sun-ruled effort or Moon-ruled inheritance and flow.`,
+  },
+  {
+    area: 'Children',
+    chart: 'Saptamsha',
+    code: 'D7',
+    d: 7,
+    emoji: '👶',
+    governs: `Children, progeny, and creative output. The D7 is consulted for timing of childbirth and the nature of the parent-child relationship.`,
+  },
+  {
+    area: 'Education',
+    chart: 'Siddhamsha',
+    code: 'D24',
+    d: 24,
+    emoji: '📚',
+    governs: `Formal learning, intellect, skill acquisition, and academic success. The D24 reveals the depth and direction of your intellectual potential.`,
+  },
+  {
+    area: 'Property',
+    chart: 'Chaturthamsha',
+    code: 'D4',
+    d: 4,
+    emoji: '🏡',
+    governs: `Home, fixed assets, land, and immovable property. The D4 is the chart of roots — where you settle and what you accumulate in terms of physical foundation.`,
+  },
+  {
+    area: 'Spiritual',
+    chart: 'Vimsamsa',
+    code: 'D20',
+    d: 20,
+    emoji: '🙏',
+    governs: `Spiritual progress, devotion, and sadhana. The D20 shows the quality of your inner practice and which deity or path is naturally aligned with your soul.`,
+  },
+  {
+    area: 'Past Karma',
+    chart: 'Shashtiamsha',
+    code: 'D60',
+    d: 60,
+    emoji: '♾️',
+    governs: `Deep past-life imprints and karmic residues carried into this life. The D60 is the subtlest chart — used by advanced practitioners to trace unexplained patterns.`,
+  },
+  {
+    area: 'Health',
+    chart: 'Shashthamsha',
+    code: 'D6',
+    d: 6,
+    emoji: '💚',
+    governs: `Physical health, immunity, service, and the nature of illnesses. The D6 reveals constitutional strengths and vulnerabilities at the cellular level.`,
+  },
 ]
 
 export default function DivisionalCharts({ input, defaultDivision }) {
-  const [activeGroup, setActiveGroup] = useState('life')
-  const [selectedD, setSelectedD]     = useState(defaultDivision ?? null)
-  const [chartData, setChartData]     = useState(null)
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState(null)
+  const [selectedArea, setSelectedArea] = useState(null)  // LIFE_AREAS entry
+  const [chartData, setChartData]       = useState(null)
+  const [loading, setLoading]           = useState(false)
+  const [error, setError]               = useState(null)
 
-  // When topic provides a default division, switch to its group automatically
+  // Auto-load the default division if provided by topic
   useEffect(() => {
     if (!defaultDivision) return
-    const found = DIVISIONS.find(d => d.d === defaultDivision)
-    if (found) setActiveGroup(found.group)
-  }, [defaultDivision])
+    const area = LIFE_AREAS.find(a => a.d === defaultDivision)
+    if (area) openArea(area)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  async function fetchDivisional(division) {
-    setLoading(true)
-    setError(null)
-    setSelectedD(division)
+  async function openArea(area) {
+    setSelectedArea(area)
     setChartData(null)
+    setError(null)
+    setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/divisional?division=${division}`, {
+      const res = await fetch(`${API_BASE}/api/kundli/divisional?division=${area.d}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
@@ -80,105 +126,113 @@ export default function DivisionalCharts({ input, defaultDivision }) {
     setLoading(false)
   }
 
-  // Auto-load default division on mount
-  useEffect(() => {
-    if (defaultDivision) fetchDivisional(defaultDivision)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  function clearSelection() {
+    setSelectedArea(null)
+    setChartData(null)
+    setError(null)
+  }
 
-  const visibleDivisions = DIVISIONS.filter(d => d.group === activeGroup)
-  const selected = DIVISIONS.find(d => d.d === selectedD)
+  // ── Gallery view ───────────────────────────────────────────────────────────
+  if (!selectedArea) {
+    return (
+      <div className="space-y-5">
 
+        {/* Header */}
+        <div className="relative overflow-hidden rounded-2xl px-5 py-4"
+             style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.25)' }}>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            {['top-2 right-8','top-5 right-24','top-1 right-40'].map((pos, i) => (
+              <div key={i} className={`absolute ${pos} text-[8px]`}
+                   style={{ color: 'rgba(212,175,55,0.35)' }}>✦</div>
+            ))}
+          </div>
+          <div className="relative z-10">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-1"
+               style={{ color: 'rgba(212,175,55,0.6)' }}>Divisional Charts</p>
+            <h2 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
+              Explore Every Dimension of Your Life
+            </h2>
+            <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.6)' }}>
+              Each chart zooms in on one area of life with precision no single birth chart can offer.
+              Select a domain to see the chart that governs it.
+            </p>
+          </div>
+        </div>
+
+        {/* Life-area cards */}
+        <div className="divide-y" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>
+          {LIFE_AREAS.map(area => (
+            <button
+              key={area.d}
+              onClick={() => openArea(area)}
+              className="w-full flex items-center justify-between px-1 py-4 text-left group transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-2xl shrink-0">{area.emoji}</span>
+                <div>
+                  <p className="font-serif font-bold text-base leading-tight" style={{ color: '#E8DCC8' }}>
+                    {area.area}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(212,175,55,0.6)' }}>
+                    {area.chart} ({area.code})
+                  </p>
+                </div>
+              </div>
+              <span className="text-sm font-semibold shrink-0 ml-4 transition-transform group-hover:translate-x-0.5"
+                    style={{ color: 'rgba(212,175,55,0.6)' }}>
+                View →
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Chart view ─────────────────────────────────────────────────────────────
   return (
     <div className="space-y-5">
 
-      {/* ── Intro banner ─────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl px-5 py-4"
-           style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.25)' }}>
-        {/* Decorative stars */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-          {['top-2 right-8','top-5 right-24','top-1 right-40'].map((pos, i) => (
-            <div key={i} className={`absolute ${pos} text-[8px]`}
-                 style={{ color: 'rgba(212,175,55,0.35)' }}>✦</div>
-          ))}
-        </div>
-        <div className="relative z-10">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-1"
-             style={{ color: 'rgba(212,175,55,0.6)' }}>Varga Charts</p>
-          <h2 className="font-serif font-bold text-base mb-1" style={{ color: '#E8DCC8' }}>
-            Your Chart in 17 Dimensions
+      {/* Back link */}
+      <button
+        onClick={clearSelection}
+        className="flex items-center gap-1.5 text-xs font-semibold transition"
+        style={{ color: 'rgba(212,175,55,0.7)' }}
+      >
+        ← All Life Areas
+      </button>
+
+      {/* Chart identity header */}
+      <div className="flex items-center gap-3">
+        <span className="text-3xl">{selectedArea.emoji}</span>
+        <div>
+          <h2 className="font-serif font-bold text-xl leading-tight" style={{ color: '#E8DCC8' }}>
+            {selectedArea.area}
           </h2>
-          <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.6)' }}>
-            Vedic astrology sees beyond a single birth chart. Each Varga (divisional) chart
-            zooms in on a different life domain — wealth, career, marriage, health — giving
-            you pinpoint clarity no Western chart can match. Select a theme below to explore.
+          <p className="text-xs font-semibold" style={{ color: 'rgba(212,175,55,0.6)' }}>
+            {selectedArea.chart} · {selectedArea.code}
           </p>
         </div>
       </div>
 
-      {/* ── Group tabs ───────────────────────────────────────────────────── */}
-      <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {GROUPS.map(g => (
-          <button
-            key={g.id}
-            onClick={() => setActiveGroup(g.id)}
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-            style={
-              activeGroup === g.id
-                ? { background: '#D9A441', color: '#171B33' }
-                : { background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)', color: 'rgba(212,175,55,0.7)' }
-            }
-          >
-            {g.label}
-          </button>
-        ))}
+      {/* Governs description */}
+      <div className="rounded-xl px-4 py-3"
+           style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.15)' }}>
+        <p className="text-[10px] font-semibold uppercase tracking-widest mb-1.5"
+           style={{ color: 'rgba(212,175,55,0.5)' }}>
+          This chart governs
+        </p>
+        <p className="text-sm leading-relaxed" style={{ color: 'rgba(232,220,200,0.75)' }}>
+          {selectedArea.governs}
+        </p>
       </div>
 
-      {/* ── Chart selection cards ────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {visibleDivisions.map(({ d, name, title, desc, icon }) => {
-          const isActive = selectedD === d
-          return (
-            <button
-              key={d}
-              onClick={() => fetchDivisional(d)}
-              className="text-left rounded-xl p-3 transition-all duration-200"
-              style={
-                isActive
-                  ? { background: '#2A2050', border: '2px solid #D4AF37', boxShadow: '0 0 16px rgba(212,175,55,0.15)' }
-                  : { background: 'rgba(212,175,55,0.04)', border: '1px solid rgba(212,175,55,0.12)' }
-              }
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xl">{icon}</span>
-                <div>
-                  <p className="text-[11px] font-bold" style={{ color: isActive ? '#D4AF37' : 'rgba(212,175,55,0.5)' }}>
-                    {name}
-                  </p>
-                  <p className="text-xs font-semibold leading-tight" style={{ color: isActive ? '#E8DCC8' : 'rgba(232,220,200,0.7)' }}>
-                    {title}
-                  </p>
-                </div>
-              </div>
-              <p className="text-[11px] leading-snug" style={{ color: isActive ? 'rgba(232,220,200,0.75)' : 'rgba(232,220,200,0.4)' }}>
-                {desc}
-              </p>
-              {isActive && (
-                <div className="mt-2 text-[10px] font-semibold" style={{ color: '#D4AF37' }}>
-                  Viewing ↓
-                </div>
-              )}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* ── Chart display ────────────────────────────────────────────────── */}
+      {/* Loading */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-14">
           <div className="text-3xl animate-spin mb-3">🪐</div>
           <p className="text-sm font-medium" style={{ color: '#D4AF37' }}>
-            Calculating {selected?.name} — {selected?.title}…
+            Calculating {selectedArea.code}…
           </p>
           <div className="mt-3 w-40 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(212,175,55,0.1)' }}>
             <div className="h-full rounded-full animate-pulse" style={{ width: '70%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
@@ -186,51 +240,27 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         </div>
       )}
 
+      {/* Error */}
       {error && (
         <div className="rounded-xl p-4 text-sm" style={{ background: '#2A1010', border: '1px solid rgba(162,59,59,0.4)', color: '#E08080' }}>
           ⚠️ {error}
+          <button onClick={() => openArea(selectedArea)} className="ml-3 underline text-xs">Retry</button>
         </div>
       )}
 
-      {!loading && chartData && selected && (
+      {/* Chart + AI insight */}
+      {!loading && chartData && (
         <div className="space-y-1">
-          {/* Chart title strip */}
-          <div className="flex items-center gap-3 px-1 pb-2">
-            <span className="text-2xl">{selected.icon}</span>
-            <div>
-              <h3 className="font-serif font-bold text-base" style={{ color: '#E8DCC8' }}>
-                {selected.name} · {selected.title}
-              </h3>
-              <p className="text-xs" style={{ color: 'rgba(232,220,200,0.5)' }}>{selected.desc}</p>
-            </div>
-          </div>
-
-          {/* Chart */}
           <div className="flex justify-center">
             <div className="w-full sm:w-[480px]">
               <KundliChart
                 planets={chartData.planets}
                 ascendant={chartData.ascendant}
-                title={`${selected.name} — ${selected.title}`}
+                title={`${selectedArea.code} — ${selectedArea.chart}`}
               />
             </div>
           </div>
-
-          {/* AI Highlight */}
-          <ChartHighlight input={input} chartType={selected.name} />
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!loading && !chartData && !error && (
-        <div className="text-center py-14">
-          <div className="text-4xl mb-3" style={{ filter: 'grayscale(0.3)' }}>🔭</div>
-          <p className="text-sm font-medium" style={{ color: 'rgba(232,220,200,0.5)' }}>
-            Select a chart above to view it
-          </p>
-          <p className="text-xs mt-1" style={{ color: 'rgba(232,220,200,0.3)' }}>
-            Each chart reveals a unique dimension of your life
-          </p>
+          <ChartHighlight input={input} chartType={selectedArea.code} />
         </div>
       )}
 

@@ -19,6 +19,8 @@ import RoleRoute from './components/RoleRoute'
 import AdminDashboard from './pages/AdminDashboard'
 import AstrologerDashboard from './pages/AstrologerDashboard'
 import Disclaimer from './pages/Disclaimer'
+import Insights from './pages/Insights'
+import AskPage  from './pages/AskPage'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
 import RefundPolicy from './pages/RefundPolicy'
@@ -48,7 +50,9 @@ export default function App() {
           <Route path="/panchang" element={<PanchangDetail />} />
           <Route path="/week-ahead" element={<ProtectedRoute><OnboardingGate><WeekAhead /></OnboardingGate></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-          <Route path="/kundli" element={<Result />} />
+          <Route path="/kundli"    element={<Result />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/ask"      element={<AskPage />} />
           <Route path="/career-report" element={<CareerReport />} />
           <Route path="/login" element={<Login />} />
           <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

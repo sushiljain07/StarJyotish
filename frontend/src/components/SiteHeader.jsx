@@ -75,8 +75,8 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           </span>
         </button>
 
-        {/* Desktop nav — only when authenticated */}
-        {isAuthenticated && (
+        {/* Desktop nav — authenticated users get full nav; anon users get public links */}
+        {isAuthenticated ? (
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
             {NAV_LINKS.map(link => {
               const isActive = location.pathname === link.to && !link.hash
@@ -84,6 +84,42 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
                 <button
                   key={link.label}
                   onClick={() => handleNav(link)}
+                  className="relative px-4 py-2 text-sm font-medium transition-colors rounded-md"
+                  style={{
+                    color: isActive ? '#F0CB80' : 'rgba(248,242,228,0.65)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.9)' }}
+                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.65)' }}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span
+                      style={{
+                        position:'absolute',bottom:-1,left:'50%',
+                        transform:'translateX(-50%)',
+                        width:24,height:2,borderRadius:99,
+                        background:'#D9A441',display:'block',
+                      }}
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </nav>
+        ) : (
+          <nav className="hidden md:flex items-center gap-1" aria-label="Public navigation">
+            {[
+              { label: 'Panchang', to: '/panchang' },
+              { label: 'Learn',    to: '/learn'    },
+            ].map(link => {
+              const isActive = location.pathname === link.to
+              return (
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.to)}
                   className="relative px-4 py-2 text-sm font-medium transition-colors rounded-md"
                   style={{
                     color: isActive ? '#F0CB80' : 'rgba(248,242,228,0.65)',

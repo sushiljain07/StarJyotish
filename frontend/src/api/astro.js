@@ -94,6 +94,10 @@ export function fetchPanchang({ lat, lon, timezone, date }) {
 // Today plus the next (days-1) days of Panchang for the same location —
 // powers the home page's "This week" strip and the full week view.
 // Same location semantics as fetchPanchang: current location, not birth place.
-export function fetchPanchangWeek({ lat, lon, timezone, days = 7 }) {
-  return postJson('/api/panchang/week', { lat, lon, timezone, days })
+export function fetchPanchangWeek({ lat, lon, timezone, days = 7, start_date }) {
+  return postJson('/api/panchang/week', { lat, lon, timezone, days, start_date })
+}
+
+export function fetchPanchangHinduMonth({ lat, lon, timezone }) {
+  return postJson('/api/panchang/hindu-month', { lat, lon, timezone })
 }

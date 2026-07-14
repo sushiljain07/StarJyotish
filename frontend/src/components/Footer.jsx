@@ -79,6 +79,7 @@ export default function Footer() {
         {/* Learn — only real, live destinations */}
         <FooterColumn heading={t('footer_learn_heading')} isMobile={isMobile}>
           <ul className="space-y-2.5">
+            <FooterLink to="/panchang">{t('footer_link_panchang', 'Panchang')}</FooterLink>
             <FooterLink to="/learn">{t('footer_link_knowledge_center', 'Knowledge Center')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
             <FooterLink to="/blog">{t('footer_link_blog')}</FooterLink>

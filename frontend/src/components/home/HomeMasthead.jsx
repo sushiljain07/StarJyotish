@@ -186,7 +186,7 @@ export default function HomeMasthead({ profile, profiles = [], location, panchan
           >
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-mono text-ink-onnight/70 truncate">
-                {panchang.tithi?.name} · {panchang.nakshatra} · {panchang.yoga}
+                {panchang.tithi?.name} · {typeof panchang.nakshatra === 'object' ? panchang.nakshatra?.name : panchang.nakshatra} · {panchang.yoga}
               </span>
               <span className="text-primary-light text-xs ml-2 shrink-0">⌃</span>
             </div>

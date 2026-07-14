@@ -26,6 +26,10 @@ class LocationInput(BaseModel):
     # rather than re-deriving it. Falls back to TimezoneFinder for the
     # geolocation-API path, which only ever gives raw coordinates.
     timezone: str | None = None
+    # Optional ISO date string (YYYY-MM-DD) for computing a non-today panchang.
+    # The backend treats this as a UTC calendar date; the tz_name arg then
+    # converts all times into the location's local timezone. Defaults to today.
+    date: str | None = None
 
 
 class WeekLocationInput(LocationInput):
@@ -39,7 +43,14 @@ class WeekLocationInput(LocationInput):
 @limiter.limit(COMPUTE_LIMIT)
 def get_panchang(request: Request, body: LocationInput):
     tz_name = body.timezone or _tf.timezone_at(lat=body.lat, lng=body.lon) or "UTC"
-    panchang = calculate_panchang(body.lat, body.lon, tz_name)
+    target_date = None
+    if body.date:
+        try:
+            parsed = datetime.strptime(body.date, "%Y-%m-%d").replace(tzinfo=dt_timezone.utc)
+            target_date = parsed
+        except ValueError:
+            pass  # ignore invalid date strings — fall through to today
+    panchang = calculate_panchang(body.lat, body.lon, tz_name, target_date=target_date)
     eclipse = get_upcoming_eclipse(body.lat, body.lon, tz_name)
     return {**panchang, "upcoming_eclipse": eclipse}
 

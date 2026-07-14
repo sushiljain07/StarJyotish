@@ -104,7 +104,7 @@ export default function WeekAhead() {
                     {day.tithi?.name}
                   </span>
                   <span className="text-[10px] font-mono text-ink-onnight/55 bg-white/[0.06] px-2 py-0.5 rounded-full">
-                    {day.nakshatra}
+                    {typeof day.nakshatra === 'object' ? day.nakshatra?.name : day.nakshatra}
                   </span>
                 </div>
                 {day.muhurtas?.rahu_kaal && (

@@ -100,6 +100,9 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
         ad_planet = current_ad["planet"]
         ad_idx    = DASHA_ORDER.index(ad_planet)
         pd_start  = datetime.strptime(current_ad["start"], "%Y-%m-%d")
+        # Clamp the last pratyantar to the antardasha's own end so that
+        # day-level rounding never leaves a gap at the tail of the window.
+        ad_end_dt = datetime.strptime(current_ad["end"], "%Y-%m-%d")
 
         for i in range(9):
             pd_planet = DASHA_ORDER[(ad_idx + i) % 9]
@@ -109,6 +112,9 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
                 * DASHA_YEARS[pd_planet]
             ) / (TOTAL_YEARS ** 2)
             pd_end = _add_years(pd_start, pd_years)
+            # Last entry: snap end to antardasha boundary
+            if i == 8:
+                pd_end = ad_end_dt
             pratyantars.append({
                 "planet": pd_planet,
                 "start":  pd_start.strftime("%Y-%m-%d"),
@@ -132,6 +138,10 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
         pd_idx     = DASHA_ORDER.index(pd_planet)
         sk_start   = datetime.strptime(current_pd["start"], "%Y-%m-%d")
         ad_planet  = current_ad["planet"]
+        # Clamp the last sookshma to the pratyantar's own end so that
+        # day-level rounding of individual periods never leaves a gap at
+        # the tail of the window where current_sookshma would be None.
+        pd_end_dt  = datetime.strptime(current_pd["end"], "%Y-%m-%d")
 
         for i in range(9):
             sk_planet = DASHA_ORDER[(pd_idx + i) % 9]
@@ -142,6 +152,9 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
                 * DASHA_YEARS[sk_planet]
             ) / (TOTAL_YEARS ** 3)
             sk_end = _add_years(sk_start, sk_years)
+            # Last entry: snap end to pratyantar boundary
+            if i == 8:
+                sk_end = pd_end_dt
             sookshmas.append({
                 "planet": sk_planet,
                 "start":  sk_start.strftime("%Y-%m-%d"),

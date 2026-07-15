@@ -3,6 +3,7 @@
 // /learn/basics/planets-guide — Part 3 of the Basics Series.
 import { useState } from 'react'
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import FAQ from '../../../components/knowledge/FAQ'
@@ -85,7 +86,7 @@ export default function PlanetsGuide() {
       eyebrow="Basics Series · Part 3 of 4"
       title={PLANETS_HERO.title}
       subtitle={PLANETS_HERO.subtitle}
-      meta={{ readTime: '9 min', badge: 'Basics' }}
+      meta={<LearningMetadata estimatedReadTime={9} difficulty="beginner" category="Basics" lastUpdated="2026-07-15" />}
       breadcrumbItems={[
         { label: 'Home', to: isAuthenticated ? '/home' : '/' },
         { label: 'Knowledge Center', to: '/learn' },

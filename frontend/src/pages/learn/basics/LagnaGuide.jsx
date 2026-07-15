@@ -2,6 +2,7 @@
 //
 // /learn/basics/lagna-guide — Part 2 of the Basics Series.
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import FAQ from '../../../components/knowledge/FAQ'
@@ -41,7 +42,7 @@ export default function LagnaGuide() {
       eyebrow="Basics Series · Part 2 of 4"
       title={LAGNA_HERO.title}
       subtitle={LAGNA_HERO.subtitle}
-      meta={{ readTime: '7 min', badge: 'Basics' }}
+      meta={<LearningMetadata estimatedReadTime={7} difficulty="beginner" category="Basics" lastUpdated="2026-07-15" />}
       breadcrumbItems={[
         { label: 'Home', to: isAuthenticated ? '/home' : '/' },
         { label: 'Knowledge Center', to: '/learn' },

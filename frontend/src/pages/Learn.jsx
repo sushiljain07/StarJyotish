@@ -90,6 +90,7 @@ export default function Learn() {
                 title={path.title}
                 description={path.description}
                 meta={path.meta}
+                href={path.href}
                 comingSoon={path.comingSoon}
               />
             </Reveal>

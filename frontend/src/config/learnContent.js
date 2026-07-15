@@ -18,19 +18,22 @@ export const LEARNING_PATHS = [
     title: 'New to Vedic Astrology',
     description: 'Start from zero: what a Kundli actually is, how to read your Ascendant, and why the Moon sign matters more than most people realize.',
     meta: '5-part path',
-    comingSoon: true,
+    href: '/learn/paths/new-to-vedic',
+    comingSoon: false,
   },
   {
     title: 'Understand Your Career Direction',
     description: 'Work through the D10 chart step by step — the 10th house, its lord, and the planetary periods that tend to open doors.',
     meta: '6-part path',
-    comingSoon: true,
+    href: '/learn/paths/career-direction',
+    comingSoon: false,
   },
   {
     title: 'Marriage & Compatibility',
     description: 'From Guna Milan basics to Mangal Dosha and the 7th house — a grounded path through what Vedic astrology actually says about compatibility.',
     meta: '7-part path',
-    comingSoon: true,
+    href: '/learn/paths/marriage-compatibility',
+    comingSoon: false,
   },
 ]
 

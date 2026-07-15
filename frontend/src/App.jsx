@@ -40,6 +40,9 @@ import WhatIsKundli    from './pages/learn/basics/WhatIsKundli'
 import LagnaGuide      from './pages/learn/basics/LagnaGuide'
 import PlanetsGuide    from './pages/learn/basics/PlanetsGuide'
 import MoonSignGuide   from './pages/learn/basics/MoonSignGuide'
+import NewToVedic      from './pages/learn/paths/NewToVedic'
+import CareerPath      from './pages/learn/paths/CareerPath'
+import MarriagePath    from './pages/learn/paths/MarriagePath'
 
 export default function App() {
   return (
@@ -77,10 +80,13 @@ export default function App() {
           <Route path="/learn/zodiac" element={<ZodiacGuide />} />
           <Route path="/learn/zodiac/aries"              element={<AriesGuide />} />
           <Route path="/learn/zodiac/taurus"             element={<TaurusGuide />} />
-          <Route path="/learn/basics/what-is-kundli"     element={<WhatIsKundli />} />
-          <Route path="/learn/basics/lagna-guide"        element={<LagnaGuide />} />
-          <Route path="/learn/basics/planets-guide"      element={<PlanetsGuide />} />
-          <Route path="/learn/basics/moon-sign-guide"    element={<MoonSignGuide />} />
+          <Route path="/learn/basics/what-is-kundli"          element={<WhatIsKundli />} />
+          <Route path="/learn/basics/lagna-guide"             element={<LagnaGuide />} />
+          <Route path="/learn/basics/planets-guide"           element={<PlanetsGuide />} />
+          <Route path="/learn/basics/moon-sign-guide"         element={<MoonSignGuide />} />
+          <Route path="/learn/paths/new-to-vedic"             element={<NewToVedic />} />
+          <Route path="/learn/paths/career-direction"         element={<CareerPath />} />
+          <Route path="/learn/paths/marriage-compatibility"   element={<MarriagePath />} />
           {/* Must stay last: React Router matches routes in declaration
               order, so anything above this always wins first. */}
           <Route path="*" element={<NotFound />} />

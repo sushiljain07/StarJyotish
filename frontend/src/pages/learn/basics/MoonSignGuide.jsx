@@ -2,6 +2,7 @@
 //
 // /learn/basics/moon-sign-guide — Part 4 of the Basics Series.
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import FAQ from '../../../components/knowledge/FAQ'
@@ -42,7 +43,7 @@ export default function MoonSignGuide() {
       eyebrow="Basics Series · Part 4 of 4"
       title={MOON_HERO.title}
       subtitle={MOON_HERO.subtitle}
-      meta={{ readTime: '6 min', badge: 'Basics' }}
+      meta={<LearningMetadata estimatedReadTime={6} difficulty="beginner" category="Basics" lastUpdated="2026-07-15" />}
       breadcrumbItems={[
         { label: 'Home', to: isAuthenticated ? '/home' : '/' },
         { label: 'Knowledge Center', to: '/learn' },

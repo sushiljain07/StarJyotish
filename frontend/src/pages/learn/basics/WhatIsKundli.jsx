@@ -9,6 +9,7 @@
 //   — Uses the same component vocabulary: Callout, QuickFacts, FAQ,
 //     RelatedArticles, Reflection, Reveal.
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
+import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import FAQ from '../../../components/knowledge/FAQ'
@@ -48,7 +49,7 @@ export default function WhatIsKundli() {
       eyebrow="Basics Series · Part 1 of 4"
       title={KUNDLI_HERO.title}
       subtitle={KUNDLI_HERO.subtitle}
-      meta={{ readTime: '6 min', badge: 'Basics' }}
+      meta={<LearningMetadata estimatedReadTime={6} difficulty="beginner" category="Basics" lastUpdated="2026-07-15" />}
       breadcrumbItems={[
         { label: 'Home', to: isAuthenticated ? '/home' : '/' },
         { label: 'Knowledge Center', to: '/learn' },

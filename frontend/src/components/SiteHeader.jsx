@@ -113,7 +113,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           <nav className="hidden md:flex items-center gap-1" aria-label="Public navigation">
             {[
               { label: 'Panchang', to: '/panchang' },
-              { label: 'Learn',    to: '/learn'    },
+              { label: 'Explore',  to: '/learn'    },
             ].map(link => {
               const isActive = location.pathname === link.to
               return (

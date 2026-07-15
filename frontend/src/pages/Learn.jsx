@@ -113,6 +113,7 @@ export default function Learn() {
                 description={guide.description}
                 meta={guide.meta}
                 badge={guide.badge}
+                href={guide.href}
                 comingSoon={guide.comingSoon}
               />
             </Reveal>

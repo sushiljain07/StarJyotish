@@ -16,6 +16,7 @@
 import Seo from '../Seo'
 import SiteHeader from '../SiteHeader'
 import Footer from '../Footer'
+import BottomNav from '../home/BottomNav'
 import Hero from './Hero'
 import ReadingProgress from './ReadingProgress'
 import { useScrollProgress } from '../../hooks/useScrollProgress'
@@ -61,6 +62,7 @@ export default function KnowledgeLayout({
       {cta}
 
       <Footer />
+      <BottomNav />
     </div>
   )
 }

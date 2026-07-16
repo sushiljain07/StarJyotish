@@ -10,6 +10,8 @@
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../../contexts/AuthContext'
+import { getPrimaryProfile } from '../../services/astrologyProfiles'
 import { NAV_ITEMS, isNavActive, navTarget } from '../../config/nav'
 
 // SVG icons inline — no external dependency
@@ -57,19 +59,29 @@ const ICONS = {
   panchang: <PanchangIcon />,
 }
 
+// Self-gating: renders nothing for signed-out users and derives the primary
+// profile itself, so any page (workspace shell, Knowledge Center, guides)
+// can mount <BottomNav /> without auth plumbing. The spacer keeps the fixed
+// nav from covering the end of the page's own content/footer on mobile.
 export default function BottomNav({ profile = null }) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return null
+  const navProfile = profile ?? getPrimaryProfile(user)
 
   function handleClick(e, item) {
     if (!item.needsChart) return  // let Link handle it
     e.preventDefault()
-    const { to, state } = navTarget(item, profile)
+    const { to, state } = navTarget(item, navProfile)
     navigate(to, state ? { state } : undefined)
   }
 
   return (
+    <>
+    <div className="h-16 md:hidden" aria-hidden="true" />
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl pb-safe min-h-[60px]"
       aria-label={t('nav_bottom_aria', 'Main navigation')}
@@ -102,5 +114,6 @@ export default function BottomNav({ profile = null }) {
           : <Link key={item.id} to={item.to} {...commonProps}>{content}</Link>
       })}
     </nav>
+    </>
   )
 }

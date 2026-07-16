@@ -18,6 +18,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import Seo from '../../components/Seo'
 import SiteHeader from '../../components/SiteHeader'
 import Footer from '../../components/Footer'
+import BottomNav from '../../components/home/BottomNav'
 import Reveal from '../../components/Reveal'
 import { useScrollProgress } from '../../hooks/useScrollProgress'
 import Hero from '../../components/knowledge/Hero'
@@ -269,6 +270,7 @@ export default function ZodiacGuide() {
       />
 
       <Footer />
+      <BottomNav />
     </div>
   )
 }

@@ -5,8 +5,18 @@
 // reactions and day-score ring) is the sole owner of that content. Showing
 // it in both places was a real bug in the previous round — same sentence,
 // twice, one screen apart.
-import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+//
+// v2 (Home reimagined): the per-component Math.random() star sprinkle is
+// gone — Starfield.jsx now renders one page-level sky behind everything,
+// so this component only owns the gradient wash. The old animated
+// sun-arc/projectile is replaced by a single celestial-clock disc (real
+// Sun during the day, a phase-accurate Moon at night, canvas-drawn). A
+// tithi line, an "edition" chip and a quiet check-in streak pill round out
+// the masthead per the approved home-v5 mock. The old panchang preview
+// button (tithi/nakshatra/yoga + rahu kaal, linking to /panchang) has been
+// slimmed to just the tithi line below — the fuller panchang brief now
+// lives once, in the TodayWindow beat, rather than duplicated here.
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
@@ -37,25 +47,13 @@ function currentBucket(sunrise, sunset) {
 // (bg-night-deep in tailwind.config = #0F1226) — the gradient always ends
 // on this color regardless of time-of-day bucket, so the masthead fades
 // into the page instead of cutting off with a visible seam. Only the top
-// of the gradient (sky1) and the celestial body's color vary by bucket.
+// of the gradient (sky1) varies by bucket.
 const PAGE_BG = '#0F1226'
 const SKY = {
-  dawn:  { sky1: '#33294F', bodyColor: '#E8A874', body: 'sun' },
-  day:   { sky1: '#1D2C56', bodyColor: '#F2C94C', body: 'sun' },
-  dusk:  { sky1: '#2A1F42', bodyColor: '#C05B3C', body: 'sun' },
-  night: { sky1: '#131233', bodyColor: '#F7C877', body: 'moon' },
-}
-
-// Body position along the arc, as a % of the band's width/height — dawn
-// low-left, day high-center, dusk low-right, night high (moon doesn't
-// track the sun's arc). Rendered as a real HTML circle (see below), not
-// an SVG shape stretched by preserveAspectRatio="none" — that stretch is
-// what turned the sun into a flat ellipse in the previous round.
-const BODY_POS = {
-  dawn:  { left: '15%', top: '68%' },
-  day:   { left: '50%', top: '18%' },
-  dusk:  { left: '85%', top: '64%' },
-  night: { left: '50%', top: '24%' },
+  dawn:  { sky1: '#33294F' },
+  day:   { sky1: '#1D2C56' },
+  dusk:  { sky1: '#2A1F42' },
+  night: { sky1: '#131233' },
 }
 
 function shortLocation(label) {
@@ -71,16 +69,207 @@ function initials(label) {
   return (label || '?').trim().charAt(0).toUpperCase()
 }
 
+// ── Check-in streak — a quiet, client-only ritual signal ────────────────────
+// Independent of useUserJourney's server-backed streak (which tracks card
+// reactions): this one just answers "did you open the app today, and how
+// many days running" — a pure visit log in localStorage.
+const VISIT_KEY = 'sj_visit_days'
+
+function useCheckInStreak() {
+  const [state, setState] = useState({ streak: 0, beads: Array(7).fill(false) })
+
+  useEffect(() => {
+    try {
+      const today = new Date()
+      const todayKey = today.toISOString().slice(0, 10)
+      const raw = JSON.parse(localStorage.getItem(VISIT_KEY) || '[]')
+      let days = Array.isArray(raw) ? raw : []
+      if (!days.includes(todayKey)) days = [...days, todayKey]
+      days = days.slice(-90) // cap growth — only the trailing window matters
+      localStorage.setItem(VISIT_KEY, JSON.stringify(days))
+
+      const daySet = new Set(days)
+
+      let streak = 0
+      const cursor = new Date(today)
+      while (daySet.has(cursor.toISOString().slice(0, 10))) {
+        streak++
+        cursor.setDate(cursor.getDate() - 1)
+      }
+
+      const beads = []
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today)
+        d.setDate(d.getDate() - i)
+        beads.push(daySet.has(d.toISOString().slice(0, 10)))
+      }
+
+      setState({ streak, beads })
+    } catch {
+      /* localStorage unavailable — the pill just stays quiet at zero */
+    }
+  }, [])
+
+  return state
+}
+
+function StreakPill({ streak, beads, t }) {
+  if (!streak) return null
+  return (
+    <div
+      className="flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] rounded-full px-3 py-1.5 shrink-0"
+      title={t('home_streak_title', 'Daily check-in streak')}
+    >
+      <div className="flex items-center gap-[3px]">
+        {beads.map((lit, i) => (
+          <span
+            key={i}
+            className={`w-[5px] h-[5px] rounded-full ${lit ? 'bg-primary' : 'bg-primary/20'}`}
+            style={lit ? { boxShadow: '0 0 6px rgba(240,203,128,0.7)' } : undefined}
+          />
+        ))}
+      </div>
+      <span className="text-2xs text-primary-glow whitespace-nowrap">
+        {t('home_streak_label', { defaultValue: '{{n}}-day sky streak', n: streak })}
+      </span>
+    </div>
+  )
+}
+
+// ── Edition chip ─────────────────────────────────────────────────────────────
+function dayOfYear() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  return Math.floor((now - start) / 86400000)
+}
+
+function EditionChip({ t }) {
+  return (
+    <p className="inline-flex items-center text-3xs text-primary bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
+      {t('home_edition_chip', {
+        defaultValue: 'Edition #{{n}} — this page turns at sunrise',
+        n: dayOfYear(),
+      })}
+    </p>
+  )
+}
+
+// ── Tithi line ───────────────────────────────────────────────────────────────
+function TithiLine({ panchang, t }) {
+  if (!panchang) return null
+  const tithiName = panchang.tithi?.name
+  const nakName = typeof panchang.nakshatra === 'object' ? panchang.nakshatra?.name : panchang.nakshatra
+  const horaName = typeof panchang.hora === 'object' ? panchang.hora?.name : panchang.hora
+
+  const parts = []
+  if (tithiName) parts.push(tithiName)
+  if (nakName) parts.push(t('home_tithi_moon_in', { defaultValue: 'Moon in {{nak}}', nak: nakName }))
+  if (horaName) parts.push(t('home_tithi_hora', { defaultValue: '{{planet}} hora', planet: horaName }))
+
+  if (!parts.length) return null
+  return <p className="text-xs text-ink-onnight/55 mt-1.5">{parts.join(' · ')}</p>
+}
+
+// ── Celestial clock ──────────────────────────────────────────────────────────
+// Day (local hours 6–18): a warm glowing Sun disc. Night: the real Moon,
+// phase computed with the same synodic approximation as the approved mock
+// (reference new moon 2000-01-06 18:14 UTC-naive, period 29.530588853
+// days) and drawn on a small canvas — no image assets, just geometry.
+// Tailwind has no radial-gradient utility, so this needs a literal CSS
+// background string — but the two stops are exactly the primary-glow and
+// primary token hex values, not invented colors.
+function SunDisc({ size = 52 }) {
+  return (
+    <div
+      className="rounded-full"
+      style={{
+        width: size,
+        height: size,
+        background: 'radial-gradient(circle at 35% 32%, #F0CB80 0%, #D9A441 100%)',
+        boxShadow: '0 0 22px 4px rgba(217,164,65,0.4)',
+      }}
+      aria-hidden="true"
+    />
+  )
+}
+
+function moonPhase() {
+  const synodic = 29.530588853
+  const ref = new Date(2000, 0, 6, 18, 14)
+  const now = new Date()
+  let age = ((now - ref) / 86400000) % synodic
+  if (age < 0) age += synodic
+  const illum = (1 - Math.cos((age / synodic) * 2 * Math.PI)) / 2
+  const waxing = age < synodic / 2
+  return { illum, waxing }
+}
+
+function MoonDisc({ t, size = 52 }) {
+  const canvasRef = useRef(null)
+  const { illum, waxing } = useMemo(moonPhase, [])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const R = size * 0.4
+    const CX = size / 2
+    const CY = size / 2
+
+    // Canvas fillStyle needs a literal color (no Tailwind classes reach a
+    // <canvas> 2D context) — these two are the primary-light and night
+    // token hex values, reused rather than invented.
+    ctx.clearRect(0, 0, size, size)
+    ctx.fillStyle = '#FBF0DC'
+    ctx.beginPath()
+    ctx.arc(CX, CY, R, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Dark side — same terminator-ellipse trick as the mock's moonCanvas.
+    ctx.fillStyle = '#171B33'
+    ctx.beginPath()
+    ctx.arc(CX, CY, R, Math.PI / 2, -Math.PI / 2, waxing)
+    const w = R * (1 - 2 * illum)
+    ctx.ellipse(CX, CY, Math.abs(w), R, 0, -Math.PI / 2, Math.PI / 2, waxing ? w < 0 : w > 0)
+    ctx.fill()
+  }, [size, illum, waxing])
+
+  return (
+    <div className="flex flex-col items-center">
+      <canvas
+        ref={canvasRef}
+        width={size}
+        height={size}
+        style={{ filter: 'drop-shadow(0 0 14px rgba(240,203,128,0.28))' }}
+      />
+      <p className="text-3xs text-ink-onnight/45 mt-1 whitespace-nowrap">
+        {waxing ? t('home_moon_waxing', 'Waxing') : t('home_moon_waning', 'Waning')}
+        {' · '}
+        {Math.round(illum * 100)}%
+      </p>
+    </div>
+  )
+}
+
+function CelestialClock({ t }) {
+  const hour = new Date().getHours()
+  const isDay = hour >= 6 && hour < 18
+  return (
+    <div className="shrink-0" aria-hidden="true">
+      {isDay ? <SunDisc /> : <MoonDisc t={t} />}
+    </div>
+  )
+}
+
 export default function HomeMasthead({ profile, profiles = [], location, panchang, dashaTags }) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { streak, beads } = useCheckInStreak()
 
   const bucket = useMemo(
     () => currentBucket(panchang?.sunrise, panchang?.sunset),
     [panchang?.sunrise, panchang?.sunset],
   )
   const sky = SKY[bucket]
-  const pos = BODY_POS[bucket]
   const firstName = profile?.label?.split(' ')[0]
   const currentCity = shortLocation(location?.label)
   const birthCity = shortLocation(profile?.place)
@@ -90,82 +279,56 @@ export default function HomeMasthead({ profile, profiles = [], location, panchan
       className="relative overflow-hidden px-4 sm:px-6 pt-5 pb-8 transition-[background] duration-1000"
       style={{ background: `linear-gradient(180deg, ${sky.sky1} 0%, ${PAGE_BG} 100%)` }}
     >
-      {(bucket === 'night' || bucket === 'dusk') && (
-        <div className="absolute inset-0 opacity-70 pointer-events-none" aria-hidden="true">
-          {Array.from({ length: 28 }).map((_, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full bg-white"
-              style={{
-                width: Math.random() * 1.6 + 0.6,
-                height: Math.random() * 1.6 + 0.6,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 55}%`,
-                opacity: Math.random() * 0.6 + 0.3,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
       <div className="relative max-w-2xl mx-auto">
-        {profiles.length > 0 && (
-          <div className="flex gap-1.5 flex-wrap mb-4">
-            {profiles.slice(0, 4).map(p => (
-              <span
-                key={p.id ?? p.label}
-                className={`flex items-center gap-1.5 text-[11px] pl-1 pr-3 py-1 rounded-full ${
-                  p.label === profile?.label
-                    ? 'bg-primary/20 text-primary-light'
-                    : 'bg-white/[0.07] text-ink-onnight/55'
-                }`}
-              >
-                <span className="w-4 h-4 rounded-full bg-white/[0.18] flex items-center justify-center text-[8.5px] text-ink-onnight">
-                  {initials(p.label)}
+        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+          {profiles.length > 0 ? (
+            <div className="flex gap-1.5 flex-wrap">
+              {profiles.slice(0, 4).map(p => (
+                <span
+                  key={p.id ?? p.label}
+                  className={`flex items-center gap-1.5 text-2xs pl-1 pr-3 py-1 rounded-full ${
+                    p.label === profile?.label
+                      ? 'bg-primary/20 text-primary-light'
+                      : 'bg-white/[0.07] text-ink-onnight/55'
+                  }`}
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/[0.18] flex items-center justify-center text-3xs text-ink-onnight">
+                    {initials(p.label)}
+                  </span>
+                  {p.label}
                 </span>
-                {p.label}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <p className="font-serif text-lg font-medium text-primary-light">
-          {t('home_greeting', { name: firstName ?? '' })}
-        </p>
-        <div className="flex gap-2 mt-1.5 flex-wrap">
-          {currentCity && (
-            <span className="text-[10.5px] font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-              Current: {currentCity}
-            </span>
-          )}
-          {birthCity && (
-            <span className="text-[10.5px] font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-              Birth: {birthCity}
-            </span>
-          )}
+              ))}
+            </div>
+          ) : <div />}
+          <StreakPill streak={streak} beads={beads} t={t} />
         </div>
 
-        {/* Time-of-day arc — line stretches fine visually; the body itself
-            is a fixed-aspect HTML circle overlaid on top so it can never
-            distort into an ellipse. */}
-        <div className="relative h-16 mt-5">
-          <svg viewBox="0 0 100 60" preserveAspectRatio="none" className="w-full h-full absolute inset-0" aria-hidden="true">
-            <path d="M 3 56 Q 50 -14 97 56" fill="none" stroke="rgba(237,234,224,0.16)" strokeWidth="0.5" strokeDasharray="1.4 2.6" />
-          </svg>
-          <span
-            className="absolute rounded-full"
-            style={{
-              left: pos.left, top: pos.top,
-              width: 22, height: 22,
-              transform: 'translate(-50%, -50%)',
-              background: sky.bodyColor,
-              boxShadow: sky.body === 'moon' ? 'inset -5px -2px 0 0 rgba(15,18,38,0.65)' : `0 0 18px 2px ${sky.bodyColor}55`,
-            }}
-          />
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-lg font-medium text-primary-light">
+              {t('home_greeting', { name: firstName ?? '' })}
+            </p>
+            <div className="flex gap-2 mt-1.5 flex-wrap">
+              {currentCity && (
+                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                  Current: {currentCity}
+                </span>
+              )}
+              {birthCity && (
+                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                  Birth: {birthCity}
+                </span>
+              )}
+            </div>
+            <TithiLine panchang={panchang} t={t} />
+            <EditionChip t={t} />
+          </div>
+
+          <CelestialClock t={t} />
         </div>
 
         {dashaTags && (dashaTags.mahadasha || dashaTags.antardasha) && (
-          <div className="flex gap-2 flex-wrap mt-3">
+          <div className="flex gap-2 flex-wrap mt-4">
             {dashaTags.mahadasha && (
               <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
                 Mahadasha · {dashaTags.mahadasha}
@@ -177,25 +340,6 @@ export default function HomeMasthead({ profile, profiles = [], location, panchan
               </span>
             )}
           </div>
-        )}
-
-        {panchang && (
-          <button
-            onClick={() => navigate('/panchang')}
-            className="w-full text-left mt-3.5 bg-white/[0.06] border border-white/[0.1] rounded-xl px-3.5 py-3 hover:bg-white/[0.09] transition"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-mono text-ink-onnight/70 truncate">
-                {panchang.tithi?.name} · {typeof panchang.nakshatra === 'object' ? panchang.nakshatra?.name : panchang.nakshatra} · {panchang.yoga}
-              </span>
-              <span className="text-primary-light text-xs ml-2 shrink-0">⌃</span>
-            </div>
-            {panchang.muhurtas?.rahu_kaal && (
-              <p className="text-[10.5px] text-ink-onnight/40 mt-1">
-                Rahu Kaal {panchang.muhurtas.rahu_kaal.start}–{panchang.muhurtas.rahu_kaal.end} · full panchang →
-              </p>
-            )}
-          </button>
         )}
       </div>
     </div>

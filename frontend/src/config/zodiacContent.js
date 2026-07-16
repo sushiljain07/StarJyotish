@@ -58,16 +58,16 @@ export const RASHIS_INTRO = {
 export const RASHIS = [
   { id: 'aries',       sanskrit: 'Mesha',       english: 'Aries',       archetype: 'The Pioneer',     tagline: 'Courage begins with the first step.',                           href: '/learn/zodiac/aries', comingSoon: false },
   { id: 'taurus',      sanskrit: 'Vrishabha',   english: 'Taurus',      archetype: 'The Builder',      tagline: 'What is built slowly rarely falls quickly.',                    href: '/learn/zodiac/taurus', comingSoon: false },
-  { id: 'gemini',      sanskrit: 'Mithuna',     english: 'Gemini',      archetype: 'The Communicator',  tagline: 'Every idea deserves to be spoken aloud.' },
-  { id: 'cancer',      sanskrit: 'Karka',       english: 'Cancer',      archetype: 'The Nurturer',      tagline: 'Home is wherever they choose to protect.' },
-  { id: 'leo',         sanskrit: 'Simha',       english: 'Leo',         archetype: 'The Sovereign',     tagline: 'To lead is to be seen, and to be seen is to matter.' },
-  { id: 'virgo',       sanskrit: 'Kanya',       english: 'Virgo',       archetype: 'The Analyst',       tagline: 'Perfection is just care, repeated.' },
-  { id: 'libra',       sanskrit: 'Tula',        english: 'Libra',       archetype: 'The Diplomat',      tagline: 'Balance is not indecision — it is precision.' },
-  { id: 'scorpio',     sanskrit: 'Vrishchika',  english: 'Scorpio',     archetype: 'The Transformer',   tagline: 'Depth is chosen, not avoided.' },
-  { id: 'sagittarius', sanskrit: 'Dhanu',       english: 'Sagittarius', archetype: 'The Seeker',        tagline: "The horizon isn't a destination — it's a direction." },
-  { id: 'capricorn',   sanskrit: 'Makara',      english: 'Capricorn',   archetype: 'The Strategist',    tagline: 'Patience is ambition in disguise.' },
-  { id: 'aquarius',    sanskrit: 'Kumbha',      english: 'Aquarius',    archetype: 'The Visionary',     tagline: 'The future is easier to imagine than to wait for.' },
-  { id: 'pisces',      sanskrit: 'Meena',       english: 'Pisces',      archetype: 'The Dreamer',       tagline: 'Two currents, one sea.' },
+  { id: 'gemini',      sanskrit: 'Mithuna',     english: 'Gemini',      archetype: 'The Communicator',  tagline: 'Every idea deserves to be spoken aloud.',             href: '/learn/zodiac/gemini',      comingSoon: false },
+  { id: 'cancer',      sanskrit: 'Karka',       english: 'Cancer',      archetype: 'The Nurturer',      tagline: 'Home is wherever they choose to protect.',             href: '/learn/zodiac/cancer',      comingSoon: false },
+  { id: 'leo',         sanskrit: 'Simha',       english: 'Leo',         archetype: 'The Sovereign',     tagline: 'To lead is to be seen, and to be seen is to matter.',  href: '/learn/zodiac/leo',         comingSoon: false },
+  { id: 'virgo',       sanskrit: 'Kanya',       english: 'Virgo',       archetype: 'The Analyst',       tagline: 'Perfection is just care, repeated.',                   href: '/learn/zodiac/virgo',       comingSoon: false },
+  { id: 'libra',       sanskrit: 'Tula',        english: 'Libra',       archetype: 'The Diplomat',      tagline: 'Balance is not indecision — it is precision.',          href: '/learn/zodiac/libra',       comingSoon: false },
+  { id: 'scorpio',     sanskrit: 'Vrishchika',  english: 'Scorpio',     archetype: 'The Transformer',   tagline: 'Depth is chosen, not avoided.',                        href: '/learn/zodiac/scorpio',     comingSoon: false },
+  { id: 'sagittarius', sanskrit: 'Dhanu',       english: 'Sagittarius', archetype: 'The Seeker',        tagline: "The horizon isn't a destination — it's a direction.",   href: '/learn/zodiac/sagittarius', comingSoon: false },
+  { id: 'capricorn',   sanskrit: 'Makara',      english: 'Capricorn',   archetype: 'The Strategist',    tagline: 'Patience is ambition in disguise.',                    href: '/learn/zodiac/capricorn',   comingSoon: false },
+  { id: 'aquarius',    sanskrit: 'Kumbha',      english: 'Aquarius',    archetype: 'The Visionary',     tagline: 'The future is easier to imagine than to wait for.',    href: '/learn/zodiac/aquarius',    comingSoon: false },
+  { id: 'pisces',      sanskrit: 'Meena',       english: 'Pisces',      archetype: 'The Dreamer',       tagline: 'Two currents, one sea.',                               href: '/learn/zodiac/pisces',      comingSoon: false },
 ]
 
 export const BEYOND_ZODIAC = {

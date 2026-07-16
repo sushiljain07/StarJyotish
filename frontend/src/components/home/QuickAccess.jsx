@@ -1,8 +1,11 @@
 // frontend/src/components/home/QuickAccess.jsx
+// STATUS: Not currently rendered in PersonalHome (removed in "new home UI design" refactor).
+// Kept because it's token-correct and can be reintroduced in the two-column layout
+// (sj-ph-left-col alongside LocationSection) when that layout is restored.
 //
-// 6-icon Quick Access grid matching the design:
+// 6-icon Quick Access grid:
 // Full Chart & Analysis | Predictions | Remedies | Compatibility | Panchang | KP Insights
-// Each tile: rounded square with gradient icon bg, label, arrow
+// Each tile: night-surface icon well with accent border, label, arrow
 
 import { useNavigate } from 'react-router-dom'
 

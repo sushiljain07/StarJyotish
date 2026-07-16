@@ -1,8 +1,10 @@
 // frontend/src/components/home/CosmicSnapshot.jsx
+// STATUS: Not currently rendered in PersonalHome (removed in "new home UI design" refactor).
+// Kept because it's token-correct and can sit in the sj-ph-right-col slot
+// alongside the "Unlock deeper insights" card when the two-column layout is restored.
 //
-// "Your Cosmic Snapshot" dark card — Moon Sign, Day of week, Nakshatra.
-// Matches the design: dark purple card with gold ✦ icon, right-pointing
-// chevron, and 3 info items in a row.
+// "Your Cosmic Snapshot" — Moon Sign, Day of week, Nakshatra.
+// Night card with gold ✦ icon, three data items in a row.
 
 export default function CosmicSnapshot({ panchang, profile }) {
   if (!panchang && !profile) return null

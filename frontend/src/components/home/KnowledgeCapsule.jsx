@@ -81,32 +81,31 @@ export default function KnowledgeCapsule({ edition }) {
   const glyph = GLYPHS[planet] ?? '✦'
 
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl overflow-hidden">
-      {/* Gold top accent line */}
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
+    <div className="bg-white/[0.045] border border-white/[0.09] rounded-2xl overflow-hidden hover:border-primary/30 transition">
+      {/* Gold top accent line — the one detail that marks this as a learning card */}
+      <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
       <div className="px-5 py-4 flex items-start gap-4">
-        {/* Glyph circle */}
-        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border border-primary/30 font-serif text-base"
-             style={{ background: 'rgba(217,164,65,0.10)', color: '#D9A441' }}>
+        {/* Vedic glyph circle — same treatment as ChartSpotlight planet badges */}
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/10 border border-primary/25 font-serif text-base text-primary">
           {glyph}
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-primary-dark mb-1">
+          <p className="text-3xs uppercase tracking-widest font-bold text-primary mb-1">
             {t('capsule_eyebrow')}
           </p>
-          <p className="font-serif font-semibold text-[15px] text-ink leading-snug mb-1">
+          <p className="font-serif font-semibold text-[15px] text-primary-light leading-snug mb-1">
             {capsule.title}
           </p>
-          <p className="text-[11px] text-ink-faint">
+          <p className="text-2xs text-ink-onnight/45">
             {t('capsule_read_time', { mins: capsule.mins })}
           </p>
         </div>
 
         <Link
           to={`/learn/knowledge/${capsule.slug}`}
-          className="shrink-0 self-center text-[12px] font-bold text-primary-dark hover:text-primary transition flex items-center gap-1"
+          className="shrink-0 self-center text-2xs font-bold text-primary hover:text-primary-glow transition flex items-center gap-1"
         >
           {t('capsule_cta')} →
         </Link>

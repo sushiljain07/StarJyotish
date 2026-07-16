@@ -55,6 +55,16 @@ const MoonSignGuide = lazy(() => import('./pages/learn/basics/MoonSignGuide'))
 const NewToVedic = lazy(() => import('./pages/learn/paths/NewToVedic'))
 const CareerPath = lazy(() => import('./pages/learn/paths/CareerPath'))
 const MarriagePath = lazy(() => import('./pages/learn/paths/MarriagePath'))
+const GeminiGuide = lazy(() => import('./pages/learn/zodiac/Gemini'))
+const CancerGuide = lazy(() => import('./pages/learn/zodiac/Cancer'))
+const LeoGuide = lazy(() => import('./pages/learn/zodiac/Leo'))
+const VirgoGuide = lazy(() => import('./pages/learn/zodiac/Virgo'))
+const LibraGuide = lazy(() => import('./pages/learn/zodiac/Libra'))
+const ScorpioGuide = lazy(() => import('./pages/learn/zodiac/Scorpio'))
+const SagittariusGuide = lazy(() => import('./pages/learn/zodiac/Sagittarius'))
+const CapricornGuide = lazy(() => import('./pages/learn/zodiac/Capricorn'))
+const AquariusGuide = lazy(() => import('./pages/learn/zodiac/Aquarius'))
+const PiscesGuide = lazy(() => import('./pages/learn/zodiac/Pisces'))
 
 export default function App() {
   return (
@@ -101,6 +111,16 @@ export default function App() {
             <Route path="/learn/zodiac" element={<ZodiacGuide />} />
             <Route path="/learn/zodiac/aries" element={<AriesGuide />} />
             <Route path="/learn/zodiac/taurus" element={<TaurusGuide />} />
+            <Route path="/learn/zodiac/gemini" element={<GeminiGuide />} />
+            <Route path="/learn/zodiac/cancer" element={<CancerGuide />} />
+            <Route path="/learn/zodiac/leo" element={<LeoGuide />} />
+            <Route path="/learn/zodiac/virgo" element={<VirgoGuide />} />
+            <Route path="/learn/zodiac/libra" element={<LibraGuide />} />
+            <Route path="/learn/zodiac/scorpio" element={<ScorpioGuide />} />
+            <Route path="/learn/zodiac/sagittarius" element={<SagittariusGuide />} />
+            <Route path="/learn/zodiac/capricorn" element={<CapricornGuide />} />
+            <Route path="/learn/zodiac/aquarius" element={<AquariusGuide />} />
+            <Route path="/learn/zodiac/pisces" element={<PiscesGuide />} />
             <Route path="/learn/basics/what-is-kundli" element={<WhatIsKundli />} />
             <Route path="/learn/basics/lagna-guide" element={<LagnaGuide />} />
             <Route path="/learn/basics/planets-guide" element={<PlanetsGuide />} />

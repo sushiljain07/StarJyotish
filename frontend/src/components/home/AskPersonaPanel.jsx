@@ -14,7 +14,8 @@
 // an abuse control, until a real backend quota exists.
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { API_BASE } from '../../api/config'
+import { askKundli } from '../../api/astro'
+import { useAuth } from '../../contexts/AuthContext'
 import JyotiAvatar from './JyotiAvatar'
 
 const MAX_QUESTIONS = 5
@@ -50,6 +51,7 @@ function saveQuota(userId, count) {
 
 export default function AskPersonaPanel({ userId, input }) {
   const { t, i18n } = useTranslation()
+  const { user, authedRequest } = useAuth()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [count, setCount] = useState(() => loadQuota(userId))
@@ -89,16 +91,13 @@ export default function AskPersonaPanel({ userId, input }) {
     setError('')
 
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...input, question, language: lang, session_id: sessionIdRef.current }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || t('ask_error'))
-      }
-      const data = await res.json()
+      const payload = { ...input, question, language: lang, session_id: sessionIdRef.current }
+      // Signed in (always the case on this page, but guarded anyway) →
+      // token goes along so the backend threads this into the user's
+      // durable, memory-backed chat history — see api/astro.js askKundli.
+      const data = user
+        ? await authedRequest(token => askKundli(payload, token))
+        : await askKundli(payload)
       if (data.session_id) sessionIdRef.current = data.session_id
       setMessages(prev => [...prev, { role: 'assistant', text: data.answer }])
       const next = count + 1

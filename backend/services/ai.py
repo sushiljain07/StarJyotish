@@ -1308,6 +1308,7 @@ def ask_chart(
     language: str,
     transit: Optional[dict] = None,
     conversation_history: Optional[list[dict]] = None,
+    user_memory: Optional[str] = None,
 ) -> tuple[str, str]:
     """
     Answer a kundli question using the full available chart context.
@@ -1320,6 +1321,11 @@ def ask_chart(
     was actually asked/answered before, instead of treating every question
     as if it arrived with no context. Empty/None for the first question of
     a session — handled the same as "no history" below, not as an error.
+
+    user_memory: the signed-in user's rolling distilled memory from
+    previous conversations (see services/user_memory.py) — what they've
+    shared about their life, not chart facts. None for anonymous callers
+    or a first-ever conversation.
 
     Chart data passed in (from the route):
       chart['planets']          — D1 placements
@@ -1398,6 +1404,17 @@ def ask_chart(
     if transit_text:
         charts_listed += ", Transit"
 
+    # ── Long-term memory (signed-in users only) ────────────────────────────
+    memory_text = ""
+    if user_memory:
+        memory_text = (
+            f"\n\nWHAT YOU REMEMBER ABOUT THIS PERSON (from earlier "
+            f"conversations — weave it in naturally where relevant, e.g. "
+            f"connect today's answer to a concern they raised before; never "
+            f"recite this list back, and never claim to remember anything "
+            f"not written here):\n{user_memory}\n"
+        )
+
     # ── Prior conversation turns (if any) ──────────────────────────────────
     history_text = ""
     if conversation_history:
@@ -1432,6 +1449,7 @@ def ask_chart(
         + extra_div_text
         + transit_text
         + skill_text
+        + memory_text
         + history_text
         + f"\n\nQUESTION: {question}"
     )

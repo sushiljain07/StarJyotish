@@ -22,6 +22,7 @@ from db.models.session import UserSession  # noqa: F401
 from db.models.setting import AppSetting  # noqa: F401
 from db.models.transaction import RelatedEntityType, Transaction, TransactionStatus, TransactionType  # noqa: F401
 from db.models.user import User, UserRole  # noqa: F401
+from db.models.user_memory import UserAiMemory  # noqa: F401
 from db.models.wallet import Wallet, WalletLedgerDirection, WalletLedgerEntry  # noqa: F401
 
 __all__ = [
@@ -43,4 +44,5 @@ __all__ = [
     "Feedback", "FeedbackCategory",
     "Testimonial", "TestimonialStatus",
     "ChatSession", "ChatMessage", "ChatRole",
+    "UserAiMemory",
 ]

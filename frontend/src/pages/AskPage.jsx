@@ -3,22 +3,15 @@
 import { lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 import Seo from '../components/Seo'
+import { StateBlock } from '../components/ui'
 import { formatDate, formatTime } from '../utils/format'
 
 const AskChart = lazy(() => import('../components/AskChart'))
 
+// Lazy-load fallback — shared skeleton StateBlock (see components/ui).
 function TabLoader() {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-      <div className="text-3xl mb-3 animate-spin">💬</div>
-      <div className="w-40 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full rounded-full animate-pulse bg-primary w-3/4" />
-      </div>
-    </div>
-  )
+  return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
 
 export default function AskPage() {
@@ -33,10 +26,8 @@ export default function AskPage() {
   const { input, presetQuestion = null } = state
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <Seo title="Ask Your Chart" description="Ask any question about your Vedic birth chart." path="/ask" noindex />
-      <SiteHeader />
-      <div className="h-[60px] shrink-0" />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
@@ -65,13 +56,11 @@ export default function AskPage() {
         </div>
       </div>
 
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-24 sm:pb-4">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
         <Suspense fallback={<TabLoader />}>
           <AskChart input={input} initialQuestion={presetQuestion} />
         </Suspense>
       </div>
-
-      <CompactFooter />
     </div>
   )
 }

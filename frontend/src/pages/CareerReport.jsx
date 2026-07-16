@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -191,7 +189,7 @@ export default function CareerReport() {
   }
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <Seo
         title="Vedic Career Report — AI Career & Vocation Analysis"
         description="Get a detailed Vedic career report analyzing your best career path, job vs. business verdict, peak career windows, and gemstone remedies — based on D10, Dasha, and Rajyoga analysis."
@@ -201,10 +199,9 @@ export default function CareerReport() {
       {/* This route is orphaned (nothing in the app links here anymore —
           career reports are reached via Result.jsx's Insights tab /
           CareerReportTab.jsx today), but it's still directly reachable by
-          URL, so it gets the same header/footer consistency fix as every
-          other page rather than being left as a dead end (SJ-006.9 audit). */}
-      <SiteHeader />
-      <div className="bg-night px-6 pt-24 sm:pt-28 pb-8 text-center">
+          URL, so it stays consistent with every other workspace page
+          rather than being left as a dead end (SJ-006.9 audit). */}
+      <div className="bg-night px-6 pt-8 sm:pt-10 pb-8 text-center">
         <span className="text-4xl mb-3 inline-block" aria-hidden="true">💼</span>
         <h1 className="font-serif font-semibold text-3xl text-primary-light tracking-tight">Career Report</h1>
         <p className="text-ink-onnight mt-1 text-sm">Vedic Career &amp; Vocation Analysis</p>
@@ -275,8 +272,6 @@ export default function CareerReport() {
         )}
 
       </div>
-
-      <CompactFooter />
     </div>
   )
 }

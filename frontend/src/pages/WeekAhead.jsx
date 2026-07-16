@@ -10,13 +10,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import CelestialBackdrop from '../components/CelestialBackdrop'
-import BottomNav from '../components/home/BottomNav'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { fetchPanchangWeek } from '../api/astro'
-import { getPrimaryProfile } from '../services/astrologyProfiles'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -30,8 +27,6 @@ function dayNumber(dateStr) {
 export default function WeekAhead() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
-  const profile = getPrimaryProfile(user)
   const { location } = useCurrentLocation()
 
   const [week, setWeek] = useState(null)
@@ -53,7 +48,7 @@ export default function WeekAhead() {
   const todayStr = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="min-h-screen bg-night-deep pb-24 md:pb-12">
+    <div className="pb-8 md:pb-12">
       <Seo title={t('week_page_title')} path="/week-ahead" noindex />
 
       <div className="relative overflow-hidden bg-night px-4 pt-6 pb-8">
@@ -117,8 +112,6 @@ export default function WeekAhead() {
           )
         })}
       </div>
-
-      <BottomNav profile={profile} />
     </div>
   )
 }

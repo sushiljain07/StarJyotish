@@ -13,6 +13,11 @@ export default {
           DEFAULT: '#D9A441',
           dark:    '#BD8A2E',
           light:   '#FBF0DC',
+          // Luminous gold for text/active states on night surfaces —
+          // brighter than DEFAULT (which is tuned for parchment), softer
+          // than light (which is nearly white). Promoted from the hardcoded
+          // #F0CB80 the home page and nav active states were using.
+          glow:    '#F0CB80',
         },
         // Deep indigo-night — used for hero/header dark bands (the "look up
         // at the stars" moments), not for buttons or links.
@@ -74,6 +79,41 @@ export default {
         // the sans stack automatically; that's a deliberate, honest
         // fallback rather than a forced, less-legible serif substitute.
         serif: ['Fraunces', 'Georgia', 'serif'],
+      },
+      // One card radius for the whole app — components/ui/Card.jsx uses
+      // this; ad-hoc rounded-lg/xl/2xl on cards should converge here.
+      borderRadius: {
+        card: '1rem',
+      },
+      // Two elevations only: resting cards and lifted/hover/overlay
+      // surfaces. Tuned to the warm night ink so shadows don't go gray.
+      boxShadow: {
+        card: '0 1px 2px rgba(23, 27, 51, 0.06), 0 4px 12px rgba(23, 27, 51, 0.05)',
+        lift: '0 6px 16px rgba(23, 27, 51, 0.10), 0 12px 32px rgba(23, 27, 51, 0.08)',
+      },
+      keyframes: {
+        // Content entrance — same motion as index.css's legacy
+        // .prediction-fade/.tab-fade classes; new components should use
+        // these utilities instead of those raw classes.
+        fadeSlideIn: {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeSlideInFast: {
+          from: { opacity: '0', transform: 'translateY(4px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Route-change cross-fade — fast enough to feel instant, present
+        // enough that pages stop hard-swapping. Used by the app shell.
+        routeFade: {
+          from: { opacity: '0' },
+          to:   { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-in-up':   'fadeSlideIn 0.6s ease forwards',
+        'fade-in-fast': 'fadeSlideInFast 0.25s ease-out forwards',
+        'route-fade':   'routeFade 0.18s ease-out',
       },
     },
   },

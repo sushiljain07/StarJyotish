@@ -5,8 +5,6 @@ import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import TopicIcon from '../components/TopicIcon'
 import Seo from '../components/Seo'
@@ -59,10 +57,8 @@ export default function Insights() {
   const SUBTABS = buildSubtabs(t, topicId)
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <Seo title="Chart Insights" description="AI-powered reading of your Vedic birth chart." path="/insights" noindex />
-      <SiteHeader />
-      <div className="h-[60px] shrink-0" />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
@@ -104,7 +100,7 @@ export default function Insights() {
         </div>
       </div>
 
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-24 sm:pb-4">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
         <Suspense fallback={<TabLoader />}>
           <div className={activeSub === 'reading' ? 'tab-fade' : 'hidden'}>
             <ChartReading input={input} onSwitchToCareer={() => setActiveSub('career')} />
@@ -122,8 +118,6 @@ export default function Insights() {
           )}
         </Suspense>
       </div>
-
-      <CompactFooter />
     </div>
   )
 }

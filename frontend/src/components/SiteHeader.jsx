@@ -1,33 +1,42 @@
 // frontend/src/components/SiteHeader.jsx
 //
 // Fixed top header.
-// Desktop (md+): Logo + horizontal nav links (Home, Charts, Predictions, Remedies, Panchang, Insights) + avatar/CTA
-// Mobile: Logo + avatar/CTA only (nav is in BottomNav)
+// Desktop (md+): Logo + nav links (from config/nav.js) + avatar/CTA
+// Mobile, signed in:  Logo + avatar only — page nav lives in BottomNav
+// Mobile, signed out: Logo + hamburger menu (public links) + Sign in
+//
+// Active/hover states use design tokens (text-primary-glow etc.) — this
+// component previously hand-rolled them with inline styles and JS
+// onMouseEnter/Leave handlers, the only place in the app that did.
 
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AccountMenu from './AccountMenu'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
+import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
 
-// Each link's activeTab/activeSubtab matches what Result.jsx (the /kundli
-// page) expects in navigation state — see BottomNav.jsx's onGuidanceClick
-// for the same pattern. Without this state, /kundli has no chart to show,
-// which is why these links looked "broken": they navigated, but to an
-// empty page.
-//
-// "Remedies" is deliberately removed rather than pointed at /kundli like
-// the rest — there's no remedies feature in the app yet (no route, no
-// tab, no content), so linking it anywhere would just be a second broken
-// link with better styling. Real fix is building that feature, not faking
-// a destination for it.
-const NAV_LINKS = [
-  { label: 'Home',        to: '/home' },
-  { label: 'My Charts',   to: '/kundli',   activeTab: 'birth_chart', activeSubtab: 'chart' },
-  { label: 'AI Guidance', to: '/insights' },
-  { label: 'Explore',     to: '/learn' },
-  { label: 'Panchang',    to: '/panchang' },
-]
+function NavButton({ item, active, onClick }) {
+  const { t } = useTranslation()
+  return (
+    <button
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
+      className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+        active ? 'text-primary-glow' : 'text-primary-light/60 hover:text-primary-light/90'
+      }`}
+    >
+      {t(item.key, item.fallback)}
+      {active && (
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-px left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary"
+        />
+      )}
+    </button>
+  )
+}
 
 export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const { t } = useTranslation()
@@ -35,23 +44,21 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const location = useLocation()
   const { user, isAuthenticated } = useAuth()
   const profile = isAuthenticated ? getPrimaryProfile(user) : null
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Close the mobile menu on any navigation.
+  useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
   const p = Math.min(1, Math.max(0, scrollProgress))
   const blurPx      = 6 + p * 6
   const borderAlpha = 0.06 + p * 0.08
 
-  function handleNav(link) {
-    if (link.to !== '/kundli' && link.to !== '/insights') { navigate(link.to); return }
-    if (!profile) { navigate('/generate'); return }
-    navigate(link.to, {
-      state: {
-        data: profile.chart,
-        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
-        activeTab: link.activeTab,
-        activeSubtab: link.activeSubtab,
-      },
-    })
+  function handleNav(item) {
+    const { to, state } = navTarget(item, profile)
+    navigate(to, state ? { state } : undefined)
   }
+
+  const items = isAuthenticated ? NAV_ITEMS : PUBLIC_NAV_ITEMS.slice(0, 2)
 
   return (
     <header
@@ -62,7 +69,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
         borderColor: `rgba(255, 255, 255, ${borderAlpha})`,
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-0 flex items-center justify-between gap-4" style={{height:60}}>
+      <div className="max-w-6xl mx-auto px-4 py-0 flex items-center justify-between gap-4 h-[60px]">
         {/* Logo */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
@@ -75,77 +82,17 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           </span>
         </button>
 
-        {/* Desktop nav — authenticated users get full nav; anon users get public links */}
-        {isAuthenticated ? (
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {NAV_LINKS.map(link => {
-              const isActive = location.pathname === link.to && !link.hash
-              return (
-                <button
-                  key={link.label}
-                  onClick={() => handleNav(link)}
-                  className="relative px-4 py-2 text-sm font-medium transition-colors rounded-md"
-                  style={{
-                    color: isActive ? '#F0CB80' : 'rgba(248,242,228,0.65)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.9)' }}
-                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.65)' }}
-                >
-                  {link.label}
-                  {isActive && (
-                    <span
-                      style={{
-                        position:'absolute',bottom:-1,left:'50%',
-                        transform:'translateX(-50%)',
-                        width:24,height:2,borderRadius:99,
-                        background:'#D9A441',display:'block',
-                      }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-        ) : (
-          <nav className="hidden md:flex items-center gap-1" aria-label="Public navigation">
-            {[
-              { label: 'Panchang', to: '/panchang' },
-              { label: 'Explore',  to: '/learn'    },
-            ].map(link => {
-              const isActive = location.pathname === link.to
-              return (
-                <button
-                  key={link.label}
-                  onClick={() => navigate(link.to)}
-                  className="relative px-4 py-2 text-sm font-medium transition-colors rounded-md"
-                  style={{
-                    color: isActive ? '#F0CB80' : 'rgba(248,242,228,0.65)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.9)' }}
-                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.color='rgba(248,242,228,0.65)' }}
-                >
-                  {link.label}
-                  {isActive && (
-                    <span
-                      style={{
-                        position:'absolute',bottom:-1,left:'50%',
-                        transform:'translateX(-50%)',
-                        width:24,height:2,borderRadius:99,
-                        background:'#D9A441',display:'block',
-                      }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-        )}
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-1" aria-label={t('nav_bottom_aria', 'Main navigation')}>
+          {items.map(item => (
+            <NavButton
+              key={item.id}
+              item={item}
+              active={isNavActive(location.pathname, item.to)}
+              onClick={() => handleNav(item)}
+            />
+          ))}
+        </nav>
 
         {/* Right: auth actions */}
         <div className="flex items-center gap-2 shrink-0">
@@ -167,8 +114,52 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
             </button>
           )}
           {isAuthenticated && <AccountMenu />}
+          {/* Signed-out mobile: hamburger for the public links (signed-in
+              mobile needs none — BottomNav is the app's mobile nav). */}
+          {!isAuthenticated && (
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              aria-expanded={menuOpen}
+              aria-label={t('nav_menu', 'Menu')}
+              className="md:hidden p-2 -mr-1 text-primary-light/70 hover:text-primary-light transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                {menuOpen ? (
+                  <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                ) : (
+                  <path d="M3 5.5h14M3 10h14M3 14.5h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                )}
+              </svg>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Signed-out mobile menu panel */}
+      {!isAuthenticated && menuOpen && (
+        <nav
+          className="md:hidden border-t border-white/10 bg-night animate-fade-in-fast motion-reduce:animate-none"
+          aria-label={t('nav_bottom_aria', 'Main navigation')}
+        >
+          <div className="max-w-6xl mx-auto px-4 py-2">
+            {PUBLIC_NAV_ITEMS.map(item => {
+              const active = isNavActive(location.pathname, item.to)
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => navigate(item.to)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`block w-full text-left px-2 py-3 text-sm font-medium border-b border-white/[0.06] last:border-0 transition-colors ${
+                    active ? 'text-primary-glow' : 'text-primary-light/70 hover:text-primary-light'
+                  }`}
+                >
+                  {t(item.key, item.fallback)}
+                </button>
+              )
+            })}
+          </div>
+        </nav>
+      )}
     </header>
   )
 }

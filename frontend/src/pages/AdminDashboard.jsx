@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
-import CompactFooter from '../components/CompactFooter'
 import {
   adminListUsers, adminUserReports,
   adminListSettings, adminUpsertSetting,
@@ -915,7 +914,7 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState('users')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="flex-1">
       <Seo title="Admin — Star Jyotish" noindex />
 
       {/* Header */}
@@ -957,7 +956,6 @@ export default function AdminDashboard() {
         {tab === 'testimonials' && <TestimonialsAdminTab token={accessToken} />}
         {tab === 'audit'        && <AuditTab        token={accessToken} />}
       </div>
-      <CompactFooter />
     </div>
   )
 }

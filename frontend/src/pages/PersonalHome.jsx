@@ -23,17 +23,18 @@
 //  9. Beat: New today — KnowledgeCapsule (deliberately still the one
 //     parchment-light card on the page — see its own file for why)
 //  10. JournalPrompt + DisclaimerBlock
-//  11. AskPersonaPanel FAB · BottomNav · CompactFooter
+//  11. AskPersonaPanel FAB
+//
+// Header/footer/BottomNav/background are the app shell's job — see
+// components/layout/WorkspaceLayout.jsx. This page renders content only.
 
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 import Reveal from '../components/Reveal'
-import { useScrollProgress } from '../hooks/useScrollProgress'
+import { Button, Card, StateBlock } from '../components/ui'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
 import { useDailyEditor } from '../hooks/useDailyEditor'
@@ -43,7 +44,6 @@ import { useChartExtras } from '../hooks/useChartExtras'
 import HomeMasthead from '../components/home/HomeMasthead'
 import ContinuityStrip from '../components/home/ContinuityStrip'
 import DailyPatrikaHero from '../components/home/DailyPatrikaHero'
-import BottomNav from '../components/home/BottomNav'
 import DoAvoidCards from '../components/home/DoAvoidCards'
 import LifeAreaGrid from '../components/home/LifeAreaGrid'
 import ChartSpotlight from '../components/home/ChartSpotlight'
@@ -72,17 +72,28 @@ function zodiacGuideFor(signName, t) {
   return { href: '/learn/zodiac', label: t('home_your_sign_guide', { sign: signName ?? '' }) }
 }
 
+// One "beat" on the home thread: gold dot on the hairline, serif gold
+// heading, optional sub + view-full CTA. Previously styled by an inline
+// <style> block with hardcoded hex (#F0CB80, #D9A441, #0F1226) — now pure
+// design tokens (primary-glow / primary / night-deep).
 function Beat({ id, title, subtitle, cta, onCta, delay = 0, children }) {
   return (
-    <div id={id} className="sj-beat">
-      <div className="sj-beat-dot" aria-hidden="true" />
-      <div className="sj-section-header">
+    <div id={id} className="relative pl-5 mb-8">
+      <div
+        className="absolute -left-px top-[7px] w-2 h-2 rounded-full bg-primary ring-4 ring-night-deep"
+        aria-hidden="true"
+      />
+      <div className="flex items-start justify-between gap-3 mb-3.5">
         <div>
-          <h2 className="sj-section-title">{title}</h2>
-          {subtitle && <p className="sj-section-sub">{subtitle}</p>}
+          <h2 className="font-serif font-medium text-base sm:text-[19px] leading-snug text-primary-glow">
+            {title}
+          </h2>
+          {subtitle && <p className="text-xs text-primary-light/55 mt-1">{subtitle}</p>}
         </div>
         {cta && (
-          <button className="sj-view-full-btn" onClick={onCta}>{cta}</button>
+          <Button variant="outline" surface="night" size="sm" onClick={onCta} className="shrink-0">
+            {cta}
+          </Button>
         )}
       </div>
       <Reveal delay={delay}>{children}</Reveal>
@@ -94,7 +105,6 @@ export default function PersonalHome() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { user, accessToken } = useAuth()
-  const scrollProgress = useScrollProgress(120)
 
   const [profilesLoaded, setProfilesLoaded] = useState(false)
   useEffect(() => {
@@ -138,28 +148,26 @@ export default function PersonalHome() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-night flex items-center justify-center">
-        <div className="text-3xl animate-spin">🪐</div>
+      <div className="max-w-2xl mx-auto w-full px-4 pt-10">
+        <StateBlock loading lines={6} surface="night" />
       </div>
     )
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-night-deep">
+      <div className="max-w-3xl mx-auto w-full px-4 pt-16 pb-16">
         <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
-        <SiteHeader scrollProgress={scrollProgress} />
-        <div className="max-w-3xl mx-auto px-4 pt-24 pb-16">
-          <div className="text-center py-20">
-            <p className="font-serif text-2xl text-primary-light mb-3">{t('home_empty_title')}</p>
-            <p className="text-ink-onnight/60 text-sm mb-6 max-w-sm mx-auto">{t('home_empty_body')}</p>
-            <Link to="/onboarding"
-              className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold px-6 py-3 rounded-full transition">
+        <StateBlock
+          surface="night"
+          title={t('home_empty_title')}
+          body={t('home_empty_body')}
+          action={
+            <Button to="/onboarding" size="lg" className="mt-6">
               {t('home_set_up_chart')}
-            </Link>
-          </div>
-        </div>
-        <BottomNav />
+            </Button>
+          }
+        />
       </div>
     )
   }
@@ -176,24 +184,22 @@ export default function PersonalHome() {
   const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
   return (
-    <div className="min-h-screen bg-night-deep">
+    <div>
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
-      <SiteHeader scrollProgress={scrollProgress} />
 
-      <div style={{ paddingTop: 60 }}>
-        <HomeMasthead
+      <HomeMasthead
           profile={profile}
           profiles={allProfiles}
           location={location}
           panchang={panchang.data}
           dashaTags={spotlight?.dashaSpotlight}
-        />
-      </div>
+      />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-28 md:pb-12">
         <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
 
-        <div className="sj-thread">
+        {/* The thread: a fading gold hairline the beats hang off. */}
+        <div className="relative mt-5 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
           <Beat id="sj-your-day" title={t('home_right_now_label')} delay={0}>
             <DailyPatrikaHero
               firstName={profile.label?.split(' ')[0]}
@@ -233,16 +239,20 @@ export default function PersonalHome() {
           )}
 
           <Beat title={t('home_your_circle_label')}>
-            <button
+            <Card
+              as="button"
+              surface="night"
+              padding="none"
+              interactive
               onClick={() => window.dispatchEvent(new Event('sj:open-jyoti'))}
-              className="w-full text-left bg-white/[0.045] border border-white/[0.09] rounded-2xl px-5 py-4 mb-4 hover:bg-white/[0.07] transition flex items-center justify-between gap-3"
+              className="w-full text-left px-5 py-4 mb-4 hover:bg-white/[0.07] flex items-center justify-between gap-3"
             >
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
+                <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
                 <p className="text-sm text-ink-onnight/75">{t('home_ask_jyoti_body')}</p>
               </div>
               <span className="text-primary-light text-lg shrink-0">↗</span>
-            </button>
+            </Card>
             <ReflectionLoop profile={profile} lang={editorLang} />
           </Beat>
 
@@ -270,7 +280,7 @@ export default function PersonalHome() {
           </Beat>
         </div>
 
-        <div style={{ marginTop: 8 }}>
+        <div className="mt-2">
           <Reveal delay={0}><JournalPrompt /></Reveal>
         </div>
         <DisclaimerBlock />
@@ -280,56 +290,6 @@ export default function PersonalHome() {
         userId={user?.id}
         input={{ date: profile.birth_date, time: profile.birth_time, place: profile.place }}
       />
-
-      <BottomNav profile={profile} />
-      <CompactFooter />
-
-      <style>{`
-        .sj-thread { position: relative; margin-top: 20px; }
-        .sj-thread::before {
-          content: '';
-          position: absolute;
-          left: 3px; top: 4px; bottom: 24px; width: 1px;
-          background: linear-gradient(to bottom, #D9A441 0%, rgba(217,164,65,0.08) 96%);
-          opacity: 0.4;
-        }
-        .sj-beat { position: relative; padding-left: 20px; margin-bottom: 30px; }
-        .sj-beat-dot {
-          position: absolute; left: -1px; top: 7px; width: 8px; height: 8px;
-          border-radius: 50%; background: #D9A441;
-          box-shadow: 0 0 0 4px #0F1226;
-        }
-        .sj-section-header {
-          display: flex; align-items: flex-start; justify-content: space-between;
-          gap: 12px; margin-bottom: 14px;
-        }
-        .sj-section-title {
-          font-family: Fraunces, Georgia, serif;
-          font-size: clamp(16px, 2.2vw, 19px);
-          font-weight: 500;
-          color: #F0CB80;
-          margin: 0;
-        }
-        .sj-section-sub {
-          font-size: 12px;
-          color: rgba(248,242,228,0.55);
-          margin: 4px 0 0;
-        }
-        .sj-view-full-btn {
-          background: none;
-          border: 1px solid rgba(217,164,65,0.4);
-          border-radius: 99px;
-          padding: 6px 14px;
-          font-size: 12px;
-          font-weight: 600;
-          color: #E4C769;
-          cursor: pointer;
-          white-space: nowrap;
-          transition: all 150ms;
-          flex-shrink: 0;
-        }
-        .sj-view-full-btn:hover { background: rgba(217,164,65,0.1); }
-      `}</style>
     </div>
   )
 }

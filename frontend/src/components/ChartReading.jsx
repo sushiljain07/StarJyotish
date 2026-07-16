@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
+import { Button } from './ui'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -184,10 +185,9 @@ export default function ChartReading({ input, onSwitchToCareer }) {
       <p className="text-ink-muted text-sm mb-6 max-w-sm">
         {t('reading_idle_body')}
       </p>
-      <button onClick={generate}
-        className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
+      <Button size="lg" onClick={generate}>
         Reveal My Prediction
-      </button>
+      </Button>
       <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
     </div>
   )
@@ -214,10 +214,9 @@ export default function ChartReading({ input, onSwitchToCareer }) {
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
-      <button onClick={() => setStatus('idle')}
-        className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition">
+      <Button onClick={() => setStatus('idle')}>
         Try Again
-      </button>
+      </Button>
     </div>
   )
 

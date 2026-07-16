@@ -13,8 +13,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 import MobileNumberField from '../components/auth/MobileNumberField'
 import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
@@ -177,11 +175,10 @@ export default function Profile() {
   const showAvatarImage = form.avatar_url && !avatarError
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="flex-1">
       <Seo title={t('profile_title')} path="/account" noindex />
-      <SiteHeader />
 
-      <div className="max-w-2xl mx-auto px-4 pt-20 sm:pt-24 pb-16">
+      <div className="max-w-2xl mx-auto px-4 pt-6 sm:pt-8 pb-16">
         {/* Identity header */}
         <div className="flex items-center gap-4 mb-8">
           {showAvatarImage ? (
@@ -440,8 +437,6 @@ export default function Profile() {
         </div>
 
       </div>
-
-      <CompactFooter />
     </div>
   )
 }

@@ -13,16 +13,20 @@ function NavIcon({ icon, className, style }) {
   return <TabIcon id={icon} className={className} />
 }
 
-export default function NavBar({ tabs, activeTab, onTabChange }) {
+// `raised` — set when the app shell's BottomNav occupies the true bottom
+// edge (authenticated mobile): this bar then stacks directly above it
+// instead of overlapping. The safe-area inset only applies at the real
+// screen bottom, so it's skipped when raised.
+export default function NavBar({ tabs, activeTab, onTabChange, raised = false }) {
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
+      className={`md:hidden fixed left-0 right-0 z-50 border-t ${raised ? 'bottom-[60px]' : 'bottom-0'}`}
       style={{
         background: "rgba(19,24,58,0.97)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderColor: "rgba(248,242,228,0.12)",
-        paddingBottom: "env(safe-area-inset-bottom,0px)",
+        ...(raised ? {} : { paddingBottom: "env(safe-area-inset-bottom,0px)" }),
       }}
     >
       <div className="flex justify-around items-center py-2">

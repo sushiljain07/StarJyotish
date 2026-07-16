@@ -1,16 +1,16 @@
 // frontend/src/components/onboarding/OnboardingLayout.jsx
 //
-// Shared shell for every onboarding screen. Deliberately its own minimal
-// header rather than <SiteHeader> — the account menu, language toggle,
-// and marketing CTA that make sense everywhere else would just be noise
-// in the middle of a guided flow the person is meant to complete in one
-// sitting. Only three things ever live up here: a way back one step, the
-// wordmark, and (while it's still allowed) a way out entirely.
+// Shared wizard chrome for every onboarding screen, rendered inside the
+// app shell (WorkspaceLayout provides SiteHeader, background, and footer).
+// This row carries only the wizard's own controls: a way back one step
+// and (while it's still allowed) a way out entirely. The wordmark that
+// used to sit between them is gone — the shell's header directly above
+// already shows it.
 import CelestialBackdrop from '../CelestialBackdrop'
 
 export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }) {
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
         <div className="w-20">
           {onBack && (
@@ -25,11 +25,6 @@ export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }
               </svg>
             </button>
           )}
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          <img src="/starjyotish.svg" alt="" className="w-5 h-5" />
-          <span className="font-serif font-semibold text-sm text-ink-muted">Star Jyotish</span>
         </div>
 
         <div className="w-20 text-right">

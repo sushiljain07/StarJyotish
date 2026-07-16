@@ -14,8 +14,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 import OnboardingLayout from '../components/onboarding/OnboardingLayout'
 import ProgressIndicator from '../components/onboarding/ProgressIndicator'
 import QuestionCard from '../components/onboarding/QuestionCard'
@@ -178,9 +176,8 @@ export default function Onboarding() {
 
   if (step === 'complete') {
     return (
-      <div className="min-h-screen bg-parchment flex flex-col">
+      <div className="flex-1 flex flex-col">
         <Seo title={t('onboarding_seo_title')} description={t('onboarding_seo_description')} path="/onboarding" noindex />
-        <SiteHeader />
         <main className="flex-1 flex items-center justify-center px-4 py-6">
           <CompletionCelebration
             t={t}
@@ -188,7 +185,6 @@ export default function Onboarding() {
             onContinue={() => navigate('/home', { replace: true })}
           />
         </main>
-        <CompactFooter />
       </div>
     )
   }

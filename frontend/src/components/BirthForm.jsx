@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
+import { Button } from './ui'
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -136,10 +137,9 @@ export default function BirthForm({ onSubmit, loading }) {
         )}
       </div>
 
-      <button type="submit" disabled={loading}
-        className="w-full bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold py-2.5 rounded-full transition">
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? t('loading') : t('form_submit')}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
-import CompactFooter from '../components/CompactFooter'
 import {
   astrologerGetProfile,
   astrologerUpdateProfile,
@@ -306,7 +305,7 @@ export default function AstrologerDashboard() {
   const [tab, setTab] = useState('overview')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="flex-1">
       <Seo title="Astrologer Dashboard — Star Jyotish" noindex />
 
       {/* Header */}
@@ -341,7 +340,6 @@ export default function AstrologerDashboard() {
         {tab === 'bookings' && <BookingsTab token={accessToken} />}
         {tab === 'profile'  && <ProfileTab  token={accessToken} />}
       </div>
-      <CompactFooter />
     </div>
   )
 }

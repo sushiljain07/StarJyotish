@@ -1,12 +1,16 @@
 // frontend/src/components/home/BottomNav.jsx
 //
-// Mobile bottom nav — 5 items matching the desktop SiteHeader nav exactly:
-//   Home · My Charts · AI Guidance · Explore · Panchang
+// Mobile bottom nav — renders the same NAV_ITEMS as the desktop SiteHeader
+// (config/nav.js), so the two can't drift. Rendered once by
+// layouts/WorkspaceLayout on every authenticated workspace page — it was
+// previously mounted per-page and existed on only /home and /week-ahead,
+// leaving every other workspace page a mobile dead-end.
 //
 // md:hidden so it only shows on mobile; desktop uses SiteHeader nav links.
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { NAV_ITEMS, isNavActive, navTarget } from '../../config/nav'
 
 // SVG icons inline — no external dependency
 const HomeIcon = () => (
@@ -45,13 +49,13 @@ const PanchangIcon = () => (
   </svg>
 )
 
-const NAV = [
-  { id: 'home',       key: 'nav_home_tab',      to: '/home',      icon: <HomeIcon /> },
-  { id: 'charts',     key: 'nav_my_charts',      to: '/kundli',    icon: <ChartIcon />,   needsChart: true },
-  { id: 'guidance',   key: 'nav_ai_guidance',    to: '/insights',  icon: <AIIcon />,      needsChart: true },
-  { id: 'explore',    key: 'nav_explore',        to: '/learn',     icon: <ExploreIcon /> },
-  { id: 'panchang',   key: 'nav_panchang_tab',   to: '/panchang',  icon: <PanchangIcon /> },
-]
+const ICONS = {
+  home:     <HomeIcon />,
+  charts:   <ChartIcon />,
+  guidance: <AIIcon />,
+  explore:  <ExploreIcon />,
+  panchang: <PanchangIcon />,
+}
 
 export default function BottomNav({ profile = null }) {
   const { t } = useTranslation()
@@ -60,35 +64,23 @@ export default function BottomNav({ profile = null }) {
 
   function handleClick(e, item) {
     if (!item.needsChart) return  // let Link handle it
-
     e.preventDefault()
-    if (!profile) { navigate('/generate'); return }
-
-    const chartState = {
-      data: profile.chart,
-      input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
-    }
-
-    if (item.id === 'charts') {
-      navigate('/kundli', { state: { ...chartState, activeTab: 'birth_chart', activeSubtab: 'chart' } })
-    } else if (item.id === 'guidance') {
-      navigate('/insights', { state: chartState })
-    }
+    const { to, state } = navTarget(item, profile)
+    navigate(to, state ? { state } : undefined)
   }
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)', minHeight: 60 }}
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl pb-safe min-h-[60px]"
       aria-label={t('nav_bottom_aria', 'Main navigation')}
     >
-      {NAV.map(item => {
-        const isActive = pathname === item.to || pathname.startsWith(item.to + '/')
+      {NAV_ITEMS.map(item => {
+        const isActive = isNavActive(pathname, item.to)
         const commonProps = {
-          key: item.id,
           'aria-current': isActive ? 'page' : undefined,
-          className: 'relative flex flex-1 flex-col items-center justify-center gap-0.5 px-1 pt-2.5 pb-2 no-underline',
-          style: { color: isActive ? '#F0CB80' : 'rgba(248,242,228,0.5)', background: 'none', border: 'none', cursor: 'pointer' },
+          className: `relative flex flex-1 flex-col items-center justify-center gap-0.5 px-1 pt-2.5 pb-2 no-underline transition-colors ${
+            isActive ? 'text-primary-glow' : 'text-primary-light/50'
+          }`,
         }
         const content = (
           <>
@@ -98,16 +90,16 @@ export default function BottomNav({ profile = null }) {
                 aria-hidden="true"
               />
             )}
-            <span className="flex justify-center">{item.icon}</span>
-            <span className="text-[10px] font-semibold tracking-[0.3px] leading-none text-center">
-              {t(item.key, item.key)}
+            <span className="flex justify-center">{ICONS[item.id]}</span>
+            <span className="text-3xs font-semibold tracking-[0.3px] leading-none text-center">
+              {t(item.key, item.fallback)}
             </span>
           </>
         )
 
         return item.needsChart
-          ? <button type="button" onClick={e => handleClick(e, item)} {...commonProps}>{content}</button>
-          : <Link to={item.to} {...commonProps}>{content}</Link>
+          ? <button key={item.id} type="button" onClick={e => handleClick(e, item)} {...commonProps}>{content}</button>
+          : <Link key={item.id} to={item.to} {...commonProps}>{content}</Link>
       })}
     </nav>
   )

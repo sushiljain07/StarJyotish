@@ -10,8 +10,6 @@ import { useAuth } from '../contexts/AuthContext'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
 
 export default function Home() {
   const { t } = useTranslation()
@@ -58,20 +56,13 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <Seo
         title={topic ? `Free ${topic.id.charAt(0).toUpperCase() + topic.id.slice(1)} Astrology Report` : 'Enter Your Birth Details'}
         description="Enter your date, time, and place of birth to generate a free, Swiss Ephemeris-accurate Vedic Kundli with an AI-powered reading."
         path="/generate"
       />
-      {/* SiteHeader replaces this page's old bespoke mini-header (logo +
-          language toggle only) — that version had no way to reach Learn,
-          Home, or the account menu, so a signed-in visitor landing here
-          (e.g. from PersonalHome's "Generate New Chart") lost their own
-          nav entirely. Same header everyone else gets; the brand
-          moment below is now just page content, not navigation. */}
-      <SiteHeader />
-      <div className="relative overflow-hidden bg-night px-6 pt-24 sm:pt-28 pb-12 text-center">
+      <div className="relative overflow-hidden bg-night px-6 pt-8 sm:pt-10 pb-12 text-center">
         <CelestialBackdrop className="text-primary opacity-30" />
         <img src="/starjyotish.svg" alt="" className="relative block mx-auto mb-3 w-16 h-16" />
         <h1 className="relative font-serif font-semibold text-3xl text-primary-light tracking-tight">{t('app_title')}</h1>
@@ -110,11 +101,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Previously this page had no footer at all — Contact/Privacy/Terms
-          were unreachable without leaving the flow first (SJ-006.8's
-          Navigation Audit). CompactFooter, not the full marketing
-          Footer — this is a focused task screen, not a landing page. */}
-      <CompactFooter />
     </div>
   )
 }

@@ -8,8 +8,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
-import SiteHeader from '../components/SiteHeader'
-import Footer from '../components/Footer'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
@@ -513,12 +511,11 @@ export default function PanchangDetail() {
     : "This Month's Panchang"
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="flex-1 flex flex-col">
       <Seo title="Panchang — Tithi, Nakshatra & Muhurta" path="/panchang" />
-      <SiteHeader />
 
       {/* Dark hero */}
-      <div className="bg-night pt-20 pb-8 px-4">
+      <div className="bg-night pt-8 pb-8 px-4">
         <div className="max-w-2xl mx-auto">
           <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">Panchang</p>
           <h1 className="font-serif text-3xl font-medium text-primary-light leading-snug">{heroTitle}</h1>
@@ -557,8 +554,6 @@ export default function PanchangDetail() {
         {tab === 'week'  && <WeekTab  location={location} onSetLocation={handleSetLocation} />}
         {tab === 'month' && <HinduMonthTab location={location} onSetLocation={handleSetLocation} />}
       </div>
-
-      <Footer />
     </div>
   )
 }

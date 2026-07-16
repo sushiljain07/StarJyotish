@@ -7,6 +7,7 @@ import { useScrollProgress } from '../hooks/useScrollProgress'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
+import { Button } from '../components/ui'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import FaqSchema from '../components/FaqSchema'
@@ -150,12 +151,9 @@ export default function Landing() {
             passing the hero) — now that SiteHeader is always present from
             the first paint, that duplication is gone; this section is
             just the hero's own content again. */}
-        <button
-          onClick={() => goToForm(null)}
-          className="relative mt-7 bg-primary hover:bg-primary-dark text-night font-semibold text-sm sm:text-base px-7 py-3 rounded-full shadow-lg hover:shadow-xl transition"
-        >
+        <Button size="lg" onClick={() => goToForm(null)} className="relative mt-7 shadow-lift">
           {t('landing_cta_generic')} →
-        </button>
+        </Button>
         <p className="relative text-ink-onnight text-xs mt-2">{t('landing_footer_note')}</p>
       </div>
 
@@ -315,12 +313,9 @@ export default function Landing() {
           {t('landing_final_cta_heading')}
         </h2>
         <p className="relative text-ink-onnight text-sm mt-2">{t('landing_final_cta_body')}</p>
-        <button
-          onClick={() => goToForm(null)}
-          className="relative mt-6 bg-primary hover:bg-primary-dark text-night font-semibold text-sm sm:text-base px-7 py-3 rounded-full shadow-lg hover:shadow-xl transition"
-        >
+        <Button size="lg" onClick={() => goToForm(null)} className="relative mt-6 shadow-lift">
           {t('landing_cta_generic')} →
-        </button>
+        </Button>
       </Reveal>
 
       <Footer />

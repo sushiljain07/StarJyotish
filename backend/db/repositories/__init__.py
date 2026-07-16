@@ -14,6 +14,7 @@ from db.repositories.review_repository import ReviewRepository
 from db.repositories.session_repository import SessionRepository, hash_token
 from db.repositories.settings_repository import SettingsRepository
 from db.repositories.transaction_repository import TransactionRepository
+from db.repositories.user_memory_repository import UserAiMemoryRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.wallet_repository import InsufficientBalanceError, WalletRepository
 
@@ -36,4 +37,5 @@ __all__ = [
     "FeedbackRepository",
     "TestimonialRepository",
     "ChatSessionRepository",
+    "UserAiMemoryRepository",
 ]

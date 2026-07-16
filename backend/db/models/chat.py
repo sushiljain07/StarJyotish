@@ -6,11 +6,10 @@ independent, unrelated row.
 This is intentionally separate from Report (report_type=ask): today,
 services/persistence.py's opt-in hook saves every /kundli/ask call as its
 own standalone Report row, and that keeps working unchanged. ChatSession/
-ChatMessage is the foundation for the next step — giving "Ask the Chart"
-actual conversation memory — without having decided yet whether that
-replaces or supplements the existing per-question Report rows. Wiring
-routes/kundli.py's ask_kundli() to create/append to a session is a
-follow-up, not done here.
+ChatMessage now backs the durable conversation path in routes/kundli.py's
+ask_kundli(): signed-in users' Ask conversations are persisted here (and
+distilled into UserAiMemory — see services/user_memory.py), while
+anonymous callers still use the in-memory services/ask_sessions.py store.
 
 user_id is nullable for the same anonymous-by-default reason as Report and
 Feedback — a chat session can exist before any phone number is known.

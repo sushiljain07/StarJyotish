@@ -4,9 +4,13 @@ main.py) rather than inside services/ or db/ because it imports from both
 and every router needs to import it — a single flat module avoids any risk
 of a circular import between routers and a deeper package.
 
-Two dependencies are exported:
+Three dependencies are exported:
   - get_current_user:          hard — raises 401 if there's no valid token
   - get_current_user_optional:  soft — returns None instead of raising
+  - get_current_user_soft:      softest — also tolerates an unconfigured DB
+                                (uses get_db_optional), for chart routes
+                                that work anonymously but personalize when
+                                a signed-in user calls them
 
 Same "hard vs optional" split db/session.py uses for get_db/get_db_optional,
 for the same reason: most account/session-mutating endpoints have no
@@ -22,7 +26,7 @@ from sqlalchemy.orm import Session
 
 from db.models.user import User
 from db.repositories import UserRepository
-from db.session import get_db
+from db.session import get_db, get_db_optional
 from services.jwt_service import decode_access_token
 
 
@@ -72,6 +76,35 @@ def get_current_user_optional(
     user = UserRepository(db).get(user_id)
     if user is None or not user.is_active:
         return None
+    return user
+
+
+def get_current_user_soft(
+    authorization: Optional[str] = Header(default=None),
+    db: Optional[Session] = Depends(get_db_optional),
+) -> Optional[User]:
+    """For routes that serve anonymous callers but personalize for
+    signed-in ones (e.g. /kundli/ask's durable conversation memory).
+
+    No Authorization header, or no DATABASE_URL configured → None, exactly
+    like an anonymous caller. But a *presented* token that fails validation
+    raises 401 instead of silently downgrading to anonymous — the frontend's
+    AuthContext.authedRequest() relies on that 401 to refresh an expired
+    access token and retry, which keeps a conversation older than one
+    token lifetime on the durable path instead of quietly losing it."""
+    token = _extract_bearer_token(authorization)
+    if token is None or db is None:
+        return None
+    payload = decode_access_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+    try:
+        user_id = uuid.UUID(payload.sub)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
+    user = UserRepository(db).get(user_id)
+    if user is None or not user.is_active:
+        raise HTTPException(status_code=401, detail="Account not found or disabled", headers={"WWW-Authenticate": "Bearer"})
     return user
 
 

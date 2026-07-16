@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
+
+from dependencies import get_current_user_soft
 
 from models.birth_data import BirthInput
 from models.chart_data import (
@@ -133,9 +135,32 @@ def get_reading(request: Request, body: ReadingRequest, db=Depends(get_db_option
     return response
 
 
+def _resolve_chat_session(repo, user, session_id: str | None, language: str):
+    """The user's existing session when they echoed back a valid, owned
+    session_id; otherwise a fresh one. An ephemeral-store id (32-hex from
+    services/ask_sessions.py, e.g. from a conversation started before
+    login) parses as a UUID but won't match any owned row — it just falls
+    through to a new session."""
+    import uuid as _uuid
+    if session_id:
+        try:
+            existing = repo.get_owned(_uuid.UUID(session_id), user.id)
+        except ValueError:
+            existing = None
+        if existing is not None:
+            return existing
+    return repo.start_session(user_id=user.id, language=language)
+
+
 @router.post("/kundli/ask", response_model=AskResponse)
 @limiter.limit(LLM_LIMIT)
-def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
+def ask_kundli(
+    request: Request,
+    body: AskRequest,
+    background_tasks: BackgroundTasks,
+    db=Depends(get_db_optional),
+    user=Depends(get_current_user_soft),
+):
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd, naive_dt = ctx.geo, ctx.jd_ut, ctx.naive_dt
 
@@ -144,10 +169,13 @@ def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
     )
-    
+
     from services.divisional_charts import calculate_divisional_chart
     from services.ai import _detect_division
     from services.ask_sessions import get_history, append_turn
+    from services.user_memory import get_memory_summary, update_memory_after_exchange
+    from db.models.chat import ChatRole
+    from db.repositories import ChatSessionRepository
 
     # Detect the primary chart for this question
     division = _detect_division(body.question)
@@ -166,12 +194,35 @@ def ask_kundli(request: Request, body: AskRequest, db=Depends(get_db_optional)):
 
     transit_data = calculate_transit(jd, geo.lat, geo.lon)
 
-    conversation_history = get_history(body.session_id)
+    # Signed-in + DB configured → durable conversation (ChatSession rows)
+    # plus long-term memory. Anonymous (or no DATABASE_URL) → the original
+    # in-memory session store, unchanged.
+    chat_session = None
+    user_memory = None
+    if user is not None and db is not None:
+        chat_repo = ChatSessionRepository(db)
+        chat_session = _resolve_chat_session(chat_repo, user, body.session_id, body.language)
+        conversation_history = chat_repo.recent_turns(chat_session.id)
+        user_memory = get_memory_summary(db, user.id)
+    else:
+        conversation_history = get_history(body.session_id)
+
     answer, provider = ask_chart(
         chart, dasha_raw, body.question, body.language,
         transit=transit_data, conversation_history=conversation_history,
+        user_memory=user_memory,
     )
-    session_id = append_turn(body.session_id, body.question, answer)
+
+    if chat_session is not None:
+        chat_repo.append_message(chat_session, role=ChatRole.user, content=body.question, meta={"division": division})
+        chat_repo.append_message(chat_session, role=ChatRole.assistant, content=answer, llm_provider=provider)
+        session_id = str(chat_session.id)
+        # Fold this exchange into the user's rolling memory after the
+        # response is sent — one extra LLM call that must never delay or
+        # fail the answer itself (see services/user_memory.py).
+        background_tasks.add_task(update_memory_after_exchange, user.id, body.question, answer)
+    else:
+        session_id = append_turn(body.session_id, body.question, answer)
     response = AskResponse(answer=answer, llm_provider=provider, session_id=session_id)
 
     save_report_if_requested(

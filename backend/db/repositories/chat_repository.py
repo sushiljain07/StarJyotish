@@ -58,5 +58,33 @@ class ChatSessionRepository(BaseRepository[ChatSession]):
         stmt = select(ChatMessage).where(ChatMessage.session_id == session_id).order_by(ChatMessage.created_at)
         return list(self.db.scalars(stmt))
 
+    def get_owned(self, session_id: uuid.UUID, user_id: uuid.UUID) -> Optional[ChatSession]:
+        """The session, but only if it belongs to this user — a caller
+        echoing back someone else's session_id gets None (and therefore a
+        fresh session), never a cross-user history leak."""
+        session = self.get(session_id)
+        if session is None or session.user_id != user_id:
+            return None
+        return session
+
+    def recent_turns(self, session_id: uuid.UUID, *, max_turns: int = 5) -> List[dict]:
+        """History as {question, answer} pairs, oldest first — the same
+        shape services/ask_sessions.py's get_history() returns, so
+        ask_chart() sees one format regardless of which store backed the
+        conversation. max_turns default matches ask_sessions.MAX_TURNS_KEPT.
+
+        An unanswered question (assistant reply never got persisted, e.g.
+        a crash between the two appends) is dropped rather than paired
+        with the wrong answer."""
+        turns: List[dict] = []
+        pending_question: Optional[str] = None
+        for message in self.history(session_id):
+            if message.role == ChatRole.user:
+                pending_question = message.content
+            elif message.role == ChatRole.assistant and pending_question is not None:
+                turns.append({"question": pending_question, "answer": message.content})
+                pending_question = None
+        return turns[-max_turns:]
+
     def archive(self, session: ChatSession) -> ChatSession:
         return self.update(session, is_archived=True)

@@ -1,7 +1,8 @@
 // frontend/src/components/AskChart.jsx
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { API_BASE } from '../api/config'
+import { askKundli } from '../api/astro'
+import { useAuth } from '../contexts/AuthContext'
 
 // Matches AskPersonaPanel.jsx's home-page persona limit — previously this
 // was 10 while the home page's "Ask Jyoti" was 5, an inconsistency with no
@@ -11,6 +12,7 @@ const MAX_QUESTIONS = 5
 
 export default function AskChart({ input, initialQuestion = null }) {
   const { t, i18n } = useTranslation()
+  const { user, authedRequest } = useAuth()
   const [messages, setMessages]     = useState([])
   const [questionCount, setCount]   = useState(0)
   const [inputValue, setInputValue] = useState('')
@@ -54,25 +56,23 @@ export default function AskChart({ input, initialQuestion = null }) {
     setErrorMsg('')
 
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...input,
-          question,
-          language: lang,
-          // Pass the session_id from the previous response so the backend
-          // can look up conversation history and give contextual answers.
-          // Null on the very first question — the backend creates a new session
-          // and returns its ID, which we store below for all subsequent calls.
-          session_id: sessionIdRef.current,
-        }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || t('ask_error'))
+      const payload = {
+        ...input,
+        question,
+        language: lang,
+        // Pass the session_id from the previous response so the backend
+        // can look up conversation history and give contextual answers.
+        // Null on the very first question — the backend creates a new session
+        // and returns its ID, which we store below for all subsequent calls.
+        session_id: sessionIdRef.current,
       }
-      const data = await res.json()
+      // Signed in → send the access token (via authedRequest so an expired
+      // token is refreshed and retried) so the backend threads this
+      // conversation into the user's durable, memory-backed chat history.
+      // Signed out → same anonymous call as always.
+      const data = user
+        ? await authedRequest(token => askKundli(payload, token))
+        : await askKundli(payload)
       // Store the session_id for the next question. The backend returns the
       // same ID on every response once a session exists, so this is idempotent.
       if (data.session_id) sessionIdRef.current = data.session_id

@@ -101,3 +101,29 @@ export function fetchPanchangWeek({ lat, lon, timezone, days = 7, start_date }) 
 export function fetchPanchangHinduMonth({ lat, lon, timezone }) {
   return postJson('/api/panchang/hindu-month', { lat, lon, timezone })
 }
+
+// Ask the Chart (conversational). Unlike the postJson helpers above, this
+// one (a) attaches the caller's access token when provided, so the backend
+// can key the conversation to a durable, memory-backed ChatSession for
+// signed-in users (see routes/kundli.py's get_current_user_soft path) —
+// anonymous calls behave exactly as before — and (b) sets err.status so
+// AuthContext.authedRequest() can recognize a 401 from an expired token,
+// refresh, and retry without dropping the conversation to the anonymous
+// path mid-session.
+export async function askKundli(payload, token = null) {
+  const resp = await fetch(`${API_BASE}/api/kundli/ask`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}))
+    const e = new Error(err.detail ?? 'Server error')
+    e.status = resp.status
+    throw e
+  }
+  return resp.json()
+}

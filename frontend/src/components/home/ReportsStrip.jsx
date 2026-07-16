@@ -12,8 +12,9 @@ const REPORTS = [
     labelKey: 'report_career_label',
     noteKey: 'report_career_note',
     bullets: ['report_career_b1', 'report_career_b2'],
-    gradient: 'linear-gradient(135deg, #1d3557 0%, #457b9d 100%)',
-    accent: '#90CAF9',
+    // Gold accent — career/ambition register
+    gradient: 'linear-gradient(135deg, #1F1C0E 0%, #2A2010 100%)',
+    accent: '#D9A441',
   },
   {
     id: 'finance',
@@ -21,8 +22,9 @@ const REPORTS = [
     labelKey: 'report_finance_label',
     noteKey: 'report_finance_note',
     bullets: ['report_finance_b1', 'report_finance_b2'],
-    gradient: 'linear-gradient(135deg, #1b4332 0%, #52b788 100%)',
-    accent: '#95D5B2',
+    // Sage accent — growth/stability register
+    gradient: 'linear-gradient(135deg, #141F15 0%, #1C2A1D 100%)',
+    accent: '#5B7A5E',
   },
   {
     id: 'relationship',
@@ -30,8 +32,9 @@ const REPORTS = [
     labelKey: 'report_relationship_label',
     noteKey: 'report_relationship_note',
     bullets: ['report_relationship_b1', 'report_relationship_b2'],
-    gradient: 'linear-gradient(135deg, #4a1942 0%, #9b2335 100%)',
-    accent: '#F4A0B5',
+    // Mauve accent — relationships/emotions register
+    gradient: 'linear-gradient(135deg, #1E1520 0%, #271A24 100%)',
+    accent: '#8C5B73',
   },
   {
     id: 'health',
@@ -39,8 +42,9 @@ const REPORTS = [
     labelKey: 'report_health_label',
     noteKey: 'report_health_note',
     bullets: ['report_health_b1', 'report_health_b2'],
-    gradient: 'linear-gradient(135deg, #2d2d2d 0%, #6b4c11 100%)',
-    accent: '#FFD180',
+    // Vermillion accent — vitality/action register
+    gradient: 'linear-gradient(135deg, #1E1414 0%, #271A1A 100%)',
+    accent: '#A23B3B',
   },
 ]
 

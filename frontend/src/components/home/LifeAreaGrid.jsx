@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next'
 const AREA_EMOJI = { career: '💼', wealth: '💰', relationship: '💞', health: '🌿' }
 
 const BAR_COLOR = {
-  up:   'linear-gradient(90deg, #5B7A5E, #9FC7A2)',
-  down: 'linear-gradient(90deg, #A23B3B, #E09090)',
+  up:   'linear-gradient(90deg, #5B7A5E, #E7EEE3)',
+  down: 'linear-gradient(90deg, #A23B3B, #F7E8E4)',
   flat: 'linear-gradient(90deg, #BD8A2E, #F0CB80)',
 }
 const TREND_STYLE = {

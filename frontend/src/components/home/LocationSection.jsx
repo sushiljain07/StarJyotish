@@ -58,7 +58,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
       <div className="sj-loc-card">
         <div className="sj-loc-card-body">
           <p className="sj-loc-eyebrow">
-            <span style={{color:'#e05555',marginRight:4}}>📍</span>
+            <span style={{color:'#A23B3B',marginRight:4}}>📍</span>
             Currently in
           </p>
           <p className="sj-loc-city">{currentLabel ?? 'Set your city'}</p>
@@ -97,7 +97,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
       <div className="sj-loc-card">
         <div className="sj-loc-card-body">
           <p className="sj-loc-eyebrow">
-            <span style={{color:'#D9A441',marginRight:4}}>🪔</span>
+            <span style={{color:'#D9A441',marginRight:4}} aria-hidden="true">🪔</span>
             Chart cast for
           </p>
           <p className="sj-loc-city sj-loc-birth">{birthPlace}</p>
@@ -124,8 +124,8 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
           .sj-loc-grid { grid-template-columns: 1fr; }
         }
         .sj-loc-card {
-          background: #fff;
-          border: 1px solid #EAE1CC;
+          background: #171B33;
+          border: 1px solid rgba(217,164,65,0.12);
           border-radius: 14px;
           overflow: hidden;
           display: flex;
@@ -143,21 +143,21 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         .sj-loc-city {
           font-size: clamp(14px,2.5vw,18px);
           font-weight: 700;
-          color: #2A2724;
+          color: #F8F3E7;
           margin: 0 0 6px;
           line-height: 1.25;
         }
-        .sj-loc-birth { color: #2A2724; }
+        .sj-loc-birth { color: #C9C2D6; }
         .sj-loc-sub {
           font-size: 11px;
-          color: #A39C8C;
+          color: #7A7264;
           margin: 0 0 8px;
         }
         .sj-loc-update-btn {
           display: inline-block;
           font-size: 11px;
           font-weight: 600;
-          color: #BD8A2E;
+          color: #D9A441;
           border: 1px solid rgba(217,164,65,0.4);
           border-radius: 99px;
           padding: 5px 12px;
@@ -173,25 +173,25 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
           opacity: 0.6;
         }
         .sj-loc-input {
-          width:100%;border:1px solid #EAE1CC;border-radius:10px;
-          padding:6px 10px;font-size:12px;color:#2A2724;
-          outline:none;
+          width:100%;border:1px solid rgba(217,164,65,0.2);border-radius:10px;
+          padding:6px 10px;font-size:12px;color:#F8F3E7;
+          background:#0F1226;outline:none;
         }
         .sj-loc-input:focus { border-color:#D9A441; }
         .sj-loc-dropdown {
           position:absolute;top:calc(100% + 4px);left:0;right:0;
-          background:#fff;border:1px solid #EAE1CC;border-radius:10px;
-          box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:50;
+          background:#171B33;border:1px solid rgba(217,164,65,0.15);border-radius:10px;
+          box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:50;
           max-height:160px;overflow-y:auto;
         }
         .sj-loc-match {
           display:block;width:100%;text-align:left;
-          padding:8px 12px;font-size:11px;color:#2A2724;
+          padding:8px 12px;font-size:11px;color:#C9C2D6;
           background:none;border:none;cursor:pointer;
-          border-bottom:1px solid #EAE1CC;
+          border-bottom:1px solid rgba(217,164,65,0.08);
         }
         .sj-loc-match:last-child { border-bottom:none; }
-        .sj-loc-match:hover { background:#FBF0DC; }
+        .sj-loc-match:hover { background:rgba(217,164,65,0.06); }
       `}</style>
     </div>
   )

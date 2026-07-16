@@ -36,7 +36,7 @@ export default function ChartsStrip({ profile }) {
           onClick={openDivisional}
           className="flex-shrink-0 w-[148px] text-left rounded-xl border border-white/[0.09] bg-white/[0.045] p-3.5 hover:bg-white/[0.07] transition"
         >
-          <p className="text-[10px] font-mono text-indigo-200/70 mb-1.5">{c.code}</p>
+          <p className="text-3xs font-mono text-ink-onnight/60 mb-1.5">{c.code}</p>
           <p className="font-serif text-sm font-medium text-primary-light mb-1 leading-tight">{c.name}</p>
           <p className="text-[11px] text-ink-onnight/50 leading-snug">{c.blurb}</p>
         </button>

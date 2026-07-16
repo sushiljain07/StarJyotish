@@ -51,10 +51,10 @@ function SkyPill({ id, time, t }) {
 function PanchangFact({ label, value }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9px] uppercase tracking-wider font-bold leading-none mb-0.5" style={{ color: '#D9A441' }}>
+      <p className="text-3xs uppercase tracking-wider font-bold leading-none mb-0.5 text-primary">
         {label}
       </p>
-      <p className="font-serif font-semibold text-[13px] leading-tight truncate" style={{ color: 'rgba(248,242,228,0.92)' }}>
+      <p className="font-serif font-semibold text-[13px] leading-tight truncate text-parchment/90">
         {value ?? '—'}
       </p>
     </div>

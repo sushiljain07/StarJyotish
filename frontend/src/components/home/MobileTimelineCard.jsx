@@ -82,10 +82,10 @@ function findNextGood(slots, nowMin) {
 // ─── Zone 1: Status card ──────────────────────────────────────────────────────
 
 const STATUS_THEME = {
-  good:   { bg: '#1A3B2F', border: '#2E7D5E', dot: '#4CAF7D', text: '#7FCFA0', labelKey: 'status_favorable', icon: '✓' },
-  avoid:  { bg: '#3B1A1A', border: '#8B3A3A', dot: '#E05555', text: '#E08080', labelKey: 'status_avoid',     icon: '✗' },
-  anchor: { bg: '#2A2410', border: '#9A7B2A', dot: '#D9A441', text: '#D9A441', labelKey: 'status_neutral',   icon: '◎' },
-  none:   { bg: '#1E2240', border: '#3A4070', dot: '#6A7CC0', text: '#9AA8D8', labelKey: 'status_neutral',   icon: '◎' },
+  good:   { bg: '#1A2E22', border: '#5B7A5E', dot: '#5B7A5E', text: '#5B7A5E', labelKey: 'status_favorable', icon: '✓' },
+  avoid:  { bg: '#2E1A1A', border: '#A23B3B', dot: '#A23B3B', text: '#F7E8E4', labelKey: 'status_avoid',     icon: '✗' },
+  anchor: { bg: '#1F1C0E', border: '#D9A441', dot: '#D9A441', text: '#D9A441', labelKey: 'status_neutral',   icon: '◎' },
+  none:   { bg: '#171B33', border: '#262B4A', dot: '#C9C2D6', text: '#C9C2D6', labelKey: 'status_neutral',   icon: '◎' },
 }
 
 function StatusCard({ slot, nowMin, slots, t }) {
@@ -114,7 +114,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
             </p>
           )}
         </div>
-        <div style={{ width: 42, height: 42, borderRadius: '50%', background: theme.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
+        <div style={{ width: 42, height: 42, borderRadius: '50%', background: theme.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#F8F3E7', fontWeight: 700, flexShrink: 0 }}>
           {theme.icon}
         </div>
       </div>
@@ -122,7 +122,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
       {next && nextTimeStr && (
         <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '7px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: next.kind === 'good' ? '#4CAF7D' : next.kind === 'avoid' ? '#E05555' : '#D9A441', flexShrink: 0 }} />
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: next.kind === 'good' ? '#5B7A5E' : next.kind === 'avoid' ? '#A23B3B' : '#D9A441', flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {t('status_card_next_event')}
@@ -144,7 +144,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
 
 // ─── Zone 2: Bar timeline ─────────────────────────────────────────────────────
 
-const BAR_COLOR = { avoid: '#C0392B', good: '#2E7D5E', neutral: '#3D4466' }
+const BAR_COLOR = { avoid: '#A23B3B', good: '#5B7A5E', neutral: '#262B4A' }
 
 function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
   const START = sunriseMin ?? 360
@@ -190,7 +190,7 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
           }} />
         ))}
         {showNow && (
-          <div style={{ position: 'absolute', left: `${nowPct}%`, top: -3, bottom: -3, width: 3, background: '#fff', borderRadius: 2, transform: 'translateX(-50%)', zIndex: 2 }} />
+          <div style={{ position: 'absolute', left: `${nowPct}%`, top: -3, bottom: -3, width: 3, background: 'transparent', borderRadius: 2, transform: 'translateX(-50%)', zIndex: 2 }} />
         )}
       </div>
 
@@ -198,7 +198,7 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5, position: 'relative' }}>
         <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌅 Sunrise</span>
         {showNow && (
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#fff', background: 'rgba(80,80,80,0.8)', borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#F8F3E7', background: 'rgba(80,80,80,0.8)', borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
             NOW
           </span>
         )}
@@ -207,7 +207,7 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
-        {[['#C0392B', 'Avoid'], ['#2E7D5E', 'Favorable'], ['#3D4466', 'Neutral']].map(([color, label]) => (
+        {[['#A23B3B', 'Avoid'], ['#5B7A5E', 'Favorable'], ['#262B4A', 'Neutral']].map(([color, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
             <span style={{ fontSize: 9, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>{label}</span>
@@ -227,8 +227,8 @@ function WindowRow({ slot, isNow, t }) {
   const details = SLOT_DETAILS[slot.id]
   const timeStr = slot.kind === 'anchor' ? fmt(slot.start) : `${fmt(slot.start)} – ${fmt(slot.end)}`
 
-  const badgeBg    = isNow ? '#4A4010' : slot.kind === 'good' ? '#1A3B2F' : slot.kind === 'avoid' ? '#3B1A1A' : '#2A2240'
-  const badgeColor = isNow ? '#D9A441' : slot.kind === 'good' ? '#7FCFA0' : slot.kind === 'avoid' ? '#E08080' : '#9AA8D8'
+  const badgeBg    = isNow ? '#2A220A' : slot.kind === 'good' ? '#1A2E22' : slot.kind === 'avoid' ? '#2E1A1A' : '#171B33'
+  const badgeColor = isNow ? '#D9A441' : slot.kind === 'good' ? '#5B7A5E' : slot.kind === 'avoid' ? '#F7E8E4' : '#C9C2D6'
 
   return (
     <div>
@@ -261,20 +261,20 @@ function WindowRow({ slot, isNow, t }) {
       {open && details && (
         <div style={{ margin: '2px 8px 6px', padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#7FCFA0', marginBottom: 6 }}>{t('timeline_good_for')}</p>
+            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5B7A5E', marginBottom: 6 }}>{t('timeline_good_for')}</p>
             {details.do.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
-                <span style={{ color: '#4CAF7D', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
+                <span style={{ color: '#5B7A5E', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
                 <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{item}</span>
               </div>
             ))}
           </div>
           <div>
-            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#E08080', marginBottom: 6 }}>{t('timeline_avoid')}</p>
+            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#F7E8E4', marginBottom: 6 }}>{t('timeline_avoid')}</p>
             {details.avoid.length > 0
               ? details.avoid.map((item, i) => (
                   <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
-                    <span style={{ color: '#E05555', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
+                    <span style={{ color: '#A23B3B', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
                     <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{item}</span>
                   </div>
                 ))
@@ -341,7 +341,7 @@ export default function MobileTimelineCard({ panchang }) {
   const nextGood = findNextGood(slots, nowMin)
 
   return (
-    <div style={{ background: '#13183a', borderRadius: 14, padding: '14px 12px 12px', overflow: 'hidden' }}>
+    <div style={{ background: '#171B33', borderRadius: 14, padding: '14px 12px 12px', overflow: 'hidden' }}>
       <StatusCard slot={active} nowMin={nowMin} slots={slots} t={t} />
       <BarTimeline slots={slots} nowMin={nowMin} sunriseMin={sunriseMin} sunsetMin={sunsetMin} />
 

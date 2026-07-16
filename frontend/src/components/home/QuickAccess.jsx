@@ -11,7 +11,8 @@ const TILES = [
     id: 'chart',
     icon: '📊',
     label: 'Full Chart & Analysis',
-    iconBg: 'linear-gradient(135deg,#1d3557,#457b9d)',
+    iconBg: '#1F1C0E',          // gold tint on night
+    iconBorder: '#D9A441',
     route: '/kundli',
     tab: 'kundli',
   },
@@ -19,7 +20,8 @@ const TILES = [
     id: 'predictions',
     icon: '🔮',
     label: 'Predictions',
-    iconBg: 'linear-gradient(135deg,#4a1a6e,#7b2d9e)',
+    iconBg: '#1E1520',          // mauve tint on night
+    iconBorder: '#8C5B73',
     route: '/kundli',
     tab: 'insights',
   },
@@ -27,7 +29,8 @@ const TILES = [
     id: 'remedies',
     icon: '🌸',
     label: 'Remedies',
-    iconBg: 'linear-gradient(135deg,#5e2750,#9e4a80)',
+    iconBg: '#141F15',          // sage tint on night
+    iconBorder: '#5B7A5E',
     route: '/kundli',
     tab: 'insights',
   },
@@ -35,7 +38,8 @@ const TILES = [
     id: 'compatibility',
     icon: '❤️',
     label: 'Compatibility',
-    iconBg: 'linear-gradient(135deg,#6e1a1a,#b03030)',
+    iconBg: '#1E1414',          // vermillion tint on night
+    iconBorder: '#A23B3B',
     route: '/kundli',
     tab: 'insights',
   },
@@ -43,7 +47,8 @@ const TILES = [
     id: 'panchang',
     icon: '📅',
     label: 'Panchang',
-    iconBg: 'linear-gradient(135deg,#1a4a6e,#2a7ab0)',
+    iconBg: '#1F1C0E',
+    iconBorder: '#D9A441',
     route: '/home',
     section: 'panchang',
   },
@@ -51,7 +56,8 @@ const TILES = [
     id: 'kp',
     icon: '🪐',
     label: 'KP Insights',
-    iconBg: 'linear-gradient(135deg,#1a3b6e,#2a55a0)',
+    iconBg: '#1E1520',
+    iconBorder: '#8C5B73',
     route: '/kundli',
     tab: 'kp',
   },
@@ -87,7 +93,7 @@ export default function QuickAccess({ profile }) {
             onClick={() => handleTile(tile)}
             aria-label={tile.label}
           >
-            <div className="sj-qa-icon" style={{ background: tile.iconBg }}>
+            <div className="sj-qa-icon" style={{ background: tile.iconBg, border: `1px solid ${tile.iconBorder}40` }}>
               <span role="img" aria-hidden="true" style={{fontSize:22}}>{tile.icon}</span>
             </div>
             <p className="sj-qa-label">{tile.label}</p>
@@ -97,15 +103,15 @@ export default function QuickAccess({ profile }) {
       </div>
       <style>{`
         .sj-qa-wrap {
-          background: #fff;
-          border: 1px solid #EAE1CC;
+          background: #171B33;
+          border: 1px solid rgba(217,164,65,0.12);
           border-radius: 16px;
           padding: 18px 18px 20px;
         }
         .sj-qa-heading {
           font-size: 16px;
           font-weight: 700;
-          color: #2A2724;
+          color: #F8F3E7;
           margin: 0 0 14px;
         }
         .sj-qa-grid {
@@ -139,14 +145,14 @@ export default function QuickAccess({ profile }) {
         .sj-qa-label {
           font-size: 11px;
           font-weight: 600;
-          color: #2A2724;
+          color: #C9C2D6;
           text-align: center;
           margin: 0;
           line-height: 1.3;
         }
         .sj-qa-arrow {
           font-size: 11px;
-          color: #BD8A2E;
+          color: #D9A441;
         }
       `}</style>
     </div>

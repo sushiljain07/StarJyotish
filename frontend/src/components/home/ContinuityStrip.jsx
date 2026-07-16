@@ -75,7 +75,7 @@ export default function ContinuityStrip({ summary }) {
         fontWeight: 500,
         letterSpacing: '0.01em',
         padding: '6px 4px',
-        animation: 'sj-fade-in 300ms ease both',
+        animation: 'fadeSlideInFast 0.25s ease-out both',
       }}
       aria-live="polite"
     >

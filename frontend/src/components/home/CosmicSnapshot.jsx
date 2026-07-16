@@ -41,7 +41,7 @@ export default function CosmicSnapshot({ panchang, profile }) {
       </div>
       <style>{`
         .sj-cs-card {
-          background: linear-gradient(135deg, #2d1f5e 0%, #1a1635 100%);
+          background: #171B33;
           border: 1px solid rgba(217,164,65,0.2);
           border-radius: 16px;
           padding: 16px 18px 18px;

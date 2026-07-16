@@ -19,13 +19,13 @@ function shortDayName(dateStr) {
 // not a fabricated daily mood.
 function rahuTone(muhurtas) {
   const start = muhurtas?.rahu_kaal?.start
-  if (!start) return '#8FA876'
+  if (!start) return '#5B7A5E'   // sage — neutral/unknown
   const hour = parseInt(start, 10)
   const isPM = /PM/i.test(start)
   const hour24 = isPM && hour !== 12 ? hour + 12 : hour
-  if (hour24 < 13) return '#C05B3C'
-  if (hour24 >= 16) return '#F0A93A'
-  return '#8FA876'
+  if (hour24 < 13) return '#A23B3B'   // vermillion — morning rahu, high caution
+  if (hour24 >= 16) return '#D9A441'  // gold — evening rahu, moderate caution
+  return '#5B7A5E'                    // sage — midday rahu, low caution
 }
 
 export default function WeekStrip({ location }) {

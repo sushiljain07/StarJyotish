@@ -167,12 +167,12 @@ export default function HomeMasthead({ profile, profiles = [], location, panchan
         {dashaTags && (dashaTags.mahadasha || dashaTags.antardasha) && (
           <div className="flex gap-2 flex-wrap mt-3">
             {dashaTags.mahadasha && (
-              <span className="text-[10.5px] font-mono text-indigo-200 bg-indigo-400/[0.14] border border-indigo-300/20 px-2.5 py-1 rounded-full">
+              <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
                 Mahadasha · {dashaTags.mahadasha}
               </span>
             )}
             {dashaTags.antardasha && (
-              <span className="text-[10.5px] font-mono text-indigo-200 bg-indigo-400/[0.14] border border-indigo-300/20 px-2.5 py-1 rounded-full">
+              <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
                 Antardasha · {dashaTags.antardasha}
               </span>
             )}

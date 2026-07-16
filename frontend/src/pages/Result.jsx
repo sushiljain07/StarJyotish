@@ -1,3 +1,11 @@
+// frontend/src/pages/Result.jsx
+//
+// Hub-and-spoke kundli navigation: one Overview (charts + grouped drill-in
+// cards) and full-screen drill-ins with a Back affordance in the sticky bar
+// — replaces the old two-level main-tab + sub-tab stack, and the page-level
+// bottom NavBar that existed only because the underline tab row was hidden
+// on mobile. There is deliberately NO persistent tab row of all sections:
+// the nine surfaces don't belong to one frame; the Overview is the frame.
 import { useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -7,13 +15,10 @@ import { StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
 import DashaTable      from '../components/DashaTable'
 import PlanetTable     from '../components/PlanetTable'
-import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
-import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { formatDate, formatTime } from '../utils/format'
 import { getTopic } from '../config/topics'
 import TopicIcon from '../components/TopicIcon'
-import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
 
 const KPChart             = lazy(() => import('../components/KPChart'))
@@ -24,8 +29,6 @@ const BhavaChalit         = lazy(() => import('../components/BhavaChalit'))
 const AshtakavargaTable   = lazy(() => import('../components/AshtakavargaTable'))
 const SarvatobhadraChakra = lazy(() => import('../components/SarvatobhadraChakra'))
 
-// Lazy-tab fallback — shared skeleton StateBlock (was a bespoke spinning 🪐
-// with a fake progress bar, duplicated in AskPage with a different emoji).
 function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
@@ -50,24 +53,23 @@ function SummaryChips({ data }) {
   )
 }
 
-const MAIN_TABS = [
-  { id: 'birth_chart', label: 'Birth Chart', icon: '/starjyotish.svg' },
-  { id: 'divisional',  label: 'Life Areas',  icon: 'insights' },
-  { id: 'analysis',    label: 'Analysis',    icon: 'advanced' },
-  { id: 'download',    label: 'Download',    icon: 'ask' },
+// Every drill-in. `group` clusters the Overview cards so unrelated surfaces
+// (birth-chart details vs deeper analysis vs export) don't share one frame.
+const SECTIONS = [
+  { id: 'planets',       label: 'Planets',       emoji: '🪐', group: 'birth',    desc: 'Sign, house, nakshatra & dignity of every planet' },
+  { id: 'dasha',         label: 'Dasha',         emoji: '⏳', group: 'birth',    desc: 'Your Vimshottari planetary time cycles' },
+  { id: 'transit',       label: 'Transit',       emoji: '🌗', group: 'birth',    desc: 'Where the planets are moving right now' },
+  { id: 'divisional',    label: 'Life Areas',    emoji: '🧭', group: 'analysis', desc: 'Divisional charts for career, marriage & more' },
+  { id: 'bhava',         label: 'Bhava Chalit',  emoji: '🏛️', group: 'analysis', desc: 'House-based chart of life circumstances' },
+  { id: 'ashtakavarga',  label: 'Ashtakavarga',  emoji: '🔢', group: 'analysis', desc: 'Point-based strength of each sign & planet' },
+  { id: 'sarvatobhadra', label: 'Sarvatobhadra', emoji: '✳️', group: 'analysis', desc: 'The all-direction chakra of nakshatra vedha' },
+  { id: 'download',      label: 'Download',      emoji: '📄', group: 'export',   desc: 'Save your full kundli as a PDF report' },
 ]
 
-const BIRTH_SUBTABS = [
-  { id: 'chart',   label: 'Chart' },
-  { id: 'planets', label: 'Planets' },
-  { id: 'dasha',   label: 'Dasha' },
-  { id: 'transit', label: 'Transit' },
-]
-
-const ANALYSIS_SUBTABS = [
-  { id: 'bhava',         label: 'Bhava Chalit' },
-  { id: 'ashtakavarga',  label: 'Ashtakavarga' },
-  { id: 'sarvatobhadra', label: 'Sarvatobhadra' },
+const GROUPS = [
+  { id: 'birth',    heading: 'Your birth chart, in detail' },
+  { id: 'analysis', heading: 'Deeper analysis' },
+  { id: 'export',   heading: 'Take it with you' },
 ]
 
 const CHART_STYLES = [
@@ -75,8 +77,25 @@ const CHART_STYLES = [
   { id: 'kp',    label: 'KP' },
 ]
 
-function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
-  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} />
+// Older callers (QuickAccess, ChartsStrip, PersonalHome, config/nav) still
+// send the two-level activeTab/activeSubtab shape — map both levels onto
+// the flat section list.
+function resolveSection(tab, sub) {
+  const byTab = { divisional: 'divisional', download: 'download', analysis: 'bhava', advanced: 'bhava' }
+  if (byTab[tab]) return byTab[tab]
+  const bySub = Object.fromEntries(SECTIONS.map(s => [s.id, s.id]))
+  return bySub[sub] ?? 'overview'
+}
+
+function InfoBox({ heading, children }) {
+  return (
+    <div className="mb-4 rounded-xl px-4 py-3"
+         style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
+      <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
+         style={{ color: 'rgba(212,175,55,0.55)' }}>{heading}</p>
+      <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>{children}</p>
+    </div>
+  )
 }
 
 export default function Result() {
@@ -90,43 +109,20 @@ export default function Result() {
   const initTab = state?.activeTab ?? 'birth_chart'
   const initSub = state?.activeSubtab ?? 'chart'
 
-  const legacyMainMap = {
-    kundli: 'birth_chart', advanced: 'analysis',
-    birth_chart: 'birth_chart', divisional: 'divisional',
-    analysis: 'analysis', download: 'download',
-  }
-  const resolvedMain = legacyMainMap[initTab] ?? 'birth_chart'
-  const legacyBirthMap = { birth_chart: 'chart', planets: 'planets', dasha: 'dasha', transit: 'transit' }
-  const resolvedBirthSub = legacyBirthMap[initSub] ?? initSub
-
-  const [activeMain, setActiveMain]         = useState(resolvedMain)
-  const [activeBirthSub, setActiveBirthSub] = useState(
-    ['chart','planets','dasha','transit'].includes(resolvedBirthSub) ? resolvedBirthSub : 'chart'
-  )
-  const [activeAnalysisSub, setActiveAnalysisSub] = useState('bhava')
-  const [chartStyle, setChartStyle]               = useState('north')
+  const [section, setSection]       = useState(() => resolveSection(initTab, initSub))
+  const [chartStyle, setChartStyle] = useState(initTab === 'kp' ? 'kp' : 'north')
 
   if (!state?.data) { navigate(homeDestination); return null }
 
   const { data, input, presetQuestion = null } = state
   const topic = getTopic(input.topic)
 
+  function goto(id) {
+    setSection(id)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   function renderBirthChart() {
-    if (chartStyle === 'north') {
-      return (
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
-          <div className="w-full sm:w-[460px]">
-            <KundliChart planets={data.planets} ascendant={data.ascendant}
-                         navamsaPlanets={data.navamsa_planets}
-                         title={t('tab_birth_chart', 'Lagna Chart')} />
-          </div>
-          <div className="w-full sm:w-[460px]">
-            <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
-                         title={t('tab_navamsa', 'Navamsa (D9)')} />
-          </div>
-        </div>
-      )
-    }
     if (chartStyle === 'kp') {
       return (
         <Suspense fallback={<TabLoader />}>
@@ -134,7 +130,19 @@ export default function Result() {
         </Suspense>
       )
     }
-    return null
+    return (
+      <div className="flex flex-col sm:flex-row gap-6 justify-center items-start">
+        <div className="w-full sm:w-[460px]">
+          <KundliChart planets={data.planets} ascendant={data.ascendant}
+                       navamsaPlanets={data.navamsa_planets}
+                       title={t('tab_birth_chart', 'Lagna Chart')} />
+        </div>
+        <div className="w-full sm:w-[460px]">
+          <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
+                       title={t('tab_navamsa', 'Navamsa (D9)')} />
+        </div>
+      </div>
+    )
   }
 
   function InsightsAskEntry() {
@@ -207,27 +215,20 @@ export default function Result() {
           {/* Row 2 — chips */}
           <SummaryChips data={data} />
 
-          {/* Row 3 — main tabs */}
-          <div className="border-t border-line/40 pt-1">
-            <AnimatedTabRow
-              tabs={MAIN_TABS}
-              active={activeMain}
-              onChange={setActiveMain}
-              renderIcon={tab => tab.icon.startsWith('/')
-                ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
-                : <TabIcon id={tab.icon} className="w-4 h-4" />}
-            />
-          </div>
-
-          {/* Row 4 — sub-tabs (only when the active main tab has them) */}
-          {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
-            <div className="border-t border-line/40 py-2">
-              {activeMain === 'birth_chart' && (
-                <SubTabBar subtabs={BIRTH_SUBTABS} active={activeBirthSub} onChange={setActiveBirthSub} />
-              )}
-              {activeMain === 'analysis' && (
-                <SubTabBar subtabs={ANALYSIS_SUBTABS} active={activeAnalysisSub} onChange={setActiveAnalysisSub} accent="sage" />
-              )}
+          {/* Row 3 — drill-in context: back to the hub + where you are */}
+          {section !== 'overview' && (
+            <div className="border-t border-line/40 py-2 flex items-center gap-2">
+              <button
+                onClick={() => goto('overview')}
+                className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-primary-dark hover:text-primary transition"
+              >
+                ← {t('kundli_back_overview', 'Overview')}
+              </button>
+              <span className="text-ink-faint text-xs">/</span>
+              <span className="text-xs font-semibold text-ink truncate">
+                {SECTIONS.find(s => s.id === section)?.emoji}{' '}
+                {SECTIONS.find(s => s.id === section)?.label}
+              </span>
             </div>
           )}
         </div>
@@ -236,80 +237,86 @@ export default function Result() {
       {/* ── Page content ────────────────────────────────────────────────── */}
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
 
-        {/* ══ BIRTH CHART ══ */}
-        <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
+        {/* ══ OVERVIEW ══ */}
+        <div className={section === 'overview' ? 'tab-fade' : 'hidden'}>
+          <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
+          {renderBirthChart()}
 
-          <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
-            <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
-            {renderBirthChart()}
-            <InsightsAskEntry />
-          </div>
+          {/* Grouped drill-in cards */}
+          {GROUPS.map(g => {
+            const items = SECTIONS.filter(s => s.group === g.id)
+            return (
+              <div key={g.id} className="mt-8">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-faint mb-2.5">{g.heading}</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {items.map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => goto(s.id)}
+                      className="text-left px-4 py-3 rounded-xl border transition-all hover:border-primary/60 hover:shadow-sm"
+                      style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
+                    >
+                      <span className="text-lg">{s.emoji}</span>
+                      <p className="text-sm font-semibold text-ink mt-1">{s.label}</p>
+                      <p className="text-xs text-ink-muted mt-0.5 leading-snug">{s.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
 
-          <div className={activeBirthSub === 'planets' ? 'tab-fade' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>Planet Positions</p>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
-                Every planet&#39;s sign, house, nakshatra, and dignity at the moment of your birth.
-                Retrograde (R) planets express their energy inward — more reflective, sometimes delayed, always deep.
-              </p>
-            </div>
-            <PlanetTable planets={data.planets} ascendant={data.ascendant} />
-          </div>
-
-          <div className={activeBirthSub === 'dasha' ? 'tab-fade' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>Vimshottari Dasha</p>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
-                Your life unfolds in planetary time cycles. Your active Mahadasha shapes the decade;
-                Antardasha refines the year. The highlighted row is your present period.
-              </p>
-            </div>
-            <DashaTable dasha={data.dasha} />
-          </div>
-
-          <Suspense fallback={<TabLoader />}>
-            <div className={activeBirthSub === 'transit' ? 'tab-fade' : 'hidden'}>
-              <TransitPanel input={input} natalData={data} />
-            </div>
-          </Suspense>
+          <InsightsAskEntry />
         </div>
 
-        {/* ══ LIFE AREAS (DIVISIONAL) ══ */}
-        <div className={activeMain === 'divisional' ? 'tab-fade' : 'hidden'}>
+        {/* ══ DRILL-INS ══ */}
+        <div className={section === 'planets' ? 'tab-fade' : 'hidden'}>
+          <InfoBox heading="Planet Positions">
+            Every planet&#39;s sign, house, nakshatra, and dignity at the moment of your birth.
+            Retrograde (R) planets express their energy inward — more reflective, sometimes delayed, always deep.
+          </InfoBox>
+          <PlanetTable planets={data.planets} ascendant={data.ascendant} />
+        </div>
+
+        <div className={section === 'dasha' ? 'tab-fade' : 'hidden'}>
+          <InfoBox heading="Vimshottari Dasha">
+            Your life unfolds in planetary time cycles. Your active Mahadasha shapes the decade;
+            Antardasha refines the year. The highlighted row is your present period.
+          </InfoBox>
+          <DashaTable dasha={data.dasha} />
+        </div>
+
+        <Suspense fallback={<TabLoader />}>
+          <div className={section === 'transit' ? 'tab-fade' : 'hidden'}>
+            <TransitPanel input={input} natalData={data} />
+          </div>
+        </Suspense>
+
+        <div className={section === 'divisional' ? 'tab-fade' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <DivisionalCharts input={input} defaultDivision={topic?.division} />
           </Suspense>
         </div>
 
-        {/* ══ ANALYSIS ══ */}
-        <div className={activeMain === 'analysis' ? 'tab-fade' : 'hidden'}>
-          <Suspense fallback={<TabLoader />}>
-            <div className={activeAnalysisSub === 'bhava' ? 'tab-fade' : 'hidden'}>
-              <BhavaChalit input={input} />
-            </div>
-            <div className={activeAnalysisSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
-              <AshtakavargaTable input={input} />
-            </div>
-            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
-              <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
-            </div>
-          </Suspense>
-        </div>
+        <Suspense fallback={<TabLoader />}>
+          <div className={section === 'bhava' ? 'tab-fade' : 'hidden'}>
+            <BhavaChalit input={input} />
+          </div>
+          <div className={section === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
+            <AshtakavargaTable input={input} />
+          </div>
+          <div className={section === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
+            <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
+          </div>
+        </Suspense>
 
-        {/* ══ DOWNLOAD ══ */}
-        <div className={activeMain === 'download' ? 'tab-fade' : 'hidden'}>
+        <div className={section === 'download' ? 'tab-fade' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <KundliDownload data={data} input={input} />
           </Suspense>
         </div>
 
       </div>
-
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={setActiveMain} raised={isAuthenticated} />
     </div>
   )
 }

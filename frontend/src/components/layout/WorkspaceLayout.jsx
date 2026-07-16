@@ -21,8 +21,6 @@
 
 import { Suspense } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
-import { getPrimaryProfile } from '../../services/astrologyProfiles'
 import SiteHeader from '../SiteHeader'
 import CompactFooter from '../CompactFooter'
 import BottomNav from '../home/BottomNav'
@@ -54,8 +52,6 @@ export function RouteSkeleton({ dark = false }) {
 
 export default function WorkspaceLayout() {
   const { pathname } = useLocation()
-  const { user, isAuthenticated } = useAuth()
-  const profile = isAuthenticated ? getPrimaryProfile(user) : null
   const dark = isDark(pathname)
 
   return (
@@ -71,7 +67,7 @@ export default function WorkspaceLayout() {
         </Suspense>
       </main>
       <CompactFooter />
-      {isAuthenticated && <BottomNav profile={profile} />}
+      <BottomNav />
     </div>
   )
 }

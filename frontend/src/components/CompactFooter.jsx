@@ -17,23 +17,27 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
+// Link set mirrors Footer.jsx's bottom bar + key destinations, and the
+// EN/हि toggle matches Footer.jsx, so the two footers never disagree on
+// essentials — only on marketing weight (newsletter, brand, badges).
 const LINKS = [
-  { to: '/learn',        key: 'footer_link_knowledge_center', fallback: 'Knowledge Center' },
-  { to: '/faq',          key: 'footer_link_faq' },
-  { to: '/about',        key: 'footer_link_about' },
-  { to: '/contact',      key: 'footer_link_contact' },
-  { to: '/terms',        key: 'footer_bottom_terms' },
-  { to: '/privacy',      key: 'footer_bottom_privacy' },
+  { to: '/learn',         key: 'footer_link_knowledge_center', fallback: 'Knowledge Center' },
+  { to: '/faq',           key: 'footer_link_faq' },
+  { to: '/about',         key: 'footer_link_about' },
+  { to: '/contact',       key: 'footer_link_contact' },
+  { to: '/terms',         key: 'footer_bottom_terms' },
+  { to: '/privacy',       key: 'footer_bottom_privacy' },
   { to: '/refund-policy', key: 'footer_bottom_refund' },
+  { to: '/disclaimer',    key: 'footer_bottom_disclaimer' },
 ]
 
 const FOOTER_YEAR = new Date().getFullYear()
 
 export default function CompactFooter() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return (
-    <footer className="border-t border-white/10 bg-night mb-16 sm:mb-0">
+    <footer className="border-t border-white/10 bg-night">
       <div className="max-w-4xl mx-auto px-4 py-5">
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map(link => (
@@ -46,9 +50,24 @@ export default function CompactFooter() {
             </Link>
           ))}
         </nav>
-        <p className="text-ink-onnight/40 text-xs text-center mt-3">
-          {t('footer_copyright', { year: FOOTER_YEAR })}
-        </p>
+        <div className="flex items-center justify-center gap-3 mt-3">
+          <p className="text-ink-onnight/40 text-xs">
+            {t('footer_copyright', { year: FOOTER_YEAR })}
+          </p>
+          <div className="flex gap-1">
+            {['en', 'hi'].map(lang => (
+              <button
+                key={lang}
+                onClick={() => i18n.changeLanguage(lang)}
+                className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition ${
+                  i18n.language.startsWith(lang) ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
+                }`}
+              >
+                {lang === 'en' ? 'EN' : 'हि'}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   )

@@ -228,7 +228,23 @@ def calculate_panchang(lat: float, lon: float, tz_name: str,
     now_utc = target_date or datetime.now(dt_timezone.utc)
     jd_now = swe.julday(now_utc.year, now_utc.month, now_utc.day,
                          now_utc.hour + now_utc.minute / 60.0)
-    jd_midnight = swe.julday(now_utc.year, now_utc.month, now_utc.day, 0.0)
+
+    # The rise/set search must start from LOCAL midnight, not UT midnight:
+    # east of Greenwich (IST = UTC+5:30) the first sunrise after 00:00 UT
+    # belongs to the NEXT local day, which paired tomorrow's sunrise with
+    # today's sunset — negative day length, nonsense kaal windows, and the
+    # wrong weekday row in the segment tables.
+    try:
+        local_now = now_utc.astimezone(pytz.timezone(tz_name))
+        local_midnight_utc = local_now.replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ).astimezone(dt_timezone.utc)
+    except Exception:
+        local_now = now_utc
+        local_midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+    jd_midnight = swe.julday(local_midnight_utc.year, local_midnight_utc.month,
+                             local_midnight_utc.day,
+                             local_midnight_utc.hour + local_midnight_utc.minute / 60.0)
 
     swe.set_sid_mode(swe.SIDM_LAHIRI)
     sun_lon, moon_lon = _sun_moon_sidereal(jd_now)
@@ -251,8 +267,8 @@ def calculate_panchang(lat: float, lon: float, tz_name: str,
     nakshatra_name = _nakshatra_of(moon_lon)
 
     result = {
-        "date": now_utc.date().isoformat(),
-        "weekday": _WEEKDAY_NAMES[now_utc.weekday()],
+        "date": local_now.date().isoformat(),
+        "weekday": _WEEKDAY_NAMES[local_now.weekday()],
         "tithi": tithi_data,
         "nakshatra": {"name": nakshatra_name, "ends_at": _end_time_str(nak_end_jd, tz_name)},
         "masa": _hindu_masa(sun_lon),

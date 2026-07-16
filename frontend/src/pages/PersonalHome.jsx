@@ -1,29 +1,42 @@
-// frontend/src/pages/PersonalHome.jsx  v4
+// frontend/src/pages/PersonalHome.jsx  v5 — "Home, reimagined"
 //
-// Full redesign — not a patch on v3. Replaces the light-parchment,
-// two-column dashboard layout with the dark "sky masthead + thread of
-// beats" structure agreed on in design review (starjyotish-home-v4.html):
-// a night-sky band whose tone genuinely tracks the time of day, followed
-// by a single-column, story-like feed rather than a grid of equal-weight
-// widgets. Every beat still reads from the same real hooks v3 used
-// (useDailyEditor, usePanchang, useChartExtras, useUserJourney) — this is
-// a new skin and structure on real data, not new fake content.
+// A restructure of v4's dark "sky masthead + thread of beats" page onto
+// the approved home-v5 mock: one page-level Starfield behind everything,
+// a slimmer masthead (tithi line, edition chip, streak pill, a real
+// celestial-clock disc instead of the old sun-arc), a practical "your
+// window today" muhurta beat, a constellation in place of the week chip
+// row, life-area signal folded into the reports beat instead of living
+// separately, and a "the sky remembers" memory+journal beat closing out
+// before one last idea and a quiet closing chapter. Every beat still reads
+// from the same real hooks v4 used (useDailyEditor, usePanchang,
+// useChartExtras, useUserJourney) — this is a new skin and structure on
+// real data, not new fake content.
 //
-// Structure:
-//  1. HomeMasthead — profile chips, greeting, real time-of-day sky + arc,
-//     today's real headline, dasha tags, panchang preview → /panchang
+// Beat order:
+//  1. HomeMasthead — profile chips, streak pill, greeting, tithi line,
+//     edition chip, celestial clock (Sun by day / phase-accurate Moon by
+//     night)
 //  2. ContinuityStrip — "the app remembers you" whisper
-//  3. Beat: Your day — DailyPatrikaHero (the interactive rotating card
-//     engine with reactions) + Do/Avoid + the moon/dasha "why"
-//  4. Beat: This week — WeekStrip → /week-ahead
-//  5. Beat: Your charts — ChartsStrip → /kundli divisional tab
-//  6. Beat: Life areas — LifeAreaGrid
-//  7. Beat: Your circle — Ask Jyoti teaser + ReflectionLoop
-//  8. Beat: Coming up / Go deeper / Your reports
-//  9. Beat: New today — KnowledgeCapsule (deliberately still the one
-//     parchment-light card on the page — see its own file for why)
-//  10. JournalPrompt + DisclaimerBlock
-//  11. AskPersonaPanel FAB
+//  3. Beat: Your day — DailyPatrikaHero (tap-through patrika deck +
+//     reactions + day-score ring) + Do/Avoid + the moon/dasha "why"
+//  4. Beat: Your window today — TodayWindow (muhurta timeline + panchang
+//     brief)
+//  5. Beat: This week — WeekStrip, now a constellation → /week-ahead
+//  6. Beat: Your charts — ChartsStrip → /kundli divisional tab
+//  7. Beat: Your reports — ReportsStrip, now carrying the life-area trend
+//     signal that used to be LifeAreaGrid's own beat
+//  8. Beat: Coming up — ComingUpStrip, reduced to the 2 nearest events
+//  9. Beat: The sky remembers — a slim Ask-Jyoti entry point + SkyRemembers
+//     (yesterday's-reaction memory line + free-text journal)
+//  10. Beat: One idea before you go — KnowledgeCapsule
+//  11. ClosingBeat — the page's quiet full stop + share
+//  12. DisclaimerBlock
+//  13. AskPersonaPanel FAB
+//
+// LifeAreaGrid.jsx, ReflectionLoop.jsx and JournalPrompt.jsx are no longer
+// wired in here (their roles are folded into ReportsStrip and
+// SkyRemembers respectively) but remain on disk, unmodified and still
+// importable elsewhere — nothing was deleted.
 //
 // Header/footer/BottomNav/background are the app shell's job — see
 // components/layout/WorkspaceLayout.jsx. This page renders content only.
@@ -41,22 +54,22 @@ import { useDailyEditor } from '../hooks/useDailyEditor'
 import { useUserJourney } from '../hooks/useUserJourney'
 import { useChartExtras } from '../hooks/useChartExtras'
 
+import Starfield from '../components/home/Starfield'
 import HomeMasthead from '../components/home/HomeMasthead'
 import ContinuityStrip from '../components/home/ContinuityStrip'
 import DailyPatrikaHero from '../components/home/DailyPatrikaHero'
 import DoAvoidCards from '../components/home/DoAvoidCards'
-import LifeAreaGrid from '../components/home/LifeAreaGrid'
 import ChartSpotlight from '../components/home/ChartSpotlight'
+import TodayWindow from '../components/home/TodayWindow'
 import ComingUpStrip from '../components/home/ComingUpStrip'
-import GoDeeperCta from '../components/home/GoDeeperCta'
 import ReportsStrip from '../components/home/ReportsStrip'
-import JournalPrompt from '../components/home/JournalPrompt'
 import DisclaimerBlock from '../components/home/DisclaimerBlock'
 import AskPersonaPanel from '../components/home/AskPersonaPanel'
-import ReflectionLoop from '../components/home/ReflectionLoop'
 import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
 import WeekStrip from '../components/home/WeekStrip'
 import ChartsStrip from '../components/home/ChartsStrip'
+import SkyRemembers from '../components/home/SkyRemembers'
+import ClosingBeat from '../components/home/ClosingBeat'
 
 import { getPrimaryProfile, listProfiles, loadProfiles } from '../services/astrologyProfiles'
 import { withHindiPlanet } from '../config/hindiNames'
@@ -66,16 +79,9 @@ import {
 } from '../utils/dailyInsights'
 import { formatDate } from '../utils/format'
 
-function zodiacGuideFor(signName, t) {
-  const slug = signName?.toLowerCase()
-  if (slug === 'aries') return { href: '/learn/zodiac/aries', label: t('home_aries_guide') }
-  return { href: '/learn/zodiac', label: t('home_your_sign_guide', { sign: signName ?? '' }) }
-}
-
 // One "beat" on the home thread: gold dot on the hairline, serif gold
-// heading, optional sub + view-full CTA. Previously styled by an inline
-// <style> block with hardcoded hex (#F0CB80, #D9A441, #0F1226) — now pure
-// design tokens (primary-glow / primary / night-deep).
+// heading, optional sub + view-full CTA. Pure design tokens
+// (primary-glow / primary / night-deep) — no hardcoded hex.
 function Beat({ id, title, subtitle, cta, onCta, delay = 0, children }) {
   return (
     <div id={id} className="relative pl-5 mb-8">
@@ -173,7 +179,6 @@ export default function PersonalHome() {
   }
 
   const { chart } = profile
-  const guide = zodiacGuideFor(chart.ascendant.sign, t)
 
   const transitPlanets = transit?.transit_planets ?? null
   const dayScore    = transitPlanets ? computeDayScore(chart, transitPlanets, t) : null
@@ -183,107 +188,102 @@ export default function PersonalHome() {
   const spotlight   = transitPlanets ? computeSpotlight(chart, transitPlanets, t) : null
   const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
+  const patrikaHeadline = edition?.headline ?? edition?.cards?.[0]?.text ?? null
+
   return (
-    <div>
+    <div className="relative">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
 
-      <HomeMasthead
-          profile={profile}
-          profiles={allProfiles}
-          location={location}
-          panchang={panchang.data}
-          dashaTags={spotlight?.dashaSpotlight}
-      />
+      {/* One page-level sky behind everything — see Starfield.jsx. */}
+      <Starfield />
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-28 md:pb-12">
-        <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
+      <div className="relative z-10">
+        <HomeMasthead
+            profile={profile}
+            profiles={allProfiles}
+            location={location}
+            panchang={panchang.data}
+            dashaTags={spotlight?.dashaSpotlight}
+        />
 
-        {/* The thread: a fading gold hairline the beats hang off. */}
-        <div className="relative mt-5 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
-          <Beat id="sj-your-day" title={t('home_right_now_label')} delay={0}>
-            <DailyPatrikaHero
-              firstName={profile.label?.split(' ')[0]}
-              edition={edition}
-              dayScore={dayScore}
-              panchang={panchang.data}
-              chapterLabelFn={withHindiPlanet}
-              oneAction={oneAction}
-              onRefresh={requestRefresh}
-              onReaction={(cardType, reaction, event) =>
-                recordReaction(cardType, reaction, {
-                  planet: event?.planet, house: event?.house, variation: edition?.variation,
-                })
-              }
-              cardReactions={cardReactions}
-            />
-            {doAvoid && <div className="mt-4"><DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} /></div>}
-            {spotlight && (
-              <div className="mt-4">
-                <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
-              </div>
-            )}
-          </Beat>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-28 md:pb-12">
+          <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
 
-          <Beat id="sj-week" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
-            <WeekStrip location={location} />
-          </Beat>
-
-          <Beat id="sj-charts" title={t('home_charts_strip_label')} cta={t('home_charts_strip_cta')} onCta={() => openChart('divisional', 'kundli')}>
-            <ChartsStrip profile={profile} />
-          </Beat>
-
-          {lifeAreas && (
-            <Beat title={t('home_this_week_label')} subtitle={t('home_this_week_subtext')}>
-              <LifeAreaGrid areas={lifeAreas} onOpenReport={openReport} />
+          {/* The thread: a fading gold hairline the beats hang off. */}
+          <div className="relative mt-5 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+            <Beat id="sj-your-day" title={t('home_right_now_label')} delay={0}>
+              <DailyPatrikaHero
+                firstName={profile.label?.split(' ')[0]}
+                edition={edition}
+                dayScore={dayScore}
+                panchang={panchang.data}
+                chapterLabelFn={withHindiPlanet}
+                oneAction={oneAction}
+                onRefresh={requestRefresh}
+                onReaction={(cardType, reaction, event) =>
+                  recordReaction(cardType, reaction, {
+                    planet: event?.planet, house: event?.house, variation: edition?.variation,
+                  })
+                }
+                cardReactions={cardReactions}
+              />
+              {doAvoid && <div className="mt-4"><DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} /></div>}
+              {spotlight && (
+                <div className="mt-4">
+                  <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
+                </div>
+              )}
             </Beat>
-          )}
 
-          <Beat title={t('home_your_circle_label')}>
-            <Card
-              as="button"
-              surface="night"
-              padding="none"
-              interactive
-              onClick={() => window.dispatchEvent(new Event('sj:open-jyoti'))}
-              className="w-full text-left px-5 py-4 mb-4 hover:bg-white/[0.07] flex items-center justify-between gap-3"
-            >
-              <div>
-                <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
-                <p className="text-sm text-ink-onnight/75">{t('home_ask_jyoti_body')}</p>
-              </div>
-              <span className="text-primary-light text-lg shrink-0">↗</span>
-            </Card>
-            <ReflectionLoop profile={profile} lang={editorLang} />
-          </Beat>
+            <Beat id="sj-window" title={t('home_window_label', 'Your window today')}>
+              <TodayWindow panchang={panchang.data} />
+            </Beat>
 
-          <Beat title={t('home_coming_up_label')}>
-            {comingUpEvents.length > 0
-              ? <ComingUpStrip events={comingUpEvents} />
-              : <p className="text-sm text-ink-onnight/55">{t('home_coming_up_loading')}</p>
-            }
-          </Beat>
+            <Beat id="sj-week" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
+              <WeekStrip location={location} />
+            </Beat>
 
-          <Beat title={t('home_go_deeper_label')}>
-            <GoDeeperCta
-              onOpenFullReading={() => openChart('reading', 'insights')}
-              guideHref={guide.href}
-              guideLabel={guide.label}
-            />
-          </Beat>
+            <Beat id="sj-charts" title={t('home_charts_strip_label')} cta={t('home_charts_strip_cta')} onCta={() => openChart('divisional', 'kundli')}>
+              <ChartsStrip profile={profile} />
+            </Beat>
 
-          <Beat title={t('home_your_reports_label')}>
-            <ReportsStrip onOpenReport={openReport} featuredId={lifeAreas?.[0]?.topicId ?? 'career'} />
-          </Beat>
+            <Beat title={t('home_your_reports_label')}>
+              <ReportsStrip onOpenReport={openReport} featuredId={lifeAreas?.[0]?.topicId ?? 'career'} lifeAreas={lifeAreas} />
+            </Beat>
 
-          <Beat title={t('home_new_today_label')}>
-            <KnowledgeCapsule edition={edition} />
-          </Beat>
+            <Beat title={t('home_coming_up_label')}>
+              {comingUpEvents.length > 0
+                ? <ComingUpStrip events={comingUpEvents} />
+                : <p className="text-sm text-ink-onnight/55">{t('home_coming_up_loading')}</p>
+              }
+            </Beat>
+
+            <Beat title={t('home_sky_remembers_label', 'The sky remembers')}>
+              <Card
+                as="button"
+                surface="night"
+                padding="none"
+                interactive
+                onClick={() => window.dispatchEvent(new Event('sj:open-jyoti'))}
+                className="w-full text-left px-5 py-4 mb-4 hover:bg-white/[0.07] flex items-center justify-between gap-3"
+              >
+                <div>
+                  <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
+                  <p className="text-sm text-ink-onnight/75">{t('home_ask_jyoti_body')}</p>
+                </div>
+                <span className="text-primary-light text-lg shrink-0">↗</span>
+              </Card>
+              <SkyRemembers profile={profile} lang={editorLang} journeySummary={journeySummary} />
+            </Beat>
+
+            <Beat title={t('home_one_idea_label', 'One idea before you go')}>
+              <KnowledgeCapsule edition={edition} />
+            </Beat>
+          </div>
+
+          <ClosingBeat headline={patrikaHeadline} comingUpEvents={comingUpEvents} />
+          <DisclaimerBlock />
         </div>
-
-        <div className="mt-2">
-          <Reveal delay={0}><JournalPrompt /></Reveal>
-        </div>
-        <DisclaimerBlock />
       </div>
 
       <AskPersonaPanel

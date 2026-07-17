@@ -137,13 +137,15 @@ export default function TodayWindow({ panchang }) {
     [panchang?.sunrise, panchang?.sunset, panchang?.muhurtas],
   )
 
-  // "now" marker: clamp to 2–98% so it's always visible on the bar.
-  // Before sunrise or after sunset it sits at 0% or 100% — never "stuck at 9pm".
-  const nowPct = useMemo(() => {
+  // "now" marker only makes sense while we're actually inside today's
+  // sunrise→sunset span — outside daylight hours (e.g. after sunset) the
+  // marker is simply hidden rather than pinned at an edge, since a "now"
+  // stuck at the sunset mark reads as if it's still that time.
+  const { nowPct, showNow } = useMemo(() => {
     const now = new Date()
     const nowMin = now.getHours() * 60 + now.getMinutes()
     const p = (nowMin - sunrise) / (sunset - sunrise)
-    return Math.max(2, Math.min(98, p * 100))
+    return { nowPct: Math.max(2, Math.min(98, p * 100)), showNow: nowMin >= sunrise && nowMin <= sunset }
   }, [sunrise, sunset])
 
   const goodLeft  = pctOf(abhijitStart, sunrise, sunset)
@@ -184,15 +186,17 @@ export default function TodayWindow({ panchang }) {
           className="absolute top-0 h-full rounded-full bg-vermillion/40"
           style={{ left: `${avoidLeft}%`, width: `${avoidWidth}%` }}
         />
-        {/* Now marker */}
-        <div
-          className="absolute -top-1.5 w-0.5 h-[26px] bg-white rounded-sm motion-reduce:transition-none"
-          style={{ left: `${nowPct}%`, boxShadow: '0 0 8px rgba(255,255,255,0.8)' }}
-        >
-          <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] tracking-widest uppercase text-white whitespace-nowrap">
-            {t('home_window_now', 'now')}
-          </span>
-        </div>
+        {/* Now marker — only while today's daylight window is still current */}
+        {showNow && (
+          <div
+            className="absolute -top-1.5 w-0.5 h-[26px] bg-white rounded-sm motion-reduce:transition-none"
+            style={{ left: `${nowPct}%`, boxShadow: '0 0 8px rgba(255,255,255,0.8)' }}
+          >
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] tracking-widest uppercase text-white whitespace-nowrap">
+              {t('home_window_now', 'now')}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Axis labels: sunrise and sunset times */}

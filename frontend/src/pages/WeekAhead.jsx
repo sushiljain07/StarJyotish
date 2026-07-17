@@ -1,12 +1,13 @@
 // frontend/src/pages/WeekAhead.jsx
 //
-// Full week view reachable from PersonalHome's "This week" strip. Each
-// day's tithi/nakshatra/Rahu Kaal comes from the real per-day panchang
-// calculation (POST /api/panchang/week) — no invented "mood" or guidance
-// text per day, since that would need real transit-based reasoning per
-// day (a much bigger backend feature) rather than the panchang facts this
-// endpoint actually computes. Real data only, same principle as
-// PanchangDetail.jsx.
+// Full week view reachable from PersonalHome's "This week" strip (see
+// WeekStrip.jsx). That strip is framed entirely around the week's score/
+// destiny constellation, not panchang timing facts — this page is its
+// "Full week" destination, so it needs to carry the same framing rather
+// than switching to a flat list of tithi/nakshatra/Rahu Kaal facts (which
+// is what /panchang and PanchangDetail.jsx already own). Score here comes
+// from utils/weekScore.js, the same heuristic WeekStrip already uses, so
+// the two never disagree on a given day's number.
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -14,6 +15,7 @@ import Seo from '../components/Seo'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { fetchPanchangWeek } from '../api/astro'
+import { weekDayScore, weekDayScoreLabel } from '../utils/weekScore'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -80,8 +82,11 @@ export default function WeekAhead() {
           </p>
         )}
 
-        {week && week.map(day => {
+        {week && week.map((day, i) => {
           const isToday = day.date === todayStr
+          const score = weekDayScore(day, i)
+          const label = weekDayScoreLabel(score, t)
+          const tithiName = day.tithi?.name
           return (
             <div
               key={day.date}
@@ -93,20 +98,17 @@ export default function WeekAhead() {
                 </p>
                 <p className="font-serif text-xl text-primary-light mt-0.5">{dayNumber(day.date)}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex gap-1.5 flex-wrap mb-1.5">
-                  <span className="text-[10px] font-mono text-ink-onnight/55 bg-white/[0.06] px-2 py-0.5 rounded-full">
-                    {day.tithi?.name}
-                  </span>
-                  <span className="text-[10px] font-mono text-ink-onnight/55 bg-white/[0.06] px-2 py-0.5 rounded-full">
-                    {typeof day.nakshatra === 'object' ? day.nakshatra?.name : day.nakshatra}
-                  </span>
+              <div className="flex-1 min-w-0 flex items-center gap-3">
+                <span
+                  className="font-serif text-2xl text-primary-glow shrink-0"
+                  style={{ textShadow: '0 0 12px rgba(240,203,128,0.35)' }}
+                >
+                  {score}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-ink-onnight">{label}</p>
+                  {tithiName && <p className="text-xs text-ink-onnight/45 truncate mt-0.5">{tithiName}</p>}
                 </div>
-                {day.muhurtas?.rahu_kaal && (
-                  <p className="text-sm text-ink-onnight/75">
-                    Rahu Kaal {day.muhurtas.rahu_kaal.start} – {day.muhurtas.rahu_kaal.end}
-                  </p>
-                )}
               </div>
             </div>
           )

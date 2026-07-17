@@ -109,6 +109,18 @@ function useCheckInStreak() {
   return state
 }
 
+// Fills the top-left of the masthead's streak row, which otherwise sits
+// empty — the streak pill is the only thing in that row and it's
+// right-aligned, so on days with no streak (or even with one) the whole
+// left half read as dead space.
+function TodayDateLabel() {
+  const label = useMemo(
+    () => new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }),
+    [],
+  )
+  return <span className="text-2xs font-mono text-ink-onnight/45 whitespace-nowrap">{label}</span>
+}
+
 function StreakPill({ streak, beads, t }) {
   if (!streak) return null
   return (
@@ -245,7 +257,7 @@ function MoonDisc({ t, size = 52 }) {
       // Terminator ellipse: positive w means the ellipse curves further left
       // (more dark = less illum); negative w curves right (less dark = more illum)
       const w = R * (1 - 2 * illum)   // >0 near new moon, <0 near full moon
-      ctx.ellipse(CX, CY, Math.abs(w), R, 0, -Math.PI / 2, Math.PI / 2, w > 0)
+      ctx.ellipse(CX, CY, Math.abs(w), R, 0, -Math.PI / 2, Math.PI / 2, w < 0)
     } else {
       // Dark right half
       ctx.arc(CX, CY, R, -Math.PI / 2, Math.PI / 2, false)
@@ -272,12 +284,30 @@ function MoonDisc({ t, size = 52 }) {
   )
 }
 
+// The disc reads as noticeably small on wider (tablet/desktop) viewports,
+// where the rest of the masthead's type and spacing scale up but this
+// stayed pinned at its mobile size — bump it up past the sm breakpoint.
+function useResponsiveClockSize() {
+  const [size, setSize] = useState(() => (
+    typeof window !== 'undefined' && window.innerWidth >= 640 ? 68 : 52
+  ))
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)')
+    const update = e => setSize(e.matches ? 68 : 52)
+    update(mq)
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return size
+}
+
 function CelestialClock({ t }) {
   const hour = new Date().getHours()
   const isDay = hour >= 6 && hour < 18
+  const size = useResponsiveClockSize()
   return (
     <div className="shrink-0" aria-hidden="true">
-      {isDay ? <SunDisc /> : <MoonDisc t={t} />}
+      {isDay ? <SunDisc size={size} /> : <MoonDisc t={t} size={size} />}
     </div>
   )
 }
@@ -301,8 +331,10 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
       style={{ background: `linear-gradient(180deg, ${sky.sky1} 0%, ${PAGE_BG} 100%)` }}
     >
       <div className="relative max-w-2xl mx-auto">
-        {/* Streak pill — right-aligned; no profile name chip (single-profile app) */}
-        <div className="flex items-center justify-end gap-3 mb-4">
+        {/* Today's date on the left, streak pill on the right — no profile
+            name chip here (single-profile app). */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <TodayDateLabel />
           <StreakPill streak={streak} beads={beads} t={t} />
         </div>
 

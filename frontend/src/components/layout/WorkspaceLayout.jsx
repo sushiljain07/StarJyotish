@@ -28,8 +28,18 @@ import { Skeleton } from '../ui'
 
 const DARK_ROUTES = ['/home', '/week-ahead']
 
+// Pages that render their own page-level tab bar stacked above the shared
+// BottomNav (Result.jsx's <NavBar raised /> for Birth Chart/Life Areas/
+// Analysis/Download) — these need extra trailing clearance below the
+// footer so that second bar doesn't hide it too.
+const EXTRA_BOTTOM_NAV_ROUTES = ['/kundli']
+
 function isDark(pathname) {
   return DARK_ROUTES.some(p => pathname === p || pathname.startsWith(p + '/'))
+}
+
+function hasExtraBottomNav(pathname) {
+  return EXTRA_BOTTOM_NAV_ROUTES.some(p => pathname === p || pathname.startsWith(p + '/'))
 }
 
 // Route-level loading fallback — skeleton-shaped, matching the destination
@@ -53,6 +63,7 @@ export function RouteSkeleton({ dark = false }) {
 export default function WorkspaceLayout() {
   const { pathname } = useLocation()
   const dark = isDark(pathname)
+  const extraNav = hasExtraBottomNav(pathname)
 
   return (
     <div className={`min-h-screen flex flex-col ${dark ? 'bg-night-deep' : 'bg-parchment'}`}>
@@ -66,9 +77,19 @@ export default function WorkspaceLayout() {
           </div>
         </Suspense>
       </main>
-      {/* pb-16 clears the fixed BottomNav (h-16) on mobile; md:pb-0 removes it on desktop */}
-      <div className="md:hidden h-16" aria-hidden="true" />
       <CompactFooter />
+      {/* Mobile-only trailing clearance below the footer. BottomNav is
+          `position: fixed`, so it (and the globally-mounted ScrollToTop
+          button, which reaches ~14rem up once visible on any page) always
+          overlay whatever content is at the true bottom of the page once
+          fully scrolled — a spacer *before* the footer doesn't help with
+          that, only one *after* it does. /kundli additionally stacks its
+          own raised NavBar above BottomNav, so it needs more. */}
+      <div
+        className="md:hidden"
+        style={{ height: `calc(${extraNav ? '15.5rem' : '14rem'} + env(safe-area-inset-bottom, 0px))` }}
+        aria-hidden="true"
+      />
       <BottomNav />
     </div>
   )

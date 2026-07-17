@@ -5,7 +5,7 @@
 export const DASHAS_HERO = {
   title: 'Dashas — Vedic Astrology\'s Timing System',
   subtitle:
-    'Vedic astrology's most powerful contribution to predictive work is its timing system: the Dashas. These planetary time periods answer not just "what does my chart say" but "when does it happen" — making timing central to how astrology actually works in practice.',
+    'Vedic astrology\'s most powerful contribution to predictive work is its timing system: the Dashas. These planetary time periods answer not just "what does my chart say" but "when does it happen" — making timing central to how astrology actually works in practice.',
 }
 
 export const WHAT_ARE_DASHAS = {

@@ -180,31 +180,7 @@ export default function Result() {
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
 
-          {/* Row 1 — identity */}
-          <div className="flex items-center justify-between py-2.5 gap-3">
-            <div className="min-w-0 flex items-center gap-2 overflow-hidden">
-              {input.name && (
-                <span className="font-bold text-sm text-ink leading-none truncate">{input.name}</span>
-              )}
-              <span className="text-ink-faint text-xs leading-none hidden sm:inline shrink-0">·</span>
-              <span className="text-ink-faint text-xs leading-none hidden sm:inline truncate">
-                {formatDate(input.date)} · {formatTime(input.time)}
-              </span>
-              {topic && (
-                <span className="hidden sm:inline-flex shrink-0 items-center gap-1 bg-primary-light text-primary-dark rounded-full px-2 py-0.5 text-[11px] font-medium">
-                  <TopicIcon id={topic.id} className="w-3 h-3" /> {t(`landing_topic_${topic.id}_label`)}
-                </span>
-              )}
-            </div>
-            <button
-              onClick={() => navigate(homeDestination)}
-              className="shrink-0 bg-night hover:bg-night-light text-ink-onnight text-xs font-semibold px-3 py-1.5 rounded-full transition"
-            >
-              {t('nav_back_home', 'Home')}
-            </button>
-          </div>
-
-          {/* Row 2 — chips */}
+          {/* chips */}
           <SummaryChips data={data} />
 
           {/* Row 3 — main tabs */}

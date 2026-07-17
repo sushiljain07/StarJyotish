@@ -38,7 +38,9 @@ export default function CompactFooter() {
 
   return (
     <footer className="border-t border-white/10 bg-night">
-      <div className="max-w-4xl mx-auto px-4 py-5">
+      <div className="max-w-4xl mx-auto px-4 py-5 pb-safe-offset-5 md:pb-5"
+        style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {LINKS.map(link => (
             <Link

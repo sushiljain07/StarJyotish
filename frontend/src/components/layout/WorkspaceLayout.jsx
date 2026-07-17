@@ -66,6 +66,8 @@ export default function WorkspaceLayout() {
           </div>
         </Suspense>
       </main>
+      {/* pb-16 clears the fixed BottomNav (h-16) on mobile; md:pb-0 removes it on desktop */}
+      <div className="md:hidden h-16" aria-hidden="true" />
       <CompactFooter />
       <BottomNav />
     </div>

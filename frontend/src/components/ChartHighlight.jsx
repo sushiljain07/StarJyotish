@@ -155,12 +155,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
             </p>
             <p className="text-[11px]" style={{ color: 'rgba(212,175,55,0.4)' }}>{meta.life}</p>
           </div>
-          <div className="ml-auto">
-            <span className="text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(212,175,55,0.1)', color: 'rgba(212,175,55,0.5)' }}>
-              ✦ Jyotish Guru
-            </span>
-          </div>
+
         </div>
 
         {/* Insight text */}

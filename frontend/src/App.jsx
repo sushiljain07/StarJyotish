@@ -65,6 +65,12 @@ const SagittariusGuide = lazy(() => import('./pages/learn/zodiac/Sagittarius'))
 const CapricornGuide = lazy(() => import('./pages/learn/zodiac/Capricorn'))
 const AquariusGuide = lazy(() => import('./pages/learn/zodiac/Aquarius'))
 const PiscesGuide = lazy(() => import('./pages/learn/zodiac/Pisces'))
+const NakshatrasGuide = lazy(() => import('./pages/learn/categories/Nakshatras'))
+const PlanetsGuideHub = lazy(() => import('./pages/learn/categories/Planets'))
+const HousesGuide = lazy(() => import('./pages/learn/categories/Houses'))
+const DashasGuide = lazy(() => import('./pages/learn/categories/Dashas'))
+const YogasGuide = lazy(() => import('./pages/learn/categories/Yogas'))
+const DoshasGuide = lazy(() => import('./pages/learn/categories/Doshas'))
 
 export default function App() {
   return (
@@ -121,6 +127,12 @@ export default function App() {
             <Route path="/learn/zodiac/capricorn" element={<CapricornGuide />} />
             <Route path="/learn/zodiac/aquarius" element={<AquariusGuide />} />
             <Route path="/learn/zodiac/pisces" element={<PiscesGuide />} />
+            <Route path="/learn/nakshatras" element={<NakshatrasGuide />} />
+            <Route path="/learn/planets" element={<PlanetsGuideHub />} />
+            <Route path="/learn/houses" element={<HousesGuide />} />
+            <Route path="/learn/dashas" element={<DashasGuide />} />
+            <Route path="/learn/yogas" element={<YogasGuide />} />
+            <Route path="/learn/doshas" element={<DoshasGuide />} />
             <Route path="/learn/basics/what-is-kundli" element={<WhatIsKundli />} />
             <Route path="/learn/basics/lagna-guide" element={<LagnaGuide />} />
             <Route path="/learn/basics/planets-guide" element={<PlanetsGuide />} />

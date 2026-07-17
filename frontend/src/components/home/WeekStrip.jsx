@@ -15,6 +15,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchPanchangWeek } from '../../api/astro'
+import { weekDayScore } from '../../utils/weekScore'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -32,12 +33,6 @@ const POSITIONS = [
   { x: 322, y: 52 },
   { x: 372, y: 92 },
 ]
-
-// Deterministic, stable pseudo-score in [45,93) — a display heuristic only.
-function pseudoScore(day, index) {
-  const seed = (day?.date ?? '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 11
-  return 45 + (seed % 48)
-}
 
 export default function WeekStrip({ location }) {
   const { t } = useTranslation()
@@ -64,7 +59,7 @@ export default function WeekStrip({ location }) {
   const points = week.slice(0, 7).map((day, i) => ({
     ...POSITIONS[i],
     day,
-    score: pseudoScore(day, i),
+    score: weekDayScore(day, i),
     isToday: day.date === todayStr,
   }))
 

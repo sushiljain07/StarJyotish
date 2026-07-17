@@ -872,6 +872,7 @@ def _call_groq(
                 timeout=30,
             )
             if resp.status_code == 429:
+                last_exc = RuntimeError(f"rate limited (HTTP 429) after {attempt + 1}/{retries} attempts")
                 logger.warning("Groq rate limited (attempt %d/%d), retrying…", attempt + 1, retries)
                 time.sleep(2 ** attempt)
                 continue

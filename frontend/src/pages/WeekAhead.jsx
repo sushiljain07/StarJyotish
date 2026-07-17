@@ -16,6 +16,7 @@ import CelestialBackdrop from '../components/CelestialBackdrop'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { fetchPanchangWeek } from '../api/astro'
 import { weekDayScore, weekDayScoreLabel } from '../utils/weekScore'
+import { computeWindow, minutesToLabel } from '../utils/muhurtaWindow'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -87,6 +88,8 @@ export default function WeekAhead() {
           const score = weekDayScore(day, i)
           const label = weekDayScoreLabel(score, t)
           const tithiName = day.tithi?.name
+          const nakName = typeof day.nakshatra === 'object' ? day.nakshatra?.name : day.nakshatra
+          const { bestStart, bestEnd, bestNote } = computeWindow(day, new Date(day.date + 'T00:00:00'))
           return (
             <div
               key={day.date}
@@ -98,17 +101,33 @@ export default function WeekAhead() {
                 </p>
                 <p className="font-serif text-xl text-primary-light mt-0.5">{dayNumber(day.date)}</p>
               </div>
-              <div className="flex-1 min-w-0 flex items-center gap-3">
-                <span
-                  className="font-serif text-2xl text-primary-glow shrink-0"
-                  style={{ textShadow: '0 0 12px rgba(240,203,128,0.35)' }}
-                >
-                  {score}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink-onnight">{label}</p>
-                  {tithiName && <p className="text-xs text-ink-onnight/45 truncate mt-0.5">{tithiName}</p>}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="font-serif text-2xl text-primary-glow shrink-0"
+                    style={{ textShadow: '0 0 12px rgba(240,203,128,0.35)' }}
+                  >
+                    {score}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-ink-onnight">{label}</p>
+                    {(tithiName || nakName) && (
+                      <p className="text-xs text-ink-onnight/45 truncate mt-0.5">
+                        {[tithiName, nakName].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
+                  </div>
                 </div>
+                {bestStart != null && (
+                  <p className="text-xs text-ink-onnight/70 mt-2">
+                    {t('week_page_best_window', {
+                      defaultValue: 'Best window: {{start}} – {{end}}',
+                      start: minutesToLabel(bestStart),
+                      end: minutesToLabel(bestEnd),
+                    })}
+                    {bestNote && <span className="block text-2xs text-vermillion/70 mt-0.5">{bestNote}</span>}
+                  </p>
+                )}
               </div>
             </div>
           )

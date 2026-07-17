@@ -79,15 +79,17 @@ export default function WorkspaceLayout() {
       </main>
       <CompactFooter />
       {/* Mobile-only trailing clearance below the footer. BottomNav is
-          `position: fixed`, so it (and the globally-mounted ScrollToTop
-          button, which reaches ~14rem up once visible on any page) always
-          overlay whatever content is at the true bottom of the page once
-          fully scrolled — a spacer *before* the footer doesn't help with
-          that, only one *after* it does. /kundli additionally stacks its
-          own raised NavBar above BottomNav, so it needs more. */}
+          `position: fixed` (~60-90px incl. safe-area), so it always overlays
+          whatever content is at the true bottom of the page once fully
+          scrolled — a spacer *before* the footer doesn't help with that,
+          only one *after* it does. /kundli additionally stacks its own
+          raised NavBar above BottomNav, so it needs a bit more. Sized to
+          just clear those nav bars, not the taller (and only occasionally
+          visible) ScrollToTop FAB — that one's fine overlapping the very
+          last sliver of footer while scrolling past, same as any FAB. */}
       <div
         className="md:hidden"
-        style={{ height: `calc(${extraNav ? '15.5rem' : '14rem'} + env(safe-area-inset-bottom, 0px))` }}
+        style={{ height: `calc(${extraNav ? '8rem' : '6rem'} + env(safe-area-inset-bottom, 0px))` }}
         aria-hidden="true"
       />
       <BottomNav />

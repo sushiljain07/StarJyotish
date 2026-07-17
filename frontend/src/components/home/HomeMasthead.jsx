@@ -65,10 +65,6 @@ function shortLocation(label) {
   return label.split(',')[0].trim()
 }
 
-function initials(label) {
-  return (label || '?').trim().charAt(0).toUpperCase()
-}
-
 // ── Check-in streak — a quiet, client-only ritual signal ────────────────────
 // Independent of useUserJourney's server-backed streak (which tracks card
 // reactions): this one just answers "did you open the app today, and how
@@ -261,7 +257,7 @@ function CelestialClock({ t }) {
   )
 }
 
-export default function HomeMasthead({ profile, profiles = [], location, panchang, dashaTags }) {
+export default function HomeMasthead({ profile, location, panchang, dashaTags }) {
   const { t } = useTranslation()
   const { streak, beads } = useCheckInStreak()
 
@@ -280,26 +276,8 @@ export default function HomeMasthead({ profile, profiles = [], location, panchan
       style={{ background: `linear-gradient(180deg, ${sky.sky1} 0%, ${PAGE_BG} 100%)` }}
     >
       <div className="relative max-w-2xl mx-auto">
-        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-          {profiles.length > 0 ? (
-            <div className="flex gap-1.5 flex-wrap">
-              {profiles.slice(0, 4).map(p => (
-                <span
-                  key={p.id ?? p.label}
-                  className={`flex items-center gap-1.5 text-2xs pl-1 pr-3 py-1 rounded-full ${
-                    p.label === profile?.label
-                      ? 'bg-primary/20 text-primary-light'
-                      : 'bg-white/[0.07] text-ink-onnight/55'
-                  }`}
-                >
-                  <span className="w-4 h-4 rounded-full bg-white/[0.18] flex items-center justify-center text-3xs text-ink-onnight">
-                    {initials(p.label)}
-                  </span>
-                  {p.label}
-                </span>
-              ))}
-            </div>
-          ) : <div />}
+        {/* Streak pill — right-aligned; no profile name chip (single-profile app) */}
+        <div className="flex items-center justify-end gap-3 mb-4">
           <StreakPill streak={streak} beads={beads} t={t} />
         </div>
 

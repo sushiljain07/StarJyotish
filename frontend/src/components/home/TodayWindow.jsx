@@ -1,27 +1,28 @@
 // frontend/src/components/home/TodayWindow.jsx
 //
 // "Your window today" — turns the panchang's muhurta data into one
-// practical read: a 6am–9pm timeline with the Abhijit muhurta (favorable)
-// and Rahu kaal (avoid beginnings) marked, a live "now" marker from the
-// real clock, and a plain-English "best window" line. Falls back to the
-// classical formulas (solar-midday ± 24 min for Abhijit; the 1/8th-of
-// daytime octant by weekday for Rahu kaal) when the backend hasn't
-// returned muhurtas yet, so the card never looks broken while panchang is
-// still loading — same spirit as WeekStrip's "computed, not invented"
-// rule.
+// practical read: a sunrise→sunset timeline with the Abhijit muhurta
+// (favorable) and Rahu kaal (avoid beginnings) marked, a live "now"
+// marker from the real clock, and a plain-English "best window" line.
 //
-// Below the timeline, a compact panchang summary echoes today's classical
-// limbs + sky timings as small labeled cells, skipping whatever the
-// current panchang payload doesn't have (there's no "hora" field from the
-// backend today, so that cell simply never renders). The brief lives here
-// once; "Full panchang →" carries the rest. The whole card is one CTA
-// into /panchang.
+// The timeline always spans sunrise→sunset (the Vedic day boundary) rather
+// than an arbitrary 6am–9pm clock window. This is both more accurate
+// (Rahu Kaal and Abhijit are fractions of daylight, so they only make
+// sense on a daylight axis) and more honest (the "now" marker clamps to
+// the bar edges when outside daylight hours instead of appearing stuck at 9pm).
+//
+// Falls back to 6:00am / 18:00 if panchang hasn't loaded yet.
+//
+// Fix: Rahu Kaal can overlap Abhijit Muhurta (this is a real astronomical
+// situation — Rahu takes priority). The "best window" copy excludes any
+// overlap with Rahu Kaal, so the recommended window is always clear.
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-const WINDOW_START_MIN = 6 * 60   // 6:00 am
-const WINDOW_END_MIN   = 21 * 60  // 9:00 pm
+// Fallbacks used only while panchang is still loading
+const FALLBACK_SUNRISE = 6 * 60   // 6:00 am
+const FALLBACK_SUNSET  = 18 * 60  // 6:00 pm
 
 // "6:08 AM" -> minutes since midnight. Panchang always returns 12-hour
 // strings with an AM/PM suffix (see services/panchang.py's _fmt) — same
@@ -46,8 +47,11 @@ function minutesToLabel(mins) {
   return `${h}:${String(mm).padStart(2, '0')} ${ap}`
 }
 
-function pctOf(mins) {
-  const p = (mins - WINDOW_START_MIN) / (WINDOW_END_MIN - WINDOW_START_MIN)
+// Position as % along the sunrise→sunset bar
+function pctOf(mins, sunriseMin, sunsetMin) {
+  const span = sunsetMin - sunriseMin
+  if (span <= 0) return 0
+  const p = (mins - sunriseMin) / span
   return Math.max(0, Math.min(100, p * 100))
 }
 
@@ -55,8 +59,8 @@ function pctOf(mins) {
 const RAHU_OCTANT_BY_WEEKDAY = { 0: 8, 1: 2, 2: 7, 3: 5, 4: 6, 5: 4, 6: 3 }
 
 function computeWindow(panchang) {
-  const sunrise = parseAmPm(panchang?.sunrise) ?? 6 * 60
-  const sunset  = parseAmPm(panchang?.sunset)  ?? 18 * 60
+  const sunrise = parseAmPm(panchang?.sunrise) ?? FALLBACK_SUNRISE
+  const sunset  = parseAmPm(panchang?.sunset)  ?? FALLBACK_SUNSET
   const daylight = Math.max(1, sunset - sunrise)
 
   // Trust a backend window only if it's coherent (inside daylight, start
@@ -83,7 +87,35 @@ function computeWindow(panchang) {
     rahuEnd = rahuStart + segment
   }
 
-  return { abhijitStart, abhijitEnd, rahuStart, rahuEnd }
+  // Compute the "best window" = Abhijit minus any overlap with Rahu Kaal
+  // Overlap: max(abhijitStart, rahuStart) → min(abhijitEnd, rahuEnd)
+  const overlapStart = Math.max(abhijitStart, rahuStart)
+  const overlapEnd   = Math.min(abhijitEnd, rahuEnd)
+  const hasOverlap   = overlapStart < overlapEnd
+
+  // Best window: the largest clear sub-window of Abhijit outside Rahu Kaal
+  let bestStart = abhijitStart
+  let bestEnd   = abhijitEnd
+  let bestNote  = null
+  if (hasOverlap) {
+    // Pick whichever side of the overlap is longer
+    const beforeDur = overlapStart - abhijitStart
+    const afterDur  = abhijitEnd - overlapEnd
+    if (afterDur >= beforeDur && afterDur > 0) {
+      bestStart = overlapEnd
+      bestEnd   = abhijitEnd
+    } else if (beforeDur > 0) {
+      bestStart = abhijitStart
+      bestEnd   = overlapStart
+    } else {
+      // Rahu Kaal fully covers Abhijit — no clear window
+      bestStart = null
+      bestEnd   = null
+    }
+    bestNote = 'Rahu Kaal overlaps — avoid that portion'
+  }
+
+  return { abhijitStart, abhijitEnd, rahuStart, rahuEnd, sunrise, sunset, bestStart, bestEnd, bestNote }
 }
 
 function PanchangCell({ label, value }) {
@@ -100,22 +132,24 @@ export default function TodayWindow({ panchang }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const { abhijitStart, abhijitEnd, rahuStart, rahuEnd } = useMemo(
+  const { abhijitStart, abhijitEnd, rahuStart, rahuEnd, sunrise, sunset, bestStart, bestEnd, bestNote } = useMemo(
     () => computeWindow(panchang),
     [panchang?.sunrise, panchang?.sunset, panchang?.muhurtas],
   )
 
+  // "now" marker: clamp to 2–98% so it's always visible on the bar.
+  // Before sunrise or after sunset it sits at 0% or 100% — never "stuck at 9pm".
   const nowPct = useMemo(() => {
     const now = new Date()
     const nowMin = now.getHours() * 60 + now.getMinutes()
-    const p = (nowMin - WINDOW_START_MIN) / (WINDOW_END_MIN - WINDOW_START_MIN)
+    const p = (nowMin - sunrise) / (sunset - sunrise)
     return Math.max(2, Math.min(98, p * 100))
-  }, [])
+  }, [sunrise, sunset])
 
-  const goodLeft = pctOf(abhijitStart)
-  const goodWidth = Math.max(1, pctOf(abhijitEnd) - goodLeft)
-  const avoidLeft = pctOf(rahuStart)
-  const avoidWidth = Math.max(1, pctOf(rahuEnd) - avoidLeft)
+  const goodLeft  = pctOf(abhijitStart, sunrise, sunset)
+  const goodWidth = Math.max(1, pctOf(abhijitEnd, sunrise, sunset) - goodLeft)
+  const avoidLeft  = pctOf(rahuStart, sunrise, sunset)
+  const avoidWidth = Math.max(1, pctOf(rahuEnd, sunrise, sunset) - avoidLeft)
 
   const tithiName = panchang?.tithi?.name
   const nakName = typeof panchang?.nakshatra === 'object' ? panchang?.nakshatra?.name : panchang?.nakshatra
@@ -125,12 +159,17 @@ export default function TodayWindow({ panchang }) {
     tithiName || nakName || panchang?.yoga || panchang?.karana || panchang?.sunrise || panchang?.sunset || horaName,
   )
 
+  const sunriseLabel = panchang?.sunrise ?? minutesToLabel(sunrise)
+  const sunsetLabel  = panchang?.sunset  ?? minutesToLabel(sunset)
+
   return (
     <button
       onClick={() => navigate('/panchang')}
       className="w-full text-left bg-white/[0.045] border border-white/[0.09] rounded-card p-5 hover:border-primary/30 transition"
     >
+      {/* Timeline bar: spans sunrise → sunset */}
       <div className="relative h-3.5 rounded-full bg-white/[0.06] mx-1 mt-2 mb-2">
+        {/* Abhijit Muhurta — favorable (golden) */}
         <div
           className="absolute top-0 h-full rounded-full"
           style={{
@@ -140,10 +179,12 @@ export default function TodayWindow({ panchang }) {
             boxShadow: '0 0 12px rgba(240,203,128,0.35)',
           }}
         />
+        {/* Rahu Kaal — avoid (red) */}
         <div
           className="absolute top-0 h-full rounded-full bg-vermillion/40"
           style={{ left: `${avoidLeft}%`, width: `${avoidWidth}%` }}
         />
+        {/* Now marker */}
         <div
           className="absolute -top-1.5 w-0.5 h-[26px] bg-white rounded-sm motion-reduce:transition-none"
           style={{ left: `${nowPct}%`, boxShadow: '0 0 8px rgba(255,255,255,0.8)' }}
@@ -154,8 +195,10 @@ export default function TodayWindow({ panchang }) {
         </div>
       </div>
 
+      {/* Axis labels: sunrise and sunset times */}
       <div className="flex justify-between text-3xs text-ink-faint px-1">
-        <span>6 am</span><span>noon</span><span>9 pm</span>
+        <span>☀ {sunriseLabel}</span>
+        <span>{sunsetLabel} ☀</span>
       </div>
 
       <div className="flex gap-5 mt-3 text-2xs text-ink-onnight/60 flex-wrap">
@@ -169,15 +212,24 @@ export default function TodayWindow({ panchang }) {
         </span>
       </div>
 
-      <p className="text-sm text-ink-onnight mt-3">
-        {t('home_window_best', {
-          defaultValue: 'Best window: {{start}} – {{end}}',
-          start: minutesToLabel(abhijitStart),
-          end: minutesToLabel(abhijitEnd),
-        })}
-        {' — '}
-        {t('home_window_best_hint', 'sign, send, or start it here.')}
-      </p>
+      {bestStart != null ? (
+        <p className="text-sm text-ink-onnight mt-3">
+          {t('home_window_best', {
+            defaultValue: 'Best window: {{start}} – {{end}}',
+            start: minutesToLabel(bestStart),
+            end: minutesToLabel(bestEnd),
+          })}
+          {' — '}
+          {t('home_window_best_hint', 'sign, send, or start it here.')}
+          {bestNote && (
+            <span className="block text-2xs text-vermillion/70 mt-0.5">{bestNote}</span>
+          )}
+        </p>
+      ) : (
+        <p className="text-sm text-ink-onnight/60 mt-3">
+          Abhijit Muhurta falls within Rahu Kaal today — consider waiting for tomorrow's window.
+        </p>
+      )}
 
       {hasSummary && (
         <div className="grid grid-cols-3 gap-x-3 gap-y-2.5 mt-4 pt-4 border-t border-white/[0.08]">

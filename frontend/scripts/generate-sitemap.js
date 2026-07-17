@@ -28,6 +28,12 @@ const PUBLIC_ROUTES = [
   { path: '/learn/zodiac',         changefreq: 'monthly', priority: '0.8' },
   { path: '/learn/zodiac/aries',   changefreq: 'monthly', priority: '0.8' },
   { path: '/learn/zodiac/taurus',  changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/nakshatras',     changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/planets',        changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/houses',         changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/dashas',         changefreq: 'monthly', priority: '0.8' },
+  { path: '/learn/yogas',          changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/doshas',         changefreq: 'monthly', priority: '0.7' },
   // Future zodiac sign pages: /learn/zodiac/gemini, /learn/zodiac/cancer, ...
   // Add each here when its page ships.
   // Blog article slugs are managed dynamically via admin dashboard.

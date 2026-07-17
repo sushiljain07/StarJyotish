@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import { StateBlock } from '../components/ui'
-import { formatDate, formatTime } from '../utils/format'
 
 const AskChart = lazy(() => import('../components/AskChart'))
 
@@ -30,29 +29,10 @@ export default function AskPage() {
       <Seo title="Ask Your Chart" description="Ask any question about your Vedic birth chart." path="/ask" noindex />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between py-2.5 gap-3">
-            <div className="min-w-0 flex items-center gap-2 overflow-hidden">
-              {input.name && (
-                <span className="font-bold text-sm text-ink leading-none truncate">{input.name}</span>
-              )}
-              <span className="text-ink-faint text-xs leading-none hidden sm:inline shrink-0">·</span>
-              <span className="text-ink-faint text-xs leading-none hidden sm:inline truncate">
-                {formatDate(input.date)} · {formatTime(input.time)}
-              </span>
-            </div>
-            <button
-              onClick={() => navigate('/kundli', { state })}
-              className="shrink-0 bg-night hover:bg-night-light text-ink-onnight text-xs font-semibold px-3 py-1.5 rounded-full transition"
-            >
-              ← Chart
-            </button>
-          </div>
-          <div className="border-t border-line/40 pt-1 pb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
-              Ask Your Chart
-            </p>
-          </div>
+        <div className="max-w-5xl mx-auto px-4 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
+            Ask Your Chart
+          </p>
         </div>
       </div>
 

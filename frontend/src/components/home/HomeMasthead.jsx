@@ -212,21 +212,46 @@ function MoonDisc({ t, size = 52 }) {
     const CX = size / 2
     const CY = size / 2
 
-    // Canvas fillStyle needs a literal color (no Tailwind classes reach a
-    // <canvas> 2D context) — these two are the primary-light and night
-    // token hex values, reused rather than invented.
     ctx.clearRect(0, 0, size, size)
+
+    // Step 1: draw the full lit disc
     ctx.fillStyle = '#FBF0DC'
     ctx.beginPath()
     ctx.arc(CX, CY, R, 0, Math.PI * 2)
     ctx.fill()
 
-    // Dark side — same terminator-ellipse trick as the mock's moonCanvas.
+    // Step 2: paint the dark (unlit) portion over the top.
+    //
+    // The terminator divides the disc into a lit crescent and a dark region.
+    // We always draw the dark half that faces away from the sun, then add or
+    // subtract the terminator ellipse depending on phase.
+    //
+    // waxing (age < 14.75 days): sun is on the right → lit crescent on right
+    //   • dark covers left semicircle + the right portion beyond the terminator
+    //   • terminator ellipse width = R * (1 - 2*illum), positive = bulges left
+    //
+    // waning (age ≥ 14.75 days): sun is on the left → lit crescent on left
+    //   • dark covers right semicircle + left portion beyond terminator
+    //   • terminator ellipse width = R * (2*illum - 1), positive = bulges right
+    //
+    // ellipse x-radius: at new moon illum≈0 → w≈R (fully dark);
+    //                   at full moon illum≈1 → w≈R (fully lit, dark side gone);
+    //                   at quarter moon illum≈0.5 → w≈0 (straight terminator).
     ctx.fillStyle = '#171B33'
     ctx.beginPath()
-    ctx.arc(CX, CY, R, Math.PI / 2, -Math.PI / 2, waxing)
-    const w = R * (1 - 2 * illum)
-    ctx.ellipse(CX, CY, Math.abs(w), R, 0, -Math.PI / 2, Math.PI / 2, waxing ? w < 0 : w > 0)
+    if (waxing) {
+      // Dark left half
+      ctx.arc(CX, CY, R, Math.PI / 2, -Math.PI / 2, false)
+      // Terminator ellipse: positive w means the ellipse curves further left
+      // (more dark = less illum); negative w curves right (less dark = more illum)
+      const w = R * (1 - 2 * illum)   // >0 near new moon, <0 near full moon
+      ctx.ellipse(CX, CY, Math.abs(w), R, 0, -Math.PI / 2, Math.PI / 2, w > 0)
+    } else {
+      // Dark right half
+      ctx.arc(CX, CY, R, -Math.PI / 2, Math.PI / 2, false)
+      const w = R * (2 * illum - 1)   // >0 near full moon, <0 near new moon
+      ctx.ellipse(CX, CY, Math.abs(w), R, 0, Math.PI / 2, -Math.PI / 2, w > 0)
+    }
     ctx.fill()
   }, [size, illum, waxing])
 

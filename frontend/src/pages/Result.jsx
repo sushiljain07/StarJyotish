@@ -32,16 +32,16 @@ function SummaryChips({ data }) {
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
-    <div className="flex gap-1.5 py-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <span className="shrink-0 bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
+    <div className="flex flex-wrap gap-1.5 py-2">
+      <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         Lagna: {data.ascendant.sign}
       </span>
       {moon && (
-        <span className="shrink-0 bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
+        <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
           Rashi: {moon.sign}
         </span>
       )}
-      <span className="shrink-0 bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
+      <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         Mahadasha: {md.planet}
       </span>
     </div>

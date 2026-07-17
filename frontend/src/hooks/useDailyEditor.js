@@ -65,6 +65,7 @@ function getOrCreateVariation() {
 export function useDailyEditor(profile, panchang, lang = 'en') {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [refreshTick, setRefreshTick] = useState(0)
   const variationRef = useRef(null)
 
   const md = profile?.chart?.dasha?.current_mahadasha
@@ -142,19 +143,20 @@ export function useDailyEditor(profile, panchang, lang = 'en') {
 
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileKey, md?.planet, lang, Boolean(panchang?.muhurtas)])
+  }, [profileKey, md?.planet, lang, Boolean(panchang?.muhurtas), refreshTick])
 
-  // Expose a manual refresh for the pull-to-refresh or "Show me something else" button
+  // Expose a manual refresh for the pull-to-refresh or "Different insight"
+  // button. This only needs to invalidate variationRef and bump refreshTick
+  // (a dependency of the fetch effect above) — the effect itself derives the
+  // next variation via getOrCreateVariation() once SESSION_TIME_KEY is
+  // stale, so incrementing SESSION_VAR_KEY here too would double-advance it.
   function requestRefresh() {
     try {
-      const current = parseInt(localStorage.getItem(SESSION_VAR_KEY) || '0', 10)
-      const next = (current + 1) % 20
-      localStorage.setItem(SESSION_VAR_KEY, String(next))
-      sessionStorage.setItem('sj_this_session_var', String(next))
       sessionStorage.setItem(SESSION_TIME_KEY, '0') // force new session on next read
-      variationRef.current = null
-      setData(null)
     } catch { /* ignore */ }
+    variationRef.current = null
+    setData(null)
+    setRefreshTick(t => t + 1)
   }
 
   return { edition: data, loading, requestRefresh, variation: variationRef.current ?? 0 }

@@ -65,10 +65,6 @@ function shortLocation(label) {
   return label.split(',')[0].trim()
 }
 
-function initials(label) {
-  return (label || '?').trim().charAt(0).toUpperCase()
-}
-
 // ── Check-in streak — a quiet, client-only ritual signal ────────────────────
 // Independent of useUserJourney's server-backed streak (which tracks card
 // reactions): this one just answers "did you open the app today, and how
@@ -261,7 +257,7 @@ function CelestialClock({ t }) {
   )
 }
 
-export default function HomeMasthead({ profile, profiles = [], location, panchang, dashaTags }) {
+export default function HomeMasthead({ profile, location, panchang, dashaTags }) {
   const { t } = useTranslation()
   const { streak, beads } = useCheckInStreak()
 

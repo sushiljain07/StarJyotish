@@ -146,13 +146,18 @@ export default function PersonalHome() {
       navigate('/career-report')
       return
     }
-    // Finance, relationship, health → Life Areas tab on the kundli page
-    navigate('/kundli', {
+    // Finance, relationship, health → /insights with topic set,
+    // which opens TopicReportTab for the matching report endpoint.
+    navigate('/insights', {
       state: {
         data: profile.chart,
-        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
-        activeTab: 'divisional',
-        activeSubtab: topicId,
+        input: {
+          name: profile.label,
+          date: profile.birth_date,
+          time: profile.birth_time,
+          place: profile.place,
+          topic: topicId,
+        },
       },
     })
   }

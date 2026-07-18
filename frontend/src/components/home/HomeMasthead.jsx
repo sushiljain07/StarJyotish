@@ -187,6 +187,8 @@ function TithiLine({ panchang, t }) {
 // background string — but the two stops are exactly the primary-glow and
 // primary token hex values, not invented colors.
 function SunDisc({ size = 52 }) {
+  const glow = Math.round(size * 0.45)
+  const spread = Math.round(size * 0.08)
   return (
     <div
       className="rounded-full"
@@ -194,7 +196,7 @@ function SunDisc({ size = 52 }) {
         width: size,
         height: size,
         background: 'radial-gradient(circle at 35% 32%, #F0CB80 0%, #D9A441 100%)',
-        boxShadow: '0 0 22px 4px rgba(217,164,65,0.4)',
+        boxShadow: `0 0 ${glow}px ${spread}px rgba(217,164,65,0.45)`,
       }}
       aria-hidden="true"
     />
@@ -273,7 +275,7 @@ function MoonDisc({ t, size = 52 }) {
         ref={canvasRef}
         width={size}
         height={size}
-        style={{ filter: 'drop-shadow(0 0 14px rgba(240,203,128,0.28))' }}
+        style={{ filter: `drop-shadow(0 0 ${Math.round(size * 0.27)}px rgba(240,203,128,0.32))` }}
       />
       <p className="text-3xs text-ink-onnight/45 mt-1 whitespace-nowrap">
         {waxing ? t('home_moon_waxing', 'Waxing') : t('home_moon_waning', 'Waning')}
@@ -288,15 +290,20 @@ function MoonDisc({ t, size = 52 }) {
 // where the rest of the masthead's type and spacing scale up but this
 // stayed pinned at its mobile size — bump it up past the sm breakpoint.
 function useResponsiveClockSize() {
-  const [size, setSize] = useState(() => (
-    typeof window !== 'undefined' && window.innerWidth >= 640 ? 68 : 52
-  ))
+  const getSize = () => {
+    if (typeof window === 'undefined') return 52
+    const w = window.innerWidth
+    if (w >= 1280) return 130  // xl — large desktop
+    if (w >= 1024) return 110  // lg — desktop
+    if (w >= 768)  return 90   // md — tablet
+    if (w >= 640)  return 72   // sm — large phone
+    return 52                   // mobile
+  }
+  const [size, setSize] = useState(getSize)
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 640px)')
-    const update = e => setSize(e.matches ? 68 : 52)
-    update(mq)
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
+    const update = () => setSize(getSize())
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
   }, [])
   return size
 }
@@ -306,7 +313,7 @@ function CelestialClock({ t }) {
   const isDay = hour >= 6 && hour < 18
   const size = useResponsiveClockSize()
   return (
-    <div className="shrink-0" aria-hidden="true">
+    <div className="shrink-0 flex items-center justify-center" aria-hidden="true">
       {isDay ? <SunDisc size={size} /> : <MoonDisc t={t} size={size} />}
     </div>
   )

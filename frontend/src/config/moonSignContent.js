@@ -88,19 +88,19 @@ export const CHANDRASHTAMA = {
 
 export const MOON_FAQ = [
   {
-    q: 'How is my Moon sign different from my Sun sign?',
-    a: 'Your Sun sign is determined by where the Sun was on your birthday — it changes sign roughly once a month and is the same for everyone born in the same ~30-day period. Your Moon sign is determined by where the Moon was at your exact time and date of birth — it changes sign every 2.25 days, making it far more personally specific. In Vedic astrology, the Moon sign is considered at least as important as the Sun sign for understanding personality, and more important for understanding emotional life and timing.',
+    question: 'How is my Moon sign different from my Sun sign?',
+    answer: 'Your Sun sign is determined by where the Sun was on your birthday — it changes sign roughly once a month and is the same for everyone born in the same ~30-day period. Your Moon sign is determined by where the Moon was at your exact time and date of birth — it changes sign every 2.25 days, making it far more personally specific. In Vedic astrology, the Moon sign is considered at least as important as the Sun sign for understanding personality, and more important for understanding emotional life and timing.',
   },
   {
-    q: 'Can two people with the same Moon sign have very different emotional lives?',
-    a: 'Yes — because the Moon sign is just one factor. The sign and house placement of the Moon, whether the Moon is waxing or waning, planets aspecting or conjunct the Moon, and the overall chart context all modify how the Moon sign expresses itself. Two Scorpio Moons with very different charts can operate quite differently, even though they share the same core emotional vocabulary (depth, intensity, need for truth).',
+    question: 'Can two people with the same Moon sign have very different emotional lives?',
+    answer: 'Yes — because the Moon sign is just one factor. The sign and house placement of the Moon, whether the Moon is waxing or waning, planets aspecting or conjunct the Moon, and the overall chart context all modify how the Moon sign expresses itself. Two Scorpio Moons with very different charts can operate quite differently, even though they share the same core emotional vocabulary (depth, intensity, need for truth).',
   },
   {
-    q: 'What is the Nakshatra, and how does it relate to my Moon sign?',
-    a: 'Each of the 12 zodiac signs spans 30°. Each sign contains two or three Nakshatras — the 27 lunar mansions, each spanning 13°20\'. Your Moon Nakshatra is the specific mansion within your Moon sign. It adds another layer of detail: two people with Moon in Taurus might have the Moon in Rohini (sensuous, magnetic, fertile) or Mrigashira (curious, restless, seeking). The Moon Nakshatra is also what determines which planet\'s Dasha you begin life in — the specific starting point of your timing cycle.',
+    question: 'What is the Nakshatra, and how does it relate to my Moon sign?',
+    answer: 'Each of the 12 zodiac signs spans 30°. Each sign contains two or three Nakshatras — the 27 lunar mansions, each spanning 13°20\'. Your Moon Nakshatra is the specific mansion within your Moon sign. It adds another layer of detail: two people with Moon in Taurus might have the Moon in Rohini (sensuous, magnetic, fertile) or Mrigashira (curious, restless, seeking). The Moon Nakshatra is also what determines which planet\'s Dasha you begin life in — the specific starting point of your timing cycle.',
   },
   {
-    q: 'My Moon sign description doesn\'t resonate with me at all. What does that mean?',
-    a: 'This happens for a few reasons. First, the Moon sign is the interior emotional default — it describes how you feel privately, not how you project yourself. If you have a very strong Lagna or Sun that differs, you may identify more with those. Second, if the Moon is closely conjunct another planet, that planet modifies the Moon\'s expression significantly. Third, if you don\'t know your exact birth time, your Moon sign itself may be uncertain if you were born near a sign change. It is worth checking.',
+    question: 'My Moon sign description doesn\'t resonate with me at all. What does that mean?',
+    answer: 'This happens for a few reasons. First, the Moon sign is the interior emotional default — it describes how you feel privately, not how you project yourself. If you have a very strong Lagna or Sun that differs, you may identify more with those. Second, if the Moon is closely conjunct another planet, that planet modifies the Moon\'s expression significantly. Third, if you don\'t know your exact birth time, your Moon sign itself may be uncertain if you were born near a sign change. It is worth checking.',
   },
 ]

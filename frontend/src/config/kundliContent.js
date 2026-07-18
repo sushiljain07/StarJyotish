@@ -96,19 +96,19 @@ export const WHAT_KUNDLI_CANNOT_TELL = {
 
 export const KUNDLI_FAQ = [
   {
-    q: 'What is the difference between a Kundli and a Western horoscope?',
-    a: 'Western astrology uses the Tropical zodiac, which is fixed to the seasons. Vedic astrology uses the Sidereal zodiac, which tracks actual star positions. This creates roughly a 23° shift between the two systems, meaning your Sun sign in Western astrology is often different from your Sun sign in Vedic astrology. Vedic astrology also places far more emphasis on the Moon sign and Lagna (Ascendant) than Western sun-sign astrology does.',
+    question: 'What is the difference between a Kundli and a Western horoscope?',
+    answer: 'Western astrology uses the Tropical zodiac, which is fixed to the seasons. Vedic astrology uses the Sidereal zodiac, which tracks actual star positions. This creates roughly a 23° shift between the two systems, meaning your Sun sign in Western astrology is often different from your Sun sign in Vedic astrology. Vedic astrology also places far more emphasis on the Moon sign and Lagna (Ascendant) than Western sun-sign astrology does.',
   },
   {
-    q: 'What if I don\'t know my exact birth time?',
-    a: 'A chart without an exact birth time is incomplete. The Lagna (Ascendant) — which changes every two hours — cannot be determined, and all twelve houses are uncertain. Some astrologers use "birth time rectification" techniques to narrow down the time based on life events, but this is an advanced practice. The most reliable step is to obtain your birth certificate or ask a family member who was present.',
+    question: 'What if I don\'t know my exact birth time?',
+    answer: 'A chart without an exact birth time is incomplete. The Lagna (Ascendant) — which changes every two hours — cannot be determined, and all twelve houses are uncertain. Some astrologers use "birth time rectification" techniques to narrow down the time based on life events, but this is an advanced practice. The most reliable step is to obtain your birth certificate or ask a family member who was present.',
   },
   {
-    q: 'Does the Kundli predict what will happen to me?',
-    a: 'Not in a deterministic sense. A Kundli maps the terrain of your life — natural tendencies, timing windows, areas of strength and challenge. It does not run a fixed script. Many experienced astrologers prefer the language of "predispositions" and "timing": a chart might show a period strongly favourable for career growth, but that growth still requires action, not just waiting.',
+    question: 'Does the Kundli predict what will happen to me?',
+    answer: 'Not in a deterministic sense. A Kundli maps the terrain of your life — natural tendencies, timing windows, areas of strength and challenge. It does not run a fixed script. Many experienced astrologers prefer the language of "predispositions" and "timing": a chart might show a period strongly favourable for career growth, but that growth still requires action, not just waiting.',
   },
   {
-    q: 'Can I read my own Kundli, or do I need an astrologer?',
-    a: 'You can absolutely learn to read your own chart — that is exactly what this Knowledge Center is built for. The Basics series here (four guides, including this one) gives you the foundation. A trained astrologer brings years of pattern recognition that a beginner cannot replicate, but understanding your own Lagna, Moon sign, and major planetary placements is entirely within reach for anyone willing to spend a few hours learning.',
+    question: 'Can I read my own Kundli, or do I need an astrologer?',
+    answer: 'You can absolutely learn to read your own chart — that is exactly what this Knowledge Center is built for. The Basics series here (four guides, including this one) gives you the foundation. A trained astrologer brings years of pattern recognition that a beginner cannot replicate, but understanding your own Lagna, Moon sign, and major planetary placements is entirely within reach for anyone willing to spend a few hours learning.',
   },
 ]

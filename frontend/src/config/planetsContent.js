@@ -116,19 +116,19 @@ export const PLANETARY_STRENGTH = {
 
 export const PLANETS_FAQ = [
   {
-    q: 'Why does Vedic astrology use 9 planets when there are more in the solar system?',
-    a: 'Vedic astrology developed its system based on the visible sky — the grahas observable to the naked eye plus the lunar nodes (Rahu and Ketu). Uranus, Neptune, and Pluto were not discovered until the telescope era and are not part of classical Vedic calculation, though some modern Vedic astrologers incorporate them as supplementary factors.',
+    question: 'Why does Vedic astrology use 9 planets when there are more in the solar system?',
+    answer: 'Vedic astrology developed its system based on the visible sky — the grahas observable to the naked eye plus the lunar nodes (Rahu and Ketu). Uranus, Neptune, and Pluto were not discovered until the telescope era and are not part of classical Vedic calculation, though some modern Vedic astrologers incorporate them as supplementary factors.',
   },
   {
-    q: 'What does it mean when a planet is retrograde?',
-    a: 'A retrograde planet appears to move backward in the sky from Earth\'s perspective. In Vedic astrology, a retrograde planet is considered stronger in some respects (its energy is more internalised and intense) but also more difficult to express cleanly outward. Saturn retrograde, for example, can intensify its Karmic lessons. Jupiter retrograde often deepens philosophical and spiritual questioning.',
+    question: 'What does it mean when a planet is retrograde?',
+    answer: 'A retrograde planet appears to move backward in the sky from Earth\'s perspective. In Vedic astrology, a retrograde planet is considered stronger in some respects (its energy is more internalised and intense) but also more difficult to express cleanly outward. Saturn retrograde, for example, can intensify its Karmic lessons. Jupiter retrograde often deepens philosophical and spiritual questioning.',
   },
   {
-    q: 'Can a malefic planet be good for my chart?',
-    a: 'Absolutely. The "natural benefic / natural malefic" classification is just a baseline. What matters more is a planet\'s "functional" role for your specific Lagna — which houses it rules — and its placement. Saturn, a natural malefic, is an excellent Yoga-karaka (a planet that simultaneously rules a Kendra and a Trikona) for Taurus and Libra Lagnas. A naturally benefic Jupiter can actually harm certain charts by ruling the 6th or 8th house.',
+    question: 'Can a malefic planet be good for my chart?',
+    answer: 'Absolutely. The "natural benefic / natural malefic" classification is just a baseline. What matters more is a planet\'s "functional" role for your specific Lagna — which houses it rules — and its placement. Saturn, a natural malefic, is an excellent Yoga-karaka (a planet that simultaneously rules a Kendra and a Trikona) for Taurus and Libra Lagnas. A naturally benefic Jupiter can actually harm certain charts by ruling the 6th or 8th house.',
   },
   {
-    q: 'What is a planet\'s "dignity" and why does it matter?',
-    a: 'Dignity refers to how comfortable and strong a planet is in its current sign — from exaltation (peak strength) through own sign, friend\'s sign, neutral sign, enemy\'s sign, to debilitation (weakest). A planet in dignity expresses its significations clearly and positively. A planet out of dignity still works, but with more friction, misdirection, or need for effort to access its gifts.',
+    question: 'What is a planet\'s "dignity" and why does it matter?',
+    answer: 'Dignity refers to how comfortable and strong a planet is in its current sign — from exaltation (peak strength) through own sign, friend\'s sign, neutral sign, enemy\'s sign, to debilitation (weakest). A planet in dignity expresses its significations clearly and positively. A planet out of dignity still works, but with more friction, misdirection, or need for effort to access its gifts.',
   },
 ]

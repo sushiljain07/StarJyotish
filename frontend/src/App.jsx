@@ -55,6 +55,21 @@ const MoonSignGuide = lazy(() => import('./pages/learn/basics/MoonSignGuide'))
 const NewToVedic = lazy(() => import('./pages/learn/paths/NewToVedic'))
 const CareerPath = lazy(() => import('./pages/learn/paths/CareerPath'))
 const MarriagePath = lazy(() => import('./pages/learn/paths/MarriagePath'))
+// Career Direction individual guides
+const CareerTenthHouse = lazy(() => import('./pages/learn/career/TenthHouse'))
+const CareerTenthLord = lazy(() => import('./pages/learn/career/TenthLord'))
+const CareerSaturnAndSun = lazy(() => import('./pages/learn/career/SaturnAndSun'))
+const CareerD10Dashamsha = lazy(() => import('./pages/learn/career/D10Dashamsha'))
+const CareerDashasTiming = lazy(() => import('./pages/learn/career/DashasTiming'))
+const CareerRajyogas = lazy(() => import('./pages/learn/career/Rajyogas'))
+// Marriage & Compatibility individual guides
+const MarriageSeventhHouse = lazy(() => import('./pages/learn/marriage/SeventhHouse'))
+const MarriageVenusJupiter = lazy(() => import('./pages/learn/marriage/VenusJupiter'))
+const MarriageD9Navamsa = lazy(() => import('./pages/learn/marriage/D9Navamsa'))
+const MarriageGunaMilan = lazy(() => import('./pages/learn/marriage/GunaMilan'))
+const MarriageMangalDosha = lazy(() => import('./pages/learn/marriage/MangalDosha'))
+const MarriageTiming = lazy(() => import('./pages/learn/marriage/MarriageTiming'))
+const MarriageSynastry = lazy(() => import('./pages/learn/marriage/Synastry'))
 const GeminiGuide = lazy(() => import('./pages/learn/zodiac/Gemini'))
 const CancerGuide = lazy(() => import('./pages/learn/zodiac/Cancer'))
 const LeoGuide = lazy(() => import('./pages/learn/zodiac/Leo'))
@@ -140,6 +155,19 @@ export default function App() {
             <Route path="/learn/paths/new-to-vedic" element={<NewToVedic />} />
             <Route path="/learn/paths/career-direction" element={<CareerPath />} />
             <Route path="/learn/paths/marriage-compatibility" element={<MarriagePath />} />
+            <Route path="/learn/career/10th-house" element={<CareerTenthHouse />} />
+            <Route path="/learn/career/10th-lord" element={<CareerTenthLord />} />
+            <Route path="/learn/career/saturn-and-sun" element={<CareerSaturnAndSun />} />
+            <Route path="/learn/career/d10-dashamsha" element={<CareerD10Dashamsha />} />
+            <Route path="/learn/career/dashas-timing" element={<CareerDashasTiming />} />
+            <Route path="/learn/career/rajyogas" element={<CareerRajyogas />} />
+            <Route path="/learn/marriage/7th-house" element={<MarriageSeventhHouse />} />
+            <Route path="/learn/marriage/venus-jupiter" element={<MarriageVenusJupiter />} />
+            <Route path="/learn/marriage/d9-navamsa" element={<MarriageD9Navamsa />} />
+            <Route path="/learn/marriage/guna-milan" element={<MarriageGunaMilan />} />
+            <Route path="/learn/marriage/mangal-dosha" element={<MarriageMangalDosha />} />
+            <Route path="/learn/marriage/marriage-timing" element={<MarriageTiming />} />
+            <Route path="/learn/marriage/synastry" element={<MarriageSynastry />} />
             {/* Must stay last: React Router matches routes in declaration
                 order, so anything above this always wins first. */}
             <Route path="*" element={<NotFound />} />

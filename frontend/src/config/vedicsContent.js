@@ -81,20 +81,20 @@ export const VEDICS_AFTER = {
 
 export const VEDICS_FAQ = [
   {
-    q: 'Do I need to read these in order?',
-    a: 'Yes, for this path. Each guide builds on the previous one — guide 2 assumes you understand what a house is (guide 1), guide 3 assumes you know what the Lagna is (guide 2), and so on. If you already have some background, you can start from wherever feels unfamiliar.',
+    question: 'Do I need to read these in order?',
+    answer: 'Yes, for this path. Each guide builds on the previous one — guide 2 assumes you understand what a house is (guide 1), guide 3 assumes you know what the Lagna is (guide 2), and so on. If you already have some background, you can start from wherever feels unfamiliar.',
   },
   {
-    q: 'Do I need to generate my Kundli first?',
-    a: 'Not to read the guides — they are self-contained. But having your chart open alongside makes everything more concrete. You can generate your free Kundli on Star Jyotish and refer to it as you work through each guide. Most concepts land much faster when you can see them in your own chart.',
+    question: 'Do I need to generate my Kundli first?',
+    answer: 'Not to read the guides — they are self-contained. But having your chart open alongside makes everything more concrete. You can generate your free Kundli on Star Jyotish and refer to it as you work through each guide. Most concepts land much faster when you can see them in your own chart.',
   },
   {
-    q: 'How is Vedic astrology different from Western astrology?',
-    a: 'The main structural differences are: Vedic astrology uses the Sidereal zodiac (aligned to actual star positions) rather than the Tropical zodiac (aligned to seasons), which shifts most sign placements by about 23°; it centres on the Moon sign and Ascendant rather than the Sun sign; it uses a whole-sign house system; and it has a detailed timing system (Vimshottari Dasha) that Western astrology does not. Guide 4 in this path covers the Moon sign difference in detail.',
+    question: 'How is Vedic astrology different from Western astrology?',
+    answer: 'The main structural differences are: Vedic astrology uses the Sidereal zodiac (aligned to actual star positions) rather than the Tropical zodiac (aligned to seasons), which shifts most sign placements by about 23°; it centres on the Moon sign and Ascendant rather than the Sun sign; it uses a whole-sign house system; and it has a detailed timing system (Vimshottari Dasha) that Western astrology does not. Guide 4 in this path covers the Moon sign difference in detail.',
   },
   {
-    q: 'How long does this path take to complete?',
-    a: 'About 38 minutes if you read all five guides back to back (6 + 7 + 9 + 6 + 10 minutes). Most people find it useful to pause after each guide, look at their own chart, and sit with what they have just read before moving on.',
+    question: 'How long does this path take to complete?',
+    answer: 'About 38 minutes if you read all five guides back to back (6 + 7 + 9 + 6 + 10 minutes). Most people find it useful to pause after each guide, look at their own chart, and sit with what they have just read before moving on.',
   },
 ]
 

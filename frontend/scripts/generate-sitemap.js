@@ -38,6 +38,19 @@ const PUBLIC_ROUTES = [
   // Add each here when its page ships.
   // Blog article slugs are managed dynamically via admin dashboard.
   // Add new article URLs here when published so they get indexed.
+  { path: '/learn/career/10th-house',        changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/career/10th-lord',         changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/career/saturn-and-sun',    changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/career/d10-dashamsha',     changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/career/dashas-timing',     changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/career/rajyogas',          changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/7th-house',       changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/venus-jupiter',   changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/d9-navamsa',      changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/guna-milan',      changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/mangal-dosha',    changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/marriage-timing', changefreq: 'monthly', priority: '0.7' },
+  { path: '/learn/marriage/synastry',        changefreq: 'monthly', priority: '0.7' },
   { path: '/about',         changefreq: 'monthly', priority: '0.5' },
   { path: '/faq',           changefreq: 'monthly', priority: '0.6' },
   { path: '/contact',       changefreq: 'yearly',  priority: '0.4' },

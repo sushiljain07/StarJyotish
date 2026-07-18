@@ -90,19 +90,19 @@ export const LAGNA_IN_PRACTICE = {
 
 export const LAGNA_FAQ = [
   {
-    q: 'What if I don\'t know my exact birth time — can I still know my Lagna?',
-    a: 'Not reliably, no. The Lagna changes roughly every 2 hours, so without a birth time within at least 30 minutes of accuracy, the Lagna cannot be confirmed. Astrologers use a technique called birth-time rectification to narrow it down using significant life events, but this is advanced work. The best step is to check your birth certificate or ask a family member.',
+    question: 'What if I don\'t know my exact birth time — can I still know my Lagna?',
+    answer: 'Not reliably, no. The Lagna changes roughly every 2 hours, so without a birth time within at least 30 minutes of accuracy, the Lagna cannot be confirmed. Astrologers use a technique called birth-time rectification to narrow it down using significant life events, but this is advanced work. The best step is to check your birth certificate or ask a family member.',
   },
   {
-    q: 'My Western astrology "rising sign" is different from my Vedic Lagna — which is correct?',
-    a: 'Both are internally consistent within their own systems. Western astrology uses the Tropical zodiac (fixed to seasons), while Vedic astrology uses the Sidereal zodiac (fixed to actual star positions). The roughly 23° difference between the two means your Tropical Ascendant and your Vedic Lagna are usually different signs. This guide is about the Vedic Lagna.',
+    question: 'My Western astrology "rising sign" is different from my Vedic Lagna — which is correct?',
+    answer: 'Both are internally consistent within their own systems. Western astrology uses the Tropical zodiac (fixed to seasons), while Vedic astrology uses the Sidereal zodiac (fixed to actual star positions). The roughly 23° difference between the two means your Tropical Ascendant and your Vedic Lagna are usually different signs. This guide is about the Vedic Lagna.',
   },
   {
-    q: 'Can the Lagna change if I travel to a different country?',
-    a: 'No. Your Lagna is set at birth and does not change based on where you move later. However, a technique called Astrocartography (not a classical Vedic tool, but used by some astrologers) maps which planets are emphasised in different geographic locations — separate from the Lagna itself.',
+    question: 'Can the Lagna change if I travel to a different country?',
+    answer: 'No. Your Lagna is set at birth and does not change based on where you move later. However, a technique called Astrocartography (not a classical Vedic tool, but used by some astrologers) maps which planets are emphasised in different geographic locations — separate from the Lagna itself.',
   },
   {
-    q: 'Is the Lagna more important than the Moon sign in Vedic astrology?',
-    a: 'Both are foundational, and traditional Vedic practice reads charts from all three reference points: Lagna, Moon, and Sun. The Lagna governs physical constitution, personality, and the house structure. The Moon sign governs the mind and emotions, and anchors the Vimshottari Dasha timing system. Different astrologers weight them differently depending on the question being answered.',
+    question: 'Is the Lagna more important than the Moon sign in Vedic astrology?',
+    answer: 'Both are foundational, and traditional Vedic practice reads charts from all three reference points: Lagna, Moon, and Sun. The Lagna governs physical constitution, personality, and the house structure. The Moon sign governs the mind and emotions, and anchors the Vimshottari Dasha timing system. Different astrologers weight them differently depending on the question being answered.',
   },
 ]

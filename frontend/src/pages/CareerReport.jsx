@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
+import { useAuth } from '../contexts/AuthContext'
+import { getPrimaryProfile } from '../services/astrologyProfiles'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -152,11 +154,23 @@ function LoadingCard() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function CareerReport() {
   const { t, i18n } = useTranslation()
+  const { user, isAuthenticated } = useAuth()
 
   const [status, setStatus]             = useState('idle')   // idle | loading | done | error
   const [report, setReport]             = useState(null)
   const [submittedInput, setSubmittedInput] = useState(null)
   const [errorMsg, setErrorMsg]         = useState('')
+
+  // Logged-in: auto-submit from saved profile — skip the form entirely.
+  const autoSubmittedRef = useRef(false)
+  useEffect(() => {
+    if (!isAuthenticated || autoSubmittedRef.current) return
+    const profile = getPrimaryProfile(user)
+    if (!profile?.birth_date || !profile?.birth_time || !profile?.place) return
+    autoSubmittedRef.current = true
+    handleSubmit({ date: profile.birth_date, time: profile.birth_time, place: profile.place })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user])
 
   async function handleSubmit(input) {
     setStatus('loading')
@@ -210,8 +224,8 @@ export default function CareerReport() {
       {/* ── Content ── */}
       <div className="flex-1 px-4 -mt-4 pb-12">
 
-        {/* Form (idle + error) */}
-        {(status === 'idle' || status === 'error') && (
+        {/* Form — only for non-logged-in users (anonymous entry from landing page) */}
+        {(status === 'idle' || status === 'error') && !isAuthenticated && (
           <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
             <BirthForm onSubmit={handleSubmit} loading={false} />
             {status === 'error' && (
@@ -219,6 +233,32 @@ export default function CareerReport() {
                 {errorMsg}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Logged-in: spinner while auto-submitting */}
+        {status === 'idle' && isAuthenticated && (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <div className="text-4xl mb-4 animate-spin">⏳</div>
+            <p className="text-primary-dark font-semibold">{t('career_report_loading', 'Analysing your chart…')}</p>
+            <p className="text-xs text-ink-faint mt-1">D10 · Dasha · Rajyogas · takes ~20 seconds</p>
+          </div>
+        )}
+
+        {/* Logged-in: error with one-tap retry (no form re-entry) */}
+        {status === 'error' && isAuthenticated && (
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
+            <button
+              onClick={() => {
+                const p = getPrimaryProfile(user)
+                if (p) handleSubmit({ date: p.birth_date, time: p.birth_time, place: p.place })
+              }}
+              className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition"
+            >
+              {t('retry', 'Try again')}
+            </button>
           </div>
         )}
 

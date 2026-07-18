@@ -141,11 +141,18 @@ export default function PersonalHome() {
 
   function openReport(topicId) {
     if (!profile) return
+    if (topicId === 'career') {
+      // Dedicated career report page with its own AI analysis
+      navigate('/career-report')
+      return
+    }
+    // Finance, relationship, health → Life Areas tab on the kundli page
     navigate('/kundli', {
       state: {
         data: profile.chart,
-        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place, topic: topicId },
-        activeTab: 'insights', activeSubtab: topicId === 'career' ? 'career' : topicId,
+        input: { name: profile.label, date: profile.birth_date, time: profile.birth_time, place: profile.place },
+        activeTab: 'divisional',
+        activeSubtab: topicId,
       },
     })
   }

@@ -88,7 +88,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
       onClick={() => onOpen(report.id)}
       className={`w-full text-left rounded-card overflow-hidden group transition hover:opacity-95 bg-gradient-to-br ${accent.bgFrom} via-night to-night-deep border border-white/[0.08]`}
     >
-      <div className="px-5 pt-5 pb-4">
+      <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-4">
         <div className="flex items-center justify-between mb-3">
           <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-serif font-semibold text-sm bg-white/10 ${accent.text}`}>
             {report.houseGlyph}
@@ -128,20 +128,20 @@ function SmallReport({ report, area, onOpen, t }) {
   return (
     <button
       onClick={() => onOpen(report.id)}
-      className={`text-left rounded-card overflow-hidden group transition hover:opacity-95 flex flex-col bg-gradient-to-br ${accent.bgFrom} via-night to-night-deep border border-white/[0.08]`}
+      className={`w-full text-left rounded-card overflow-hidden group transition hover:opacity-95 flex flex-col bg-gradient-to-br ${accent.bgFrom} via-night to-night-deep border border-white/[0.08]`}
     >
-      <div className="px-3.5 py-3.5 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-2">
-          <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-serif font-semibold text-2xs bg-white/10 ${accent.text}`}>
+      <div className="px-2.5 py-3 sm:px-3.5 sm:py-3.5 flex flex-col flex-1">
+        <div className="flex items-start justify-between gap-1 mb-2">
+          <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-serif font-semibold text-3xs sm:text-2xs bg-white/10 ${accent.text} shrink-0`}>
             {report.houseGlyph}
           </span>
           <TrendChip trend={area?.trend} accent={accent} t={t} />
         </div>
-        <h4 className="font-serif font-semibold text-[13px] text-primary-light mb-0.5 leading-snug group-hover:opacity-90">
+        <h4 className={`font-serif font-semibold text-[11px] sm:text-[13px] text-primary-light mb-0.5 leading-snug group-hover:opacity-90 line-clamp-2`}>
           {t(report.labelKey)}
         </h4>
         <ScoreBar pct={area?.pct} accent={accent} />
-        <p className={`text-2xs mt-auto pt-2.5 font-semibold ${accent.text}`}>
+        <p className={`text-3xs sm:text-2xs mt-auto pt-2 font-semibold ${accent.text}`}>
           {t('report_open')} →
         </p>
       </div>
@@ -160,7 +160,7 @@ export default function ReportsStrip({ onOpenReport, featuredId, lifeAreas }) {
   return (
     <div className="space-y-2.5">
       <FeaturedReport report={featured} area={areaFor(featured.id)} onOpen={onOpenReport} t={t} />
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
         {rest.map(r => (
           <SmallReport key={r.id} report={r} area={areaFor(r.id)} onOpen={onOpenReport} t={t} />
         ))}

@@ -1,7 +1,6 @@
 // frontend/src/pages/learn/career/TenthHouse.jsx
 import KnowledgeLayout from '../../../components/knowledge/KnowledgeLayout'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
-import Callout from '../../../components/knowledge/Callout'
 import QuickFacts from '../../../components/knowledge/QuickFacts'
 import FAQ from '../../../components/knowledge/FAQ'
 import RelatedArticles from '../../../components/knowledge/RelatedArticles'

@@ -22,17 +22,18 @@ function shortDayName(dateStr) {
   return d.toLocaleDateString('en-US', { weekday: 'short' })
 }
 
-// Staggered constellation layout — seven points across a 400×150 viewBox,
-// matching the approved mock exactly.
-const POSITIONS = [
-  { x: 30,  y: 96 },
-  { x: 88,  y: 62 },
-  { x: 146, y: 100 },
-  { x: 208, y: 44 },
-  { x: 266, y: 78 },
-  { x: 322, y: 52 },
-  { x: 372, y: 92 },
-]
+// X positions for seven days across a 400×160 viewBox.
+// Y is computed from each day's score so higher scores sit visually higher
+// (SVG Y axis is inverted: y=0 is top, so lower score → higher Y value).
+const X_POS = [30, 88, 146, 208, 266, 322, 372]
+const Y_TOP    = 28   // y for score = 100 (top of chart area)
+const Y_BOTTOM = 112  // y for score = 0   (bottom of chart area)
+
+function scoreToY(score) {
+  // Clamp and invert: high score → low y (near top)
+  const clamped = Math.max(0, Math.min(100, score))
+  return Y_BOTTOM - (clamped / 100) * (Y_BOTTOM - Y_TOP)
+}
 
 export default function WeekStrip({ location }) {
   const { t } = useTranslation()
@@ -56,12 +57,16 @@ export default function WeekStrip({ location }) {
   if (!week) return null
 
   const todayStr = new Date().toISOString().slice(0, 10)
-  const points = week.slice(0, 7).map((day, i) => ({
-    ...POSITIONS[i],
-    day,
-    score: weekDayScore(day, i),
-    isToday: day.date === todayStr,
-  }))
+  const points = week.slice(0, 7).map((day, i) => {
+    const score = weekDayScore(day, i)
+    return {
+      x: X_POS[i],
+      y: scoreToY(score),
+      day,
+      score,
+      isToday: day.date === todayStr,
+    }
+  })
 
   const pathD = points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ')
   const brightest = points.reduce((best, p) => (p.score > best.score ? p : best), points[0])
@@ -69,7 +74,7 @@ export default function WeekStrip({ location }) {
   return (
     <div className="bg-white/[0.045] border border-white/[0.09] rounded-card p-4 sm:p-5">
       <div className="relative">
-        <svg viewBox="0 0 400 150" className="w-full h-auto block" aria-label={t('home_week_constellation_aria', 'Seven-day outlook drawn as a constellation')}>
+        <svg viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria', 'Seven-day outlook drawn as a constellation')}>
           <path d={pathD} fill="none" className="stroke-primary-glow" strokeOpacity={0.28} strokeWidth={1} strokeDasharray="3 4" />
           {points.map((p, i) => {
             const r = 2.5 + (p.score / 100) * 5
@@ -96,7 +101,7 @@ export default function WeekStrip({ location }) {
                   )}
                 </circle>
                 <text
-                  x={p.x} y={138} textAnchor="middle" fontSize="10" fontFamily="inherit"
+                  x={p.x} y={148} textAnchor="middle" fontSize="10" fontFamily="inherit"
                   className={p.isToday ? 'fill-primary-glow' : 'fill-ink-onnight'}
                   fillOpacity={p.isToday ? 1 : 0.45}
                 >

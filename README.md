@@ -246,7 +246,7 @@ VITE_SENTRY_DSN=              # optional
 
 ---
 
-## Remaining Work
+## Remaining Work - will keep updating this list as we go
 
 - **Payments** — Razorpay integration pending company registration + GST
 - **Reading history tracking** — backend model exists (`ReportSummaryOut`); frontend "Continue Your Journey" still uses a static graph rather than real history

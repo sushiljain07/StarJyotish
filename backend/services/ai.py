@@ -3,6 +3,7 @@ import re
 import logging
 import requests
 from pathlib import Path
+from datetime import date as date_, datetime, timezone
 from typing import Optional
 from fastapi import HTTPException
 
@@ -963,12 +964,17 @@ def build_prediction_prompt(
     language: str,
     active_yogas: Optional[list] = None,
     focus_topic: Optional[str] = None,
+    today: Optional["date_"] = None,
 ) -> str:
-    """Build the Jyotish Guru genuine-value free prediction prompt."""
+    """Build the Jyotish Guru genuine-value free prediction prompt.
+    `today` defaults to the current UTC date (overridable for tests)."""
     asc = chart["ascendant"]
     planets = chart["planets"]
     active_yogas = active_yogas or []
-    current_year = 2026
+    # Was hard-coded to 2026 and compared by year only, so from 2027 on the
+    # prompt named periods that had already begun (and later, ended) as the
+    # "upcoming" one. Compare full ISO dates against today instead.
+    today_iso = (today or datetime.now(timezone.utc).date()).isoformat()
 
     moon = next((p for p in planets if p["name"] == "Moon"), None)
     sun  = next((p for p in planets if p["name"] == "Sun"), None)
@@ -993,11 +999,7 @@ def build_prediction_prompt(
     next_dasha_str = "an upcoming powerful period"
     for entry in full_seq:
         start_str = str(entry.get("start", ""))
-        try:
-            start_year = int(start_str[:4])
-        except (ValueError, IndexError):
-            start_year = 0
-        if start_year > current_year and entry.get("planet") != md.get("planet"):
+        if start_str[:10] > today_iso and entry.get("planet") != md.get("planet"):
             next_dasha_str = f"{entry['planet']} period beginning {start_str[:7]}"
             break
 

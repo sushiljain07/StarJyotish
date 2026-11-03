@@ -40,3 +40,21 @@ def test_antardasha_dates_are_sequential():
     ads = result["antardashas"]
     for i in range(len(ads) - 1):
         assert ads[i]["end"] == ads[i + 1]["start"]
+
+
+def test_current_period_uses_the_birthplace_clock_not_utc():
+    # Born in India: a boundary at 02:00 local is 20:30 UTC the previous day.
+    # At 21:00 UTC (02:30 IST next day) the new period has begun locally;
+    # comparing the local birth time against UTC "now" said it hadn't.
+    from datetime import datetime, timezone
+    from services.dasha import calculate_vimshottari
+    birth = datetime(1990, 1, 1, 2, 0)
+    seq = calculate_vimshottari(moon_lon=100.0, birth_dt=birth)["full_sequence"]
+    boundary_local = datetime.strptime(seq[1]["start"], "%Y-%m-%d")  # local midnight of the 2nd MD's start date
+    # A moment 3h after that local midnight in IST = 21:30 UTC on the previous day.
+    from datetime import timedelta
+    now_utc = (boundary_local + timedelta(hours=3) - timedelta(hours=5, minutes=30)).replace(tzinfo=timezone.utc)
+    ist = calculate_vimshottari(moon_lon=100.0, birth_dt=birth, tz_name="Asia/Kolkata", now=now_utc)
+    utc = calculate_vimshottari(moon_lon=100.0, birth_dt=birth, now=now_utc)
+    assert ist["current_mahadasha"]["planet"] == seq[1]["planet"]
+    assert utc["current_mahadasha"]["planet"] == seq[0]["planet"]

@@ -1,4 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+import pytz
 from typing import Any
 
 DASHA_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars",
@@ -20,13 +23,20 @@ def _add_years(dt: datetime, years: float) -> datetime:
     return dt + timedelta(days=years * DAYS_PER_YEAR)
 
 
-def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]:
+def calculate_vimshottari(
+    moon_lon: float, birth_dt: datetime, tz_name: Optional[str] = None, now: Optional[datetime] = None,
+) -> dict[str, Any]:
     """
     Compute Vimshottari Dasha from Moon's sidereal longitude and birth datetime.
 
     Returns:
         full_sequence: all 9 MDs from birth (starting planet, dates, years)
-        current_mahadasha: the active MD as of today (UTC)
+        current_mahadasha: the active MD as of now
+
+    birth_dt is the naive *local* birth time. Pass the birthplace's tz_name
+    so "now" is read on the same local clock; comparing local birth time
+    with UTC now shifted every period boundary by the UTC offset (5h30m
+    for India). `now` (UTC-aware) is overridable for tests.
         current_antardasha: active AD within current MD
         antardashas: all 9 ADs within current MD
     """
@@ -37,7 +47,11 @@ def calculate_vimshottari(moon_lon: float, birth_dt: datetime) -> dict[str, Any]
     starting_lord = NAKSHATRA_LORDS[nak_idx]
     start_idx = DASHA_ORDER.index(starting_lord)
 
-    today = datetime.utcnow()
+    now_utc = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if tz_name:
+        today = now_utc.astimezone(pytz.timezone(tz_name)).replace(tzinfo=None)
+    else:
+        today = now_utc.replace(tzinfo=None)
 
     # Build full sequence: first MD is partially elapsed at birth
     full_sequence: list[dict[str, Any]] = []

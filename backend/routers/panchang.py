@@ -5,13 +5,16 @@ Nothing here touches a birth chart; lat/lon/timezone come straight from
 wherever the person is (browser geolocation or a manually chosen city on
 the frontend), not from their onboarding profile.
 """
-from datetime import datetime, timedelta, timezone as dt_timezone
+from datetime import date as date_, datetime, timedelta, timezone as dt_timezone
 
-from fastapi import APIRouter, Request
+import pytz
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 from timezonefinder import TimezoneFinder
 
-from services.panchang import calculate_panchang, get_upcoming_eclipse
+from services.panchang import (
+    _new_moon_after, _new_moon_before, calculate_panchang, get_upcoming_eclipse,
+)
 from services.rate_limit import limiter, COMPUTE_LIMIT
 
 router = APIRouter()
@@ -27,8 +30,9 @@ class LocationInput(BaseModel):
     # geolocation-API path, which only ever gives raw coordinates.
     timezone: str | None = None
     # Optional ISO date string (YYYY-MM-DD) for computing a non-today panchang.
-    # The backend treats this as a UTC calendar date; the tz_name arg then
-    # converts all times into the location's local timezone. Defaults to today.
+    # It's a calendar date *at the location* (see _local_day_moment), not a
+    # UTC date — reading it as 00:00 UTC made every place west of Greenwich
+    # get the previous day. Defaults to today.
     date: str | None = None
 
 
@@ -42,17 +46,48 @@ class WeekLocationInput(LocationInput):
     start_date: str | None = None
 
 
+# The moment within a local calendar day at which a date-specific panchang
+# is evaluated: 06:00 local, a stand-in for sunrise (the traditional
+# reference for the day's tithi/nakshatra). For India this is ~00:30 UTC,
+# close to the 00:00 UTC the old code used, so readings there barely move.
+_DAY_REFERENCE_HOUR = 6
+
+
+def _resolve_timezone(body: "LocationInput") -> str:
+    if body.timezone:
+        try:
+            pytz.timezone(body.timezone)
+        except pytz.UnknownTimeZoneError:
+            raise HTTPException(status_code=400, detail=f"Unknown timezone: {body.timezone}")
+        return body.timezone
+    return _tf.timezone_at(lat=body.lat, lng=body.lon) or "UTC"
+
+
+def _local_day_moment(day: date_, tz_name: str) -> datetime:
+    """UTC datetime for the reference moment of local calendar `day`."""
+    local = pytz.timezone(tz_name).localize(datetime(day.year, day.month, day.day, _DAY_REFERENCE_HOUR))
+    return local.astimezone(dt_timezone.utc)
+
+
+def _parse_date(value: str | None) -> date_ | None:
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None  # invalid strings fall through to "today", as before
+
+
+def _today(tz_name: str) -> date_:
+    return datetime.now(pytz.timezone(tz_name)).date()
+
+
 @router.post("/panchang")
 @limiter.limit(COMPUTE_LIMIT)
 def get_panchang(request: Request, body: LocationInput):
-    tz_name = body.timezone or _tf.timezone_at(lat=body.lat, lng=body.lon) or "UTC"
-    target_date = None
-    if body.date:
-        try:
-            parsed = datetime.strptime(body.date, "%Y-%m-%d").replace(tzinfo=dt_timezone.utc)
-            target_date = parsed
-        except ValueError:
-            pass  # ignore invalid date strings — fall through to today
+    tz_name = _resolve_timezone(body)
+    day = _parse_date(body.date)
+    target_date = _local_day_moment(day, tz_name) if day else None
     panchang = calculate_panchang(body.lat, body.lon, tz_name, target_date=target_date)
     eclipse = get_upcoming_eclipse(body.lat, body.lon, tz_name)
     return {**panchang, "upcoming_eclipse": eclipse}
@@ -67,64 +102,65 @@ def get_panchang_week(request: Request, body: WeekLocationInput):
     eclipse lookups per day, since that's a single forward-looking fact
     already available from GET /panchang, not a per-day one.
     """
-    tz_name = body.timezone or _tf.timezone_at(lat=body.lat, lng=body.lon) or "UTC"
-    start_utc = datetime.now(dt_timezone.utc)
-    if body.start_date:
-        try:
-            start_utc = datetime.strptime(body.start_date, "%Y-%m-%d").replace(tzinfo=dt_timezone.utc)
-        except ValueError:
-            pass
-    days = []
-    for offset in range(body.days):
-        day = start_utc + timedelta(days=offset)
-        days.append(calculate_panchang(body.lat, body.lon, tz_name, target_date=day))
+    tz_name = _resolve_timezone(body)
+    start = _parse_date(body.start_date)
+    if start is None:
+        # No explicit start: today, evaluated "now" (unchanged behaviour).
+        now = datetime.now(dt_timezone.utc)
+        days = [calculate_panchang(body.lat, body.lon, tz_name, target_date=now)]
+        first_extra = _today(tz_name) + timedelta(days=1)
+        extra = body.days - 1
+    else:
+        days, first_extra, extra = [], start, body.days
+    for offset in range(extra):
+        moment = _local_day_moment(first_extra + timedelta(days=offset), tz_name)
+        days.append(calculate_panchang(body.lat, body.lon, tz_name, target_date=moment))
     return {"days": days, "timezone": tz_name}
+
 
 @router.post("/panchang/hindu-month")
 @limiter.limit(COMPUTE_LIMIT)
 def get_panchang_hindu_month(request: Request, body: LocationInput):
-    """Returns the days of the current Hindu lunar month (Chandramasa).
+    """The days of the Hindu lunar month (amanta Chandramasa) containing
+    `date` (default today).
 
-    Finds the most recent Amavasya (Tithi 30 / Krishna Paksha 15) to
-    establish the start of the current month (next day = Shukla Pratipada),
-    then returns panchang for each day up to and including the next Amavasya
-    (max 32 days to be safe with short months).
+    Month boundaries come from the actual new-moon instants on either side,
+    found by solving for zero Sun–Moon elongation. The old version sampled
+    the tithi once a day at 00:00 UT and could step straight over an
+    Amavasya shorter than 24 hours, landing on the wrong month.
 
-    The response includes `masa` (Hindu month name) and `tithi_range`
-    (start_date, end_date ISO strings) so the frontend can display the
-    month header without re-computing it.
+    A local day belongs to the month when its reference moment (06:00 local,
+    see _local_day_moment) falls between the two new moons, so the first
+    day is Shukla Pratipada and the last is the day of Amavasya.
+
+    The response includes `masa` (Hindu month name) and the start/end dates
+    so the frontend can display the month header without re-computing it.
     """
-    tz_name = body.timezone or _tf.timezone_at(lat=body.lat, lng=body.lon) or "UTC"
-    today_utc = datetime.now(dt_timezone.utc)
-
-    # Scan backwards up to 32 days to find the last Amavasya
-    from services.panchang import _sun_moon_sidereal
     import swisseph as swe
 
-    def tithi_number(dt_utc: datetime) -> int:
-        jd = swe.julday(dt_utc.year, dt_utc.month, dt_utc.day, 0.0)
-        swe.set_sid_mode(swe.SIDM_LAHIRI)
-        s, m = _sun_moon_sidereal(jd)
-        diff = (m - s) % 360
-        return int(diff / 12) + 1  # 1..30
+    tz_name = _resolve_timezone(body)
+    anchor_day = _parse_date(body.date) or _today(tz_name)
 
-    # Find start: walk back until tithi was 30 (Amavasya), then +1 day
-    start_utc = today_utc
-    for back in range(1, 33):
-        candidate = today_utc - timedelta(days=back)
-        if tithi_number(candidate) == 30:
-            start_utc = today_utc - timedelta(days=back - 1)
-            break
+    def jd_of(dt_utc: datetime) -> float:
+        return swe.julday(dt_utc.year, dt_utc.month, dt_utc.day,
+                          dt_utc.hour + dt_utc.minute / 60 + dt_utc.second / 3600)
 
-    # Build days forward until we hit the next Amavasya (or 32-day cap)
+    anchor_jd = jd_of(_local_day_moment(anchor_day, tz_name))
+    month_start_jd = _new_moon_before(anchor_jd)
+    month_end_jd = _new_moon_after(month_start_jd)
+
+    # First local day whose reference moment is after the opening new moon.
+    day = anchor_day
+    while jd_of(_local_day_moment(day - timedelta(days=1), tz_name)) > month_start_jd:
+        day -= timedelta(days=1)
+
     days = []
-    for offset in range(32):
-        day = start_utc + timedelta(days=offset)
-        p = calculate_panchang(body.lat, body.lon, tz_name, target_date=day)
-        days.append(p)
-        # Stop after we've included an Amavasya that is past today's start
-        if offset > 0 and p["tithi"].get("number") == 30:
+    while len(days) < 31:
+        moment = _local_day_moment(day, tz_name)
+        if jd_of(moment) > month_end_jd:
             break
+        days.append(calculate_panchang(body.lat, body.lon, tz_name, target_date=moment))
+        day += timedelta(days=1)
 
     masa = days[0].get("masa", "") if days else ""
     return {
@@ -134,4 +170,3 @@ def get_panchang_hindu_month(request: Request, body: LocationInput):
         "start_date": days[0]["date"] if days else None,
         "end_date": days[-1]["date"] if days else None,
     }
-

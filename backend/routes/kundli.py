@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 
 from dependencies import get_current_user_soft
 
@@ -11,7 +11,7 @@ from models.chart_data import (
 )
 from services.chart_context import resolve_birth_context
 from services.astro_calc import calculate_chart
-from services.divisional_charts import calculate_divisional_chart
+from services.divisional_charts import SUPPORTED_DIVISIONS, calculate_divisional_chart
 from services.dasha import calculate_vimshottari
 from services.ai import generate_reading, ask_chart, generate_chart_highlight
 from services.ashtakavarga import calculate_ashtakavarga
@@ -41,6 +41,7 @@ def get_kundli(request: Request, body: BirthInput):
     dasha_raw = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     # 5. Assemble response
@@ -86,6 +87,7 @@ def get_reading(request: Request, body: ReadingRequest, db=Depends(get_db_option
     dasha_raw = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     # Pre-calculate all divisional charts for the reading.
@@ -168,6 +170,7 @@ def ask_kundli(
     dasha_raw = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     from services.divisional_charts import calculate_divisional_chart
@@ -299,6 +302,13 @@ def get_kp_chart(request: Request, body: BirthInput):
     }
 
 
+def _validated_division(division: int) -> int:
+    if division not in SUPPORTED_DIVISIONS:
+        supported = ", ".join(f"D{d}" for d in SUPPORTED_DIVISIONS)
+        raise HTTPException(status_code=400, detail=f"Unsupported divisional chart D{division}. Supported: {supported}")
+    return division
+
+
 @router.post("/kundli/divisional")
 @limiter.limit(COMPUTE_LIMIT)
 def get_divisional_chart(request: Request, body: BirthInput, division: int = 1):
@@ -306,6 +316,7 @@ def get_divisional_chart(request: Request, body: BirthInput, division: int = 1):
     Get any divisional chart D1–D60.
     Pass ?division=9 for D9, ?division=10 for D10, etc.
     """
+    division = _validated_division(division)
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd_ut = ctx.geo, ctx.jd_ut
 
@@ -324,11 +335,14 @@ def get_chart_highlight(request: Request, body: ChartHighlightRequest):
     Return a 2-3 sentence AI highlight for a specific divisional chart.
     Used by the Kundli page to surface a brief, contextual insight under each chart.
     """
+    chart_type = body.chart_type.strip().upper()
+    digits = chart_type[1:] if chart_type.startswith("D") else chart_type
+    if not digits.isdigit():
+        raise HTTPException(status_code=400, detail="chart_type must look like D1, D9, D10 …")
+    division = _validated_division(int(digits))
     ctx = resolve_birth_context(body.place, body.date, body.time)
     geo, jd_ut = ctx.geo, ctx.jd_ut
 
-    from services.divisional_charts import calculate_divisional_chart
-    division = int(body.chart_type.lstrip("D") or 1)
     chart = calculate_divisional_chart(jd_ut, geo.lat, geo.lon, division)
 
     highlight, provider = generate_chart_highlight(chart, body.chart_type, body.language)

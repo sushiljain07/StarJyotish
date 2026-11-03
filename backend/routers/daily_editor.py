@@ -29,7 +29,7 @@ class PlanetData(BaseModel):
 class DailyEditionInput(BaseModel):
     date: str = Field(..., description="Birth date YYYY-MM-DD")
     time: str = Field(..., description="Birth time HH:MM (24h)")
-    place: str = Field(..., description="Birth place")
+    place: str = Field(..., max_length=200, description="Birth place")
     label: str = Field("friend", max_length=60)
     md_planet: str = Field(..., max_length=20)
     ad_planet: Optional[str] = Field(None, max_length=20)

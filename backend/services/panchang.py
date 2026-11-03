@@ -25,7 +25,7 @@ only returns the astronomical facts (type, timing, local visibility) —
 the do/avoid guidance text shown to users should come from a
 content/astrology review pass, not be hardcoded here.
 """
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime, timedelta, timezone as dt_timezone
 from typing import Any, Optional
 
 import pytz
@@ -100,6 +100,47 @@ def _sun_moon_sidereal(jd_ut: float) -> tuple[float, float]:
     sun_lon = (swe.calc_ut(jd_ut, swe.SUN, CALC_FLAGS)[0][0] - ayanamsa) % 360
     moon_lon = (swe.calc_ut(jd_ut, swe.MOON, CALC_FLAGS)[0][0] - ayanamsa) % 360
     return sun_lon, moon_lon
+
+
+_MEAN_ELONGATION_PER_DAY = 360 / 29.530588  # synodic month
+
+
+def _elongation(jd_ut: float) -> float:
+    """Moon minus Sun, 0–360°. Ayanamsa cancels out, so tropical is fine."""
+    sun = swe.calc_ut(jd_ut, swe.SUN, CALC_FLAGS)[0][0]
+    moon = swe.calc_ut(jd_ut, swe.MOON, CALC_FLAGS)[0][0]
+    return (moon - sun) % 360
+
+
+def _refine_new_moon(jd_guess: float) -> float:
+    """Newton-style refinement onto the nearest instant where elongation is 0."""
+    jd = jd_guess
+    for _ in range(12):
+        e = _elongation(jd)
+        signed = e - 360 if e > 180 else e
+        step = signed / _MEAN_ELONGATION_PER_DAY
+        jd -= step
+        if abs(step) < 1e-5:  # < 1 second
+            break
+    return jd
+
+
+def _new_moon_before(jd_ut: float) -> float:
+    """The most recent new moon (Amavasya ends / Shukla Pratipada begins) at or before jd_ut."""
+    nm = _refine_new_moon(jd_ut - _elongation(jd_ut) / _MEAN_ELONGATION_PER_DAY)
+    if nm > jd_ut:  # converged onto the next one: step back a month
+        nm = _refine_new_moon(nm - 29.53)
+    return nm
+
+
+def _new_moon_after(jd_ut: float) -> float:
+    """The first new moon after jd_ut. Called *at* a new moon it returns the
+    next one: the elongation there can read 359.9999°, so the initial
+    guess lands on the same instant — hence the one-day margin."""
+    nm = _refine_new_moon(jd_ut + (360 - _elongation(jd_ut)) / _MEAN_ELONGATION_PER_DAY)
+    if nm <= jd_ut + 1:
+        nm = _refine_new_moon(nm + 29.53)
+    return nm
 
 
 def _tithi(sun_lon: float, moon_lon: float) -> dict:
@@ -184,13 +225,11 @@ def _jd_to_local(jd_ut: float, tz_name: str) -> Optional[datetime]:
     if jd_ut is None:
         return None
     y, m, d, h = swe.revjul(jd_ut)
-    hour = int(h)
-    minute = int(round((h - hour) * 60))
-    if minute == 60:
-        minute = 0
-        hour += 1
-    naive_utc = datetime(y, m, d, hour, minute, tzinfo=dt_timezone.utc)
-    return naive_utc.astimezone(pytz.timezone(tz_name))
+    # Round to the minute via timedelta rather than assembling hour/minute
+    # fields: an event in the last 30s of a UT day rounds to 24:00, which
+    # datetime() rejects (and used to turn /panchang into a 500).
+    utc = datetime(y, m, d, tzinfo=dt_timezone.utc) + timedelta(minutes=round(h * 60))
+    return utc.astimezone(pytz.timezone(tz_name))
 
 
 def _fmt(dt: Optional[datetime]) -> Optional[str]:
@@ -305,14 +344,16 @@ def calculate_panchang(lat: float, lon: float, tz_name: str,
     return result
 
 
-def get_upcoming_eclipse(lat: float, lon: float, tz_name: str, lookahead_days: int = 180) -> Optional[dict]:
+def get_upcoming_eclipse(lat: float, lon: float, tz_name: str, lookahead_days: int = 180,
+                         start: Optional[datetime] = None) -> Optional[dict]:
     """The next eclipse actually visible from this location within the
     lookahead window, or None. Checks both lunar and solar eclipses and
     returns whichever comes first; each type is searched up to 4 events
     ahead before giving up, since most eclipses in a given 1-2 year window
-    aren't visible from any single location.
+    aren't visible from any single location. `start` (UTC-aware) defaults
+    to now; pass it to look ahead from a fixed date (e.g. in tests).
     """
-    now_utc = datetime.now(dt_timezone.utc)
+    now_utc = (start or datetime.now(dt_timezone.utc)).astimezone(dt_timezone.utc)
     jd_start = swe.julday(now_utc.year, now_utc.month, now_utc.day, 0.0)
     geopos = (lon, lat, 0.0)
     horizon_jd = jd_start + lookahead_days

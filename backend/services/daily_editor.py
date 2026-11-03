@@ -121,13 +121,21 @@ def _detect_events(transit: dict, dasha_planets: set[str], natal_planets: list[d
         house = p["house"]
         deg_in = p["degree"]
         motion = abs(_MEAN_MOTION.get(name, 1.0))
+        # The nodes always move backwards through the zodiac, as does any
+        # retrograde planet: such a body entered its sign at 30° and leaves
+        # at 0° into the *previous* sign. Treating every body as direct
+        # reported a node at 29° as "about to change sign" when it had just
+        # changed, and vice versa.
+        backwards = name in ("Rahu", "Ketu") or bool(p.get("retrograde"))
         base = _RARITY.get(name, 1.0) * _HOUSE_WEIGHT.get(house, 1.0)
 
         if name in dasha_planets:
             base *= 1.5  # Dasha lord transiting = major relevance
 
-        days_to_exit = (30 - deg_in) / motion if motion else 999
-        days_since_entry = deg_in / motion if motion else 999
+        deg_remaining = deg_in if backwards else 30 - deg_in
+        deg_travelled = 30 - deg_in if backwards else deg_in
+        days_to_exit = deg_remaining / motion if motion else 999
+        days_since_entry = deg_travelled / motion if motion else 999
 
         # 1. Recent ingress
         if days_since_entry <= 2.0:
@@ -143,10 +151,11 @@ def _detect_events(transit: dict, dasha_planets: set[str], natal_planets: list[d
 
         # 2. Upcoming ingress (countdown)
         if days_to_exit <= 7:
-            next_house = house % 12 + 1
+            step = -1 if backwards else 1
+            next_house = (house - 1 + step) % 12 + 1
             events.append({
                 "type": "ingress_upcoming", "planet": name,
-                "house": next_house, "sign": SIGNS[(p["sign_index"] + 1) % 12],
+                "house": next_house, "sign": SIGNS[(p["sign_index"] + step) % 12],
                 "nakshatra": p.get("nakshatra", ""),
                 "retrograde": p.get("retrograde", False),
                 "days": max(1, round(days_to_exit)),

@@ -42,6 +42,7 @@ def get_career_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     dasha = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     # 5. Current transit positions relative to natal chart houses

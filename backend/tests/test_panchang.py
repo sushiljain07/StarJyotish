@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from services.panchang import (
@@ -65,10 +66,83 @@ def test_eclipse_visibility_is_location_specific():
     # The Aug 12, 2026 total solar eclipse is visible from Iceland but not
     # from Bengaluru — this is the exact bug the location-awareness work
     # in this sprint is meant to fix, so it's worth pinning down in a test.
-    reykjavik = get_upcoming_eclipse(64.1466, -21.9426, "Atlantic/Reykjavik", lookahead_days=60)
+    # Pinned start date: this used to look ahead from "now", so it started
+    # failing once Aug 2026 passed.
+    start = datetime(2026, 7, 1, tzinfo=timezone.utc)
+    reykjavik = get_upcoming_eclipse(64.1466, -21.9426, "Atlantic/Reykjavik", lookahead_days=60, start=start)
     assert reykjavik is not None
     assert reykjavik["type"] == "solar"
     assert reykjavik["date"] == "12 Aug 2026"
 
-    bengaluru = get_upcoming_eclipse(12.9716, 77.5946, "Asia/Kolkata", lookahead_days=60)
+    bengaluru = get_upcoming_eclipse(12.9716, 77.5946, "Asia/Kolkata", lookahead_days=60, start=start)
     assert bengaluru is None
+
+
+
+# ── Regressions ──────────────────────────────────────────────────────────
+
+
+def test_jd_to_local_handles_events_in_the_last_half_minute_of_a_day():
+    # 23:59:45 UT rounds to 24:00 — used to build hour=24 and raise ValueError.
+    import swisseph as swe
+    from services.panchang import _jd_to_local
+    jd = swe.julday(2026, 3, 14, 23 + 59 / 60 + 45 / 3600)
+    local = _jd_to_local(jd, "UTC")
+    assert (local.year, local.month, local.day, local.hour, local.minute) == (2026, 3, 15, 0, 0)
+
+
+def test_panchang_route_date_is_the_local_day_west_of_utc():
+    # date=2026-11-03 in New York used to come back as Nov 2's panchang,
+    # because the date was read as 00:00 UTC (= 19:00 the previous evening).
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    resp = client.post("/api/panchang", json={
+        "lat": 40.7128, "lon": -74.0060, "timezone": "America/New_York", "date": "2026-11-03",
+    })
+    assert resp.status_code == 200
+    assert resp.json()["date"] == "2026-11-03"
+
+
+def test_panchang_week_start_date_is_local_west_of_utc():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    resp = client.post("/api/panchang/week", json={
+        "lat": 40.7128, "lon": -74.0060, "timezone": "America/New_York", "start_date": "2026-11-01", "days": 3,
+    })
+    assert [d["date"] for d in resp.json()["days"]] == ["2026-11-01", "2026-11-02", "2026-11-03"]
+
+
+def test_panchang_rejects_unknown_timezone_with_400():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    resp = client.post("/api/panchang", json={"lat": 12.97, "lon": 77.59, "timezone": "Not/AZone"})
+    assert resp.status_code == 400
+
+
+def test_new_moon_search_finds_known_new_moons():
+    # Reference new moons (UTC): 2026-01-18 19:52, 2026-02-17 12:01, 2026-10-10 15:50.
+    import swisseph as swe
+    from services.panchang import _new_moon_before, _new_moon_after
+    for (y, m, d, h) in [(2026, 1, 18, 19 + 52 / 60), (2026, 2, 17, 12 + 1 / 60), (2026, 10, 10, 15 + 50 / 60)]:
+        truth = swe.julday(y, m, d, h)
+        assert abs(_new_moon_before(truth + 3) - truth) < 10 / 1440   # within 10 minutes
+        assert abs(_new_moon_after(truth - 3) - truth) < 10 / 1440
+
+
+def test_hindu_month_spans_one_full_lunation():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    resp = client.post("/api/panchang/hindu-month", json={
+        "lat": 12.9716, "lon": 77.5946, "timezone": "Asia/Kolkata", "date": "2026-11-03",
+    })
+    assert resp.status_code == 200
+    days = resp.json()["days"]
+    assert 29 <= len(days) <= 30
+    assert days[0]["tithi"]["number"] in (1, 2)        # starts at Shukla Pratipada (or a kshaya day)
+    assert days[-1]["tithi"]["number"] in (29, 30)     # ends on/at Amavasya
+    dates = [d["date"] for d in days]
+    assert dates[0] <= "2026-11-03" <= dates[-1]

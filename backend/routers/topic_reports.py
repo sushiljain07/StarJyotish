@@ -75,6 +75,7 @@ def get_relationship_report(request: Request, body: BirthInput, db=Depends(get_d
     dasha = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     try:
@@ -116,6 +117,7 @@ def get_wealth_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     dasha = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     try:
@@ -155,6 +157,7 @@ def get_health_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     dasha = calculate_vimshottari(
         moon_lon=chart["moon_sidereal_lon"],
         birth_dt=naive_dt,
+        tz_name=geo.timezone,
     )
 
     try:

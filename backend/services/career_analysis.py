@@ -917,7 +917,7 @@ def _build_career_prompt(
     dasha: dict,
     extra: dict,
     user_age: int = 25,
-    current_year: int = 2026,
+    current_year: Optional[int] = None,
     transit_data: Optional[dict] = None,
     gemstone_context: str = "",
     language: str = "en",
@@ -1008,6 +1008,8 @@ def _build_career_prompt(
     if not combos_notes:
         combos_notes.append("No specific placement combinations triggered.")
 
+    if current_year is None:
+        current_year = _date.today().year
     # Filter future-only dashas (end year must be after current_year)
     future_dashas = []
     for e in (dasha.get("full_sequence") or []):

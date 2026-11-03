@@ -2,7 +2,7 @@
 Conversation history for the Ask tab / Ask Jyoti panel, keyed by a
 session_id the frontend gets back on its first question and echoes on
 every subsequent one (see models/chart_data.py's AskRequest/AskResponse
-and routes/kundli.py's ask_kundli()).
+and routers/kundli.py's ask_kundli()).
 
 Storage is in-memory, same trade-off services/rate_limit.py already
 documents for its own storage: fine for a single Railway instance, and

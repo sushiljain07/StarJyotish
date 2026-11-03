@@ -2,7 +2,7 @@
 Shared helper for the single most duplicated block in this codebase: turning
 a (place, date, time) triple into geocoded coordinates plus a UTC Julian Day.
 
-Before this existed, every route in routes/kundli.py, routers/career_report.py,
+Before this existed, every route in routers/kundli.py, routers/career_report.py,
 routers/rajyogas.py, and routers/topic_reports.py repeated the same ~10 lines
 by hand (geocode -> localize -> convert to UTC -> swe.julday). That meant any
 timezone or Julian-day bug had to be fixed in 12 places at once. Now it's one

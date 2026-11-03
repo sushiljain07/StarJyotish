@@ -1,18 +1,23 @@
-fastapi>=0.111.0
-uvicorn[standard]>=0.30.0
-pyswisseph>=2.10.3
-timezonefinder>=6.5.0
-pytz>=2024.1
-requests>=2.31.0
-pydantic>=2.7.0
-pytest>=8.2.0
-httpx>=0.27.0
-python-dotenv>=1.0.0
-anthropic>=0.40.0
-slowapi>=0.1.9
-sqlalchemy>=2.0,<2.1
-alembic>=1.13,<1.14
-psycopg2-binary>=2.9
-pyjwt>=2.8.0,<3
-google-auth>=2.29.0,<3
-sentry-sdk[fastapi]>=2.0.0,<3
+# Production dependencies, pinned to exact versions so every Docker build
+# installs what was tested (previously lower-bound only, so each build could
+# pull something new). Test/dev tools live in requirements-dev.txt and are
+# no longer installed into the production image.
+#
+# To upgrade: bump a pin, `pip install -r requirements-dev.txt`, run
+# `pytest`, commit.
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
+pyswisseph==2.10.3.2
+timezonefinder==8.2.4
+pytz==2026.2
+requests==2.34.1
+pydantic==2.13.4
+python-dotenv==1.2.2
+anthropic==0.109.1
+slowapi==0.1.10
+sqlalchemy==2.0.50
+alembic==1.13.3
+psycopg2-binary==2.9.12
+pyjwt==2.13.0
+google-auth==2.53.0
+sentry-sdk[fastapi]==2.64.0

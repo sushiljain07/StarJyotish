@@ -101,6 +101,6 @@ def test_unparseable_date_on_unvalidated_model_is_400_not_500():
     # still be a clean 400 before any LLM call.
     from unittest.mock import patch as _patch
     with _patch("services.chart_context.geocode_place", return_value=_mock_geo()), \
-         _patch("routes.kundli.ask_chart", return_value=("x", "test")):
+         _patch("routers.kundli.ask_chart", return_value=("x", "test")):
         resp = client.post("/api/kundli/ask", json={**VALID_BODY, "date": "01/02/2000", "question": "career?"})
     assert resp.status_code == 400

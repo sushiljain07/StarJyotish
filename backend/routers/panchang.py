@@ -1,6 +1,6 @@
 """
 Today's Panchang for the person's CURRENT location — deliberately separate
-from routes/kundli.py's /kundli/transit, which is keyed to birth data.
+from routers/kundli.py's /kundli/transit, which is keyed to birth data.
 Nothing here touches a birth chart; lat/lon/timezone come straight from
 wherever the person is (browser geolocation or a manually chosen city on
 the frontend), not from their onboarding profile.

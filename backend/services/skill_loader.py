@@ -1,9 +1,31 @@
 """
-Load career astrology skill files from the astro-skills directory.
+Load astro-skills reference files (career, relationship, wealth, health,
+gemstones/remedies) into LLM system prompts for the topic reports.
+
+services/ai.py has its own, separate registry of skill paths for readings
+and Ask; a file moved or renamed under astro-skills/ must be updated in
+both places.
 """
+import logging
 from pathlib import Path
 
+logger = logging.getLogger("starjyotish.skill_loader")
+
 _SKILLS_ROOT = Path(__file__).parent.parent.parent / "astro-skills"
+_warned_missing_root = False
+
+
+def _skills_root_available() -> bool:
+    """False (with a one-time warning) when astro-skills/ isn't next to
+    backend/ — e.g. a Docker image built from backend/ alone. Reports then
+    run without their reference material, so make that visible in logs."""
+    global _warned_missing_root
+    if _SKILLS_ROOT.exists():
+        return True
+    if not _warned_missing_root:
+        logger.warning("astro-skills directory not found at %s — AI reports will run without skill files", _SKILLS_ROOT)
+        _warned_missing_root = True
+    return False
 
 # Priority order — most important files first; trimmed to keep context focused
 _CAREER_FILES = [
@@ -20,15 +42,13 @@ _CAREER_FILES = [
 ]
 
 
-def _load_skill_files(file_list: list, header: str, subdir: str) -> str:
+def _load_skill_files(file_list: list, header: str, subdir: str | None = None) -> str:
     """
-    Generic skill-file loader: reads the given files in priority order, then
-    catches any remaining .md files under `subdir` not already in the list.
-    Shared by load_career_skills() and load_relationship_skills() (and
-    health/wealth, once those exist) — this loop used to be duplicated
-    inline inside load_career_skills() with nothing career-specific about it.
+    Generic skill-file loader used by every load_*_skills(): reads the given
+    files in priority order, then (if `subdir` is given) any remaining .md
+    files under it not already in the list.
     """
-    if not _SKILLS_ROOT.exists():
+    if not _skills_root_available():
         return ""
 
     parts: list = [f"# {header}\n"]
@@ -43,8 +63,8 @@ def _load_skill_files(file_list: list, header: str, subdir: str) -> str:
             parts.append(path.read_text(encoding="utf-8", errors="ignore"))
             loaded.add(rel)
 
-    subdir_path = _SKILLS_ROOT / subdir
-    if subdir_path.exists():
+    subdir_path = _SKILLS_ROOT / subdir if subdir else None
+    if subdir_path is not None and subdir_path.exists():
         for md in sorted(subdir_path.rglob("*.md")):
             rel = str(md.relative_to(_SKILLS_ROOT)).replace("\\", "/")
             if rel not in loaded:
@@ -192,18 +212,8 @@ _GEMSTONE_REMEDY_FILES = [
 
 
 def load_gemstone_remedy_skills() -> str:
-    """Load gemstone and remedy skill files for embedding in career report prompts."""
-    if not _SKILLS_ROOT.exists():
-        return ""
-    parts: list[str] = ["# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n"]
-    for rel in _GEMSTONE_REMEDY_FILES:
-        path = _SKILLS_ROOT / rel
-        if path.exists():
-            parts.append(f"\n{'='*60}")
-            parts.append(f"## {rel}")
-            parts.append("=" * 60)
-            parts.append(path.read_text(encoding="utf-8", errors="ignore"))
-    return "\n".join(parts)
+    """Gemstone and remedy skill files for every topic report's system prompt."""
+    return _load_skill_files(_GEMSTONE_REMEDY_FILES, "VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE")
 
 
 def get_system_prompt(skills_context: str) -> str:

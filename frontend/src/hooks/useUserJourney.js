@@ -8,7 +8,7 @@
 //     remembers you: "You've been on a 5-day streak" / "You love Question cards"
 
 import { useState, useEffect, useCallback } from 'react'
-import { API_BASE } from '../api/config'
+import { fetchWithAuth } from '../api/auth'
 
 const LOCAL_REACTIONS_KEY = 'sj_journey_reactions_v1'
 //const LOCAL_STREAK_KEY = 'sj_journey_streak_v1'
@@ -68,9 +68,7 @@ export function useUserJourney(accessToken) {
     }
 
     setLoadingJourney(true)
-    fetch(`${API_BASE}/api/journey/summary`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    fetchWithAuth('/api/journey/summary', {}, accessToken)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data) {
@@ -111,13 +109,8 @@ export function useUserJourney(accessToken) {
     })
 
     // Fire-and-forget to backend (unauthenticated is fine)
-    const headers = { 'Content-Type': 'application/json' }
-    if (accessToken) headers.Authorization = `Bearer ${accessToken}`
-    fetch(`${API_BASE}/api/journey/card-reaction`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(entry),
-    }).catch(() => { /* silent */ })
+    fetchWithAuth('/api/journey/card-reaction', { method: 'POST', body: entry }, accessToken)
+      .catch(() => { /* silent */ })
   }, [accessToken])
 
   return { summary, loadingJourney, recordReaction, cardReactions }

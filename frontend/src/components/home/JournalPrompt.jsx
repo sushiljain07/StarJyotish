@@ -12,7 +12,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-import { API_BASE } from '../../api/config'
+import { fetchWithAuth } from '../../api/auth'
 
 const STORAGE_KEY = (date) => `sj_journal_feedback_v1:${date}`
 const TODAY = new Date().toISOString().slice(0, 10)
@@ -41,14 +41,10 @@ export default function JournalPrompt() {
     setStatus('sending')
 
     try {
-      await fetch(`${API_BASE}/api/feedback/daily-guidance`, {
+      await fetchWithAuth('/api/feedback/daily-guidance', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify({ reaction, guidance_date: TODAY }),
-      })
+        body: { reaction, guidance_date: TODAY },
+      }, accessToken)
     } catch { /* silent — local state still reflects their answer */ }
 
     markSubmittedToday(reaction)

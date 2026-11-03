@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
-import MobileNumberField from '../components/auth/MobileNumberField'
+import VerifiedContactField from '../components/auth/VerifiedContactField'
 import AvatarUpload from '../components/auth/AvatarUpload'
 import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile, deleteProfile, createProfile, UNKNOWN_BIRTH_TIME_DEFAULT } from '../services/astrologyProfiles'
@@ -133,7 +133,6 @@ export default function Profile() {
 
   const [form, setForm] = useState({
     name: user?.name || '',
-    email: user?.email || '',
     avatar_url: user?.avatar_url || '',
     preferred_language: user?.preferred_language || 'en',
     timezone: user?.timezone || '',
@@ -151,7 +150,6 @@ export default function Profile() {
     try {
       const payload = {
         name: form.name || null,
-        email: form.email || null,
         avatar_url: form.avatar_url || null,
         preferred_language: form.preferred_language,
         timezone: form.timezone || null,
@@ -203,24 +201,22 @@ export default function Profile() {
         <form onSubmit={handleSave} className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 space-y-5">
           <h2 className="font-serif font-semibold text-lg text-ink">{t('profile_edit_heading')}</h2>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>{t('profile_full_name')}</label>
-              <input type="text" value={form.name} onChange={e => setField('name', e.target.value)} className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>{t('profile_email')}</label>
-              <input type="email" value={form.email} onChange={e => setField('email', e.target.value)} className={inputCls} />
-            </div>
+          <div>
+            <label className={labelCls}>{t('profile_full_name')}</label>
+            <input type="text" value={form.name} onChange={e => setField('name', e.target.value)} className={inputCls} />
           </div>
 
-          {/* Mobile number isn't a plain text field — it's this account's
-              login identity, so adding or changing it goes through real
-              OTP verification (MobileNumberField owns that whole flow),
-              not a free-text edit that silently changes how you log in. */}
+          {/* Mobile number and email aren't plain text fields — both are
+              login identities, so adding or changing either goes through a
+              code sent to the new address (VerifiedContactField owns that
+              flow), not a free-text edit. */}
+          <div>
+            <label className={labelCls}>{t('profile_email')}</label>
+            <VerifiedContactField kind="email" />
+          </div>
           <div>
             <label className={labelCls}>{t('profile_mobile_number')}</label>
-            <MobileNumberField />
+            <VerifiedContactField kind="phone" />
           </div>
 
           <div>

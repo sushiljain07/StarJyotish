@@ -1,18 +1,19 @@
 // frontend/src/api/admin.js
 // API client for admin and astrologer endpoints.
 // Every call requires a Bearer token — pass accessToken from useAuth().
-import { API_BASE } from './config'
+import { fetchWithAuth } from './auth'
 
+// Goes through fetchWithAuth so an expired access token is refreshed and the
+// call retried, instead of every dashboard call failing ~15 minutes after
+// login. Errors carry .status like api/auth.js's authFetch.
 async function adminFetch(path, accessToken, { method = 'GET', body } = {}) {
-  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }
-  const resp = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    credentials: 'include',
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  const resp = await fetchWithAuth(path, { method, body }, accessToken)
   const data = await resp.json().catch(() => ({}))
-  if (!resp.ok) throw new Error(data.detail ?? 'Server error')
+  if (!resp.ok) {
+    const err = new Error(data.detail ?? 'Server error')
+    err.status = resp.status
+    throw err
+  }
   return data
 }
 
@@ -58,3 +59,9 @@ export const astrologerGetBookings = (token) =>
   adminFetch('/api/astrologer/me/bookings', token)
 export const astrologerGetEarnings = (token) =>
   adminFetch('/api/astrologer/me/earnings', token)
+
+// ── Admin — testimonials ───────────────────────────────────────────────────────
+export const adminListTestimonials = (token) =>
+  adminFetch('/api/admin/testimonials', token)
+export const adminSetTestimonialStatus = (token, id, status, notes) =>
+  adminFetch(`/api/admin/testimonials/${id}`, token, { method: 'PATCH', body: { status, admin_notes: notes } })

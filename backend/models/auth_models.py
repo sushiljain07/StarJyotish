@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class _ORMModel(BaseModel):
@@ -74,6 +74,30 @@ class OtpVerifyRequest(BaseModel):
 
 
 
+class EmailOtpSendRequest(BaseModel):
+    email: str = Field(max_length=255)
+
+    @field_validator("email")
+    @classmethod
+    def _validate(cls, v: str) -> str:
+        v = v.strip().lower()
+        if not _is_email(v):
+            raise ValueError("Enter a valid email address")
+        return v
+
+
+class EmailOtpVerifyRequest(EmailOtpSendRequest):
+    code: str
+
+    @field_validator("code")
+    @classmethod
+    def _validate_code(cls, v: str) -> str:
+        v = v.strip()
+        if not v.isdigit() or len(v) != 6:
+            raise ValueError("Code must be 6 digits")
+        return v
+
+
 class GoogleLoginRequest(BaseModel):
     id_token: str
 
@@ -82,6 +106,7 @@ class UserOut(_ORMModel):
     id: UUID
     phone_number: Optional[str] = None
     email: Optional[str] = None
+    email_verified_at: Optional[datetime] = None
     name: Optional[str] = None
     role: str
     preferred_language: str
@@ -100,11 +125,36 @@ class AuthResponse(BaseModel):
 
 
 class ProfileUpdateRequest(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
+    # max_length values match the users table columns, so an overlong value
+    # is a clean 422 instead of a database error (500).
+    name: Optional[str] = Field(default=None, max_length=120)
+    # Only clearing the email, or re-sending the current one, is accepted
+    # here — changing it requires proving ownership via
+    # POST /account/email/send + /account/email/verify (routers/account.py).
+    email: Optional[str] = Field(default=None, max_length=255)
     preferred_language: Optional[str] = None
     avatar_url: Optional[str] = None
-    timezone: Optional[str] = None
+    timezone: Optional[str] = Field(default=None, max_length=64)
+
+    @field_validator("email")
+    @classmethod
+    def _normalize_email(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        v = v.strip().lower()
+        return v or None
+
+    @field_validator("timezone")
+    @classmethod
+    def _validate_timezone(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+        try:
+            ZoneInfo(v)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise ValueError("timezone must be an IANA name, e.g. Asia/Kolkata")
+        return v
 
     @field_validator("preferred_language")
     @classmethod

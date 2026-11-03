@@ -60,31 +60,28 @@ def save_report_if_requested(
         if user is None:
             logger.info("save_report requested without a valid session — not saving (report_type=%s)", report_type.value)
             return
-        profiles = BirthProfileRepository(db)
-        reports = ReportRepository(db)
-
-        profile = profiles.get_or_create_for_chart(
-            user.id,
-            birth_date=date_.fromisoformat(birth_date),
-            birth_time=time_.fromisoformat(birth_time),
-            place=place,
-            lat=lat,
-            lon=lon,
-            timezone=timezone,
-            marital_status=marital_status,
-        )
-        reports.save_generated_report(
-            user_id=user.id,
-            birth_profile_id=profile.id,
-            report_type=report_type,
-            content=content,
-            language=language,
-            llm_provider=llm_provider,
-            question=question,
-        )
+        # Savepoint: if this best-effort write fails, roll back only the
+        # report rows — not other work the route already did on the same
+        # session (e.g. /kundli/ask's chat messages), which a full
+        # db.rollback() used to discard.
+        with db.begin_nested():
+            # Link the report to the user's saved birth profile only when the
+            # chart IS that profile. Users have exactly one profile (migration
+            # 0009), so creating/updating one here would overwrite the user's
+            # own chart whenever they generate a report for someone else.
+            profile = BirthProfileRepository(db).find_matching(
+                user.id, date_.fromisoformat(birth_date), time_.fromisoformat(birth_time), lat, lon,
+            )
+            ReportRepository(db).save_generated_report(
+                user_id=user.id,
+                birth_profile_id=profile.id if profile is not None else None,
+                report_type=report_type,
+                content=content,
+                language=language,
+                llm_provider=llm_provider,
+                question=question,
+            )
         db.commit()
     except Exception:
-        # Roll back just this best-effort write — the report itself was
-        # already computed and the route should still return it.
-        db.rollback()
+        # The report itself was already computed; the route still returns it.
         logger.exception("Best-effort report persistence failed (report_type=%s)", report_type.value)

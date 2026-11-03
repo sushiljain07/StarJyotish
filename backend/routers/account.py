@@ -25,7 +25,11 @@ from db.repositories.otp_repository import OTP_TTL_MINUTES
 from db.session import get_db, get_db_optional
 from dependencies import get_current_user
 from models.account_models import BirthProfileOut, BirthProfileCreate, ReportSummaryOut
-from models.auth_models import OtpSendRequest, OtpSendResponse, OtpVerifyRequest, ProfileUpdateRequest, UserOut
+from models.auth_models import (
+    EmailOtpSendRequest, EmailOtpVerifyRequest, OtpSendRequest, OtpSendResponse,
+    OtpVerifyRequest, ProfileUpdateRequest, UserOut,
+)
+from services.email_otp import send_otp_email
 from services.otp_provider import send_otp_sms
 from services.rate_limit import OTP_SEND_LIMIT, OTP_VERIFY_LIMIT, limiter
 
@@ -59,13 +63,74 @@ def update_my_profile(
     payload: ProfileUpdateRequest, user: User = Depends(get_current_user), db=Depends(get_db),
 ):
     updates = payload.model_dump(exclude_unset=True)
-    if "email" in updates and updates["email"]:
-        existing = UserRepository(db).get_by_email(updates["email"])
-        if existing is not None and existing.id != user.id:
-            raise HTTPException(status_code=409, detail="That email is already linked to another account.")
+    if "email" in updates:
+        new_email = updates.pop("email")
+        current = (user.email or "").lower()
+        if new_email is None:
+            # Clearing is always allowed.
+            user.email = None
+            user.email_verified_at = None
+        elif new_email != current:
+            # Setting an unproven email used to be allowed here, and Google /
+            # email-OTP sign-in then linked to this account by that email —
+            # so claiming a victim's address captured their sign-ins.
+            raise HTTPException(
+                status_code=400,
+                detail="To change your email, verify the new address with a code first.",
+            )
     for field, value in updates.items():
         setattr(user, field, value)
     db.flush()
+    return UserOut.model_validate(user)
+
+
+@router.post("/account/email/send", response_model=OtpSendResponse)
+@limiter.limit(OTP_SEND_LIMIT)
+def send_email_link_otp(
+    request: Request, payload: EmailOtpSendRequest,
+    user: User = Depends(get_current_user), db=Depends(get_db),
+):
+    """Step 1 of adding/changing the signed-in user's email: send a code
+    to the new address. Refuses an address another account has verified;
+    one merely *claimed* (unverified) elsewhere is released on verify."""
+    holder = UserRepository(db).get_by_email(payload.email)
+    if holder is not None and holder.id != user.id and holder.email_verified_at is not None:
+        raise HTTPException(status_code=409, detail="That email is already linked to another account.")
+
+    otp_repo = OtpRepository(db)
+    wait = otp_repo.seconds_until_resend_allowed(payload.email)
+    if wait > 0:
+        raise HTTPException(status_code=429, detail=f"Please wait {wait}s before requesting another code.")
+
+    raw_code = otp_repo.issue_code(payload.email)
+    provider = send_otp_email(payload.email, raw_code)
+    return OtpSendResponse(
+        sent=True,
+        expires_in_seconds=OTP_TTL_MINUTES * 60,
+        debug_code=raw_code if provider == "dev-console" else None,
+    )
+
+
+@router.post("/account/email/verify", response_model=UserOut)
+@limiter.limit(OTP_VERIFY_LIMIT)
+def verify_email_link_otp(
+    request: Request, payload: EmailOtpVerifyRequest,
+    user: User = Depends(get_current_user), db=Depends(get_db),
+):
+    """Step 2: on a correct code, set the address on this account as
+    verified, releasing it from any other account that only claimed it."""
+    if not OtpRepository(db).verify_code(payload.email, payload.code):
+        raise HTTPException(status_code=400, detail="That code is incorrect or has expired.")
+
+    users = UserRepository(db)
+    holder = users.get_by_email(payload.email)
+    if holder is not None and holder.id != user.id:
+        if holder.email_verified_at is not None:
+            raise HTTPException(status_code=409, detail="That email is already linked to another account.")
+        holder.email = None
+        db.flush()
+
+    users.set_verified_email(user, payload.email)
     return UserOut.model_validate(user)
 
 

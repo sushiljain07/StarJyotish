@@ -1,6 +1,6 @@
 """
 Best-effort persistence hook for the existing report-generating routes
-(routes/kundli.py's /reading and /ask, routers/topic_reports.py,
+(routers/kundli.py's /reading and /ask, routers/topic_reports.py,
 routers/career_report.py, routers/rajyogas.py).
 
 This is the seam between the new db/ persistence layer and the

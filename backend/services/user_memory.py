@@ -6,7 +6,7 @@ Two halves:
 
   get_memory_summary(db, user_id)
       Read side — fetch the user's current distilled memory so
-      routes/kundli.py can hand it to ask_chart() as prompt context.
+      routers/kundli.py can hand it to ask_chart() as prompt context.
 
   update_memory_after_exchange(user_id, question, answer)
       Write side — fold the newest Q&A exchange into the rolling summary

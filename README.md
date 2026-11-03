@@ -30,8 +30,31 @@ Learn (/learn)
 
 ### Pages
 
+Source of truth: `frontend/src/App.jsx`.
+
 | Route | Description |
 |-------|-------------|
+| `/` | Landing — product intro, AI demo, how-it-works (signed-in visitors go to `/home`) |
+| `/generate` | Birth details form (date, time, place) |
+| `/kundli` | Full chart viewer: Birth Chart, Divisional, Planets, Dasha, Transit, Download, Advanced |
+| `/insights` | AI reading, Rajyogas, Career and topic reports for a chart |
+| `/ask` | Ask AI — chart-specific Q&A (durable conversation + memory when signed in) |
+| `/career-report` | Standalone career report |
+| `/panchang` | Today's / monthly Panchang for the current location |
+| `/week-ahead` | Seven-day outlook |
+| `/home` | Signed-in dashboard: identity, inline chart, planets, dasha timeline, yogas, topic snapshots, Ask AI, Knowledge Center links |
+| `/onboarding` | First-time chart setup for signed-in users without a profile |
+| `/account` | Profile (name, verified email & mobile, avatar, language), saved astrology profile, sessions |
+| `/login` | Phone OTP, email OTP or Google sign-in |
+| `/admin` | Admin dashboard (role `admin`) — users, astrologers & KYC, settings, testimonials, audit log |
+| `/astrologer` | Astrologer dashboard (role `astrologer`) — overview, bookings, profile |
+| `/learn` | Knowledge Center hub; `/learn/zodiac` + one page per sign (`/learn/zodiac/aries` …), `/learn/{nakshatras,planets,houses,dashas,yogas,doshas}`, and article series under `/learn/basics/*`, `/learn/paths/*`, `/learn/career/*`, `/learn/marriage/*` |
+| `/blog`, `/blog/:slug` | Blog listing and article |
+| `/testimonials` | Testimonials |
+| `/pricing`, `/about`, `/faq`, `/contact` | Marketing pages |
+| `/privacy`, `/terms`, `/refund-policy`, `/disclaimer` | Legal |
+
+-------|-------------|
 | `/` | Landing — product intro, AI demo, how-it-works |
 | `/generate` | Birth details form (date, time, place) |
 | `/kundli` | Full chart viewer: Birth Chart, Divisional, Planets, Dasha, Transit, Download, Advanced, Insights (AI reading, Rajyogas, Career), Ask AI |
@@ -63,14 +86,15 @@ Learn (/learn)
 | **Routing** | react-router-dom 7 |
 | **i18n** | react-i18next (English + Hindi) |
 | **SEO** | react-helmet-async, JSON-LD schema, sitemap.xml |
-| **Backend** | FastAPI (Python 3.12) |
+| **Backend** | FastAPI (Python 3.11 in Docker; 3.12 works locally) |
 | **Astrology** | pyswisseph (Swiss Ephemeris C binding) |
-| **Database** | PostgreSQL, SQLAlchemy 2.x, Alembic (8 migrations) |
-| **Auth** | Phone OTP (MSG91 / 2Factor) + Google OAuth, JWT + rotating httpOnly refresh tokens |
-| **AI** | OpenRouter (configurable model, defaults to a free tier) primary, Claude direct fallback, Groq/Llama final fallback |
+| **Database** | PostgreSQL, SQLAlchemy 2.x, Alembic (12 migrations) |
+| **Auth** | Phone OTP (MSG91 / 2Factor), email OTP (Resend) + Google OAuth, JWT + rotating httpOnly refresh tokens |
+| **AI** | One provider chain (`backend/services/llm.py`): OpenRouter (configurable model, defaults to a free tier) → Claude direct → Groq/Llama |
 | **Deployment** | Frontend → Vercel, Backend → Railway |
 | **Monitoring** | Sentry (frontend + backend, opt-in via env var) |
 | **Security** | CSP, HSTS, X-Frame-Options, slowapi rate limiting |
+| **Tests** | pytest (backend), Vitest + React Testing Library (frontend); CI on PRs to `main` and `pre-production` |
 
 ---
 
@@ -100,9 +124,9 @@ Learn (/learn)
 
 ## Authentication & Sessions
 
-- Phone OTP or Google OAuth sign-in
+- Phone OTP, email OTP or Google OAuth sign-in. Adding/changing an account's email or mobile requires a code sent to the new address; sign-in only links accounts by a *verified* email
 - **Access token**: 15-minute JWT, memory-only (never `localStorage`)
-- **Refresh token**: 30-day rotating opaque token in an `httpOnly, Secure, SameSite=None` cookie — single-use, theft-detection via revocation replay check
+- **Refresh token**: 30-day rotating opaque token in an `httpOnly, Secure, SameSite=None` cookie — single-use, theft-detection via revocation replay check (a token rotated <30s ago gets a 409 instead, so two tabs refreshing at once don't log the user out)
 - Sessions listed and revocable at `/account`
 - No idle-timeout (users stay logged in until they explicitly log out or 30 days of inactivity)
 
@@ -139,7 +163,7 @@ StarJyotish/
 │   │   │   └── astrologyProfiles.js  # Profile create/list with backend sync
 │   │   ├── contexts/
 │   │   │   └── AuthContext.jsx  # Auth state, access token, authedRequest()
-│   │   ├── hooks/               # useScrollProgress, useScrolledPast, etc.
+│   │   ├── hooks/               # useScrollProgress, useWindowScrolledPast, etc.
 │   │   ├── api/                 # fetch wrappers for each backend endpoint
 │   │   └── i18n/
 │   │       ├── en.json
@@ -150,13 +174,15 @@ StarJyotish/
 │       └── icon-512.png
 │
 ├── backend/
-│   ├── routes/                  # /api/kundli/* — chart, reading, ask, etc.
-│   ├── routers/                 # /api/auth/*, /api/account/*
-│   ├── services/                # chart_context, jwt_service, geocode, etc.
+│   ├── main.py                  # FastAPI app: middleware, CORS, router registration
+│   ├── routers/                 # One module per API area (kundli, auth, account, admin, astrologer, panchang, reports…)
+│   ├── services/                # Domain logic: astro_calc, divisional_charts, dasha, panchang, llm (provider chain), ai, report generators…
+│   ├── models/                  # Pydantic request/response schemas (API shapes)
 │   ├── db/
-│   │   ├── models/              # SQLAlchemy models (User, UserSession, BirthProfile, …)
+│   │   ├── models/              # SQLAlchemy tables (User, UserSession, BirthProfile, Report, …) — not the same as models/ above
 │   │   └── repositories/        # Data access layer
-│   └── alembic/                 # 8 migrations: 0001_initial → 0008_*
+│   ├── alembic/                 # 12 migrations: 0001_initial_schema → 0012_add_newsletter_subscribers
+│   └── tests/                   # pytest; DB tests use TEST_DATABASE_URL (see tests/conftest.py)
 │
 ├── docs/
 │   ├── vision/                  # PRODUCT_ARCHITECTURE.md, USER_JOURNEY.md, etc.
@@ -199,39 +225,46 @@ Typography: **Fraunces** (serif, headings) + **Inter** (sans-serif, body).
 ```bash
 cd frontend
 npm install
-cp .env.example .env          # set VITE_API_BASE=http://localhost:8000
-npm run dev                   # http://localhost:5173
+cp .env.example .env          # leave VITE_API_URL unset: Vite proxies /api to localhost:8000
+npm run dev                   # http://localhost:3000
+npm test                      # Vitest
 ```
 
 ### Backend
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env          # set DATABASE_URL, JWT_SECRET_KEY, COOKIE_SECURE=false
+pip install -r requirements-dev.txt   # production pins + pytest/httpx
+cp .env.example .env          # see backend/.env.example for every variable
 alembic upgrade head
 uvicorn main:app --reload     # http://localhost:8000
+pytest                        # needs TEST_DATABASE_URL for the DB-backed tests
 ```
 
 ### Environment variables
 
+`backend/.env.example` and `frontend/.env.example` are the complete, commented
+lists. The ones you need for a working local setup:
+
 **Backend `.env`:**
 ```
-DATABASE_URL=postgresql://user:pass@localhost:5432/starjyotish
-JWT_SECRET_KEY=<64-char random hex>
-COOKIE_SECURE=false           # true in production
-OPENROUTER_API_KEY=           # primary LLM
-OPENROUTER_MODEL=             # model OpenRouter is asked for — defaults to a free-tier model
-ANTHROPIC_API_KEY=            # 1st fallback (direct Claude)
-GROQ_API_KEY=                 # final fallback LLM
-GOOGLE_CLIENT_ID=             # for Google OAuth
-RESEND_API_KEY=               # for email OTP
+DATABASE_URL=postgresql://user:pass@localhost:5432/starjyotish_dev
+TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/starjyotish_test   # pytest only
+JWT_SECRET_KEY=<random, see .env.example>
+OTP_HASH_SECRET=<a different random value>
+COOKIE_SECURE=false           # local http only; leave unset (true) in production
+OTP_DEV_MODE=true             # local only: OTP codes returned in the API response. NEVER in production
+OPENROUTER_API_KEY= / ANTHROPIC_API_KEY= / GROQ_API_KEY=   # any one is enough for AI features
+GOOGLE_CLIENT_ID=             # Google sign-in
+MSG91_AUTH_KEY= or TWOFACTOR_API_KEY=   # SMS OTP (production)
+RESEND_API_KEY=               # email OTP, email verification, newsletter (production)
+FRONTEND_URL=                 # production CORS origins, e.g. https://starjyotish.com,https://www.starjyotish.com
 SENTRY_DSN=                   # optional
 ```
 
 **Frontend `.env`:**
 ```
-VITE_API_BASE=http://localhost:8000
+VITE_API_URL=                 # unset locally (dev proxy); https://api.starjyotish.com in production
 VITE_GOOGLE_CLIENT_ID=
 VITE_SENTRY_DSN=              # optional
 ```
@@ -240,8 +273,14 @@ VITE_SENTRY_DSN=              # optional
 
 ## Deployment
 
-| Service | Platform | Trigger |
-|---------|----------|---------|
+| Service | Platform | Notes |
+|---------|----------|-------|
+| Frontend | Vercel | `https://starjyotish.com`. CSP in `frontend/vercel.json` only allows API calls to `https://api.starjyotish.com` |
+| Backend | Railway (Docker, `backend/Dockerfile`) | `https://api.starjyotish.com`. Migrations are **not** run on deploy: run `alembic upgrade head` after deploying a change that adds one |
+| Database | Railway PostgreSQL | |
+| CI | GitHub Actions (`.github/workflows/ci.yml`) | Backend pytest against Postgres; frontend lint, Vitest, build — on pushes/PRs to `main` and `pre-production` |
+
+---------|----------|---------|
 | Frontend | Vercel | Push to `main` (GitHub Actions) |
 | Backend | Railway | Push to `main` (GitHub Actions) |
 | Database | Railway PostgreSQL | Persistent, Alembic migrated on deploy |
@@ -251,6 +290,5 @@ VITE_SENTRY_DSN=              # optional
 ## Remaining Work - will keep updating this list as we go
 
 - **Payments** — Razorpay integration pending company registration + GST
-- **Reading history tracking** — backend model exists (`ReportSummaryOut`); frontend "Continue Your Journey" still uses a static graph rather than real history
-- **Ask Jyoti / Reports as canonical routes** — currently tabs inside `/kundli`; promoted to global nav once they have standalone URLs
+- **Reading history tracking** — `GET /api/account/reports/me` exists (reports saved with `save_report: true`); the frontend doesn't send `save_report` or show history yet
 - **Idle timeout** — no inactivity logout yet; straightforward to add via `useIdleLogout` hook in `AuthContext.jsx`

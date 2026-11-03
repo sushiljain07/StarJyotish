@@ -6,7 +6,7 @@ independent, unrelated row.
 This is intentionally separate from Report (report_type=ask): today,
 services/persistence.py's opt-in hook saves every /kundli/ask call as its
 own standalone Report row, and that keeps working unchanged. ChatSession/
-ChatMessage now backs the durable conversation path in routes/kundli.py's
+ChatMessage now backs the durable conversation path in routers/kundli.py's
 ask_kundli(): signed-in users' Ask conversations are persisted here (and
 distilled into UserAiMemory — see services/user_memory.py), while
 anonymous callers still use the in-memory services/ask_sessions.py store.

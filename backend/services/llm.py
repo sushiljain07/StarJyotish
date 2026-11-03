@@ -76,7 +76,7 @@ def call_openrouter(messages: list[dict], *, json_mode: bool, max_tokens: int, t
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": _env("OPENROUTER_SITE_URL", "https://starjyotish.app"),
+                "HTTP-Referer": _env("OPENROUTER_SITE_URL", "https://starjyotish.com"),
                 "X-Title": _env("OPENROUTER_SITE_NAME", "Star Jyotish"),
             },
             json=payload,

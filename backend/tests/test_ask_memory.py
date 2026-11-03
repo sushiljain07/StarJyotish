@@ -75,7 +75,7 @@ def _post_ask(headers=None, session_id=None):
     if session_id:
         body["session_id"] = session_id
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.ask_chart", return_value=("A grounded answer.", "Claude")) as mocked, \
+         patch("routers.kundli.ask_chart", return_value=("A grounded answer.", "Claude")) as mocked, \
          patch("services.user_memory.update_memory_after_exchange") as mem_task:
         resp = client.post("/api/kundli/ask", json=body, headers=headers or {})
     return resp, mocked, mem_task
@@ -216,7 +216,7 @@ def test_failed_report_save_keeps_chat_messages(db, authed_user):
     user, headers = authed_user
     body = {**VALID_BODY, "save_report": True}
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.ask_chart", return_value=("A grounded answer.", "Claude")), \
+         patch("routers.kundli.ask_chart", return_value=("A grounded answer.", "Claude")), \
          patch("services.user_memory.update_memory_after_exchange"), \
          patch("db.repositories.report_repository.ReportRepository.save_generated_report",
                side_effect=RuntimeError("db hiccup")):

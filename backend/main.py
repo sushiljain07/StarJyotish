@@ -13,7 +13,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from services.rate_limit import limiter
 from services.security_headers import SecurityHeadersMiddleware
 from services.monitoring import init_sentry
-from routes.kundli import router as kundli_router
+from routers.kundli import router as kundli_router
 from routers.career_report import router as career_router
 from routers.rajyogas import router as rajyogas_router
 from routers.topic_reports import router as topic_reports_router
@@ -44,8 +44,8 @@ app.add_middleware(SlowAPIMiddleware)
 @app.exception_handler(RuntimeError)
 def db_not_configured_handler(request: Request, exc: RuntimeError):
     # db/session.py's get_db() raises plain RuntimeError when DATABASE_URL
-    # isn't set, for the handful of endpoints (routers/account.py) that are
-    # meaningless without persistence. Surfacing this as a clean 503 rather
+    # isn't set, for the endpoints that are meaningless without persistence
+    # (login, account, admin, astrologer, newsletter). Surfacing this as a clean 503 rather
     # than an unhandled 500 makes "Postgres isn't provisioned yet" obvious
     # in the response instead of looking like a server bug.
     if "DATABASE_URL is not configured" in str(exc):

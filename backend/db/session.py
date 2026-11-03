@@ -2,7 +2,7 @@
 Engine/session setup, plus the two FastAPI dependencies the rest of the
 backend should import: `get_db` and `get_db_optional`.
 
-Why a sync engine: every existing route in routes/ and routers/ is a plain
+Why a sync engine: every existing route in routers/ is a plain
 `def` (not `async def`) — FastAPI already runs those in a thread pool, so a
 sync psycopg2 session is the simplest correct choice and matches the
 codebase's existing style. There's no mixed sync/async session-handling

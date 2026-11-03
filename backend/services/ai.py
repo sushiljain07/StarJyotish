@@ -6,6 +6,7 @@ from datetime import date as date_, datetime, timezone
 from typing import Optional
 from fastapi import HTTPException
 
+from services.astro_utils import get_planet_dignity
 from services.llm import LLMUnavailable, complete as llm_complete
 
 _SKILLS_BASE = Path(__file__).parent.parent.parent / "astro-skills"
@@ -47,26 +48,6 @@ _SKILL_LABELS: dict[str, str] = {
     "nakshatra/SKILL.md":                          "Nakshatra Guide",
     "rudraksha/SKILL.md":                          "Rudraksha Guide",
     "vedic-kundli/SKILL.md":                       "Vedic Kundli Reader",
-}
-
-# ── Classical dignity tables (sign_index 0=Aries … 11=Pisces) ────────────
-
-_EXALTED = {
-    "Sun": 0, "Moon": 1, "Mars": 9, "Mercury": 5,
-    "Jupiter": 3, "Venus": 11, "Saturn": 6,
-}
-_DEBILITATED = {
-    "Sun": 6, "Moon": 7, "Mars": 3, "Mercury": 11,
-    "Jupiter": 9, "Venus": 5, "Saturn": 0,
-}
-_OWN_SIGNS: dict[str, list[int]] = {
-    "Sun":     [4],
-    "Moon":    [3],
-    "Mars":    [0, 7],
-    "Mercury": [2, 5],
-    "Jupiter": [8, 11],
-    "Venus":   [1, 6],
-    "Saturn":  [9, 10],
 }
 
 _SECTION_NAMES = [
@@ -367,16 +348,20 @@ _CLASSICAL = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 # Dignity helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
+# The AI reading, Ask and free-prediction prompts show only the strongest
+# dignities, in this wording. Friendly/enemy/neutral are deliberately left
+# out of these prompts (the free prediction's banned-word filter would strip
+# sentences the model writes about them), and the nodes stay unlabelled.
+_PROMPT_DIGNITY_LABELS = {"exalted": "exalted", "debilitated": "debilitated", "own": "own sign"}
+
+
 def get_dignity(planet_name: str, sign_index: int) -> str:
+    """Short dignity label for the AI prompts, derived from the one shared
+    dignity table (astro_utils.get_planet_dignity) that the topic reports
+    also use, so the two can't drift apart."""
     if planet_name not in _CLASSICAL:
         return ""
-    if _EXALTED.get(planet_name) == sign_index:
-        return "exalted"
-    if _DEBILITATED.get(planet_name) == sign_index:
-        return "debilitated"
-    if sign_index in _OWN_SIGNS.get(planet_name, []):
-        return "own sign"
-    return ""
+    return _PROMPT_DIGNITY_LABELS.get(get_planet_dignity(planet_name, sign_index), "")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

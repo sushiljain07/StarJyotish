@@ -1,5 +1,5 @@
 // frontend/src/pages/Landing.jsx
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { TOPICS } from '../config/topics'
 import { isLoginRequired, hasUsedFreeKundli } from '../config/auth'
@@ -44,7 +44,7 @@ const FAQ_IDS = [1, 2, 3, 4, 5]
 export default function Landing() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   // Only meaningfully non-null for a signed-in visitor who's already
   // onboarded — used to route straight into their own Insights/Ask
   // experience instead of the anonymous "generate a chart" detour.
@@ -101,6 +101,20 @@ export default function Landing() {
       return
     }
     goToForm(null, presetQuestion ? { presetQuestion } : { landToAsk: true })
+  }
+
+  // `/` is the PWA manifest's start_url, so a logged-in visitor lands here
+  // on every mobile home-screen launch, not just the rare direct hit the
+  // auth-aware copy below was designed for — send them straight to their
+  // real home instead. OnboardingGate on /home still redirects to
+  // /onboarding for a signed-in user with no saved profile yet.
+  //
+  // Until AuthContext's mount-time session refresh settles we don't know
+  // which visitor this is, so render nothing (as ProtectedRoute does)
+  // rather than flashing the signed-out landing page at a returning user.
+  if (authLoading) return null
+  if (isAuthenticated) {
+    return <Navigate to="/home" replace />
   }
 
   return (

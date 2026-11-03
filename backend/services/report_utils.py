@@ -1,16 +1,16 @@
 """
 Shared LLM-calling and response-parsing utilities for all "topic report"
-generators (career, relationship, health, wealth). Extracted verbatim from
-career_analysis.py, where the logic was already fully generic — nothing
-here is career-specific.
+generators (career, relationship, health, wealth). The provider chain
+itself lives in services/llm.py, shared with services/ai.py.
 """
 import json
 import logging
-import os
 import re
-import time
-import requests
+
+from datetime import date
 from typing import Optional
+
+from services.llm import complete as llm_complete
 
 logger = logging.getLogger("starjyotish.report_utils")
 
@@ -29,102 +29,6 @@ def extract_json(raw: str) -> dict:
     raise ValueError(f"No valid JSON found in response (first 300 chars): {raw[:300]}")
 
 
-# Model OpenRouter is asked for — set via OPENROUTER_MODEL so switching
-# models is a config change, not a code change (see services/ai.py, which
-# shares this same env var). Defaults to a $0/M-token free model.
-_OPENROUTER_MODEL = (os.getenv("OPENROUTER_MODEL") or "openai/gpt-oss-20b:free").strip()
-
-
-def _call_openrouter(prompt: str, system: str) -> str:
-    """Call _OPENROUTER_MODEL via OpenRouter using OPENROUTER_API_KEY."""
-    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
-    if not api_key:
-        raise ValueError("OPENROUTER_API_KEY not set")
-    or_messages = ([{"role": "system", "content": system}] if system else []) + \
-                  [{"role": "user", "content": prompt}]
-    resp = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://starjyotish.app"),
-            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Star Jyotish"),
-        },
-        json={
-            "model": _OPENROUTER_MODEL,
-            "max_tokens": 7000,
-            "messages": or_messages,
-            "response_format": {"type": "json_object"},
-        },
-        timeout=90,
-    )
-    if resp.status_code in (402, 403):
-        try:
-            detail = resp.json().get("error", {}).get("message", resp.text[:200])
-        except Exception:
-            detail = resp.text[:200]
-        raise RuntimeError(f"OpenRouter {resp.status_code}: {detail}")
-    resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"]
-
-
-def _call_claude_direct(prompt: str, system: str) -> str:
-    """Call Claude directly via the Anthropic SDK using ANTHROPIC_API_KEY."""
-    import anthropic as _anthropic
-    api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-    if not api_key:
-        raise ValueError("ANTHROPIC_API_KEY not set")
-    client = _anthropic.Anthropic(api_key=api_key)
-    create_kwargs: dict = dict(
-        model="claude-sonnet-4-6",
-        max_tokens=7000,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    if system:
-        create_kwargs["system"] = system
-    msg = client.messages.create(**create_kwargs)
-    return msg.content[0].text
-
-
-def _call_groq(prompt: str, groq_system_prompt: str, groq_extra: str, groq_extra_header: str) -> str:
-    """Call Groq/Llama with retry on 429, using the compact topic-specific system prompt."""
-    groq_key = os.getenv("GROQ_API_KEY", "").strip()
-    if not groq_key:
-        raise ValueError("GROQ_API_KEY not set")
-    groq_system = groq_system_prompt
-    if groq_extra:
-        groq_system = groq_system + f"\n\n{groq_extra_header}\n" + groq_extra
-    last_exc: Exception = RuntimeError("no attempts made")
-    for attempt in range(3):
-        try:
-            resp = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {groq_key}",
-                         "Content-Type": "application/json"},
-                json={
-                    "model": "llama-3.3-70b-versatile",
-                    "messages": [
-                        {"role": "system", "content": groq_system},
-                        {"role": "user",   "content": prompt},
-                    ],
-                    "response_format": {"type": "json_object"},
-                },
-                timeout=90,
-            )
-            if resp.status_code == 429:
-                last_exc = RuntimeError(f"rate limited (HTTP 429) after {attempt + 1}/3 attempts")
-                time.sleep(2 ** attempt)
-                continue
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
-        except Exception as exc:
-            last_exc = exc
-            if attempt == 2:
-                raise
-            time.sleep(2 ** attempt)
-    raise RuntimeError(f"Groq API error: {last_exc}")
-
-
 def call_llm(
     prompt: str,
     system: str = "",
@@ -134,10 +38,11 @@ def call_llm(
     log_prefix: str = "report",
 ) -> tuple[dict, str]:
     """
-    Tries providers in order: OpenRouter (OPENROUTER_MODEL) -> Anthropic
-    (direct) -> Groq. Each stage is skipped if its API key isn't set in the
-    environment; any other failure (timeout, rate limit, bad response) also
-    falls through to the next stage.
+    Runs the shared provider chain (services/llm.py): OpenRouter -> Anthropic
+    (direct) -> Groq. Each stage is skipped if its API key isn't set; any
+    other failure (timeout, rate limit, empty or null content) also falls
+    through to the next stage. Raises llm.LLMUnavailable (a RuntimeError)
+    when none answers.
     OpenRouter and Claude receive the full `system` prompt. `groq_system_prompt`
     is the compact, topic-specific system prompt Groq receives (to avoid 413
     Payload Too Large) — callers pass their own (e.g.
@@ -152,28 +57,69 @@ def call_llm(
     Returns (parsed_json, provider_label) — provider_label reflects whichever
     one actually served this request, since the fallback can kick in silently.
     """
-    stages = [
-        (_call_openrouter, (prompt, system), "OpenRouter"),
-        (_call_claude_direct, (prompt, system), "Claude"),
-        (_call_groq, (prompt, groq_system_prompt, groq_extra, groq_extra_header), "Groq · Llama"),
-    ]
-    reasons: list[str] = []
-    for fn, call_args, label in stages:
-        try:
-            text = fn(*call_args)
-        except ValueError as exc:
-            reasons.append(f"{label}: {exc}")
-            continue
-        except Exception as exc:
-            reasons.append(f"{label}: {type(exc).__name__}: {exc}")
-            logger.warning("[%s] %s error (%s), trying next provider.", log_prefix, label, exc)
-            continue
-        try:
-            return extract_json(text), label
-        except (json.JSONDecodeError, ValueError) as e:
-            raise RuntimeError(f"{label} returned non-JSON: {e}") from e
+    groq_system = groq_system_prompt
+    if groq_extra:
+        groq_system = groq_system + f"\n\n{groq_extra_header}\n" + groq_extra
+    messages = ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": prompt}]
+    groq_messages = [{"role": "system", "content": groq_system}, {"role": "user", "content": prompt}]
 
-    raise RuntimeError(f"No LLM provider available — {'; '.join(reasons)}")
+    # Reports are long (up to ~7k tokens of JSON), hence the larger budget
+    # and timeout than services/ai.py's calls.
+    text, label = llm_complete(
+        messages, json_mode=True, max_tokens=7000, timeout=90,
+        groq_messages=groq_messages, log_prefix=log_prefix,
+    )
+    try:
+        return extract_json(text), label
+    except (json.JSONDecodeError, ValueError) as e:
+        raise RuntimeError(f"{label} returned non-JSON: {e}") from e
+
+
+# ── Shared pieces of every generate_*_report orchestrator ─────────────────
+# career, relationship, wealth and health each used to carry their own copy
+# of these steps; a fix to one silently skipped the others.
+
+GEMSTONE_SYSTEM_HEADER = "# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE"
+GEMSTONE_GROQ_HEADER = "## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT"
+DEFAULT_AGE = 25  # used when the birth date is missing or unparseable
+
+
+def compute_age(birth_date: Optional[str], today: Optional[date] = None) -> int:
+    """Whole years since `birth_date` (YYYY-MM-DD) as of `today`."""
+    today = today or date.today()
+    if not birth_date:
+        return DEFAULT_AGE
+    try:
+        birth = date.fromisoformat(birth_date)
+    except (ValueError, TypeError):
+        return DEFAULT_AGE
+    return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
+
+
+def add_gemstone_context(system: str, chart_data: dict, gemstone_context: str) -> tuple[str, str]:
+    """Append the gemstone knowledge base to the full system prompt, and
+    return a small per-ascendant excerpt for Groq (whose request-size limit
+    can't take the whole base). Returns (system, groq_excerpt)."""
+    if not gemstone_context:
+        return system, ""
+    from services.skill_loader import get_gemstone_excerpt_for_ascendant
+    system = f"{system}\n\n{GEMSTONE_SYSTEM_HEADER}\n{gemstone_context}"
+    ascendant_sign = chart_data.get("ascendant", {}).get("sign", "")
+    return system, get_gemstone_excerpt_for_ascendant(ascendant_sign)
+
+
+def extract_sections(raw: dict, section_keys: list[str]) -> dict:
+    """{key: {title, content}} for each requested section the model actually
+    filled in; empty or malformed sections are dropped."""
+    sections = {}
+    for key in section_keys:
+        section = raw.get(key)
+        if isinstance(section, dict) and section.get("content"):
+            sections[key] = {
+                "title": section.get("title", key.replace("_", " ").title()),
+                "content": section["content"],
+            }
+    return sections
 
 
 _FORBIDDEN_TERM_REPLACEMENTS = [

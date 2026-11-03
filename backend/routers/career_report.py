@@ -145,7 +145,7 @@ def get_career_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     )
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.career,
+        db, request=request, save=body.save_report, report_type=ReportType.career,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,

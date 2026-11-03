@@ -126,7 +126,7 @@ def get_reading(request: Request, body: ReadingRequest, db=Depends(get_db_option
     )
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.reading,
+        db, request=request, save=body.save_report, report_type=ReportType.reading,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,
@@ -226,7 +226,7 @@ def ask_kundli(
     response = AskResponse(answer=answer, llm_provider=provider, session_id=session_id)
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.ask,
+        db, request=request, save=body.save_report, report_type=ReportType.ask,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=provider, question=body.question,

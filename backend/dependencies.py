@@ -59,10 +59,10 @@ def get_current_user(
     return user
 
 
-def get_current_user_optional(
-    authorization: Optional[str] = Header(default=None),
-    db: Session = Depends(get_db),
-) -> Optional[User]:
+def user_from_authorization(authorization: Optional[str], db: Session) -> Optional[User]:
+    """Non-raising resolver: the active User behind a valid
+    `Authorization: Bearer` header, or None for a missing, invalid or
+    expired token, an unknown user, or a disabled account."""
     token = _extract_bearer_token(authorization)
     if token is None:
         return None
@@ -77,6 +77,13 @@ def get_current_user_optional(
     if user is None or not user.is_active:
         return None
     return user
+
+
+def get_current_user_optional(
+    authorization: Optional[str] = Header(default=None),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    return user_from_authorization(authorization, db)
 
 
 def get_current_user_soft(

@@ -11,11 +11,16 @@ decides the provider, with MSG91 preferred if both are configured (set
 OTP_PROVIDER=2factor to force the other way around without removing
 either key, e.g. while comparing delivery rates between the two).
 
-In local dev with neither key set, send_otp_sms logs the code to the
-console instead of calling out to a provider — the same "degrade
-gracefully without optional config" pattern db/session.py uses for
-DATABASE_URL, so OTP login is testable end-to-end on a laptop with zero
-SMS spend.
+In local dev with neither key set AND OTP_DEV_MODE=true, send_otp_sms
+logs the code to the console instead of calling out to a provider (and
+the send endpoints echo it back as `debug_code`), so OTP login is
+testable end-to-end on a laptop with zero SMS spend.
+
+The dev fallback is opt-in on purpose: it used to kick in whenever no
+provider key was set, which meant a production deploy that merely lost
+its SMS key would hand every OTP back to whoever requested it — i.e.
+anyone could log in as anyone. Without a provider and without
+OTP_DEV_MODE=true, sending now fails closed with a 503.
 """
 import logging
 import os
@@ -27,6 +32,19 @@ logger = logging.getLogger("starjyotish.otp")
 
 _MSG91_URL = "https://control.msg91.com/api/v5/flow/"
 _TWOFACTOR_URL = "https://2factor.in/API/V1"
+
+
+def otp_dev_mode_enabled() -> bool:
+    """True only when OTP_DEV_MODE is explicitly "true". Never set this in
+    a real deployment: it makes OTP codes visible in API responses."""
+    return (os.getenv("OTP_DEV_MODE") or "").strip().lower() == "true"
+
+
+def otp_unavailable(channel: str) -> HTTPException:
+    """Fail-closed response when no delivery provider is configured and
+    dev mode is off. Deliberately never logs the code."""
+    logger.error("No %s OTP provider configured and OTP_DEV_MODE is not 'true' — refusing to issue code.", channel)
+    return HTTPException(status_code=503, detail="Login codes are temporarily unavailable. Please try again later.")
 
 
 def _send_via_msg91(phone_number: str, code: str) -> None:
@@ -87,6 +105,8 @@ def send_otp_sms(phone_number: str, code: str) -> str:
         _send_via_2factor(phone_number, code)
         return "2factor"
 
-    logger.warning("No OTP provider configured (MSG91_AUTH_KEY/TWOFACTOR_API_KEY unset) — "
+    if not otp_dev_mode_enabled():
+        raise otp_unavailable("SMS")
+    logger.warning("OTP_DEV_MODE: no SMS provider configured — "
                     "logging code instead of sending SMS. phone=%s code=%s", phone_number, code)
     return "dev-console"

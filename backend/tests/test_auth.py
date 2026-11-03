@@ -29,6 +29,9 @@ pytestmark = pytest.mark.skipif(
 os.environ.setdefault("JWT_SECRET_KEY", "test-only-secret-not-for-production-use")
 os.environ.setdefault("OTP_HASH_SECRET", "test-only-otp-secret-not-for-production-use")
 os.environ.setdefault("COOKIE_SECURE", "false")  # TestClient talks http, not https
+# Tests read the OTP from the send response, which only happens in
+# explicit dev mode (services/otp_provider.otp_dev_mode_enabled).
+os.environ.setdefault("OTP_DEV_MODE", "true")
 
 
 def _unique_phone() -> str:
@@ -239,3 +242,42 @@ def test_cannot_link_phone_already_owned_by_another_account(client):
     conflict = client.post("/api/account/phone/send", headers={"Authorization": f"Bearer {access_b}"},
                             json={"phone_number": phone_a})
     assert conflict.status_code == 409
+
+
+def _clear_otp_providers(monkeypatch):
+    for key in ("MSG91_AUTH_KEY", "MSG91_TEMPLATE_ID", "TWOFACTOR_API_KEY", "OTP_PROVIDER", "RESEND_API_KEY"):
+        monkeypatch.delenv(key, raising=False)
+
+
+def test_otp_send_fails_closed_without_provider_or_dev_mode(client, monkeypatch):
+    # Regression: a deploy missing its SMS key used to fall back to the
+    # dev console and return the code in the response — anyone could log
+    # in as anyone. Without OTP_DEV_MODE=true it must refuse instead.
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.delenv("OTP_DEV_MODE", raising=False)
+    resp = client.post("/api/auth/otp/send", json={"phone_number": _unique_phone()})
+    assert resp.status_code == 503
+    assert "debug_code" not in resp.text
+
+
+def test_email_otp_send_fails_closed_without_provider_or_dev_mode(client, monkeypatch):
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.setenv("OTP_DEV_MODE", "false")
+    email = f"user-{uuid.uuid4().hex[:10]}@example.com"
+    resp = client.post("/api/auth/otp/send", json={"phone_number": email})
+    assert resp.status_code == 503
+
+
+def test_otp_send_with_real_provider_never_returns_code(client, monkeypatch):
+    # Even with dev mode on, a configured provider means the code goes by
+    # SMS only and never appears in the response.
+    from unittest.mock import patch
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.setenv("OTP_DEV_MODE", "true")
+    monkeypatch.setenv("MSG91_AUTH_KEY", "test-key")
+    monkeypatch.setenv("MSG91_TEMPLATE_ID", "test-template")
+    with patch("services.otp_provider._send_via_msg91") as sent_sms:
+        resp = client.post("/api/auth/otp/send", json={"phone_number": _unique_phone()})
+    assert resp.status_code == 200
+    assert resp.json()["debug_code"] is None
+    sent_sms.assert_called_once()

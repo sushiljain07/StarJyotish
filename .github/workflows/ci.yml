@@ -44,6 +44,9 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/starjyotish_test
       JWT_SECRET_KEY: ci-only-secret-not-for-production-use
       OTP_HASH_SECRET: ci-only-otp-secret-not-for-production-use
+      # Lets the OTP tests read the code from the send response. Must never
+      # be set in a real deployment (see services/otp_provider.py).
+      OTP_DEV_MODE: "true"
     steps:
       - uses: actions/checkout@v4
 

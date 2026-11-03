@@ -1,6 +1,7 @@
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
+import logging
 import os
 import re
 from fastapi import FastAPI, Request
@@ -114,5 +115,8 @@ def health_db():
         with SessionLocal() as db:
             db.execute(text("SELECT 1"))
         return {"database": "connected"}
-    except Exception as e:
-        return JSONResponse(status_code=503, content={"database": "error", "detail": str(e)})
+    except Exception:
+        # Log the driver error server-side only: psycopg2 messages include
+        # the DB host, IP, port and username, and this endpoint is public.
+        logging.getLogger("starjyotish.health").exception("Database health check failed")
+        return JSONResponse(status_code=503, content={"database": "error"})

@@ -892,6 +892,7 @@ def identify_career_fields(
 # exact original call signature and behavior so nothing else in this file
 # needs to change.
 from services.report_utils import extract_json as _extract_json
+from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
 from services.report_utils import call_llm as _report_call_llm
 
 
@@ -900,7 +901,7 @@ def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict
     return _report_call_llm(
         prompt, system=system, groq_extra=groq_extra,
         groq_system_prompt=GROQ_SYSTEM_PROMPT,
-        groq_extra_header="## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT",
+        groq_extra_header=GEMSTONE_GROQ_HEADER,
         log_prefix="career",
     )
 
@@ -1330,17 +1331,8 @@ def generate_career_report(
     lagna_idx = chart_data.get("ascendant", {}).get("sign_index", 0)
 
     # Compute user age and current year from birth date
-    today        = _date.today()
-    current_year = today.year
-    user_age     = 25  # sensible default when birth_date unavailable
-    if birth_date:
-        try:
-            birth    = _date.fromisoformat(birth_date)
-            user_age = today.year - birth.year - (
-                (today.month, today.day) < (birth.month, birth.day)
-            )
-        except (ValueError, TypeError):
-            pass
+    current_year = _date.today().year
+    user_age     = compute_age(birth_date)
 
     ak_data      = calculate_amatyakaraka(planets)
     jvb          = determine_job_vs_business(planets, lagna_idx, d10_chart=d10_chart)
@@ -1372,14 +1364,7 @@ def generate_career_report(
     # GROQ_SYSTEM_PROMPT instead, but does get a small per-ascendant gemstone
     # excerpt via groq_extra below — full gemstone_recommendation depth still
     # only happens on Claude, but Groq is no longer completely ungrounded.
-    if gemstone_context:
-        system = system + "\n\n# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n" + gemstone_context
-
-    groq_gemstone_excerpt = ""
-    if gemstone_context:
-        from services.skill_loader import get_gemstone_excerpt_for_ascendant
-        ascendant_sign = chart_data.get("ascendant", {}).get("sign", "")
-        groq_gemstone_excerpt = get_gemstone_excerpt_for_ascendant(ascendant_sign)
+    system, groq_gemstone_excerpt = add_gemstone_context(system, chart_data, gemstone_context)
 
     prompt = _build_career_prompt(
         chart_data=chart_data,

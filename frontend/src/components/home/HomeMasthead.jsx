@@ -18,6 +18,7 @@
 // lives once, in the TodayWindow beat, rather than duplicated here.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { localDateStr } from '../../utils/localDate'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
 // 12-hour strings with an AM/PM suffix (see services/panchang.py's _fmt).
@@ -77,7 +78,7 @@ function useCheckInStreak() {
   useEffect(() => {
     try {
       const today = new Date()
-      const todayKey = today.toISOString().slice(0, 10)
+      const todayKey = localDateStr(today)
       const raw = JSON.parse(localStorage.getItem(VISIT_KEY) || '[]')
       let days = Array.isArray(raw) ? raw : []
       if (!days.includes(todayKey)) days = [...days, todayKey]
@@ -88,7 +89,7 @@ function useCheckInStreak() {
 
       let streak = 0
       const cursor = new Date(today)
-      while (daySet.has(cursor.toISOString().slice(0, 10))) {
+      while (daySet.has(localDateStr(cursor))) {
         streak++
         cursor.setDate(cursor.getDate() - 1)
       }
@@ -97,7 +98,7 @@ function useCheckInStreak() {
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today)
         d.setDate(d.getDate() - i)
-        beads.push(daySet.has(d.toISOString().slice(0, 10)))
+        beads.push(daySet.has(localDateStr(d)))
       }
 
       setState({ streak, beads })

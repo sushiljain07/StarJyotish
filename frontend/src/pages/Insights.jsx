@@ -2,7 +2,7 @@
 // Standalone page for AI readings, Rajyogas, and topic reports.
 // Promoted from the old "Insights" tab inside /kundli to its own URL.
 import { useState, lazy, Suspense } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import AnimatedTabRow from '../components/AnimatedTabRow'
@@ -39,7 +39,6 @@ function buildSubtabs(t, topicId) {
 export default function Insights() {
   const { t } = useTranslation()
   const { state }   = useLocation()
-  const navigate    = useNavigate()
   const { isAuthenticated } = useAuth()
 
   // All hooks before any early return
@@ -47,7 +46,8 @@ export default function Insights() {
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
-  if (!state?.input) { navigate(homeDestination); return null }
+  // <Navigate>, not navigate() — see Result.jsx.
+  if (!state?.input) return <Navigate to={homeDestination} replace />
 
   const { input } = state
   const topic   = getTopic(input?.topic)

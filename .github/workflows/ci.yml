@@ -1,6 +1,7 @@
 name: CI
 
-# Runs on every push and PR against main.
+# Runs on every push and PR against main and pre-production (the branch
+# every feature PR targets — it used to go untested until a PR to main).
 #
 # The backend job spins up a real Postgres service so the full suite runs,
 # not just the subset that works without a database — tests/test_auth.py
@@ -15,9 +16,9 @@ name: CI
 # CI-only Postgres container, not anything real.
 on:
   push:
-    branches: [main]
+    branches: [main, pre-production]
   pull_request:
-    branches: [main]
+    branches: [main, pre-production]
 
 jobs:
   backend:
@@ -68,7 +69,7 @@ jobs:
         run: pytest tests/ -v
 
   frontend:
-    name: Frontend (lint + build)
+    name: Frontend (lint + test + build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -87,6 +88,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Unit tests (Vitest)
+        run: npm test
 
       - name: Build
         run: npm run build

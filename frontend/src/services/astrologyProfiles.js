@@ -34,7 +34,7 @@
 // details, which is fast (< 1 s) and deterministic.
 
 import { fetchKundli } from '../api/astro'
-import { API_BASE } from '../api/config'
+import { fetchWithAuth } from '../api/auth'
 
 export const UNKNOWN_BIRTH_TIME_DEFAULT = '12:00'
 
@@ -82,24 +82,16 @@ function listProfilesLegacy(user) {
 // ── API helpers ─────────────────────────────────────────────────────────
 
 async function apiFetchProfiles(accessToken) {
-  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    credentials: 'include',
-  })
+  const resp = await fetchWithAuth('/api/account/birth-profiles/me', {}, accessToken)
   if (!resp.ok) return null
   return resp.json()
 }
 
 async function apiSaveProfile(accessToken, { label, birth_date, birth_time, place, current_lat, current_lon, current_location_label }) {
-  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/me`, {
+  const resp = await fetchWithAuth('/api/account/birth-profiles/me', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    credentials: 'include',
-    body: JSON.stringify({ label, birth_date, birth_time, place, current_lat, current_lon, current_location_label }),
-  })
+    body: { label, birth_date, birth_time, place, current_lat, current_lon, current_location_label },
+  }, accessToken)
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}))
     throw new Error(err.detail ?? 'Could not save profile')
@@ -108,11 +100,7 @@ async function apiSaveProfile(accessToken, { label, birth_date, birth_time, plac
 }
 
 async function apiDeleteProfile(accessToken, profileId) {
-  const resp = await fetch(`${API_BASE}/api/account/birth-profiles/${profileId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${accessToken}` },
-    credentials: 'include',
-  })
+  const resp = await fetchWithAuth(`/api/account/birth-profiles/${profileId}`, { method: 'DELETE' }, accessToken)
   if (!resp.ok && resp.status !== 404) {
     const err = await resp.json().catch(() => ({}))
     throw new Error(err.detail ?? 'Could not delete profile')

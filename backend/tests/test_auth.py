@@ -125,9 +125,52 @@ def test_refresh_rotates_token_and_old_token_then_fails(client):
     new_cookie = client.cookies.get("sj_refresh")
     assert new_cookie != old_cookie
 
-    # Replaying the now-revoked old token must fail.
+    # Replaying the just-rotated token inside the grace window is treated
+    # as a lost concurrent-refresh race: 409, and the winner's new session
+    # must stay valid (no mass revocation).
+    client.cookies.clear()
+    raced = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
+    assert raced.status_code == 409
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 200
+
+
+def test_refresh_token_reuse_after_grace_window_revokes_everything(client, monkeypatch):
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    old_cookie = client.cookies.get("sj_refresh")
+    assert client.post("/api/auth/refresh").status_code == 200
+    new_cookie = client.cookies.get("sj_refresh")
+
+    import routers.auth as auth_router
+    monkeypatch.setattr(auth_router, "REFRESH_REUSE_GRACE_SECONDS", 0)
+    client.cookies.clear()
     reused = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
     assert reused.status_code == 401
+
+    # Treated as theft: the legitimate new session is revoked too.
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 401
+
+
+def test_cannot_revoke_another_users_session(client):
+    def login():
+        client.cookies.clear()
+        phone = _unique_phone()
+        sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+        resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+        return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+    token_a, cookie_a = login()
+    token_b, _ = login()
+    sessions_a = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {token_a}"}).json()
+    assert len(sessions_a) == 1
+
+    resp = client.delete(f"/api/auth/sessions/{sessions_a[0]['id']}", headers={"Authorization": f"Bearer {token_b}"})
+    assert resp.status_code == 404
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": cookie_a}).status_code == 200
 
 
 def test_logout_revokes_session(client):

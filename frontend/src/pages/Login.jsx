@@ -6,7 +6,6 @@ import CelestialBackdrop from '../components/CelestialBackdrop'
 import PhoneOtpForm from '../components/auth/PhoneOtpForm'
 import GoogleLoginButton from '../components/auth/GoogleLoginButton'
 import { useAuth } from '../contexts/AuthContext'
-import { hasAnyProfile } from '../services/astrologyProfiles'
 
 // Decides where a signed-in visitor lands. An explicit `next` (set by
 // ProtectedRoute.jsx when a signed-out visitor tried to reach a specific
@@ -16,9 +15,12 @@ import { hasAnyProfile } from '../services/astrologyProfiles'
 // docs/USER_JOURNEY.md's state machine. OnboardingGate.jsx enforces this
 // same rule again at the /home route itself, so this is purely a
 // same-visit shortcut, not the actual enforcement.
-function destinationFor(user, explicitNext) {
-  if (explicitNext) return explicitNext
-  return hasAnyProfile(user) ? '/home' : '/onboarding'
+//
+// Without a local profile we send the user to /home rather than
+// /onboarding: OnboardingGate there checks the *server* first, so a
+// returning user on a new device isn't pushed into re-onboarding.
+function destinationFor(explicitNext) {
+  return explicitNext || '/home'
 }
 
 export default function Login() {
@@ -42,14 +44,14 @@ export default function Login() {
   // login) — no reason to show the form again.
   if (isAuthenticated) {
     const role = user?.role
-    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(user, location.state?.next)
+    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(location.state?.next)
     navigate(dest, { replace: true })
     return null
   }
 
   function handleSuccess(loggedInUser) {
     const role = loggedInUser?.role
-    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(loggedInUser, location.state?.next)
+    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(location.state?.next)
     navigate(dest, { replace: true })
   }
 

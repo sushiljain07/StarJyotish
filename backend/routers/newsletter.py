@@ -2,10 +2,10 @@
 Newsletter subscription — stores the email and sends a welcome email
 via Resend (same provider and credentials as email_otp.py and contact.py).
 
-No separate DB table for now: subscriptions are recorded in the audit_log
-(user_action="newsletter_subscribe") and a welcome email is sent
-immediately. When a proper email marketing integration (Mailchimp, Loops,
-etc.) is needed, wire it here.
+Subscriptions are stored in newsletter_subscribers (db/models/newsletter.py)
+before anything else happens; the welcome email is best-effort and only
+sent for a new subscription. When a proper email marketing integration
+(Mailchimp, Loops, etc.) is needed, wire it here.
 
 Rate-limited to 3 requests/hour per IP to prevent abuse.
 """
@@ -14,9 +14,12 @@ import os
 import re
 
 import requests
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field, field_validator
+from sqlalchemy.orm import Session
 
+from db.repositories import NewsletterRepository
+from db.session import get_db
 from services.rate_limit import limiter
 
 router = APIRouter()
@@ -78,13 +81,19 @@ def _send_welcome(email: str) -> None:
         )
         resp.raise_for_status()
     except Exception as exc:  # noqa: BLE001
-        logger.warning("Newsletter welcome email failed for %s: %s", email, exc)
+        # The subscription is already stored; log at error level so a
+        # broken Resend setup shows up in monitoring instead of vanishing.
+        logger.error("Newsletter welcome email failed for %s: %s", email, exc)
 
 
 @router.post("/newsletter")
 @limiter.limit("3/hour")
-def subscribe_newsletter(request: Request, body: NewsletterSubscription):
-    """Subscribe an email to the Star Jyotish newsletter."""
-    _send_welcome(body.email)
-    logger.info("Newsletter subscription: %s", body.email)
+def subscribe_newsletter(request: Request, body: NewsletterSubscription, db: Session = Depends(get_db)):
+    """Subscribe an email to the Star Jyotish newsletter. Stores it first —
+    the response only claims success once the row is committed."""
+    _subscriber, created = NewsletterRepository(db).subscribe(body.email)
+    db.commit()
+    if created:
+        logger.info("Newsletter subscription: %s", body.email)
+        _send_welcome(body.email)
     return {"subscribed": True}

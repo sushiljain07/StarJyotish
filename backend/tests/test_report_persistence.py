@@ -117,3 +117,36 @@ def test_reports_me_requires_authentication(client):
 def test_old_phone_keyed_reports_route_is_gone(client):
     resp = client.get("/api/account/reports/+919876543210")
     assert resp.status_code in (401, 404, 405)
+
+
+def test_saving_someone_elses_chart_does_not_overwrite_own_profile(client):
+    token = _login(client)
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        client.post(
+            "/api/account/birth-profiles/me",
+            json={"label": "Self", "birth_date": "1990-05-05", "birth_time": "08:30", "place": "New Delhi, India"},
+            headers=_auth(token),
+        )
+        # A friend's chart (different birth details), saved to my account.
+        resp = client.post("/api/rajyogas", json={**_BIRTH, "save_report": True}, headers=_auth(token))
+    assert resp.status_code == 200
+
+    profiles = client.get("/api/account/birth-profiles/me", headers=_auth(token)).json()
+    assert len(profiles) == 1
+    assert profiles[0]["birth_date"] == "1990-05-05"
+    reports = client.get("/api/account/reports/me", headers=_auth(token)).json()
+    assert len(reports) == 1
+    assert reports[0]["birth_profile_id"] is None
+
+
+def test_saving_own_chart_links_to_own_profile(client):
+    token = _login(client)
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        created = client.post(
+            "/api/account/birth-profiles/me",
+            json={"label": "Self", "birth_date": _BIRTH["date"], "birth_time": _BIRTH["time"], "place": _BIRTH["place"]},
+            headers=_auth(token),
+        ).json()
+        client.post("/api/rajyogas", json={**_BIRTH, "save_report": True}, headers=_auth(token))
+    reports = client.get("/api/account/reports/me", headers=_auth(token)).json()
+    assert reports[0]["birth_profile_id"] == created["id"]

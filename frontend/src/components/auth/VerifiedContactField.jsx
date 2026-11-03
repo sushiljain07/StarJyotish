@@ -1,17 +1,17 @@
-// frontend/src/components/auth/MobileNumberField.jsx
+// frontend/src/components/auth/VerifiedContactField.jsx
 //
-// The Profile page's mobile-number field needs more than a text input:
-// the phone number is this account's login identity, so changing it has
-// to go through the same OTP-verification step adding one for the first
-// time does — see routers/account.py's send_phone_link_otp /
-// verify_phone_link_otp for why that's a distinct pair of endpoints from
-// the login ones. This component owns that whole mini state machine
-// (view → entering a number → entering a code → back to view) so
-// Profile.jsx doesn't have to.
+// A login identity on the Profile page — the mobile number or the email —
+// is never a plain text edit. Adding or changing either one goes through a
+// code sent to the new address first (routers/account.py's
+// /account/phone/* and /account/email/* endpoints). Email especially:
+// sign-in links accounts by verified email, so an unverified email edit
+// would let someone claim another person's address.
 //
-// Fully self-contained — reads the current user and the two link
-// functions straight from AuthContext rather than taking them as props,
-// the same pattern AccountMenu.jsx uses.
+// This component owns the whole mini state machine (view → entering the
+// value → entering a code → back to view). It renders inside Profile's
+// own <form>, and React submit events bubble through the component tree,
+// so every inner submit stops propagation — otherwise it would also fire
+// the outer Profile save.
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
@@ -19,9 +19,15 @@ import { useAuth } from '../../contexts/AuthContext'
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const RESEND_COOLDOWN_SECONDS = 30
 
-export default function MobileNumberField() {
+export default function VerifiedContactField({ kind = 'phone' }) {
   const { t } = useTranslation()
-  const { user, sendPhoneLinkOtp, verifyPhoneLinkOtp } = useAuth()
+  const auth = useAuth()
+  const { user } = auth
+  const isEmail = kind === 'email'
+  const sendCode = isEmail ? auth.sendEmailLinkOtp : auth.sendPhoneLinkOtp
+  const verifyCode = isEmail ? auth.verifyEmailLinkOtp : auth.verifyPhoneLinkOtp
+  const currentValue = isEmail ? user?.email : user?.phone_number
+  const isVerified = isEmail ? !!user?.email_verified_at : !!user?.phone_number
 
   // 'view' | 'phone' | 'code'
   const [step, setStep] = useState('view')
@@ -56,10 +62,11 @@ export default function MobileNumberField() {
 
   async function handleSendCode(e) {
     e.preventDefault()
+    e.stopPropagation()
     setError('')
     setLoading(true)
     try {
-      await sendPhoneLinkOtp(phone)
+      await sendCode(phone)
       setStep('code')
       setCooldown(RESEND_COOLDOWN_SECONDS)
     } catch (err) {
@@ -73,7 +80,7 @@ export default function MobileNumberField() {
     if (cooldown > 0) return
     setError('')
     try {
-      await sendPhoneLinkOtp(phone)
+      await sendCode(phone)
       setCooldown(RESEND_COOLDOWN_SECONDS)
     } catch (err) {
       setError(err.message)
@@ -82,10 +89,11 @@ export default function MobileNumberField() {
 
   async function handleVerify(e) {
     e.preventDefault()
+    e.stopPropagation()
     setError('')
     setLoading(true)
     try {
-      await verifyPhoneLinkOtp(phone, code)
+      await verifyCode(phone, code)
       setStep('view')
     } catch (err) {
       setError(err.message)
@@ -99,8 +107,8 @@ export default function MobileNumberField() {
       <form onSubmit={handleSendCode} className="space-y-2">
         <div className="flex items-center gap-2">
           <input
-            type="tel" inputMode="tel" required autoFocus
-            placeholder="+91 98765 43210"
+            type={isEmail ? 'email' : 'tel'} inputMode={isEmail ? 'email' : 'tel'} required autoFocus
+            placeholder={isEmail ? 'you@example.com' : '+91 98765 43210'}
             value={phone}
             onChange={e => setPhone(e.target.value)}
             className={inputCls}
@@ -150,19 +158,21 @@ export default function MobileNumberField() {
 
   return (
     <div className="flex items-center gap-2">
-      <input type="text" value={user?.phone_number || t('profile_not_set')} disabled
+      <input type="text" value={currentValue || t('profile_not_set')} disabled
              className={`${inputCls} bg-parchment/60 text-ink-muted cursor-not-allowed`} />
-      {user?.phone_number ? (
+      {currentValue ? (
         <>
-          <span className="text-sage text-xs font-medium whitespace-nowrap">{t('profile_verified')}</span>
+          {isVerified
+            ? <span className="text-sage text-xs font-medium whitespace-nowrap">{t('profile_verified')}</span>
+            : <span className="text-ink-faint text-xs font-medium whitespace-nowrap">{t('profile_email_unverified')}</span>}
           <button type="button" onClick={startFlow} className="text-primary-dark hover:underline text-sm whitespace-nowrap">
-            {t('profile_change_number')}
+            {isVerified ? t('profile_change_number') : t('profile_verify_email')}
           </button>
         </>
       ) : (
         <button type="button" onClick={startFlow}
                 className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
-          {t('profile_add_number')}
+          {isEmail ? t('profile_add_email') : t('profile_add_number')}
         </button>
       )}
     </div>

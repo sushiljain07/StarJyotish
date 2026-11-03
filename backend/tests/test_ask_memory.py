@@ -204,3 +204,28 @@ def test_update_memory_after_exchange_rolls_summary_forward(db, authed_user):
     memory = UserAiMemoryRepository(db).get_for_user(user.id)
     assert memory.summary == "Merged memory after second exchange."
     assert memory.exchange_count == 2
+
+
+@requires_db
+def test_failed_report_save_keeps_chat_messages(db, authed_user):
+    # Regression: persistence used db.rollback() on failure, which threw away
+    # the chat messages the route had already flushed on the same session,
+    # while still returning their session_id.
+    from db.repositories import ChatSessionRepository
+
+    user, headers = authed_user
+    body = {**VALID_BODY, "save_report": True}
+    with patch("services.chart_context.geocode_place", return_value=_geo()), \
+         patch("routes.kundli.ask_chart", return_value=("A grounded answer.", "Claude")), \
+         patch("services.user_memory.update_memory_after_exchange"), \
+         patch("db.repositories.report_repository.ReportRepository.save_generated_report",
+               side_effect=RuntimeError("db hiccup")):
+        resp = client.post("/api/kundli/ask", json=body, headers=headers)
+    assert resp.status_code == 200
+
+    db.expire_all()
+    session = ChatSessionRepository(db).get_owned(uuid.UUID(resp.json()["session_id"]), user.id)
+    assert session is not None
+    assert ChatSessionRepository(db).recent_turns(session.id) == [
+        {"question": VALID_BODY["question"], "answer": "A grounded answer."}
+    ]

@@ -19,6 +19,14 @@ with and creates a brand new one — a refresh token is single-use. If a
 raw token leaked (e.g. it was copied off a stolen device, then both the
 thief and the legitimate device tried to use their respective copies),
 and every session for that user is revoked as a precaution.
+
+Exception — the rotation race: two tabs (or two parallel requests) that
+refresh at the same moment both send the same cookie. The session row is
+locked during rotation so only one wins; the loser then sees a token
+revoked moments ago. Within REFRESH_REUSE_GRACE_SECONDS of revocation
+that's treated as benign: 409, no mass revocation, and the cookie is left
+alone (the winner's response has already set the new one, which the
+client picks up by retrying). Outside the window it's treated as theft.
 """
 import os
 import uuid
@@ -55,6 +63,7 @@ def _is_email(identifier: str) -> bool:
 
 
 REFRESH_COOKIE_NAME = "sj_refresh"
+REFRESH_REUSE_GRACE_SECONDS = 30
 REFRESH_COOKIE_PATH = "/api/auth"
 
 
@@ -174,14 +183,19 @@ def refresh_session(
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     session_repo = SessionRepository(db)
-    session = session_repo.get_active_by_raw_token(sj_refresh)
+    session = session_repo.get_active_by_raw_token(sj_refresh, for_update=True)
     if session is None:
         # Distinguish "never existed / already expired" (normal) from
         # "exists but was already revoked" (possible token-theft replay —
         # see module docstring) before giving up.
         stale = session_repo.get_by_raw_token_any_state(sj_refresh)
         if stale is not None and stale.revoked_at is not None:
-            session_repo.revoke_all_for_user(stale.user_id)
+            revoked_ago = (datetime.now(timezone.utc) - stale.revoked_at).total_seconds()
+            if stale.revoked_reason == "rotated" and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
+                # Lost a concurrent-refresh race (see module docstring).
+                # Don't clear the cookie: it now holds the winner's token.
+                raise HTTPException(status_code=409, detail="Session refresh already in progress. Retry.")
+            session_repo.revoke_all_for_user(stale.user_id, reason="reuse")
             # Commit now, not just flush: this branch always ends in an
             # HTTPException below, and get_db rolls back the transaction
             # for any exception that escapes the route — without this,
@@ -193,12 +207,12 @@ def refresh_session(
 
     user = UserRepository(db).get(session.user_id)
     if user is None or not user.is_active:
-        session_repo.revoke(session)
+        session_repo.revoke(session, reason="disabled")
         db.commit()  # same reasoning as above — this path also ends in a raise
         _clear_refresh_cookie(response)
         raise HTTPException(status_code=401, detail="Account not found or disabled")
 
-    session_repo.revoke(session)  # single-use: this token is now spent
+    session_repo.revoke(session, reason="rotated")  # single-use: this token is now spent
     return _issue_session_and_response(db, response, user, request)
 
 
@@ -207,7 +221,7 @@ def logout(response: Response, sj_refresh: str | None = Cookie(default=None), db
     if sj_refresh:
         session = SessionRepository(db).get_active_by_raw_token(sj_refresh)
         if session is not None:
-            SessionRepository(db).revoke(session)
+            SessionRepository(db).revoke(session, reason="logout")
     _clear_refresh_cookie(response)
     return {"logged_out": True}
 
@@ -239,5 +253,5 @@ def revoke_session(session_id: uuid.UUID, user: User = Depends(get_current_user)
     target = session_repo.get(session_id)
     if target is None or target.user_id != user.id:
         raise HTTPException(status_code=404, detail="Session not found")
-    session_repo.revoke(target)
+    session_repo.revoke(target, reason="user")
     return {"revoked": True}

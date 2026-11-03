@@ -22,11 +22,12 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../../api/config'
 import JyotiAvatar from './JyotiAvatar'
+import { localDateStr } from '../../utils/localDate'
 
 function yesterdayHeadline(profileKey, lang) {
   const d = new Date()
   d.setDate(d.getDate() - 1)
-  const day = d.toISOString().slice(0, 10)
+  const day = localDateStr(d)
   try {
     // Try v2 key first, fall back to v1 for backwards compat
     const raw = localStorage.getItem(`sj_daily_ed_v2:${profileKey}:${lang}:${day}`)
@@ -38,7 +39,7 @@ function yesterdayHeadline(profileKey, lang) {
 }
 
 function reactionKey(profileKey) {
-  const day = new Date().toISOString().slice(0, 10)
+  const day = localDateStr()
   return `sj_reflection_v1:${profileKey}:${day}`
 }
 

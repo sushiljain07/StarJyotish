@@ -27,6 +27,7 @@ import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
 import {
   hasAnyProfile,
+  loadProfiles,
   markOnboardingSkipped,
   createProfile,
   UNKNOWN_BIRTH_TIME_DEFAULT,
@@ -90,8 +91,19 @@ export default function Onboarding() {
   // "add another chart" re-entry any more; editing happens on the
   // profile page instead (see Profile.jsx).
   useEffect(() => {
-    if (hasAnyProfile(user)) navigate('/home', { replace: true })
-  }, [user, navigate])
+    if (hasAnyProfile(user)) {
+      navigate('/home', { replace: true })
+      return undefined
+    }
+    // Local cache can be empty on a new device — ask the server too, so a
+    // returning user isn't asked to re-enter (and overwrite) their profile.
+    let cancelled = false
+    loadProfiles(user, accessToken)
+      .then(profiles => { if (!cancelled && profiles?.length) navigate('/home', { replace: true }) })
+      .catch(() => {})
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, navigate])
 
   function update(patch) {
     setDraft(d => ({ ...d, ...patch }))

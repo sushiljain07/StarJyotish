@@ -4,7 +4,10 @@ from typing import Optional
 from services.astro_utils import (
     SIGNS, get_planet_dignity, planet_by_name, house_sign, house_lord, house_occupants,
 )
-from services.report_utils import call_llm, filter_report_language
+from services.report_utils import (
+    GEMSTONE_GROQ_HEADER, add_gemstone_context, call_llm, compute_age, extract_sections,
+    filter_report_language,
+)
 
 # Deliberately NOT modeled: classical "Dhana Yoga" as a labeled, named
 # combination. The term appears only in passing remedy/reference mentions
@@ -303,21 +306,13 @@ def generate_wealth_report(
     """Orchestrate wealth analysis + LLM call, mirroring generate_relationship_report's shape."""
     from services.skill_loader import (
         get_topic_system_prompt, GROQ_WEALTH_SYSTEM_PROMPT,
-        get_gemstone_excerpt_for_ascendant,
     )
 
     planets   = chart_data.get("planets", [])
     lagna_idx = chart_data.get("ascendant", {}).get("sign_index", 0)
 
-    today        = _date.today()
-    current_year = today.year
-    user_age     = 25
-    if birth_date:
-        try:
-            birth    = _date.fromisoformat(birth_date)
-            user_age = today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
-        except (ValueError, TypeError):
-            pass
+    current_year = _date.today().year
+    user_age     = compute_age(birth_date)
 
     facts = analyze_wealth(planets, lagna_idx, d2_chart)
 
@@ -325,13 +320,7 @@ def generate_wealth_report(
         "wealth and financial analysis", "the 2nd/11th house and D2 Hora methodology", skills_context,
     ) if skills_context else "You are an expert Vedic wealth astrologer. Respond ONLY with valid JSON."
 
-    if gemstone_context:
-        system = system + "\n\n# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n" + gemstone_context
-
-    groq_gemstone_excerpt = ""
-    if gemstone_context:
-        ascendant_sign = chart_data.get("ascendant", {}).get("sign", "")
-        groq_gemstone_excerpt = get_gemstone_excerpt_for_ascendant(ascendant_sign)
+    system, groq_gemstone_excerpt = add_gemstone_context(system, chart_data, gemstone_context)
 
     prompt = _build_wealth_prompt(
         chart_data=chart_data, facts=facts, dasha=dasha,
@@ -342,7 +331,7 @@ def generate_wealth_report(
     raw, provider = call_llm(
         prompt, system=system, groq_extra=groq_gemstone_excerpt,
         groq_system_prompt=GROQ_WEALTH_SYSTEM_PROMPT,
-        groq_extra_header="## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT",
+        groq_extra_header=GEMSTONE_GROQ_HEADER,
         log_prefix="wealth",
     )
     raw = filter_report_language(raw)
@@ -353,11 +342,6 @@ def generate_wealth_report(
         "gemstone_recommendation", "rudraksha_recommendation",
         "empowering_remedies", "closing_blessing",
     ]
-    sections = {}
-    for key in section_keys:
-        section = raw.get(key)
-        if isinstance(section, dict) and section.get("content"):
-            sections[key] = {"title": section.get("title", key.replace("_", " ").title()),
-                              "content": section["content"]}
+    sections = extract_sections(raw, section_keys)
 
     return {"sections": sections, "highlights": None, "llm_provider": provider}

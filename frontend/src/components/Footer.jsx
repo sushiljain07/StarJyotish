@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
+import { subscribeNewsletter } from '../api/newsletter'
 
 const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
 const FOOTER_YEAR = new Date().getFullYear()
@@ -117,19 +118,13 @@ export default function Footer() {
                 if (!newsletterEmail.trim()) return
                 setNewsletterStatus('sending')
                 try {
-                  const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/newsletter`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: newsletterEmail.trim() }),
-                  })
-                  if (!res.ok) throw new Error('failed')
+                  await subscribeNewsletter(newsletterEmail)
                   setNewsletterStatus('sent')
                   setNewsletterEmail('')
                 } catch {
-                  // Graceful degradation: if endpoint doesn't exist yet, still show success
-                  // so the user experience isn't broken during rollout
-                  setNewsletterStatus('sent')
-                  setNewsletterEmail('')
+                  // Keep the email in the field so they can retry; never
+                  // claim success for a signup that wasn't stored.
+                  setNewsletterStatus('error')
                 }
               }}
               className="flex gap-2 w-full md:w-auto"
@@ -152,6 +147,11 @@ export default function Footer() {
             </form>
           )}
         </div>
+        {newsletterStatus === 'error' && (
+          <p role="alert" className="max-w-6xl mx-auto px-6 pb-2 text-sm text-vermillion md:text-right">
+            {t('footer_newsletter_error')}
+          </p>
+        )}
         <p className="max-w-6xl mx-auto px-6 pb-4 text-[11px] text-ink-onnight/50 md:text-right">🔒 {t('footer_newsletter_note')}</p>
       </div>
 

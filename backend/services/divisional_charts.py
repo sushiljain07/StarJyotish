@@ -14,12 +14,29 @@ from services.astro_calc import SIGNS, PLANET_IDS, CALC_FLAGS, _sidereal, _sign_
 # ─────────────────────────────────────────────────────────────
 _D9_START = [0, 9, 6, 3, 0, 9, 6, 3, 0, 9, 6, 3]
 
+# Divisions with a defined Parashari rule. Anything else is rejected rather
+# than silently computed with a made-up formula (division=0 used to raise
+# ZeroDivisionError → 500).
+SUPPORTED_DIVISIONS = (1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60)
+
+# Start sign by modality (sign_idx % 3: 0 movable, 1 fixed, 2 dual).
+_START_ARIES_SAG_LEO = (0, 8, 4)   # D8, D20
+_START_ARIES_LEO_SAG = (0, 4, 8)   # D16, D45
+
+# D30 Trimshamsha: (upper bound in degrees, sign) for odd and even signs.
+# Odd: Mars→Aries, Saturn→Aquarius, Jupiter→Sagittarius, Mercury→Gemini, Venus→Libra.
+# Even: Venus→Taurus, Mercury→Virgo, Jupiter→Pisces, Saturn→Capricorn, Mars→Scorpio.
+_D30_ODD = ((5, 0), (10, 10), (18, 8), (25, 2), (30, 6))
+_D30_EVEN = ((5, 1), (12, 5), (20, 11), (25, 9), (30, 7))
+
 
 def _get_divisional_sign(sidereal_lon: float, division: int) -> int:
     """
     Universal formula for any divisional chart.
     Returns 0-based sign index (0=Aries … 11=Pisces).
     """
+    if division not in SUPPORTED_DIVISIONS:
+        raise ValueError(f"Unsupported divisional chart D{division}")
     sign_idx = int(sidereal_lon / 30) % 12          # which rashi the planet is in
     degree_in_sign = sidereal_lon % 30               # degrees within that rashi
 
@@ -63,9 +80,9 @@ def _get_divisional_sign(sidereal_lon: float, division: int) -> int:
             return (sign_idx + 6 + part) % 12
 
     elif division == 8:
-        # D8 Ashtamsha
+        # D8 Ashtamsha — movable from Aries, fixed from Sagittarius, dual from Leo
         part = int(degree_in_sign / (30 / 8))
-        return (sign_idx + part) % 12
+        return (_START_ARIES_SAG_LEO[sign_idx % 3] + part) % 12
 
     elif division == 9:
         # D9 Navamsha — special start signs
@@ -86,22 +103,14 @@ def _get_divisional_sign(sidereal_lon: float, division: int) -> int:
         return (sign_idx + part) % 12
 
     elif division == 16:
-        # D16 Shodashamsha
+        # D16 Shodashamsha — movable from Aries, fixed from Leo, dual from Sagittarius
         part = int(degree_in_sign / (30 / 16))
-        if sign_idx % 2 == 0:
-            return part % 12
-        else:
-            return (part + 4) % 12
+        return (_START_ARIES_LEO_SAG[sign_idx % 3] + part) % 12
 
     elif division == 20:
-        # D20 Vimshamsha
+        # D20 Vimshamsha — movable from Aries, fixed from Sagittarius, dual from Leo
         part = int(degree_in_sign / 1.5)
-        if sign_idx % 3 == 0:   # fire signs
-            return part % 12
-        elif sign_idx % 3 == 1: # earth signs
-            return (part + 4) % 12
-        else:                    # air/water
-            return (part + 8) % 12
+        return (_START_ARIES_SAG_LEO[sign_idx % 3] + part) % 12
 
     elif division == 24:
         # D24 Chaturvimshamsha (Siddhamsha)
@@ -124,21 +133,12 @@ def _get_divisional_sign(sidereal_lon: float, division: int) -> int:
             return (part + 9) % 12
 
     elif division == 30:
-        # D30 Trimshamsha — special rules
-        # Odd signs: Mars 0-5, Saturn 5-10, Jupiter 10-18, Mercury 18-25, Venus 25-30
-        # Even signs: Venus 0-5, Mercury 5-12, Jupiter 12-20, Saturn 20-25, Mars 25-30
-        if sign_idx % 2 == 0:   # odd rashi
-            if degree_in_sign < 5:   return 0   # Aries (Mars)
-            elif degree_in_sign < 10: return 10  # Capricorn (Saturn)
-            elif degree_in_sign < 18: return 8   # Sagittarius (Jupiter)
-            elif degree_in_sign < 25: return 5   # Virgo (Mercury)
-            else:                     return 6   # Libra (Venus)
-        else:                    # even rashi
-            if degree_in_sign < 5:   return 6   # Libra (Venus)
-            elif degree_in_sign < 12: return 5  # Virgo (Mercury)
-            elif degree_in_sign < 20: return 8  # Sagittarius (Jupiter)
-            elif degree_in_sign < 25: return 9  # Capricorn (Saturn)
-            else:                     return 0  # Aries (Mars)
+        # D30 Trimshamsha — unequal portions, see _D30_ODD/_D30_EVEN
+        table = _D30_ODD if sign_idx % 2 == 0 else _D30_EVEN
+        for upper, sign in table:
+            if degree_in_sign < upper:
+                return sign
+        return table[-1][1]
 
     elif division == 40:
         # D40 Khavedamsha
@@ -149,24 +149,16 @@ def _get_divisional_sign(sidereal_lon: float, division: int) -> int:
             return (part + 6) % 12
 
     elif division == 45:
-        # D45 Akshavedamsha
+        # D45 Akshavedamsha — movable from Aries, fixed from Leo, dual from Sagittarius
         part = int(degree_in_sign / (30 / 45))
-        if sign_idx % 3 == 0:
-            return part % 12
-        elif sign_idx % 3 == 1:
-            return (part + 4) % 12
-        else:
-            return (part + 8) % 12
+        return (_START_ARIES_LEO_SAG[sign_idx % 3] + part) % 12
 
     elif division == 60:
-        # D60 Shashtiamsha — each degree split into 2 parts of 0.5°
+        # D60 Shashtiamsha — 0.5° parts counted from the sign itself
         part = int(degree_in_sign / 0.5)             # 0–59
-        return part % 12
-
-    else:
-        # Generic fallback for any other division
-        part = int(degree_in_sign / (30 / division))
         return (sign_idx + part) % 12
+
+    raise ValueError(f"Unsupported divisional chart D{division}")  # unreachable
 
 
 def calculate_divisional_chart(
@@ -182,6 +174,9 @@ def calculate_divisional_chart(
     divisional sign, house, and degree.
     """
     import swisseph as swe
+
+    if division not in SUPPORTED_DIVISIONS:
+        raise ValueError(f"Unsupported divisional chart D{division}")
 
     swe.set_sid_mode(swe.SIDM_LAHIRI)
     ayanamsa = swe.get_ayanamsa_ut(jd_ut)
@@ -206,20 +201,24 @@ def calculate_divisional_chart(
             "sign": SIGNS[div_sign],
             "sign_index": div_sign,
             "degree": round(sid % 30, 2),
+            "longitude": round(sid, 6),
             "house": house,
             "retrograde": retrograde,
         })
 
-    # Add Ketu (always opposite Rahu)
+    # Ketu is exactly opposite Rahu in *longitude*, so map that longitude
+    # through the division. Its divisional sign is Rahu's + 6 only in some
+    # divisions; e.g. in D2 every planet is in Cancer or Leo.
     rahu = next(p for p in planets_out if p["name"] == "Rahu")
-    ketu_sign = (rahu["sign_index"] + 6) % 12
-    ketu_house = (ketu_sign - asc_div_sign) % 12 + 1
+    ketu_sid = (rahu["longitude"] + 180) % 360
+    ketu_sign = _get_divisional_sign(ketu_sid, division)
     planets_out.append({
         "name": "Ketu",
         "sign": SIGNS[ketu_sign],
         "sign_index": ketu_sign,
-        "degree": rahu["degree"],
-        "house": ketu_house,
+        "degree": round(ketu_sid % 30, 2),
+        "longitude": round(ketu_sid, 6),
+        "house": (ketu_sign - asc_div_sign) % 12 + 1,
         "retrograde": True,
     })
 

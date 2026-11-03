@@ -9,29 +9,8 @@ import {
   adminListSettings, adminUpsertSetting,
   adminAuditLogs,
   adminListAstrologers, adminOnboardAstrologer, adminSetKyc,
+  adminListTestimonials, adminSetTestimonialStatus,
 } from '../api/admin'
-import { API_BASE } from '../api/config'
-
-// Testimonials admin API — direct fetch since these aren't in the admin.js client yet
-async function adminListTestimonials(token) {
-  const r = await fetch(`${API_BASE}/api/admin/testimonials`, {
-    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
-  })
-  const data = await r.json()
-  if (!r.ok) throw new Error(data.detail ?? 'Error')
-  return data
-}
-async function adminSetTestimonialStatus(token, id, status, notes) {
-  const r = await fetch(`${API_BASE}/api/admin/testimonials/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    credentials: 'include',
-    body: JSON.stringify({ status, admin_notes: notes }),
-  })
-  const data = await r.json()
-  if (!r.ok) throw new Error(data.detail ?? 'Error')
-  return data
-}
 
 const TABS = [
   { id: 'users',       label: 'Users' },

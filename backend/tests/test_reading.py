@@ -115,7 +115,7 @@ def _geo():
 # prediction_sections / teasers / llm_provider. Mocking the old list shape
 # here made these three tests fail against the real route with
 # `AttributeError: 'list' object has no attribute 'get'` — a bug in the
-# test's mock, not in routes/kundli.py or services/ai.py, both of which
+# test's mock, not in routers/kundli.py or services/ai.py, both of which
 # already agree on the dict shape below.
 def _reading_result():
     return {
@@ -135,20 +135,20 @@ def _reading_result():
 
 def test_reading_returns_200():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_reading_result()):
+         patch("routers.kundli.generate_reading", return_value=_reading_result()):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 200
 
 def test_reading_has_prediction_sections():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_reading_result()):
+         patch("routers.kundli.generate_reading", return_value=_reading_result()):
         data = client.post("/api/kundli/reading", json=BODY).json()
     assert len(data["prediction_sections"]) == 2
     assert data["prediction_sections"]["Career & Wealth"] == "Good prospects."
 
 def test_reading_response_fields():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading", return_value=_reading_result()):
+         patch("routers.kundli.generate_reading", return_value=_reading_result()):
         data = client.post("/api/kundli/reading", json=BODY).json()
     assert {"sections", "prediction_text", "prediction_sections", "teasers", "llm_provider"} <= data.keys()
     assert data["teasers"]["teaser2"] == "Your Peak Career Window"
@@ -156,7 +156,7 @@ def test_reading_response_fields():
 
 def test_reading_missing_key_returns_503():
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.generate_reading",
+         patch("routers.kundli.generate_reading",
                side_effect=HTTPException(status_code=503, detail="No LLM provider configured")):
         resp = client.post("/api/kundli/reading", json=BODY)
     assert resp.status_code == 503

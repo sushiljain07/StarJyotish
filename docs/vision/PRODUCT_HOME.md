@@ -101,7 +101,7 @@ later is mechanical:
 | Cosmic Snapshot | `getCosmicSnapshotFromChart(chart)` | **Real as of the Onboarding sprint** — derived from the account's own `ChartResponse.dasha`, saved on their Astrology Profile |
 | Birth Chart preview | `profile.chart` (from `services/astrologyProfiles.js`) | **Real as of the Onboarding sprint** — the same `ChartResponse.{ascendant, planets}` |
 | Continue Your Journey | `getJourney()` | Real data already — `config/knowledgeGraph.js`. Only *which* guide counts as "recently viewed" is mocked (no reading-history tracking exists yet) |
-| Recent Activity | `getRecentActivity()` | `GET /api/account/reports/{phone_number}` → `ReportSummaryOut` (`backend/models/account_models.py`, `backend/routers/account.py` — this endpoint already exists), widened to also cover non-report events (Ask questions, chart generation) once those have a backend model |
+| Recent Activity | `getRecentActivity()` | `GET /api/account/reports/me` (authenticated) → `ReportSummaryOut` (`backend/models/account_models.py`, `backend/routers/account.py` — this endpoint already exists), widened to also cover non-report events (Ask questions, chart generation) once those have a backend model |
 | Suggested Questions | `SUGGESTED_QUESTIONS` (static) | Static by design — these are prompts, not personalized data |
 | Reflection | `getReflectionKey()` | Static by design — deliberately not predictive/personalized |
 

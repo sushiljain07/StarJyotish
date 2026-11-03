@@ -11,8 +11,9 @@ forcing a fake phone number onto Google-only signups. `name` is optional/
 collected later, not at signup either way.
 """
 import enum
+from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, Enum as SAEnum, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Enum as SAEnum, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base
@@ -38,6 +39,12 @@ class User(UUIDPKMixin, TimestampMixin, Base):
 
     phone_number: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
+    # Set only when ownership of `email` was proven (Google sign-in with a
+    # verified email, email-OTP login, or the /account/email verify flow).
+    # Sign-in flows link to an existing account by email ONLY when this is
+    # set — otherwise anyone could type a victim's address onto their own
+    # account and capture the victim's next Google/email sign-in.
+    email_verified_at: Mapped["datetime | None"] = mapped_column(DateTime(timezone=True), nullable=True)
     name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     # Google's stable per-account subject identifier ("sub" claim) — the
     # right key to dedupe Google sign-ins on, not email. Email can in rare

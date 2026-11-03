@@ -10,6 +10,7 @@
 // whisper, not a banner. It disappears on the user's first ever visit.
 
 import { useMemo } from 'react'
+import { localDateStr } from '../../utils/localDate'
 
 const CARD_LABELS = {
   HEADLINE:       "daily headlines",
@@ -39,7 +40,7 @@ export default function ContinuityStrip({ summary }) {
     // Yesterday's reaction
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
-    const yKey = yesterday.toISOString().slice(0, 10)
+    const yKey = localDateStr(yesterday)
     const yReaction = reactions?.find(r => r.date === yKey)
     if (yReaction) {
       const emoji = REACTION_EMOJI[yReaction.reaction] || ''

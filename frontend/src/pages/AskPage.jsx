@@ -1,7 +1,7 @@
 // frontend/src/pages/AskPage.jsx
 // Standalone page for asking free-form questions about the birth chart.
 import { lazy, Suspense } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import { StateBlock } from '../components/ui'
@@ -15,12 +15,12 @@ function TabLoader() {
 
 export default function AskPage() {
   const { state }   = useLocation()
-  const navigate    = useNavigate()
   const { isAuthenticated } = useAuth()
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
-  if (!state?.input) { navigate(homeDestination); return null }
+  // <Navigate>, not navigate() — see Result.jsx.
+  if (!state?.input) return <Navigate to={homeDestination} replace />
 
   const { input, presetQuestion = null } = state
 

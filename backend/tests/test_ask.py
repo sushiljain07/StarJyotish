@@ -26,12 +26,12 @@ def _geo():
 def test_ask_returns_answer():
     # ask_chart returns a (answer, provider_label) tuple — see services/ai.py —
     # not a bare string. The mock previously returned a bare string here,
-    # which `answer, provider = ask_chart(...)` in routes/kundli.py would have
+    # which `answer, provider = ask_chart(...)` in routers/kundli.py would have
     # failed to unpack; that was masked by an earlier, unrelated failure (this
     # test also had no geocode mock, so it depended on a live network call to
     # Nominatim that doesn't work in every environment).
     with patch("services.chart_context.geocode_place", return_value=_geo()), \
-         patch("routes.kundli.ask_chart", return_value=("Test answer text.", "Claude")):
+         patch("routers.kundli.ask_chart", return_value=("Test answer text.", "Claude")):
         resp = client.post("/api/kundli/ask", json=VALID_BODY)
     assert resp.status_code == 200
     data = resp.json()

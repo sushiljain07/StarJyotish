@@ -21,6 +21,7 @@
 // uses this beat in their place.
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { localDateStr } from '../../utils/localDate'
 
 function headlineForDate(profileKey, lang, dateStr) {
   if (!profileKey || !dateStr) return null
@@ -43,7 +44,7 @@ const REACTION_CHIP = {
 
 function useMemoryLine(profile, lang, journeySummary, t) {
   const profileKey = profile ? `${profile.birth_date}:${profile.birth_time}:${profile.place}` : null
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
 
   return useMemo(() => {
     const past = journeySummary?.reactions?.find(r => r.date && r.date !== todayStr)
@@ -67,7 +68,7 @@ function saveJournalEntry(text) {
   try {
     const raw = JSON.parse(localStorage.getItem(JOURNAL_KEY) || '[]')
     const entries = Array.isArray(raw) ? raw : []
-    entries.unshift({ date: new Date().toISOString().slice(0, 10), text })
+    entries.unshift({ date: localDateStr(), text })
     localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries.slice(0, 200)))
   } catch {
     /* best-effort — the ritual matters, the storage doesn't have to be perfect */

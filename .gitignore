@@ -10,9 +10,17 @@ __pycache__/
 node_modules/
 frontend/dist/
 
+# Backups / merge leftovers
+*.bak
+*.orig
+*.rej
+
 # Editor
 .vscode/
 .idea/
 
 # Superpowers brainstorm mockups
 .superpowers/
+
+# graphify knowledge graph output
+graphify-out/

@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -104,7 +104,9 @@ export default function Result() {
   const [activeAnalysisSub, setActiveAnalysisSub] = useState('bhava')
   const [chartStyle, setChartStyle]               = useState('north')
 
-  if (!state?.data) { navigate(homeDestination); return null }
+  // <Navigate>, not navigate(): navigate() during render is ignored by
+  // React Router, which left a blank page for bookmarked/refreshed URLs.
+  if (!state?.data) return <Navigate to={homeDestination} replace />
 
   const { data, input, presetQuestion = null } = state
   const topic = getTopic(input.topic)

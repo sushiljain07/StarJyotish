@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchPanchangWeek } from '../../api/astro'
 import { weekDayScore } from '../../utils/weekScore'
+import { localDateStr } from '../../utils/localDate'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -56,7 +57,7 @@ export default function WeekStrip({ location }) {
 
   if (!week) return null
 
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
   const points = week.slice(0, 7).map((day, i) => {
     const score = weekDayScore(day, i)
     return {

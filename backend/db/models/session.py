@@ -32,5 +32,10 @@ class UserSession(UUIDPKMixin, TimestampMixin, Base):
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Why the session ended: "rotated" (spent by a normal /auth/refresh),
+    # "logout", "reuse" (mass revocation after a replayed token), etc.
+    # Only "rotated" sessions qualify for the concurrent-refresh grace
+    # window in routers/auth.py; replaying a logged-out token never does.
+    revoked_reason: Mapped[str | None] = mapped_column(String(16), nullable=True)
 
     user = relationship("User", back_populates="sessions")

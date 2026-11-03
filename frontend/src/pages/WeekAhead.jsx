@@ -17,6 +17,7 @@ import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { fetchPanchangWeek } from '../api/astro'
 import { weekDayScore, weekDayScoreLabel } from '../utils/weekScore'
 import { computeWindow, minutesToLabel } from '../utils/muhurtaWindow'
+import { localDateStr } from '../utils/localDate'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -48,7 +49,7 @@ export default function WeekAhead() {
     return () => { cancelled = true }
   }, [location?.lat, location?.lon])
 
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
 
   return (
     <div className="pb-8 md:pb-12">

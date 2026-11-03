@@ -26,7 +26,7 @@ def get_rajyogas(request: Request, body: BirthInput, db=Depends(get_db_optional)
 
     # 4. Compute all yogas — single source of truth shared with the Reading
     #    tab's free-prediction prompt (see services/career_analysis.check_all_yogas
-    #    and routes/kundli.py's /kundli/reading endpoint).
+    #    and routers/kundli.py's /kundli/reading endpoint).
     all_yogas = check_all_yogas(planets, lagna_sign_idx)
 
     present = [y for y in all_yogas if y["present"]]
@@ -39,7 +39,7 @@ def get_rajyogas(request: Request, body: BirthInput, db=Depends(get_db_optional)
     }
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.rajyoga,
+        db, request=request, save=body.save_report, report_type=ReportType.rajyoga,
         content=response, birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language,

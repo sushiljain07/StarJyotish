@@ -13,10 +13,13 @@ import {
   verifyOtp as apiVerifyOtp,
   loginWithGoogle as apiLoginWithGoogle,
   refreshSession as apiRefreshSession,
+  onSessionRefreshed,
   logout as apiLogout,
   updateProfile as apiUpdateProfile,
   sendPhoneLinkOtp as apiSendPhoneLinkOtp,
   verifyPhoneLinkOtp as apiVerifyPhoneLinkOtp,
+  sendEmailLinkOtp as apiSendEmailLinkOtp,
+  verifyEmailLinkOtp as apiVerifyEmailLinkOtp,
 } from '../api/auth'
 
 const AuthContext = createContext(null)
@@ -30,14 +33,19 @@ export function AuthProvider({ children }) {
   // the one render before that attempt finishes.
   const [loading, setLoading] = useState(true)
 
+  // Any successful refresh — here, in authedRequest, or in fetchWithAuth
+  // (api/auth.js) — lands in this state, so the token never goes stale.
+  useEffect(() => onSessionRefreshed(data => {
+    setAccessToken(data.access_token)
+    setUser(data.user)
+  }), [])
+
   useEffect(() => {
     let cancelled = false
+    // Shared with every other refresh in this tab (see api/auth.js), so
+    // StrictMode's double-run of this effect can't spend the refresh
+    // token twice.
     apiRefreshSession()
-      .then(data => {
-        if (cancelled) return
-        setAccessToken(data.access_token)
-        setUser(data.user)
-      })
       .catch(() => {
         // No valid refresh cookie (never logged in, or it expired) —
         // that's an entirely normal outcome here, not an error to surface.
@@ -82,9 +90,7 @@ export function AuthProvider({ children }) {
       return await fn(accessToken)
     } catch (err) {
       if (err.status !== 401) throw err
-      const data = await apiRefreshSession()
-      setAccessToken(data.access_token)
-      setUser(data.user)
+      const data = await apiRefreshSession()  // updates state via onSessionRefreshed
       return fn(data.access_token)
     }
   }, [accessToken])
@@ -112,6 +118,18 @@ export function AuthProvider({ children }) {
     })
   ), [authedRequest])
 
+  // Same two-step shape as the phone flow above, for the account email.
+  const sendEmailLinkOtp = useCallback((email) => (
+    authedRequest(token => apiSendEmailLinkOtp(token, email))
+  ), [authedRequest])
+
+  const verifyEmailLinkOtp = useCallback((email, code) => (
+    authedRequest(token => apiVerifyEmailLinkOtp(token, email, code)).then(updated => {
+      setUser(updated)
+      return updated
+    })
+  ), [authedRequest])
+
   const value = {
     user,
     accessToken,
@@ -124,6 +142,8 @@ export function AuthProvider({ children }) {
     updateMyProfile,
     sendPhoneLinkOtp,
     verifyPhoneLinkOtp,
+    sendEmailLinkOtp,
+    verifyEmailLinkOtp,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

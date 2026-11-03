@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next'
 import { askKundli } from '../../api/astro'
 import { useAuth } from '../../contexts/AuthContext'
 import JyotiAvatar from './JyotiAvatar'
+import { localDateStr } from '../../utils/localDate'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -27,7 +28,7 @@ function quotaKey(userId) {
 }
 
 function todayStr() {
-  return new Date().toISOString().slice(0, 10)
+  return localDateStr()
 }
 
 function loadQuota(userId) {

@@ -1,8 +1,3 @@
-import os
-import json
-import re
-import time
-import requests
 from datetime import date as _date
 from typing import Optional
 
@@ -13,9 +8,8 @@ from services.ashtakavarga import calculate_ashtakavarga
 # in astro_utils.py, shared with relationship/health/wealth analysis — only
 # career-specific lookup tables (below) stay in this file.
 from services.astro_utils import (
-    SIGNS, SIGN_LORDS, EXALTATION, DEBILITATION, OWN_SIGNS,
-    NATURAL_FRIENDS, NATURAL_ENEMIES, DIGNITY_SCORE,
-    DASHA_ORDER as _DASHA_ORDER, DASHA_YEARS as _DASHA_YEARS,
+    SIGNS, SIGN_LORDS, EXALTATION, DEBILITATION, DIGNITY_SCORE,
+    DASHA_YEARS as _DASHA_YEARS,
     planet_by_name as _planet_by_name,
     house_sign as _house_sign,
     house_lord as _house_lord,
@@ -23,6 +17,7 @@ from services.astro_utils import (
     calculate_amatyakaraka,
     sign_from_planet as _sign_from_planet,
     get_first_mahadasha as _get_first_mahadasha,
+    fmt_sign_factor,
 )
 
 # Academic / study streams by ruling planet
@@ -300,19 +295,32 @@ def determine_job_vs_business(
 
 # ── 4. Special Combinations ───────────────────────────────────────────────────
 
-def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
-    """Check 12 classical career yogas and return presence/description for each."""
-
-    def _house_of(name: str) -> Optional[int]:
+def _planet_lookups(planets: list):
+    """(house_of, sign_of) closures over `planets`, shared by the yoga checkers
+    (each used to define its own identical pair)."""
+    def house_of(name: str) -> Optional[int]:
         p = _planet_by_name(planets, name)
         return p.get("house") if p else None
 
-    def _sign_of(name: str) -> Optional[int]:
+    def sign_of(name: str) -> Optional[int]:
         p = _planet_by_name(planets, name)
         return p.get("sign_index") if p else None
 
-    def _in_kendra(h: Optional[int]) -> bool:
-        return h in {1, 4, 7, 10}
+    return house_of, sign_of
+
+
+def _in_kendra(h: Optional[int]) -> bool:
+    return h in {1, 4, 7, 10}
+
+
+def _in_trikona(h: Optional[int]) -> bool:
+    return h in {1, 5, 9}
+
+
+def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
+    """Check 12 classical career yogas and return presence/description for each."""
+
+    _house_of, _sign_of = _planet_lookups(planets)
 
     results = []
 
@@ -505,19 +513,7 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
 def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
     """Check additional classical Rajyogas beyond the check_special_combinations set."""
 
-    def _house_of(name: str):
-        p = _planet_by_name(planets, name)
-        return p.get("house") if p else None
-
-    def _sign_of(name: str):
-        p = _planet_by_name(planets, name)
-        return p.get("sign_index") if p else None
-
-    def _in_kendra(h) -> bool:
-        return h in {1, 4, 7, 10}
-
-    def _in_trikona(h) -> bool:
-        return h in {1, 5, 9}
+    _house_of, _sign_of = _planet_lookups(planets)
 
     results = []
 
@@ -887,11 +883,10 @@ def identify_career_fields(
 
 # ── LLM Integration ───────────────────────────────────────────────────────────
 
-# _extract_json and _call_llm moved to report_utils.py (shared with
-# relationship/health/wealth analysis) — thin wrapper below preserves the
-# exact original call signature and behavior so nothing else in this file
-# needs to change.
-from services.report_utils import extract_json as _extract_json
+# The provider chain lives in services/llm.py and the JSON handling in
+# report_utils.call_llm (shared with relationship/health/wealth); the thin
+# wrapper below just supplies career's Groq prompt and log prefix.
+from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
 from services.report_utils import call_llm as _report_call_llm
 
 
@@ -900,7 +895,7 @@ def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict
     return _report_call_llm(
         prompt, system=system, groq_extra=groq_extra,
         groq_system_prompt=GROQ_SYSTEM_PROMPT,
-        groq_extra_header="## GEMSTONE QUICK REFERENCE FOR THIS PERSON'S ASCENDANT",
+        groq_extra_header=GEMSTONE_GROQ_HEADER,
         log_prefix="career",
     )
 
@@ -917,7 +912,7 @@ def _build_career_prompt(
     dasha: dict,
     extra: dict,
     user_age: int = 25,
-    current_year: int = 2026,
+    current_year: Optional[int] = None,
     transit_data: Optional[dict] = None,
     gemstone_context: str = "",
     language: str = "en",
@@ -962,16 +957,6 @@ def _build_career_prompt(
     fourth_sun   = extra.get("fourth_from_sun", {})
     tenth_saturn = extra.get("tenth_from_saturn", {})
 
-    def _fmt_sign_factor(f: dict, label: str) -> str:
-        if not f.get("found"):
-            return f"{label}: {f.get('planet','?')} not found in chart"
-        occ = ", ".join(f["occupants"]) or "empty"
-        return (
-            f"{label}: {f['sign']} (H{f['house']}) | "
-            f"Sign lord = {f['lord']} ({f['lord_dignity']}) | "
-            f"Occupants = {occ}"
-        )
-
     # Transit
     transit_lines_str = ""
     if transit_data:
@@ -1008,6 +993,8 @@ def _build_career_prompt(
     if not combos_notes:
         combos_notes.append("No specific placement combinations triggered.")
 
+    if current_year is None:
+        current_year = _date.today().year
     # Filter future-only dashas (end year must be after current_year)
     future_dashas = []
     for e in (dasha.get("full_sequence") or []):
@@ -1151,8 +1138,8 @@ AMATYAKARAKA (career soul planet):
   Amatyakaraka: {amaty_name} in {amaty_sign} H{amaty_house} ({amaty.get('degree',0):.1f}°)
 
 NATURAL ABILITIES:
-  {_fmt_sign_factor(fourth_sun, '4th from Sun')}
-  {_fmt_sign_factor(tenth_saturn, '10th from Saturn')}
+  {fmt_sign_factor(fourth_sun, '4th from Sun')}
+  {fmt_sign_factor(tenth_saturn, '10th from Saturn')}
   First Mahadasha at birth: {first_md} ({_DASHA_YEARS.get(first_md,'?')} yr) → career style shaped by {', '.join(CAREER_DOMAINS.get(first_md, ['?'])[:3])}
 
 CAREER MODE (D10 chart = highest astrological weight):
@@ -1328,17 +1315,8 @@ def generate_career_report(
     lagna_idx = chart_data.get("ascendant", {}).get("sign_index", 0)
 
     # Compute user age and current year from birth date
-    today        = _date.today()
-    current_year = today.year
-    user_age     = 25  # sensible default when birth_date unavailable
-    if birth_date:
-        try:
-            birth    = _date.fromisoformat(birth_date)
-            user_age = today.year - birth.year - (
-                (today.month, today.day) < (birth.month, birth.day)
-            )
-        except (ValueError, TypeError):
-            pass
+    current_year = _date.today().year
+    user_age     = compute_age(birth_date)
 
     ak_data      = calculate_amatyakaraka(planets)
     jvb          = determine_job_vs_business(planets, lagna_idx, d10_chart=d10_chart)
@@ -1370,14 +1348,7 @@ def generate_career_report(
     # GROQ_SYSTEM_PROMPT instead, but does get a small per-ascendant gemstone
     # excerpt via groq_extra below — full gemstone_recommendation depth still
     # only happens on Claude, but Groq is no longer completely ungrounded.
-    if gemstone_context:
-        system = system + "\n\n# VEDIC GEMSTONE & REMEDY KNOWLEDGE BASE\n" + gemstone_context
-
-    groq_gemstone_excerpt = ""
-    if gemstone_context:
-        from services.skill_loader import get_gemstone_excerpt_for_ascendant
-        ascendant_sign = chart_data.get("ascendant", {}).get("sign", "")
-        groq_gemstone_excerpt = get_gemstone_excerpt_for_ascendant(ascendant_sign)
+    system, groq_gemstone_excerpt = add_gemstone_context(system, chart_data, gemstone_context)
 
     prompt = _build_career_prompt(
         chart_data=chart_data,

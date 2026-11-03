@@ -1,8 +1,14 @@
-# React + Vite
+# Star Jyotish — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 18 + Vite SPA, deployed on Vercel.
 
-Currently, two official plugins are available:
+Setup, environment variables, routes and project structure are documented in
+the [root README](../README.md#frontend). Quick start:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+npm run dev     # http://localhost:3000 — /api is proxied to http://localhost:8000
+npm test        # Vitest unit tests
+npm run lint
+npm run build
+```

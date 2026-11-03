@@ -32,8 +32,14 @@ class SessionRepository(BaseRepository[UserSession]):
             ip_address=ip_address,
         )
 
-    def get_active_by_raw_token(self, raw_token: str) -> Optional[UserSession]:
+    def get_active_by_raw_token(self, raw_token: str, *, for_update: bool = False) -> Optional[UserSession]:
+        """`for_update=True` row-locks the session (SELECT ... FOR UPDATE)
+        so two concurrent /auth/refresh calls with the same cookie are
+        serialized: the second waits, then sees the session as revoked
+        instead of also minting a new session from it."""
         stmt = select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_token))
+        if for_update:
+            stmt = stmt.with_for_update()
         session = self.db.scalars(stmt).first()
         if session is None:
             return None
@@ -52,15 +58,16 @@ class SessionRepository(BaseRepository[UserSession]):
         stmt = select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_token))
         return self.db.scalars(stmt).first()
 
-    def revoke(self, session: UserSession) -> UserSession:
-        return self.update(session, revoked_at=datetime.now(timezone.utc))
+    def revoke(self, session: UserSession, reason: Optional[str] = None) -> UserSession:
+        return self.update(session, revoked_at=datetime.now(timezone.utc), revoked_reason=reason)
 
-    def revoke_all_for_user(self, user_id: uuid.UUID) -> int:
+    def revoke_all_for_user(self, user_id: uuid.UUID, reason: Optional[str] = None) -> int:
         stmt = select(UserSession).where(UserSession.user_id == user_id, UserSession.revoked_at.is_(None))
         sessions = list(self.db.scalars(stmt))
         now = datetime.now(timezone.utc)
         for s in sessions:
             s.revoked_at = now
+            s.revoked_reason = reason
         self.db.flush()
         return len(sessions)
 

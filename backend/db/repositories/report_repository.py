@@ -41,7 +41,7 @@ class ReportRepository(BaseRepository[Report]):
     ) -> Report:
         """Single entry point used by every report-generating route's
         best-effort persistence hook (see routers/topic_reports.py,
-        routers/career_report.py, routes/kundli.py). Always succeeds with a
+        routers/career_report.py, routers/kundli.py). Always succeeds with a
         completed-status row — there's no async/queued generation path
         today, so by the time this is called the report content already
         exists in hand."""

@@ -64,3 +64,43 @@ def test_kundli_place_not_found_returns_400():
     with patch("services.chart_context.geocode_place", side_effect=ValueError("Place not found")):
         resp = client.post("/api/kundli", json=VALID_BODY)
     assert resp.status_code == 400
+
+
+def test_divisional_rejects_unsupported_division_with_400():
+    # division=0 used to raise ZeroDivisionError → 500.
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        for bad in (0, 5, 61):
+            resp = client.post(f"/api/kundli/divisional?division={bad}", json=VALID_BODY)
+            assert resp.status_code == 400, bad
+
+
+def test_divisional_supported_division_still_works():
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        resp = client.post("/api/kundli/divisional?division=60", json=VALID_BODY)
+    assert resp.status_code == 200
+    assert resp.json()["division"] == 60
+
+
+def test_chart_highlight_rejects_malformed_chart_type_with_400():
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        for bad in ("Dx", "D0", "D61", "nine"):
+            resp = client.post("/api/kundli/chart-highlight", json={**VALID_BODY, "chart_type": bad})
+            assert resp.status_code == 400, bad
+
+
+def test_time_with_seconds_is_accepted():
+    # BirthInput's validator accepts HH:MM:SS, but chart_context's strict
+    # strptime('%H:%M') rejected it → unhandled ValueError → 500.
+    with patch("services.chart_context.geocode_place", return_value=_mock_geo()):
+        resp = client.post("/api/kundli", json={**VALID_BODY, "time": "12:00:00"})
+    assert resp.status_code == 200
+
+
+def test_unparseable_date_on_unvalidated_model_is_400_not_500():
+    # ReadingRequest/AskRequest have no date validators; bad input must
+    # still be a clean 400 before any LLM call.
+    from unittest.mock import patch as _patch
+    with _patch("services.chart_context.geocode_place", return_value=_mock_geo()), \
+         _patch("routers.kundli.ask_chart", return_value=("x", "test")):
+        resp = client.post("/api/kundli/ask", json={**VALID_BODY, "date": "01/02/2000", "question": "career?"})
+    assert resp.status_code == 400

@@ -29,6 +29,9 @@ pytestmark = pytest.mark.skipif(
 os.environ.setdefault("JWT_SECRET_KEY", "test-only-secret-not-for-production-use")
 os.environ.setdefault("OTP_HASH_SECRET", "test-only-otp-secret-not-for-production-use")
 os.environ.setdefault("COOKIE_SECURE", "false")  # TestClient talks http, not https
+# Tests read the OTP from the send response, which only happens in
+# explicit dev mode (services/otp_provider.otp_dev_mode_enabled).
+os.environ.setdefault("OTP_DEV_MODE", "true")
 
 
 def _unique_phone() -> str:
@@ -122,9 +125,52 @@ def test_refresh_rotates_token_and_old_token_then_fails(client):
     new_cookie = client.cookies.get("sj_refresh")
     assert new_cookie != old_cookie
 
-    # Replaying the now-revoked old token must fail.
+    # Replaying the just-rotated token inside the grace window is treated
+    # as a lost concurrent-refresh race: 409, and the winner's new session
+    # must stay valid (no mass revocation).
+    client.cookies.clear()
+    raced = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
+    assert raced.status_code == 409
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 200
+
+
+def test_refresh_token_reuse_after_grace_window_revokes_everything(client, monkeypatch):
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    old_cookie = client.cookies.get("sj_refresh")
+    assert client.post("/api/auth/refresh").status_code == 200
+    new_cookie = client.cookies.get("sj_refresh")
+
+    import routers.auth as auth_router
+    monkeypatch.setattr(auth_router, "REFRESH_REUSE_GRACE_SECONDS", 0)
+    client.cookies.clear()
     reused = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
     assert reused.status_code == 401
+
+    # Treated as theft: the legitimate new session is revoked too.
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 401
+
+
+def test_cannot_revoke_another_users_session(client):
+    def login():
+        client.cookies.clear()
+        phone = _unique_phone()
+        sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+        resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+        return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+    token_a, cookie_a = login()
+    token_b, _ = login()
+    sessions_a = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {token_a}"}).json()
+    assert len(sessions_a) == 1
+
+    resp = client.delete(f"/api/auth/sessions/{sessions_a[0]['id']}", headers={"Authorization": f"Bearer {token_b}"})
+    assert resp.status_code == 404
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": cookie_a}).status_code == 200
 
 
 def test_logout_revokes_session(client):
@@ -239,3 +285,42 @@ def test_cannot_link_phone_already_owned_by_another_account(client):
     conflict = client.post("/api/account/phone/send", headers={"Authorization": f"Bearer {access_b}"},
                             json={"phone_number": phone_a})
     assert conflict.status_code == 409
+
+
+def _clear_otp_providers(monkeypatch):
+    for key in ("MSG91_AUTH_KEY", "MSG91_TEMPLATE_ID", "TWOFACTOR_API_KEY", "OTP_PROVIDER", "RESEND_API_KEY"):
+        monkeypatch.delenv(key, raising=False)
+
+
+def test_otp_send_fails_closed_without_provider_or_dev_mode(client, monkeypatch):
+    # Regression: a deploy missing its SMS key used to fall back to the
+    # dev console and return the code in the response — anyone could log
+    # in as anyone. Without OTP_DEV_MODE=true it must refuse instead.
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.delenv("OTP_DEV_MODE", raising=False)
+    resp = client.post("/api/auth/otp/send", json={"phone_number": _unique_phone()})
+    assert resp.status_code == 503
+    assert "debug_code" not in resp.text
+
+
+def test_email_otp_send_fails_closed_without_provider_or_dev_mode(client, monkeypatch):
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.setenv("OTP_DEV_MODE", "false")
+    email = f"user-{uuid.uuid4().hex[:10]}@example.com"
+    resp = client.post("/api/auth/otp/send", json={"phone_number": email})
+    assert resp.status_code == 503
+
+
+def test_otp_send_with_real_provider_never_returns_code(client, monkeypatch):
+    # Even with dev mode on, a configured provider means the code goes by
+    # SMS only and never appears in the response.
+    from unittest.mock import patch
+    _clear_otp_providers(monkeypatch)
+    monkeypatch.setenv("OTP_DEV_MODE", "true")
+    monkeypatch.setenv("MSG91_AUTH_KEY", "test-key")
+    monkeypatch.setenv("MSG91_TEMPLATE_ID", "test-template")
+    with patch("services.otp_provider._send_via_msg91") as sent_sms:
+        resp = client.post("/api/auth/otp/send", json={"phone_number": _unique_phone()})
+    assert resp.status_code == 200
+    assert resp.json()["debug_code"] is None
+    sent_sms.assert_called_once()

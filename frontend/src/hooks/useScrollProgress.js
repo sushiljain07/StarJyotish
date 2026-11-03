@@ -1,8 +1,8 @@
 // frontend/src/hooks/useScrollProgress.js
 //
 // Returns a 0–1 float that climbs smoothly as the page scrolls past
-// `distance` pixels, instead of the binary "have we scrolled past this
-// point or not" useScrolledPast.js gives. SiteHeader needs the continuous
+// `distance` pixels, instead of a binary "have we scrolled past this point
+// or not" (see useWindowScrolledPast.js for that). SiteHeader needs the continuous
 // version specifically: a header that snaps between two fixed visual
 // states at one scroll threshold reads as a hard cut (you can see exactly
 // where hero content was still rendering crisply right up against the

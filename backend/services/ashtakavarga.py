@@ -4,7 +4,10 @@ Sarvashtakavarga (total) for the 7 classical planets.
 """
 from typing import Any
 
-# Benefic house positions counted FROM each source planet
+# Benefic house positions counted FROM each source planet, per BPHS
+# (Parashari) — verified against the reference table and the canonical
+# totals in tests/test_ashtakavarga.py: Sun 48, Moon 49, Mars 39,
+# Mercury 54, Jupiter 56, Venus 52, Saturn 39; Sarvashtakavarga 337.
 # e.g. ASHTAK_TABLES['Sun']['Moon'] = [3,6,10,11] means:
 #   Moon gives a benefic point to the signs that are 3,6,10,11 houses away from Moon's sign
 ASHTAK_TABLES: dict[str, dict[str, list[int]]] = {
@@ -16,14 +19,14 @@ ASHTAK_TABLES: dict[str, dict[str, list[int]]] = {
         "Jupiter": [5, 6, 9, 11],
         "Venus":   [6, 7, 12],
         "Saturn":  [1, 2, 4, 7, 8, 9, 10, 11],
-        "Lagna":   [1, 2, 4, 7, 8, 9, 10, 11],
+        "Lagna":   [3, 4, 6, 10, 11, 12],
     },
     "Moon": {
         "Sun":     [3, 6, 7, 8, 10, 11],
         "Moon":    [1, 3, 6, 7, 10, 11],
         "Mars":    [2, 3, 5, 6, 9, 10, 11],
         "Mercury": [1, 3, 4, 5, 7, 8, 10, 11],
-        "Jupiter": [1, 4, 7, 8, 10, 11],
+        "Jupiter": [1, 4, 7, 8, 10, 11, 12],
         "Venus":   [3, 4, 5, 7, 9, 10, 11],
         "Saturn":  [3, 5, 6, 11],
         "Lagna":   [3, 6, 10, 11],
@@ -36,7 +39,7 @@ ASHTAK_TABLES: dict[str, dict[str, list[int]]] = {
         "Jupiter": [6, 10, 11, 12],
         "Venus":   [6, 8, 11, 12],
         "Saturn":  [1, 4, 7, 8, 9, 10, 11],
-        "Lagna":   [1, 2, 4, 7, 8, 10, 11],
+        "Lagna":   [1, 3, 6, 10, 11],
     },
     "Mercury": {
         "Sun":     [5, 6, 9, 11, 12],
@@ -46,7 +49,7 @@ ASHTAK_TABLES: dict[str, dict[str, list[int]]] = {
         "Jupiter": [6, 8, 11, 12],
         "Venus":   [1, 2, 3, 4, 5, 8, 9, 11],
         "Saturn":  [1, 2, 4, 7, 8, 9, 10, 11],
-        "Lagna":   [1, 2, 4, 7, 8, 10, 11],
+        "Lagna":   [1, 2, 4, 6, 8, 10, 11],
     },
     "Jupiter": {
         "Sun":     [1, 2, 3, 4, 7, 8, 9, 10, 11],
@@ -61,7 +64,7 @@ ASHTAK_TABLES: dict[str, dict[str, list[int]]] = {
     "Venus": {
         "Sun":     [8, 11, 12],
         "Moon":    [1, 2, 3, 4, 5, 8, 9, 11, 12],
-        "Mars":    [3, 4, 6, 9, 11, 12],
+        "Mars":    [3, 5, 6, 9, 11, 12],
         "Mercury": [3, 5, 6, 9, 11],
         "Jupiter": [5, 8, 9, 10, 11],
         "Venus":   [1, 2, 3, 4, 5, 8, 9, 10, 11],

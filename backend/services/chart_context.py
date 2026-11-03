@@ -2,7 +2,7 @@
 Shared helper for the single most duplicated block in this codebase: turning
 a (place, date, time) triple into geocoded coordinates plus a UTC Julian Day.
 
-Before this existed, every route in routes/kundli.py, routers/career_report.py,
+Before this existed, every route in routers/kundli.py, routers/career_report.py,
 routers/rajyogas.py, and routers/topic_reports.py repeated the same ~10 lines
 by hand (geocode -> localize -> convert to UTC -> swe.julday). That meant any
 timezone or Julian-day bug had to be fixed in 12 places at once. Now it's one
@@ -27,6 +27,23 @@ class BirthContext:
     jd_ut: float         # Julian Day (UT) — what calculate_chart() / divisional charts / transit want
 
 
+def _parse_birth_datetime(date: str, time: str) -> datetime:
+    """Accepts YYYY-MM-DD and HH:MM or HH:MM:SS. Some request models validate
+    these and some don't, so a bad value here must be a 400, not the
+    unhandled ValueError (→ 500) a strict strptime used to raise."""
+    try:
+        return datetime.strptime(f"{date.strip()} {time.strip()}", "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        pass
+    try:
+        return datetime.strptime(f"{date.strip()} {time.strip()}", "%Y-%m-%d %H:%M")
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Birth date must be YYYY-MM-DD and time HH:MM (24-hour).",
+        )
+
+
 def resolve_birth_context(place: str, date: str, time: str) -> BirthContext:
     """
     Geocode `place` and convert the local birth date/time into a UTC Julian Day.
@@ -41,13 +58,13 @@ def resolve_birth_context(place: str, date: str, time: str) -> BirthContext:
         raise HTTPException(status_code=400, detail=str(e))
 
     local_tz = pytz.timezone(geo.timezone)
-    naive_dt = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+    naive_dt = _parse_birth_datetime(date, time)
     local_dt = local_tz.localize(naive_dt)
     utc_dt = local_dt.astimezone(pytz.utc)
 
     jd_ut = swe.julday(
         utc_dt.year, utc_dt.month, utc_dt.day,
-        utc_dt.hour + utc_dt.minute / 60.0,
+        utc_dt.hour + utc_dt.minute / 60.0 + utc_dt.second / 3600.0,
     )
 
     return BirthContext(geo=geo, naive_dt=naive_dt, utc_dt=utc_dt, jd_ut=jd_ut)

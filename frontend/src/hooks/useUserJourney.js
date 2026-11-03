@@ -8,7 +8,8 @@
 //     remembers you: "You've been on a 5-day streak" / "You love Question cards"
 
 import { useState, useEffect, useCallback } from 'react'
-import { API_BASE } from '../api/config'
+import { fetchWithAuth } from '../api/auth'
+import { localDateStr } from '../utils/localDate'
 
 const LOCAL_REACTIONS_KEY = 'sj_journey_reactions_v1'
 //const LOCAL_STREAK_KEY = 'sj_journey_streak_v1'
@@ -32,7 +33,7 @@ function computeLocalStreak(reactions) {
   let streak = 0
   const today = new Date()
   while (true) {
-    const d = today.toISOString().slice(0, 10)
+    const d = localDateStr(today)
     if (!days.has(d)) break
     streak++
     today.setDate(today.getDate() - 1)
@@ -68,9 +69,7 @@ export function useUserJourney(accessToken) {
     }
 
     setLoadingJourney(true)
-    fetch(`${API_BASE}/api/journey/summary`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    fetchWithAuth('/api/journey/summary', {}, accessToken)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data) {
@@ -93,7 +92,7 @@ export function useUserJourney(accessToken) {
     const entry = {
       card_type: cardType,
       reaction,
-      date: new Date().toISOString().slice(0, 10),
+      date: localDateStr(),
       planet: meta.planet || null,
       house: meta.house || null,
       variation: meta.variation || 0,
@@ -111,13 +110,8 @@ export function useUserJourney(accessToken) {
     })
 
     // Fire-and-forget to backend (unauthenticated is fine)
-    const headers = { 'Content-Type': 'application/json' }
-    if (accessToken) headers.Authorization = `Bearer ${accessToken}`
-    fetch(`${API_BASE}/api/journey/card-reaction`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(entry),
-    }).catch(() => { /* silent */ })
+    fetchWithAuth('/api/journey/card-reaction', { method: 'POST', body: entry }, accessToken)
+      .catch(() => { /* silent */ })
   }, [accessToken])
 
   return { summary, loadingJourney, recordReaction, cardReactions }

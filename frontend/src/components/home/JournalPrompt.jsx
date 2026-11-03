@@ -13,19 +13,19 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { fetchWithAuth } from '../../api/auth'
+import { localDateStr } from '../../utils/localDate'
 
 const STORAGE_KEY = (date) => `sj_journal_feedback_v1:${date}`
-const TODAY = new Date().toISOString().slice(0, 10)
 
 function markSubmittedToday(reaction) {
-  try { localStorage.setItem(STORAGE_KEY(TODAY), reaction) } catch { /* best-effort */ }
+  try { localStorage.setItem(STORAGE_KEY(localDateStr()), reaction) } catch { /* best-effort */ }
 }
 
 export default function JournalPrompt() {
   const { t } = useTranslation()
   const { accessToken } = useAuth()
   const [picked, setPicked] = useState(() => {
-    try { return localStorage.getItem(STORAGE_KEY(TODAY)) || null } catch { return null }
+    try { return localStorage.getItem(STORAGE_KEY(localDateStr())) || null } catch { return null }
   })
   const [status, setStatus] = useState(picked ? 'done' : 'idle')
 
@@ -43,7 +43,7 @@ export default function JournalPrompt() {
     try {
       await fetchWithAuth('/api/feedback/daily-guidance', {
         method: 'POST',
-        body: { reaction, guidance_date: TODAY },
+        body: { reaction, guidance_date: localDateStr() },
       }, accessToken)
     } catch { /* silent — local state still reflects their answer */ }
 

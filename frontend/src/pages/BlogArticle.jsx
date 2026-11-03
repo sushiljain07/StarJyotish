@@ -4,7 +4,7 @@
 // key "blog_article_{slug}" via the public settings endpoint.
 // No hardcoded content — everything is managed from the admin dashboard.
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link, Navigate } from 'react-router-dom'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
@@ -130,10 +130,7 @@ export default function BlogArticle() {
       .finally(() => setLoading(false))
   }, [slug])
 
-  if (notFound && !loading) {
-    navigate('/blog')
-    return null
-  }
+  if (notFound && !loading) return <Navigate to="/blog" replace />
 
   return (
     <div className="min-h-screen bg-parchment">

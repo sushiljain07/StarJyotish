@@ -27,6 +27,14 @@ function Spinner() {
   )
 }
 
+function LoadError({ what }) {
+  return (
+    <div role="alert" className="bg-vermillion-light border border-vermillion/30 text-vermillion text-sm rounded-xl px-4 py-3">
+      Couldn't load {what}. Please refresh the page or try again in a moment.
+    </div>
+  )
+}
+
 function Card({ children, className = '' }) {
   return (
     <div className={`bg-parchment-card rounded-xl border border-line p-5 ${className}`}>
@@ -69,19 +77,24 @@ function OverviewTab({ token }) {
   const [profile,  setProfile]  = useState(null)
   const [earnings, setEarnings] = useState(null)
   const [loading,  setLoading]  = useState(true)
+  const [failed,   setFailed]   = useState(false)
 
   useEffect(() => {
     Promise.all([astrologerGetProfile(token), astrologerGetEarnings(token)])
       .then(([p, e]) => { setProfile(p); setEarnings(e) })
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false))
   }, [token])
 
   if (loading) return <Spinner />
+  // Without this, a failed load left profile null and the banner below
+  // announced "KYC verification rejected" to a perfectly fine account.
+  if (failed) return <LoadError what="your dashboard" />
 
   return (
     <div className="space-y-4">
       {/* KYC status banner */}
-      {profile?.kyc_status !== 'verified' && (
+      {profile && profile.kyc_status !== 'verified' && (
         <Card className="border-primary/40 bg-primary-light/50">
           <div className="flex items-center gap-3">
             <span className="text-2xl">📋</span>
@@ -144,10 +157,12 @@ function BookingsTab({ token }) {
   const [bookings, setBookings] = useState(null)
   const [loading,  setLoading]  = useState(true)
   const [filter,   setFilter]   = useState('all')
+  const [failed,   setFailed]   = useState(false)
 
   useEffect(() => {
     astrologerGetBookings(token)
       .then(setBookings)
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false))
   }, [token])
 
@@ -155,6 +170,7 @@ function BookingsTab({ token }) {
   const filtered = (bookings ?? []).filter(b => filter === 'all' || b.status === filter)
 
   if (loading) return <Spinner />
+  if (failed) return <LoadError what="your bookings" />
 
   return (
     <div>
@@ -218,10 +234,12 @@ function ProfileTab({ token }) {
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState(false)
   const [form,    setForm]    = useState(null)
+  const [failed,  setFailed]  = useState(false)
 
   useEffect(() => {
     astrologerGetProfile(token)
       .then(p => { setProfile(p); setForm({ bio: p.bio || '', price_per_session: String(p.price_per_session), experience_years: String(p.experience_years), specialties: (p.specialties || []).join(', '), languages: (p.languages || []).join(', ') }) })
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false))
   }, [token])
 
@@ -241,7 +259,9 @@ function ProfileTab({ token }) {
     finally { setSaving(false) }
   }
 
-  if (loading || !form) return <Spinner />
+  if (loading) return <Spinner />
+  // A failed load never sets `form`, which used to mean a spinner forever.
+  if (failed || !form) return <LoadError what="your profile" />
 
   return (
     <Card>

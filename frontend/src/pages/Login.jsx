@@ -1,5 +1,5 @@
 // frontend/src/pages/Login.jsx
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import CelestialBackdrop from '../components/CelestialBackdrop'
@@ -42,17 +42,24 @@ export default function Login() {
 
   // Already logged in (e.g. browser back button after a successful
   // login) — no reason to show the form again.
+  // Whatever else the caller put in router state alongside `next` (e.g.
+  // Landing's topic / presetQuestion / landToAsk) is passed on to the
+  // destination — it used to be dropped, losing the visitor's pick.
+  const { next, ...forwardState } = location.state ?? {}
+  const carry = Object.keys(forwardState).length ? forwardState : undefined
+
+  function destinationForRole(role) {
+    return role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(next)
+  }
+
+  // <Navigate>, not navigate(): navigate() during render is ignored, which
+  // left a blank page for an already-signed-in visitor.
   if (isAuthenticated) {
-    const role = user?.role
-    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(location.state?.next)
-    navigate(dest, { replace: true })
-    return null
+    return <Navigate to={destinationForRole(user?.role)} state={carry} replace />
   }
 
   function handleSuccess(loggedInUser) {
-    const role = loggedInUser?.role
-    const dest = role === 'admin' ? '/admin' : role === 'astrologer' ? '/astrologer' : destinationFor(location.state?.next)
-    navigate(dest, { replace: true })
+    navigate(destinationForRole(loggedInUser?.role), { replace: true, state: carry })
   }
 
   return (

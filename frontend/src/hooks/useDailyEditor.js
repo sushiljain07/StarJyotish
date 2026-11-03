@@ -18,13 +18,14 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { API_BASE } from '../api/config'
+import { localDateStr } from '../utils/localDate'
 
 const SESSION_VAR_KEY = 'sj_session_variation'
 const SESSION_TIME_KEY = 'sj_session_time'
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 min = new session
 
 function getDailyKey(profileKey, lang) {
-  const day = new Date().toISOString().slice(0, 10)
+  const day = localDateStr()
   return `sj_daily_ed_v2:${profileKey}:${lang}:${day}`
 }
 

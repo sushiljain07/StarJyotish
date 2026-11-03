@@ -39,7 +39,7 @@ def get_rajyogas(request: Request, body: BirthInput, db=Depends(get_db_optional)
     }
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.rajyoga,
+        db, request=request, save=body.save_report, report_type=ReportType.rajyoga,
         content=response, birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language,

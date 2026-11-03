@@ -2,9 +2,10 @@
 A small, purely additive router demonstrating the persistence layer from
 the outside: a public settings endpoint (the real-backend replacement for
 the hardcoded flags in frontend/src/config/entitlements.js and
-config/auth.js), and read endpoints for a user's saved birth profiles and
-report history, keyed by the same phone number used as the opt-in
-`save_for_phone` field on the existing report routes.
+config/auth.js), and endpoints for the signed-in user's own birth
+profiles and report history. Everything account-scoped is keyed to the
+authenticated user (get_current_user) — never to a phone number or other
+identifier supplied by the caller.
 
 None of this existed before, so none of it can break "existing API
 behavior" — but /settings/public is deliberately designed to degrade
@@ -222,19 +223,17 @@ def delete_my_birth_profile(
             repo.update(remaining[0], is_primary=True)
 
     db.commit()
-def list_birth_profiles(phone_number: str, db=Depends(get_db)):
-    user = UserRepository(db).get_by_phone(phone_number)
-    if user is None:
-        raise HTTPException(status_code=404, detail="No account found for this phone number")
-    return BirthProfileRepository(db).list_for_user(user.id)
 
 
-@router.get("/account/reports/{phone_number}", response_model=List[ReportSummaryOut])
-def list_reports(phone_number: str, report_type: Optional[str] = None, db=Depends(get_db)):
-    user = UserRepository(db).get_by_phone(phone_number)
-    if user is None:
-        raise HTTPException(status_code=404, detail="No account found for this phone number")
-
+@router.get("/account/reports/me", response_model=List[ReportSummaryOut])
+def list_my_reports(
+    report_type: Optional[str] = None,
+    user: User = Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """The signed-in user's saved report history. Replaces the old
+    unauthenticated GET /account/reports/{phone_number}, which let anyone
+    list any user's reports (and probe which numbers have accounts)."""
     parsed_type: Optional[ReportType] = None
     if report_type is not None:
         try:

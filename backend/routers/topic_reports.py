@@ -94,7 +94,7 @@ def get_relationship_report(request: Request, body: BirthInput, db=Depends(get_d
     response = _build_topic_report(report_data)
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.relationship,
+        db, request=request, save=body.save_report, report_type=ReportType.relationship,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,
@@ -134,7 +134,7 @@ def get_wealth_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     response = _build_topic_report(report_data)
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.wealth,
+        db, request=request, save=body.save_report, report_type=ReportType.wealth,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,
@@ -173,7 +173,7 @@ def get_health_report(request: Request, body: BirthInput, db=Depends(get_db_opti
     response = _build_topic_report(report_data)
 
     save_report_if_requested(
-        db, user_phone=body.save_for_phone, report_type=ReportType.health,
+        db, request=request, save=body.save_report, report_type=ReportType.health,
         content=response.model_dump(), birth_date=body.date, birth_time=body.time,
         place=body.place, lat=geo.lat, lon=geo.lon, timezone=geo.timezone,
         language=body.language, llm_provider=response.llm_provider,

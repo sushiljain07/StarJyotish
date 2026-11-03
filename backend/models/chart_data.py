@@ -85,7 +85,7 @@ class ReadingRequest(_Flexible):
     topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' —
                                   # set when the user arrived via a landing-page topic
                                   # card; see services/ai.py build_prediction_prompt().
-    save_for_phone: Optional[str] = Field(default=None, max_length=20)  # see models/birth_data.py
+    save_report: bool = False  # see models/birth_data.py
 
 
 class ReadingSection(_Flexible):
@@ -109,7 +109,7 @@ class AskRequest(_Flexible):
     place: str = Field(max_length=200)
     question: str = Field(max_length=500)
     language: str = "en"
-    save_for_phone: Optional[str] = Field(default=None, max_length=20)  # see models/birth_data.py
+    save_report: bool = False  # see models/birth_data.py
     # Returned by the previous /kundli/ask response and echoed back here so
     # the backend can look up this conversation's prior Q&A — see
     # services/ask_sessions.py. None on the first question of a session.

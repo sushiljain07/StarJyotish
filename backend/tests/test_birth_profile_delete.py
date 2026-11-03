@@ -20,6 +20,9 @@ pytestmark = pytest.mark.skipif(
 os.environ.setdefault("JWT_SECRET_KEY", "test-only-secret-not-for-production-use")
 os.environ.setdefault("OTP_HASH_SECRET", "test-only-otp-secret-not-for-production-use")
 os.environ.setdefault("COOKIE_SECURE", "false")
+# Tests read the OTP from the send response, which only happens in
+# explicit dev mode (services/otp_provider.otp_dev_mode_enabled).
+os.environ.setdefault("OTP_DEV_MODE", "true")
 
 
 def _unique_phone() -> str:

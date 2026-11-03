@@ -19,6 +19,8 @@ import os
 import requests
 from fastapi import HTTPException
 
+from services.otp_provider import otp_dev_mode_enabled, otp_unavailable
+
 logger = logging.getLogger("starjyotish.email_otp")
 
 _RESEND_URL = "https://api.resend.com/emails"
@@ -63,8 +65,10 @@ def send_otp_email(email: str, code: str) -> str:
     from_email = (os.getenv("RESEND_FROM_EMAIL") or "info@starjyotish.com").strip()
 
     if not api_key:
+        if not otp_dev_mode_enabled():
+            raise otp_unavailable("email")
         logger.warning(
-            "RESEND_API_KEY not configured — logging OTP to console. "
+            "OTP_DEV_MODE: RESEND_API_KEY not configured — logging OTP to console. "
             "email=%s code=%s", email, code
         )
         return "dev-console"

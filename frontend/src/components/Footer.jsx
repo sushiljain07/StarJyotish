@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
+import { API_BASE } from '../api/config'
 
 const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
 const FOOTER_YEAR = new Date().getFullYear()
@@ -117,7 +118,7 @@ export default function Footer() {
                 if (!newsletterEmail.trim()) return
                 setNewsletterStatus('sending')
                 try {
-                  const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/newsletter`, {
+                  const res = await fetch(`${API_BASE}/api/newsletter`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: newsletterEmail.trim() }),

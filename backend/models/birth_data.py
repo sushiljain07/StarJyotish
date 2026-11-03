@@ -42,14 +42,14 @@ class BirthInput(BaseModel):
     current_profession: Optional[str] = Field(default=None, max_length=200)
     # Up to 3 free-form concern strings, e.g. "Am I in the right career?"
     career_concerns: Optional[List[str]] = None
-    # Opt-in persistence: when set, the report-generating routes (career,
-    # rajyogas, relationship, wealth) best-effort save a BirthProfile +
-    # Report row for this phone number via services/persistence.py. Omit
-    # it (the default) and nothing is written — behavior is identical to
-    # before this field existed. Not validated as a real phone number
-    # here; the persistence layer treats it as an opaque identity key the
-    # same way the WhatsApp/Razorpay funnel design already does.
-    save_for_phone: Optional[str] = Field(default=None, max_length=20)
+    # Opt-in persistence: when true AND the request carries a valid access
+    # token, the report-generating routes best-effort save a BirthProfile +
+    # Report row to that signed-in user's account (services/persistence.py).
+    # Anonymous callers are never saved for. The old `save_for_phone` field
+    # was removed because it let anyone write into anyone's account; an
+    # old client still sending it is silently ignored (extra fields are
+    # dropped by pydantic).
+    save_report: bool = False
 
     @field_validator("date")
     @classmethod

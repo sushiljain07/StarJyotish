@@ -1,7 +1,7 @@
 // The career report is a ~20s LLM call that auto-starts for signed-in users
 // when it mounts. Insights used to mount it (hidden) on every topic, so a
 // relationship or health visit paid for an invisible career report.
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useEffect } from 'react'
@@ -49,7 +49,9 @@ describe('Insights career report mounting', () => {
     expect(mounts.CareerReportTab ?? 0).toBe(0)
     fireEvent.click(screen.getByRole('button', { name: 'Career' }))
     expect(await screen.findByText('CAREER')).toBeInTheDocument()
-    expect(mounts.CareerReportTab).toBe(1)
+    // The mount counter is bumped in an effect, which may run just after
+    // the text appears under load.
+    await waitFor(() => expect(mounts.CareerReportTab).toBe(1))
   })
 
   it('keeps the career report mounted when switching away and back', async () => {
@@ -63,7 +65,9 @@ describe('Insights career report mounting', () => {
   it('opens the sub-tab named in the URL (and counts it as opened)', async () => {
     renderInsights('career', '?sub=career')
     expect(await screen.findByText('CAREER')).toBeInTheDocument()
-    expect(mounts.CareerReportTab).toBe(1)
+    // The mount counter is bumped in an effect, which may run just after
+    // the text appears under load.
+    await waitFor(() => expect(mounts.CareerReportTab).toBe(1))
   })
 
   it('takes the topic from the URL', async () => {

@@ -85,11 +85,6 @@ export default function PrivacyPolicy() {
         <p><strong className="text-ink">Technical & usage data.</strong> Your IP address (used to apply fair-use rate
           limits and prevent abuse of paid AI features), browser/device type, and which pages or report tabs you
           use. We do not currently run any third-party analytics or advertising trackers on the Platform.</p>
-        <p><strong className="text-ink">WhatsApp number, if you choose to share one.</strong> Certain prompts on the
-          Platform invite you to leave a WhatsApp number (for example, to receive your reading later). As of this
-          policy's date, that number is saved only in your own browser's local storage on your device — it is not
-          transmitted to or stored on our servers. This will change once WhatsApp delivery is fully wired up on
-          our backend, at which point this policy will be updated accordingly.</p>
 
         <h2 id="how-we-use" className={h2}>2. How we use your information</h2>
         <ul className={ul}>
@@ -143,11 +138,10 @@ export default function PrivacyPolicy() {
           browser's local storage (not cookies) for a small number of first-party purposes:</p>
         <ul className={ul}>
           <li>Remembering your language preference (English/Hindi)</li>
-          <li>Remembering a WhatsApp number you've chosen to leave (stored on your device only — see Section 1)</li>
           <li>A developer-only flag used internally during testing, which has no effect on your data or privacy</li>
         </ul>
         <p>You can clear this at any time via your browser's settings; doing so simply resets your language
-          preference and any saved WhatsApp number on that device.</p>
+          preference on that device.</p>
 
         <h2 id="your-rights" className={h2}>7. Your rights</h2>
         <p>Under India's Digital Personal Data Protection Act, 2023, and other applicable law, you have the right

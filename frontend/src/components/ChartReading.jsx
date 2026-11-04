@@ -51,17 +51,12 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
 
   // Staggered visibility per section
   const [visible, setVisible]         = useState([])
-  const [showWa, setShowWa]           = useState(false)
 
-  // WhatsApp
-  const [waNumber, setWaNumber]       = useState('')
-  const [waSubmitted, setWaSubmitted] = useState(false)
 
   async function generate() {
     setStatus('loading')
     setPredSections({})
     setVisible([])
-    setShowWa(false)
     setErrorMsg('')
 
     try {
@@ -83,14 +78,11 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       setStatus('done')
 
       // Stagger each section's fade-in, 380ms apart
-      const count = SECTION_CONFIG.filter(c => secs[c.key]).length
       SECTION_CONFIG.forEach((c, i) => {
         if (secs[c.key]) {
           setTimeout(() => setVisible(prev => [...prev, c.key]), i * 380)
         }
       })
-      const base = count * 380 + 300
-      setTimeout(() => setShowWa(true), base + 400)
     } catch (e) {
       setErrorMsg(errorMessage(e, t('error_something_wrong')))
       setStatus('error')
@@ -114,19 +106,6 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated])
 
-  function handleWaSubmit() {
-    if (waNumber.trim()) {
-      try {
-        localStorage.setItem('starjyotish_wa', JSON.stringify({
-          number: waNumber.trim(), savedAt: new Date().toISOString(),
-        }))
-      } catch {
-        // Best-effort only — localStorage can throw in private browsing
-        // or when full; the WhatsApp number itself isn't critical to save.
-      }
-      setWaSubmitted(true)
-    }
-  }
 
   // ── IDLE ──────────────────────────────────────────────────────────────────
   if (status === 'idle' && !isAuthenticated) return (
@@ -260,46 +239,8 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
         </div>
       )}
 
-      {/* ── WHATSAPP LEAD CAPTURE ─────────────────────────────────────────── */}
-      <div className={`transition-all duration-700
-                      ${showWa ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        {showWa && !waSubmitted && (
-          <div className="rounded-xl p-4"
-               style={{ border: '1px solid rgba(147,51,234,0.45)', background: 'rgba(45,27,105,0.35)' }}>
-            <p className="text-white text-sm mb-3">
-              📲 Want a reminder when your peak career window opens? Enter your WhatsApp number for a free timing alert.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="tel"
-                value={waNumber}
-                onChange={e => setWaNumber(e.target.value)}
-                placeholder="WhatsApp number"
-                className="flex-1 px-3 py-2 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none"
-                style={{ background: 'rgba(30,10,60,0.8)', border: '1px solid rgba(147,51,234,0.6)' }}
-              />
-              <button
-                onClick={handleWaSubmit}
-                className="px-4 py-2 rounded-lg font-semibold text-sm shrink-0 w-full sm:w-auto"
-                style={{ background: '#D4AF37', color: '#1A0A3B' }}>
-                Notify Me →
-              </button>
-            </div>
-            <p className="text-gray-500 text-xs mt-2">No spam. Only your personal career timing updates.</p>
-          </div>
-        )}
-        {waSubmitted && (
-          <div className="rounded-xl p-4 text-center"
-               style={{ background: 'rgba(4,120,87,0.15)', border: '1px solid rgba(16,185,129,0.4)' }}>
-            <p className="text-emerald-400 text-sm">
-              ✓ We'll notify you on WhatsApp when your peak career window opens.
-            </p>
-          </div>
-        )}
-      </div>
-
       <div className="text-center pb-4">
-        <button onClick={() => setStatus('idle')}
+        <button onClick={() => generate()}
           className="text-sm text-primary hover:text-primary-dark transition">
           ↺ Regenerate Prediction
         </button>

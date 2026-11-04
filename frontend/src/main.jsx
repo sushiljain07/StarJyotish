@@ -7,8 +7,10 @@ import './index.css'
 import App from './App.jsx'
 import { initSentry, SentryErrorBoundary } from './monitoring.js'
 import ErrorFallback from './components/ErrorFallback.jsx'
+import { removeLegacyStorage } from './legacyCleanup.js'
 
 initSentry()
+removeLegacyStorage()
 
 // Empty string rather than throwing when unset, so the app still boots
 // for local dev before Google Cloud credentials exist — the Google

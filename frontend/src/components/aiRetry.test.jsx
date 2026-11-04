@@ -92,3 +92,29 @@ describe('Ask after a failure', () => {
     expect(await screen.findByText(en.network_error)).toBeInTheDocument()
   })
 })
+
+describe('WhatsApp opt-in removed', () => {
+  it('a finished reading never asks for a WhatsApp number', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    fetchMock.mockResolvedValueOnce(ok({ prediction_sections: { identity: 'Good.' } }))
+    render(<ChartReading input={INPUT} />)
+    await screen.findByText('Good.')
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(screen.queryByPlaceholderText(/whatsapp/i)).toBeNull()
+    expect(screen.queryByText(/whatsapp/i)).toBeNull()
+    vi.useRealTimers()
+  })
+})
+
+describe('Regenerate after a finished reading', () => {
+  it('ChartReading (signed in): Regenerate re-requests instead of spinning forever', async () => {
+    fetchMock
+      .mockResolvedValueOnce(ok({ prediction_sections: { identity: 'First.' } }))
+      .mockResolvedValueOnce(ok({ prediction_sections: { identity: 'Second.' } }))
+    render(<ChartReading input={INPUT} />)
+    await screen.findByText('First.')
+    fireEvent.click(screen.getByRole('button', { name: /regenerate/i }))
+    expect(await screen.findByText('Second.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+})

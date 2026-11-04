@@ -43,6 +43,13 @@ export default function Insights() {
 
   // All hooks before any early return
   const [activeSub, setActiveSub] = useState('reading')
+  // The career report auto-generates (a ~20s LLM call) when it mounts, so
+  // mount it only once its tab has been opened, then keep it mounted.
+  const [careerOpened, setCareerOpened] = useState(false)
+  function selectSub(id) {
+    if (id === 'career') setCareerOpened(true)
+    setActiveSub(id)
+  }
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
@@ -68,7 +75,7 @@ export default function Insights() {
 
           {SUBTABS.length > 1 && (
             <div className="border-t border-line/40 py-2">
-              <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={setActiveSub} variant="pill" accent="mauve" />
+              <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={selectSub} variant="pill" accent="mauve" />
             </div>
           )}
         </div>
@@ -82,9 +89,11 @@ export default function Insights() {
           <div className={activeSub === 'rajyogas' ? 'tab-fade' : 'hidden'}>
             <RajyogasTab input={input} />
           </div>
-          <div className={activeSub === 'career' ? 'tab-fade' : 'hidden'}>
-            <CareerReportTab input={input} onOpenRajyogas={() => setActiveSub('rajyogas')} />
-          </div>
+          {topicId === 'career' && careerOpened && (
+            <div className={activeSub === 'career' ? 'tab-fade' : 'hidden'}>
+              <CareerReportTab input={input} onOpenRajyogas={() => setActiveSub('rajyogas')} />
+            </div>
+          )}
           {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (
             <div className={activeSub === topicId ? 'tab-fade' : 'hidden'}>
               <TopicReportTab topic={topicId} input={input} />

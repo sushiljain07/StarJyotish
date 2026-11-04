@@ -153,7 +153,7 @@ Goal: a Hindi user sees no English on the main journey.
 | Phase | Branch | Plan | Status |
 |---|---|---|---|
 | 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — PR open |
-| 2 | `fix/phase2-core-flows` | to write | — |
+| 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
 | 3 | `feat/phase3-hindi` | to write | — |
 | 4 | `fix/phase4-mobile-nav` | to write | — |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

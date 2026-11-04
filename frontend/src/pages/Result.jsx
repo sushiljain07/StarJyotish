@@ -87,7 +87,7 @@ export default function Result() {
   const { t } = useTranslation()
   const location  = useLocation()
   const navigate  = useNavigate()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
   const state = resolveChartState(location.state, user)
 
@@ -119,6 +119,7 @@ export default function Result() {
   // main tab); a sub-tab change replaces it. Router state is carried along
   // so the chart and any preset question survive.
   function selectMain(id) {
+    if (id === activeMain) return
     setSearchParams({ tab: id }, { state: location.state })
   }
   function selectSub(id) {
@@ -132,6 +133,10 @@ export default function Result() {
   useEffect(() => {
     if (location.state?.data) saveLastChart(location.state)
   }, [location.state])
+
+  // On a hard page load the saved profile is only known once sign-in
+  // has resolved; redirecting before then would bounce a signed-in user.
+  if (!state?.data && authLoading) return null
 
   // <Navigate>, not navigate(): navigate() during render is ignored by
   // React Router, which left a blank page for bookmarked/refreshed URLs.

@@ -63,4 +63,11 @@ describe('BirthForm', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_pick_place)
     expect(spy).not.toHaveBeenCalled()
   })
+  it('says so when the birth time is incomplete', () => {
+    fillDate('16', '8', '1990')
+    select('Hour', '07'); select('Minute', '05')
+    submit()
+    expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_time)
+    expect(spy).not.toHaveBeenCalled()
+  })
 })

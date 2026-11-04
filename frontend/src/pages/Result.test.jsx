@@ -67,4 +67,9 @@ describe('Kundli tabs in the URL', () => {
     renderAt({ pathname: '/kundli', search: '?tab=bogus&sub=nope', state: CHART })
     expect(shown('KUNDLI_CHART')).toBe(true)
   })
+  it('tapping the active main tab keeps its sub-tab', () => {
+    renderAt({ pathname: '/kundli', search: '?tab=birth_chart&sub=dasha', state: CHART })
+    fireEvent.click(screen.getAllByRole('button', { name: /Birth Chart/ })[0])
+    expect(lastSearch).toBe('?tab=birth_chart&sub=dasha')
+  })
 })

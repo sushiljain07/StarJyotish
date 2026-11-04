@@ -20,9 +20,17 @@ function stableStringify(value) {
 
 const cacheKey = (endpoint, body) => `${PREFIX}${endpoint}:${stableStringify(body)}`
 
+// The chart fields the report endpoints read. Other input fields (name,
+// topic, timeAccuracy) are ignored by the server, so they stay out of the
+// body and the cache key; otherwise the same reading would be generated
+// and paid for once per entry point.
+export function chartBody(input) {
+  return { date: input.date, time: input.time, place: input.place }
+}
+
 // The exact body ChartReading sends to /api/kundli/reading.
 export function readingBody(input, lang) {
-  return { ...input, language: lang }
+  return { ...chartBody(input), language: lang }
 }
 
 export function peekReport(endpoint, body) {

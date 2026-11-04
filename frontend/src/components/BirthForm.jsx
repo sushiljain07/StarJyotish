@@ -50,7 +50,10 @@ export default function BirthForm({ onSubmit, loading }) {
     setError('')
     const needsTime = accuracy !== 'unknown'
     if (!day || !month || !year || !place) return
-    if (needsTime && (!time.hour || !time.minute || !time.ampm)) return
+    if (needsTime && (!time.hour || !time.minute || !time.ampm)) {
+      setError(t('form_error_time'))
+      return
+    }
     if (!placePicked && suggestions.length > 0) {
       setError(t('form_error_pick_place'))
       return

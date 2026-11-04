@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchReport } from '../api/reportCache'
+import { chartBody, fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
@@ -469,7 +469,7 @@ export default function RajyogasTab({ input }) {
     setStatus('loading')
     setErrorMsg('')
     try {
-      const data = await fetchReport('/api/rajyogas', input, { fallback: 'Something went wrong. Please try again.' })
+      const data = await fetchReport('/api/rajyogas', chartBody(input), { fallback: 'Something went wrong. Please try again.' })
       if (!isCurrent()) return
       setResult(data)
       setStatus('done')

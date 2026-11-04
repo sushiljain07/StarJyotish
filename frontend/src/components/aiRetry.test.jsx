@@ -167,3 +167,31 @@ describe('Report cache', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('Report cache keys and language during load', () => {
+  const reading = text => ok({ prediction_sections: { identity: text } })
+
+  it('a language switch while loading ends on the new language', async () => {
+    let resolveEn
+    fetchMock
+      .mockReturnValueOnce(new Promise(r => { resolveEn = r }))
+      .mockResolvedValueOnce(reading('हिंदी।'))
+    render(<ChartReading input={INPUT} />)
+    await act(() => i18n.changeLanguage('hi'))
+    await act(async () => { resolveEn(reading('English.')) })
+    expect(await screen.findByText('हिंदी।')).toBeInTheDocument()
+    expect(screen.queryByText('English.')).toBeNull()
+    await act(() => i18n.changeLanguage('en'))
+  })
+
+  it('the reading is cached by chart and language only', async () => {
+    fetchMock.mockResolvedValueOnce(reading('Once.'))
+    const first = render(<ChartReading input={{ ...INPUT, name: 'Asha', topic: 'career', timeAccuracy: 'exact' }} />)
+    await screen.findByText('Once.')
+    first.unmount()
+    render(<ChartReading input={INPUT} />)
+    expect(await screen.findByText('Once.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(Object.keys(JSON.parse(fetchMock.mock.calls[0][1].body)).sort()).toEqual(['date', 'language', 'place', 'time'])
+  })
+})

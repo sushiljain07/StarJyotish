@@ -5,7 +5,9 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function CareerReportRedirect() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
+  // Wait for sign-in to resolve, or a signed-in user lands on /generate.
+  if (loading) return null
   const to = isAuthenticated ? '/insights?topic=career&sub=career' : '/generate?topic=career'
   return <Navigate to={to} replace />
 }

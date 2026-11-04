@@ -31,3 +31,17 @@ export function resolveChartState(routerState, user) {
   if (routerState?.input) return routerState
   return loadLastChart() ?? (user ? chartStateFromProfile(getPrimaryProfile(user)) : null)
 }
+
+// Drop this tab's chart and cached reports. Called on sign-out so the next
+// person on a shared device doesn't see them.
+export function clearChartSession() {
+  try {
+    sessionStorage.removeItem(KEY)
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const k = sessionStorage.key(i)
+      if (k?.startsWith('sj_report:')) sessionStorage.removeItem(k)
+    }
+  } catch {
+    // Storage blocked: nothing was stored.
+  }
+}

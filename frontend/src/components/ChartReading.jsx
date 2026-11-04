@@ -102,7 +102,9 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   useEffect(() => {
     if (shownLangRef.current === lang) return
     shownLangRef.current = lang
-    if (status === 'done') generate()
+    // While loading, the new request makes the old one stale (its reply
+    // is still cached).
+    if (status === 'done' || status === 'loading') generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang])
 

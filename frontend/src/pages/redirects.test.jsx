@@ -45,6 +45,7 @@ function StateProbe({ label }) {
 beforeEach(() => {
   auth.isAuthenticated = false
   auth.user = null
+  auth.loading = false
 })
 
 describe('state-less pages rebuild from the last chart', () => {
@@ -136,5 +137,22 @@ describe('/generate?topic=', () => {
       </MemoryRouter>,
     )
     expect(await screen.findByText(/landing_topic_career_label/)).toBeInTheDocument()
+  })
+})
+
+describe('while sign-in is still resolving', () => {
+  it.each([
+    ['/kundli', () => import('./Result')],
+    ['/insights', () => import('./Insights')],
+    ['/ask', () => import('./AskPage')],
+    ['/career-report', () => import('./CareerReportRedirect')],
+  ])('%s waits instead of redirecting', async (path, load) => {
+    auth.loading = true
+    const { default: Page } = await load()
+    renderAt(path, <Page />)
+    await new Promise(r => setTimeout(r, 50))
+    expect(screen.queryByText('LANDING')).toBeNull()
+    expect(screen.queryByText(/GENERATE/)).toBeNull()
+    auth.loading = false
   })
 })

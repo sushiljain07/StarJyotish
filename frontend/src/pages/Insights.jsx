@@ -40,7 +40,7 @@ function buildSubtabs(t, topicId) {
 export default function Insights() {
   const { t } = useTranslation()
   const location = useLocation()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
   const state = resolveChartState(location.state, user)
 
@@ -56,6 +56,10 @@ export default function Insights() {
   }, [urlSub])
 
   const homeDestination = isAuthenticated ? '/home' : '/'
+
+  // On a hard page load the saved profile is only known once sign-in
+  // has resolved; redirecting before then would bounce a signed-in user.
+  if (!state?.input && authLoading) return null
 
   // <Navigate>, not navigate() — see Result.jsx.
   if (!state?.input) return <Navigate to={homeDestination} replace />

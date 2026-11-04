@@ -8,6 +8,7 @@
   "form_error_invalid_date": "That date doesn't exist. Please check the day and month.",
   "form_error_future_date": "Birth date can't be in the future.",
   "form_error_pick_place": "Please pick your birth place from the list.",
+  "form_error_time": "Please choose the hour, minute and AM/PM, or pick \"I don't know\".",
   "teaser_heading": "Your AI reading is ready",
   "teaser_body": "A personal reading of this chart: strengths, current period and what's ahead.",
   "teaser_reveal": "Reveal my reading",

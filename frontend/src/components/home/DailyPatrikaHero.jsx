@@ -22,6 +22,7 @@
 // strip — is unchanged; those weren't part of this reskin.
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { localeFor, currentLanguage } from '../../i18n/languages'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
 const ICON_BY_TYPE = {
@@ -284,8 +285,8 @@ export default function DailyPatrikaHero({
   firstName, edition, dayScore, chapterLabelFn, oneAction, onRefresh, onReaction,
   cardReactions,
 }) {
-  const { i18n } = useTranslation()
-  const locale = i18n.language?.startsWith("hi") ? "hi-IN" : "en-GB"
+  useTranslation() // subscribe so the date locale follows the language
+  const locale = localeFor(currentLanguage())
   const dateStr = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
 
   const chapter = edition?.chapter

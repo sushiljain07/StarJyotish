@@ -1,7 +1,8 @@
-import { useState, lazy, Suspense } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
+import { resolveChartState, saveLastChart } from '../services/lastChart'
 
 import { StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
@@ -79,9 +80,11 @@ function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
 
 export default function Result() {
   const { t } = useTranslation()
-  const { state } = useLocation()
+  const location  = useLocation()
   const navigate  = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile.
+  const state = resolveChartState(location.state, user)
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
@@ -103,6 +106,12 @@ export default function Result() {
   )
   const [activeAnalysisSub, setActiveAnalysisSub] = useState('bhava')
   const [chartStyle, setChartStyle]               = useState('north')
+
+  // Remember a chart that arrived by navigation, so a refresh or a
+  // sign-in round-trip comes back to it (see services/lastChart.js).
+  useEffect(() => {
+    if (location.state?.data) saveLastChart(location.state)
+  }, [location.state])
 
   // <Navigate>, not navigate(): navigate() during render is ignored by
   // React Router, which left a blank page for bookmarked/refreshed URLs.

@@ -3,6 +3,7 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { resolveChartState } from '../services/lastChart'
 import Seo from '../components/Seo'
 import { StateBlock } from '../components/ui'
 
@@ -14,8 +15,10 @@ function TabLoader() {
 }
 
 export default function AskPage() {
-  const { state }   = useLocation()
-  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  const { isAuthenticated, user } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile.
+  const state = resolveChartState(location.state, user)
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 

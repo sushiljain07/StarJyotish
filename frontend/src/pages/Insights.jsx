@@ -5,6 +5,7 @@ import { useState, lazy, Suspense } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
+import { resolveChartState } from '../services/lastChart'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import Seo from '../components/Seo'
 import { getTopic } from '../config/topics'
@@ -38,8 +39,10 @@ function buildSubtabs(t, topicId) {
 
 export default function Insights() {
   const { t } = useTranslation()
-  const { state }   = useLocation()
-  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  const { isAuthenticated, user } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile.
+  const state = resolveChartState(location.state, user)
 
   // All hooks before any early return
   const [activeSub, setActiveSub] = useState('reading')

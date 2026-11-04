@@ -46,19 +46,26 @@ export function isNavActive(pathname, to) {
 // Chart-dependent destinations (/kundli, /insights) need the saved chart in
 // navigation state; without a profile they fall through to /generate.
 // Shared by SiteHeader and BottomNav — previously duplicated in both.
+export function chartStateFromProfile(profile) {
+  if (!profile) return null
+  return {
+    data: profile.chart,
+    input: {
+      name: profile.label,
+      date: profile.birth_date,
+      time: profile.birth_time,
+      place: profile.place,
+    },
+  }
+}
+
 export function navTarget(item, profile) {
   if (!item.needsChart) return { to: item.to, state: undefined }
   if (!profile) return { to: '/generate', state: undefined }
   return {
     to: item.to,
     state: {
-      data: profile.chart,
-      input: {
-        name: profile.label,
-        date: profile.birth_date,
-        time: profile.birth_time,
-        place: profile.place,
-      },
+      ...chartStateFromProfile(profile),
       ...(item.activeTab ? { activeTab: item.activeTab, activeSubtab: item.activeSubtab } : {}),
     },
   }

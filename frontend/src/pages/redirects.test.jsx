@@ -12,6 +12,10 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: k => k, i18n: { language: 'en', changeLanguage: () => {} } }),
 }))
 vi.mock('../components/Seo', () => ({ default: () => null }))
+// Chart widgets need a full chart payload; these tests are about routing.
+vi.mock('../components/KundliChart', () => ({ default: () => null }))
+vi.mock('../components/PlanetTable', () => ({ default: () => null }))
+vi.mock('../components/DashaTable', () => ({ default: () => null }))
 
 function renderAt(path, element, { state } = {}) {
   return render(
@@ -41,6 +45,27 @@ function StateProbe({ label }) {
 beforeEach(() => {
   auth.isAuthenticated = false
   auth.user = null
+})
+
+describe('state-less pages rebuild from the last chart', () => {
+  const LAST = {
+    data: { planets: [], ascendant: { sign: 'Virgo' }, navamsa_planets: [], navamsa_ascendant: { sign: 'Leo' },
+            dasha: { current_mahadasha: { planet: 'Jupiter' }, mahadashas: [] } },
+    input: { name: 'Asha', date: '1990-08-16', time: '19:05', place: 'Delhi, India' },
+  }
+  it.each([
+    ['/kundli', () => import('./Result'), /Lagna: Virgo/],
+    ['/insights', () => import('./Insights'), /Insights/],
+    ['/ask', () => import('./AskPage'), /Ask Your Chart/],
+  ])('%s with a saved last chart renders instead of redirecting', async (path, load, marker) => {
+    const { saveLastChart } = await import('../services/lastChart')
+    saveLastChart(LAST)
+    const { default: Page } = await load()
+    renderAt(path, <Page />)
+    expect(await screen.findByText(marker)).toBeInTheDocument()
+    expect(screen.queryByText('LANDING')).toBeNull()
+    sessionStorage.clear()
+  })
 })
 
 describe('state-less pages redirect home', () => {

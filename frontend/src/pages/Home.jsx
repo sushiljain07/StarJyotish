@@ -7,6 +7,7 @@ import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
 import { markFreeKundliUsed } from '../config/auth'
 import { useAuth } from '../contexts/AuthContext'
+import { saveLastChart } from '../services/lastChart'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import Seo from '../components/Seo'
@@ -46,6 +47,7 @@ export default function Home() {
       // route signed-out repeat visitors to /login), so there's nothing
       // to mark for them.
       if (!topicId && !isAuthenticated) markFreeKundliUsed()
+      saveLastChart({ data, input })
       navigate('/kundli', { state: { data, input, presetQuestion, landToAsk } })
     } catch (err) {
       setError(

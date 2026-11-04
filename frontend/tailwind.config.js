@@ -73,12 +73,13 @@ export default {
         '3xs': ['0.625rem',  { lineHeight: '0.875rem' }], // 10px — replaces text-[10px]
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         // Headline-only serif — see index.html for the Fraunces import.
-        // Devanagari has no Fraunces glyphs, so Hindi headings fall back to
-        // the sans stack automatically; that's a deliberate, honest
-        // fallback rather than a forced, less-legible serif substitute.
-        serif: ['Fraunces', 'Georgia', 'serif'],
+        // Neither Inter nor Fraunces has Devanagari glyphs, so the browser
+        // falls through to the Devanagari face per character. Hindi
+        // headlines get Tiro Devanagari Hindi, a serif that matches Fraunces'
+        // character rather than a sans fallback.
+        sans: ['Inter', 'Noto Sans Devanagari', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Fraunces', 'Tiro Devanagari Hindi', 'Georgia', 'serif'],
       },
       // One card radius for the whole app — components/ui/Card.jsx uses
       // this; ad-hoc rounded-lg/xl/2xl on cards should converge here.

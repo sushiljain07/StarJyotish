@@ -1,17 +1,11 @@
 import { useTranslation } from 'react-i18next'
-
-function ordinalSuffix(n) {
-  if (!n) return ''
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return s[(v - 20) % 10] || s[v] || s[0]
-}
+import { planetName, signName } from '../../utils/astroNames'
 
 export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
   const { t } = useTranslation()
   const house = moonSpotlight?.house
   const antardashaStr = dashaSpotlight?.antardasha
-    ? t('spotlight_antardasha_suffix', { antardasha: dashaSpotlight.antardasha })
+    ? t('spotlight_antardasha_suffix', { antardasha: planetName(t, dashaSpotlight.antardasha) })
     : ''
   return (
     <div className="grid sm:grid-cols-2 gap-4">
@@ -21,7 +15,7 @@ export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
           <div>
             <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_moon_title')}</h3>
             <p className="text-[11px] text-ink-onnight/45 mt-0.5">
-              {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ?? '—', house: house ? `${house}${ordinalSuffix(house)}` : '—' })}
+              {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ? signName(t, moonSpotlight.sign) : '—', house: house ? t('house_ordinal', { count: house, ordinal: true }) : '—' })}
             </p>
           </div>
         </div>
@@ -33,7 +27,7 @@ export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
           <div>
             <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_dasha_title')}</h3>
             <p className="text-[11px] text-ink-onnight/45 mt-0.5">
-              {t('spotlight_dasha_subtitle', { mahadasha: dashaSpotlight?.mahadasha ?? '—', antardasha: antardashaStr })}
+              {t('spotlight_dasha_subtitle', { mahadasha: dashaSpotlight?.mahadasha ? planetName(t, dashaSpotlight.mahadasha) : '—', antardasha: antardashaStr })}
             </p>
           </div>
         </div>

@@ -2,6 +2,7 @@
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
+import LegalLanguageNote from '../components/LegalLanguageNote'
 
 const sections = [
   {
@@ -128,6 +129,7 @@ export default function Disclaimer() {
         path="/disclaimer"
       />
       <StaticPageLayout title={t('disclaimer_page_heading')}>
+        <LegalLanguageNote />
         {/* Plain-language summary */}
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-6 not-prose">
           <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>

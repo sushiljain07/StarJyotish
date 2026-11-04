@@ -20,6 +20,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { computeWindow, minutesToLabel } from '../../utils/muhurtaWindow'
+import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
 
 // Position as % along the sunrise→sunset bar
 function pctOf(mins, sunriseMin, sunsetMin) {
@@ -64,9 +65,12 @@ export default function TodayWindow({ panchang }) {
   const avoidLeft  = pctOf(rahuStart, sunrise, sunset)
   const avoidWidth = Math.max(1, pctOf(rahuEnd, sunrise, sunset) - avoidLeft)
 
-  const tithiName = panchang?.tithi?.name
-  const nakName = typeof panchang?.nakshatra === 'object' ? panchang?.nakshatra?.name : panchang?.nakshatra
-  const horaName = typeof panchang?.hora === 'object' ? panchang?.hora?.name : panchang?.hora
+  const tithiRaw = panchang?.tithi?.name
+  const nakRaw = typeof panchang?.nakshatra === 'object' ? panchang?.nakshatra?.name : panchang?.nakshatra
+  const horaRaw = typeof panchang?.hora === 'object' ? panchang?.hora?.name : panchang?.hora
+  const tithiName = panchangName(t, 'tithi', tithiRaw)
+  const nakName = nakRaw ? nakshatraName(t, nakRaw) : nakRaw
+  const horaName = horaRaw ? planetName(t, horaRaw) : horaRaw
 
   const hasSummary = Boolean(
     tithiName || nakName || panchang?.yoga || panchang?.karana || panchang?.sunrise || panchang?.sunset || horaName,
@@ -137,7 +141,7 @@ export default function TodayWindow({ panchang }) {
           {' — '}
           {t('home_window_best_hint', 'sign, send, or start it here.')}
           {bestNote && (
-            <span className="block text-2xs text-vermillion/70 mt-0.5">{bestNote}</span>
+            <span className="block text-2xs text-vermillion/70 mt-0.5">{t('window_rahu_overlap_note')}</span>
           )}
         </p>
       ) : (
@@ -160,8 +164,8 @@ export default function TodayWindow({ panchang }) {
         <div className="grid grid-cols-3 gap-x-3 gap-y-2.5 mt-4 pt-4 border-t border-white/[0.08]">
           <PanchangCell label={t('panchang_tithi', 'Tithi')} value={tithiName} />
           <PanchangCell label={t('panchang_nakshatra', 'Nakshatra')} value={nakName} />
-          <PanchangCell label={t('panchang_yoga', 'Yoga')} value={panchang?.yoga} />
-          <PanchangCell label={t('panchang_karana', 'Karana')} value={panchang?.karana} />
+          <PanchangCell label={t('panchang_yoga', 'Yoga')} value={panchangName(t, 'yoga', panchang?.yoga)} />
+          <PanchangCell label={t('panchang_karana', 'Karana')} value={panchangName(t, 'karana', panchang?.karana)} />
           <PanchangCell label={t('home_window_sunrise', 'Sunrise')} value={panchang?.sunrise} />
           <PanchangCell label={t('home_window_sunset', 'Sunset')} value={panchang?.sunset} />
           <PanchangCell label={t('home_window_hora', 'Hora')} value={horaName} />

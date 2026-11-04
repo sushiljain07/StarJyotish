@@ -12,6 +12,7 @@
 // was passed, since linking to the page you're already on is dead weight
 // for both users and crawlers.
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const VARIANTS = {
   // On the night hero band — see Hero.jsx.
@@ -29,11 +30,12 @@ const VARIANTS = {
 }
 
 export default function Breadcrumb({ items, variant = 'light', className = '' }) {
+  const { t } = useTranslation()
   if (!items || items.length === 0) return null
   const tone = VARIANTS[variant] ?? VARIANTS.light
 
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label={t('knowledge_breadcrumb_aria')} className={className}>
       <ol className="flex flex-wrap items-center gap-1.5 text-xs">
         {items.map((item, i) => {
           const isLast = i === items.length - 1

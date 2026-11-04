@@ -14,6 +14,7 @@
 // since a whole grid of these is a much more visible promise than one
 // footer link.
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function ArticleCard({
   title,
@@ -25,6 +26,7 @@ export default function ArticleCard({
   featured = false,
   comingSoon = false,
 }) {
+  const { t } = useTranslation()
   const isInteractive = Boolean(href) && !comingSoon
 
   const inner = (
@@ -42,7 +44,7 @@ export default function ArticleCard({
         )}
         {comingSoon && (
           <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-parchment text-ink-faint border border-line ml-auto">
-            Coming soon
+            {t('knowledge_coming_soon')}
           </span>
         )}
       </div>
@@ -61,7 +63,7 @@ export default function ArticleCard({
           <span className={`text-[11px] ${featured ? 'text-ink-onnight' : 'text-ink-faint'}`}>{meta}</span>
           {isInteractive && (
             <span className={`text-xs font-medium transition-transform group-hover:translate-x-0.5 ${featured ? 'text-primary' : 'text-primary-dark'}`}>
-              Read →
+              {t('knowledge_read')}
             </span>
           )}
         </div>

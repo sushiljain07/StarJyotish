@@ -38,17 +38,17 @@ export default function BirthTimeSelector({ t, accuracy, onAccuracyChange, hour,
       {showTimePicker && (
         <div className="mt-4">
           <div className="flex gap-2 items-center">
-            <select aria-label="Hour" value={hour} onChange={e => onTimeChange({ hour: e.target.value, minute, ampm })} className={selCls}>
-              <option value="">HH</option>
+            <select aria-label={t('form_hour')} value={hour} onChange={e => onTimeChange({ hour: e.target.value, minute, ampm })} className={selCls}>
+              <option value="">{t('form_hour_short')}</option>
               {HOURS_12.map(h => <option key={h} value={h}>{h}</option>)}
             </select>
             <span className="text-ink-faint font-bold text-lg">:</span>
-            <select aria-label="Minute" value={minute} onChange={e => onTimeChange({ hour, minute: e.target.value, ampm })} className={selCls}>
-              <option value="">MM</option>
+            <select aria-label={t('form_minute')} value={minute} onChange={e => onTimeChange({ hour, minute: e.target.value, ampm })} className={selCls}>
+              <option value="">{t('form_minute_short')}</option>
               {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select aria-label="AM/PM" value={ampm} onChange={e => onTimeChange({ hour, minute, ampm: e.target.value })} className={selCls}>
-              <option value="">AM/PM</option>
+            <select aria-label={t('form_ampm')} value={ampm} onChange={e => onTimeChange({ hour, minute, ampm: e.target.value })} className={selCls}>
+              <option value="">{t('form_ampm')}</option>
               <option value="AM">AM</option>
               <option value="PM">PM</option>
             </select>

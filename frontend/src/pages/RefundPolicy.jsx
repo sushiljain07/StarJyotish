@@ -7,13 +7,16 @@
 // generic e-commerce boilerplate that doesn't match how this app actually
 // charges people.
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
+import LegalLanguageNote from '../components/LegalLanguageNote'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2 scroll-mt-20'
 const ul = 'list-disc pl-5 space-y-1.5'
 
 export default function RefundPolicy() {
+  const { t } = useTranslation()
   return (
     <>
       <Seo
@@ -21,7 +24,8 @@ export default function RefundPolicy() {
         description="When Star Jyotish refunds a payment — failed charges, duplicate transactions, and how to request one — for AI astrology reports and consultations."
         path="/refund-policy"
       />
-      <StaticPageLayout title="Refund & Cancellation Policy" maxWidth="max-w-3xl">
+      <StaticPageLayout title={t('legal_refund_title')} maxWidth="max-w-3xl">
+        <LegalLanguageNote />
         <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
 
         <p className="bg-sage-light border border-sage/30 rounded-xl px-4 py-3 text-ink text-xs leading-relaxed">

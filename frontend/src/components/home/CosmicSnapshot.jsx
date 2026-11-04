@@ -6,19 +6,24 @@
 // "Your Cosmic Snapshot" — Moon Sign, Day of week, Nakshatra.
 // Night card with gold ✦ icon, three data items in a row.
 
+import { useTranslation } from 'react-i18next'
+import { formatDate } from '../../utils/format'
+import { nakshatraName, signName } from '../../utils/astroNames'
+
 export default function CosmicSnapshot({ panchang, profile }) {
+  const { t } = useTranslation()
   if (!panchang && !profile) return null
 
   const moonSign = profile?.chart?.planets?.find(p => p.name === 'Moon')?.sign ?? '—'
   const nakName  = typeof panchang?.nakshatra === 'object'
     ? panchang.nakshatra?.name
     : panchang?.nakshatra ?? '—'
-  const dayName  = new Date().toLocaleDateString('en-GB', { weekday: 'long' })
+  const dayName  = formatDate(new Date(), { weekday: 'long' })
 
   const items = [
-    { icon: '☽', label: 'Moon Sign', value: moonSign },
-    { icon: '📅', label: 'Day',       value: dayName },
-    { icon: '✦',  label: 'Nakshatra', value: nakName },
+    { icon: '☽', label: t('snapshot_moon_sign'), value: moonSign === '—' ? moonSign : signName(t, moonSign) },
+    { icon: '📅', label: t('snapshot_day'), value: dayName },
+    { icon: '✦',  label: t('panchang_nakshatra'), value: nakName === '—' ? nakName : nakshatraName(t, nakName) },
   ]
 
   return (
@@ -27,8 +32,8 @@ export default function CosmicSnapshot({ panchang, profile }) {
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <div className="sj-cs-icon-wrap">✦</div>
           <div>
-            <p className="sj-cs-title">Your Cosmic Snapshot</p>
-            <p className="sj-cs-sub">A quick peek into today's energies</p>
+            <p className="sj-cs-title">{t('snapshot_title')}</p>
+            <p className="sj-cs-sub">{t('snapshot_sub')}</p>
           </div>
         </div>
         <span className="sj-cs-chevron">›</span>

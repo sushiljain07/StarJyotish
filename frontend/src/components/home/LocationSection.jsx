@@ -6,6 +6,7 @@
 // These replace the old LocationBar component on the home page.
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { usePlaceMatches } from '../../hooks/usePlaceMatches'
 
 // Simple Indian city SVG silhouette placeholder
@@ -39,6 +40,7 @@ function CitySilhouette({ dark = false }) {
 }
 
 export default function LocationSection({ location, onRetryGeolocation, onSetManualLocation, birthPlace }) {
+  const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
   const [query, setQuery]     = useState('')
   const matches = usePlaceMatches(query)
@@ -50,7 +52,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
   }
 
   const currentLabel = location?.label
-    ?? (location ? `Near ${location.lat?.toFixed(1)}°, ${location.lon?.toFixed(1)}°` : null)
+    ?? (location ? t('location_near', { lat: location.lat?.toFixed(1), lon: location.lon?.toFixed(1) }) : null)
 
   return (
     <div className="sj-loc-grid">
@@ -59,12 +61,12 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         <div className="sj-loc-card-body">
           <p className="sj-loc-eyebrow">
             <span style={{color:'#A23B3B',marginRight:4}}>📍</span>
-            Currently in
+            {t('location_currently_in')}
           </p>
-          <p className="sj-loc-city">{currentLabel ?? 'Set your city'}</p>
+          <p className="sj-loc-city">{currentLabel ?? t('location_set_your_city')}</p>
           {!editing && (
             <button className="sj-loc-update-btn" onClick={() => setEditing(true)}>
-              Update current city
+              {t('location_update_city')}
             </button>
           )}
           {editing && (
@@ -73,7 +75,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search city…"
+                placeholder={t('location_search_city')}
                 className="sj-loc-input"
               />
               {matches.length > 0 && (
@@ -98,15 +100,15 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         <div className="sj-loc-card-body">
           <p className="sj-loc-eyebrow">
             <span style={{color:'#D9A441',marginRight:4}} aria-hidden="true">🪔</span>
-            Chart cast for
+            {t('location_chart_cast_for')}
           </p>
           <p className="sj-loc-city sj-loc-birth">{birthPlace}</p>
-          <p className="sj-loc-sub">(Birth place — unchanged)</p>
+          <p className="sj-loc-sub">{t('location_birth_place_label')}</p>
           <button
             className="sj-loc-update-btn"
             onClick={onRetryGeolocation}
           >
-            Update current city
+            {t('location_update_city')}
           </button>
         </div>
         <div className="sj-loc-illustration">

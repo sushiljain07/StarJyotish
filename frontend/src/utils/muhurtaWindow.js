@@ -78,7 +78,7 @@ export function computeWindow(panchang, date = new Date()) {
   // Best window: the largest clear sub-window of Abhijit outside Rahu Kaal
   let bestStart = abhijitStart
   let bestEnd   = abhijitEnd
-  let bestNote  = null
+  let bestNote  = false
   if (hasOverlap) {
     // Pick whichever side of the overlap is longer
     const beforeDur = overlapStart - abhijitStart
@@ -94,7 +94,7 @@ export function computeWindow(panchang, date = new Date()) {
       bestStart = null
       bestEnd   = null
     }
-    bestNote = 'Rahu Kaal overlaps — avoid that portion'
+    bestNote = true
   }
 
   return { abhijitStart, abhijitEnd, rahuStart, rahuEnd, sunrise, sunset, bestStart, bestEnd, bestNote }

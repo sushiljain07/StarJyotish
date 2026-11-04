@@ -18,10 +18,12 @@ import { fetchPanchangWeek } from '../api/astro'
 import { weekDayScore, weekDayScoreLabel } from '../utils/weekScore'
 import { computeWindow, minutesToLabel } from '../utils/muhurtaWindow'
 import { localDateStr } from '../utils/localDate'
+import { formatDate } from '../utils/format'
+import { nakshatraName, panchangName } from '../utils/astroNames'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
+  return formatDate(d, { weekday: 'short' }).toUpperCase()
 }
 
 function dayNumber(dateStr) {
@@ -69,7 +71,7 @@ export default function WeekAhead() {
           </h1>
           {week?.length > 0 && (
             <p className="text-sm text-ink-onnight/60 mt-1">
-              {week[0].date} – {week[week.length - 1].date}
+              {formatDate(week[0].date)} – {formatDate(week[week.length - 1].date)}
               {location?.label ? ` · ${location.label}` : ''}
             </p>
           )}
@@ -77,10 +79,10 @@ export default function WeekAhead() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 pt-4">
-        {loading && <p className="text-sm text-ink-onnight/60 py-6">Loading the week ahead…</p>}
+        {loading && <p className="text-sm text-ink-onnight/60 py-6">{t('week_page_loading')}</p>}
         {error && (
           <p className="text-sm text-vermillion py-6">
-            Couldn't load the week ahead for your current location. Try again in a moment.
+            {t('week_page_error')}
           </p>
         )}
 
@@ -88,8 +90,9 @@ export default function WeekAhead() {
           const isToday = day.date === todayStr
           const score = weekDayScore(day, i)
           const label = weekDayScoreLabel(score, t)
-          const tithiName = day.tithi?.name
-          const nakName = typeof day.nakshatra === 'object' ? day.nakshatra?.name : day.nakshatra
+          const tithiName = panchangName(t, 'tithi', day.tithi?.name)
+          const nakRaw = typeof day.nakshatra === 'object' ? day.nakshatra?.name : day.nakshatra
+          const nakName = nakRaw ? nakshatraName(t, nakRaw) : nakRaw
           const { bestStart, bestEnd, bestNote } = computeWindow(day, new Date(day.date + 'T00:00:00'))
           return (
             <div
@@ -122,11 +125,10 @@ export default function WeekAhead() {
                 {bestStart != null && (
                   <p className="text-xs text-ink-onnight/70 mt-2">
                     {t('week_page_best_window', {
-                      defaultValue: 'Best window: {{start}} – {{end}}',
                       start: minutesToLabel(bestStart),
                       end: minutesToLabel(bestEnd),
                     })}
-                    {bestNote && <span className="block text-2xs text-vermillion/70 mt-0.5">{bestNote}</span>}
+                    {bestNote && <span className="block text-2xs text-vermillion/70 mt-0.5">{t('window_rahu_overlap_note')}</span>}
                   </p>
                 )}
               </div>

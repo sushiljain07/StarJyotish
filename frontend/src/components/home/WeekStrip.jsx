@@ -17,10 +17,10 @@ import { useTranslation } from 'react-i18next'
 import { fetchPanchangWeek } from '../../api/astro'
 import { weekDayScore } from '../../utils/weekScore'
 import { localDateStr } from '../../utils/localDate'
+import { formatDate } from '../../utils/format'
 
 function shortDayName(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString('en-US', { weekday: 'short' })
+  return formatDate(dateStr, { weekday: 'short' })
 }
 
 // X positions for seven days across a 400×160 viewBox.
@@ -75,7 +75,7 @@ export default function WeekStrip({ location }) {
   return (
     <div className="bg-white/[0.045] border border-white/[0.09] rounded-card p-4 sm:p-5">
       <div className="relative">
-        <svg viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria', 'Seven-day outlook drawn as a constellation')}>
+        <svg viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria')}>
           <path d={pathD} fill="none" className="stroke-primary-glow" strokeOpacity={0.28} strokeWidth={1} strokeDasharray="3 4" />
           {points.map((p, i) => {
             const r = 2.5 + (p.score / 100) * 5
@@ -124,14 +124,13 @@ export default function WeekStrip({ location }) {
           >
             <span className="font-serif font-semibold text-primary-glow">{shortDayName(points[hover].day.date)}</span>
             {' · '}
-            {t('home_week_score', { defaultValue: 'score {{score}}', score: points[hover].score })}
+            {t('home_week_score', { score: points[hover].score })}
           </div>
         )}
       </div>
 
       <p className="text-center text-2xs text-ink-onnight/50 mt-2">
         {t('home_week_caption', {
-          defaultValue: '{{day}} carries this week’s brightest reading.',
           day: shortDayName(brightest.day.date),
         })}
       </p>

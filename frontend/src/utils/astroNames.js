@@ -1,3 +1,4 @@
+import { formatDate } from './format'
 // Localized astrological names. The data lives in the locale files
 // (planets.*, signs.*, nakshatras.*, planet_abbr.*); nothing here knows a
 // language. An unknown name is shown as itself.
@@ -10,3 +11,28 @@ export const planetShort = (t, name) =>
 // Lagna is passed as 'Ascendant'.
 export const planetAbbr = (t, name) =>
   t(`planet_abbr.${name}`, { defaultValue: String(name ?? '').slice(0, 2) })
+
+// Panchang names the backend sends in English (tithi, yoga, karana, masa,
+// paksha). The locale files hold <kind>_<Name>; an unknown name is shown as
+// itself, and a missing one stays missing.
+export const panchangName = (t, kind, name) =>
+  (name ? t(`${kind}_${name}`, { defaultValue: name }) : name)
+
+// "Total Lunar Eclipse (Chandra Grahan)" is built from the eclipse's type and
+// kind (the backend sends both beside the English name).
+export const eclipseName = (t, eclipse) => {
+  if (!eclipse?.type || !eclipse?.kind) return eclipse?.name
+  return t(`eclipse_${eclipse.type}`, {
+    defaultValue: eclipse.name,
+    kind: t(`eclipse_kind_${eclipse.kind}`, { defaultValue: eclipse.kind }),
+  })
+}
+
+// The backend formats an eclipse date as "03 Mar 2026"; show it localized.
+const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+export function localizeBackendDate(text) {
+  const m = /^(\d{1,2}) ([A-Za-z]{3}) (\d{4})$/.exec(text ?? '')
+  const month = m ? EN_MONTHS.indexOf(m[2]) : -1
+  if (month < 0) return text
+  return formatDate(new Date(Number(m[3]), month, Number(m[1])), { day: '2-digit', month: 'short', year: 'numeric' })
+}

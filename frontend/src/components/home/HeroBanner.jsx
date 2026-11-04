@@ -10,8 +10,9 @@
 // - Desktop: side-by-side layout. Mobile: stacked, wheel hidden
 
 import { Link } from 'react-router-dom'
-//import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { formatDate, formatTime } from '../../utils/format'
+import { planetName, signName } from '../../utils/astroNames'
 
 // Zodiac sign symbols
 const SIGN_GLYPHS = {
@@ -79,7 +80,7 @@ function ZodiacWheelSVG() {
 }
 
 export default function HeroBanner({ profile, user, onOpenChart }) {
-  //const { t } = useTranslation()
+  const { t } = useTranslation()
   if (!profile) return null
 
   const { chart } = profile
@@ -125,15 +126,15 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
                 </span>
               </div>
             )}
-            <span className="sj-hb-edit-btn" aria-label="Edit profile">✎</span>
+            <span className="sj-hb-edit-btn" aria-label={t('home_hero_edit_profile')}>✎</span>
           </div>
 
           {/* Name + tagline */}
           <div className="sj-hb-nameblock">
             <h1 className="sj-hb-namaste">
-              Namaste, <span className="sj-hb-firstname">{firstName}</span> 🙏
+              {t('home_hero_namaste')} <span className="sj-hb-firstname">{firstName}</span> 🙏
             </h1>
-            <p className="sj-hb-tagline">Your cosmic journey begins here ✨</p>
+            <p className="sj-hb-tagline">{t('home_hero_tagline')}</p>
             <p className="sj-hb-birthinfo">
               📅 {formatDate(profile.birth_date)}
               <span className="sj-hb-sep">·</span>
@@ -151,9 +152,9 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
             }}>
               <span className="sj-hb-tag-icon" style={{color: TAG_STYLES.lagna.text}}>{lagnaGlyph}</span>
               <div>
-                <p className="sj-hb-tag-label">Lagna</p>
+                <p className="sj-hb-tag-label">{t('home_lagna_label')}</p>
                 <p className="sj-hb-tag-value" style={{color: TAG_STYLES.lagna.text}}>
-                  {lagnaSign}
+                  {signName(t, lagnaSign)}
                 </p>
               </div>
             </div>
@@ -164,9 +165,9 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
             }}>
               <span className="sj-hb-tag-icon" style={{color: TAG_STYLES.rashi.text}}>{rashiGlyph}</span>
               <div>
-                <p className="sj-hb-tag-label">Rashi</p>
+                <p className="sj-hb-tag-label">{t('home_rashi_label')}</p>
                 <p className="sj-hb-tag-value" style={{color: TAG_STYLES.rashi.text}}>
-                  {rashiSign}
+                  {signName(t, rashiSign)}
                 </p>
               </div>
             </div>
@@ -177,9 +178,9 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
             }}>
               <span className="sj-hb-tag-icon" style={{color: TAG_STYLES.mahadasha.text}}>⟳</span>
               <div>
-                <p className="sj-hb-tag-label">Mahadasha</p>
+                <p className="sj-hb-tag-label">{t('home_mahadasha_label')}</p>
                 <p className="sj-hb-tag-value" style={{color: TAG_STYLES.mahadasha.text}}>
-                  {md?.planet} (Saturn)
+                  {planetName(t, md?.planet)}
                 </p>
               </div>
             </div>
@@ -191,9 +192,9 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
               }}>
                 <span className="sj-hb-tag-icon" style={{color: TAG_STYLES.antardasha.text}}>✦</span>
                 <div>
-                  <p className="sj-hb-tag-label">Antardasha</p>
+                  <p className="sj-hb-tag-label">{t('home_antardasha_label')}</p>
                   <p className="sj-hb-tag-value" style={{color: TAG_STYLES.antardasha.text}}>
-                    {ad?.planet} (Mercury)
+                    {planetName(t, ad?.planet)}
                   </p>
                 </div>
               </div>
@@ -203,10 +204,10 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
           {/* Action buttons */}
           <div className="sj-hb-actions">
             <button onClick={() => onOpenChart?.('birth_chart','kundli')} className="sj-hb-btn-primary">
-              Full Chart & Analysis →
+              {t('home_full_chart_analysis')}
             </button>
             <Link to="/onboarding" state={{addAnother:true}} className="sj-hb-btn-ghost">
-              + Add another chart
+              {t('home_add_another_chart')}
             </Link>
           </div>
         </div>

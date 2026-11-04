@@ -28,14 +28,12 @@ import {
   FEATURED_GUIDES,
   WHY_LEARN_POINTS,
 } from '../config/learnContent'
-import { DEFAULT_LANGUAGE, currentLanguage } from '../i18n/languages'
 
 export default function Learn() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  useTranslation() // subscribe so this re-renders when the language changes
-  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
+  const { t } = useTranslation()
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -47,9 +45,9 @@ export default function Learn() {
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
       <Hero
-        eyebrow="Knowledge Center"
-        title="Understand your chart, one idea at a time"
-        subtitle="A calm, practical library for learning Vedic astrology — grounded in classical teaching, written for people who don't already know the terminology."
+        eyebrow={t('footer_link_knowledge_center')}
+        title={t('learn_title')}
+        subtitle={t('learn_subtitle')}
         // The hub itself had no Home affordance beyond SiteHeader's small
         // logo click — every page one level deeper (Zodiac, Aries) already
         // has this exact breadcrumb, so the hub was the one gap in an
@@ -58,32 +56,27 @@ export default function Learn() {
         // as plain (non-link) "current page" text, so a single-item
         // ["Home"] array would render Home as unclickable text, not a link.
         breadcrumbItems={[
-          { label: 'Home', to: isAuthenticated ? '/home' : '/' },
-          { label: 'Knowledge Center' },
+          { label: t('learn_breadcrumb_home'), to: isAuthenticated ? '/home' : '/' },
+          { label: t('footer_link_knowledge_center') },
         ]}
       />
 
-      {/* Hindi language notice — Knowledge Center content is currently
-          English-only; show a banner so Hindi users know this upfront
-          rather than discovering it mid-article. */}
-      {isHindi && (
+      {/* Language notice — Knowledge Center articles exist in English only.
+          The locale value is empty where no notice is needed. */}
+      {t('learn_english_only_notice') && (
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">
-              ज्ञान केंद्र की सामग्री अभी केवल अंग्रेज़ी में उपलब्ध है।
-              हिंदी अनुवाद जल्द आएगा।{' '}
-              <span className="font-medium">(Knowledge Center is currently available in English only. Hindi translation coming soon.)</span>
-            </p>
+            <p className="text-sm text-primary-dark leading-relaxed">{t('learn_english_only_notice')}</p>
           </div>
         </div>
       )}
 
       {/* Featured Learning Paths */}
       <Section
-        eyebrow="Start here"
-        title="Featured learning paths"
-        description="Curated sequences that take you from a single concept to a full working understanding — in order, at your own pace."
+        eyebrow={t('learn_paths_eyebrow')}
+        title={t('learn_paths_title')}
+        description={t('learn_paths_desc')}
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {LEARNING_PATHS.map((path, i) => (
@@ -103,9 +96,9 @@ export default function Learn() {
       {/* Beginner Guides */}
       <Section
         id="beginner-guides"
-        eyebrow="First steps"
-        title="Beginner guides"
-        description="Never read a birth chart before? These four guides cover everything you need before the rest of the Knowledge Center will make sense."
+        eyebrow={t('learn_beginner_eyebrow')}
+        title={t('learn_beginner_title')}
+        description={t('learn_beginner_desc')}
         className="bg-parchment-card/60"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -126,9 +119,9 @@ export default function Learn() {
 
       {/* Explore by Category */}
       <Section
-        eyebrow="Browse"
-        title="Explore by category"
-        description="Every guide in the Knowledge Center falls into one of these areas. Start wherever is most relevant to your chart right now."
+        eyebrow={t('learn_browse_eyebrow')}
+        title={t('learn_browse_title')}
+        description={t('learn_browse_desc')}
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {CATEGORIES.map((cat, i) => (
@@ -148,9 +141,9 @@ export default function Learn() {
 
       {/* Featured Guides */}
       <Section
-        eyebrow="Handpicked"
-        title="Featured guides"
-        description="A few guides worth reading regardless of where you are in your chart — commonly misunderstood ideas, explained clearly."
+        eyebrow={t('learn_featured_eyebrow')}
+        title={t('learn_featured_title')}
+        description={t('learn_featured_desc')}
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {FEATURED_GUIDES.map((guide, i) => (
@@ -169,8 +162,8 @@ export default function Learn() {
 
       {/* Why Learn Vedic Astrology */}
       <Section
-        eyebrow="Why it's worth learning"
-        title="Why learn Vedic astrology"
+        eyebrow={t('learn_why_eyebrow')}
+        title={t('learn_why_title')}
         align="center"
         tone="dark"
         className="bg-night"
@@ -187,10 +180,10 @@ export default function Learn() {
 
       {/* Call To Action */}
       <CTA
-        eyebrow="Star Jyotish"
-        title="Ready to see this in your own chart?"
-        description="Everything in the Knowledge Center becomes personal once you generate your free Kundli."
-        buttonLabel="Generate My Free Kundli →"
+        eyebrow={t('learn_cta_eyebrow')}
+        title={t('learn_cta_title')}
+        description={t('learn_cta_desc')}
+        buttonLabel={t('learn_cta_button')}
         to="/generate"
         variant="full"
       />

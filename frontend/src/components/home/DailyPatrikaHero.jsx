@@ -22,7 +22,8 @@
 // strip — is unchanged; those weren't part of this reskin.
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { localeFor, currentLanguage } from '../../i18n/languages'
+import { formatDate } from '../../utils/format'
+import { planetName } from '../../utils/astroNames'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
 const ICON_BY_TYPE = {
@@ -84,23 +85,22 @@ function buildWhy(card, t) {
   if (!ev?.planet) return null
   if (ev.house) {
     return t('patrika_why_house', {
-      defaultValue: 'Why: transit {{planet}} activates your {{house}}th house today.',
-      planet: ev.planet, house: ev.house,
+      planet: planetName(t, ev.planet), house: ev.house,
     })
   }
-  return t('patrika_why_planet', { defaultValue: 'Why: transit {{planet}} is active today.', planet: ev.planet })
+  return t('patrika_why_planet', { planet: planetName(t, ev.planet) })
 }
 
 // ── Reaction chips + confirmation ──────────────────────────────────────────
 function ReactionRow({ cardType, event, reacted, onReaction, t }) {
   const OPTIONS = [
-    { id: 'up',       label: t('patrika_react_resonates', '✓ Resonates') },
-    { id: 'skip',     label: t('patrika_react_notsure', 'Not sure') },
-    { id: 'tellmore', label: t('patrika_react_tellmore', 'Tell me more') },
+    { id: 'up',       label: t('patrika_react_resonates') },
+    { id: 'skip',     label: t('patrika_react_notsure') },
+    { id: 'tellmore', label: t('patrika_react_tellmore') },
   ]
   return (
     <div className="mt-3.5">
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t('patrika_react_group', 'Rate this insight')}>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('patrika_react_group')}>
         {OPTIONS.map(opt => (
           <button
             key={opt.id}
@@ -118,8 +118,8 @@ function ReactionRow({ cardType, event, reacted, onReaction, t }) {
       {reacted && (
         <p className="text-2xs text-sage mt-2.5">
           {reacted === 'tellmore'
-            ? t('patrika_note_tellmore', 'Jyoti will unpack this in your next reading.')
-            : t('patrika_note_default', "Noted — Jyoti will remember this against tomorrow's sky.")}
+            ? t('patrika_note_tellmore')
+            : t('patrika_note_default')}
         </p>
       )}
     </div>
@@ -156,7 +156,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
         key={active}
         role="button"
         tabIndex={0}
-        aria-label={t('patrika_tap_hint', 'Tap for the next insight')}
+        aria-label={t('patrika_tap_hint')}
         onClick={next}
         onKeyDown={onKeyDown}
         onTouchStart={onTouchStart}
@@ -180,7 +180,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
               />
             ))}
           </div>
-          <span className="text-3xs tracking-wide text-ink-onnight/40">{t('patrika_tap_next', 'tap for next ›')}</span>
+          <span className="text-3xs tracking-wide text-ink-onnight/40">{t('patrika_tap_next')}</span>
         </div>
       </div>
 
@@ -197,7 +197,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
           onClick={onRefresh}
           className="block mx-auto mt-3 text-3xs font-semibold text-ink-onnight/40 border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight/70 hover:border-white/[0.2] transition"
         >
-          {t('patrika_refresh', '↺ Different insight')}
+          {t('patrika_refresh')}
         </button>
       )}
     </div>
@@ -206,6 +206,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
 
 // ── Countdown strip — unchanged from v3 ─────────────────────────────────────
 function CountdownStrip({ countdowns, chapterLabelFn }) {
+  const { t } = useTranslation()
   if (!countdowns?.length) return null
   return (
     <div className="sj-cd-strip">
@@ -213,8 +214,8 @@ function CountdownStrip({ countdowns, chapterLabelFn }) {
         <div key={`${c.planet}-${i}`} className="sj-cd-chip" style={{ animationDelay: `${180 + i * 70}ms` }}>
           <span className="sj-cd-glyph">{c.glyph || PLANET_GLYPHS[c.planet] || "✦"}</span>
           <div>
-            <p className="sj-cd-in">In {c.days} day{c.days !== 1 ? "s" : ""}</p>
-            <p className="sj-cd-name">{chapterLabelFn?.(c.planet) ?? c.planet} → {c.house}th house</p>
+            <p className="sj-cd-in">{t('patrika_in_days', { count: c.days })}</p>
+            <p className="sj-cd-name">{chapterLabelFn?.(c.planet) ?? c.planet} → {t('patrika_countdown_house', { house: c.house })}</p>
             <p className="sj-cd-theme">{c.theme}</p>
           </div>
         </div>
@@ -225,12 +226,13 @@ function CountdownStrip({ countdowns, chapterLabelFn }) {
 
 // ── Chapter bar — unchanged from v3 ─────────────────────────────────────────
 function ChapterBar({ chapter, chapterLabelFn }) {
+  const { t } = useTranslation()
   if (!chapter) return null
   return (
     <div className="sj-chap">
       <div className="sj-chap-row">
-        <span>{chapterLabelFn?.(chapter.md) ?? chapter.md}{chapter.ad ? ` · ${chapterLabelFn?.(chapter.ad) ?? chapter.ad}` : ""} chapter</span>
-        <span>{chapter.pct}% · {chapter.days_remaining}d left</span>
+        <span>{t('patrika_chapter_name', { name: `${chapterLabelFn?.(chapter.md) ?? chapter.md}${chapter.ad ? ` · ${chapterLabelFn?.(chapter.ad) ?? chapter.ad}` : ''}` })}</span>
+        <span>{t('patrika_chapter_left', { pct: chapter.pct, days: chapter.days_remaining })}</span>
       </div>
       <div className="sj-chap-track"><div className="sj-chap-fill sj-grow-bar" style={{ width: `${chapter.pct}%` }}/></div>
     </div>
@@ -255,7 +257,7 @@ function OneAction({ action }) {
 
   return (
     <div className="sj-action sj-fade-up" style={{ animationDelay: "120ms" }}>
-      <p className="sj-action-eyebrow">One thing to do today</p>
+      <p className="sj-action-eyebrow">{t('patrika_one_action')}</p>
       <div className="sj-action-card" style={{ background: ts.bg, border: `1px solid ${ts.border}` }}>
         <p className="sj-action-text">
           <span style={{ color: ts.ac }}>{action.verb}</span>{" "}{action.context}
@@ -263,7 +265,7 @@ function OneAction({ action }) {
         <p className="sj-action-why">{action.why}</p>
         <button className="sj-why-btn" onClick={openJyoti}
                 style={{ color: ts.ac, border: `1px solid ${ts.border}` }}>
-          Why?
+          {t('patrika_why_btn')}
         </button>
       </div>
     </div>
@@ -271,13 +273,13 @@ function OneAction({ action }) {
 }
 
 // ── Greeting ────────────────────────────────────────────────────────────────
-function greet() {
+function greet(t) {
   const h = new Date().getHours()
-  if (h < 5)  return "Still up?"
-  if (h < 12) return "Good morning,"
-  if (h < 17) return "Good afternoon,"
-  if (h < 21) return "Good evening,"
-  return "Still up?"
+  if (h < 5)  return t('patrika_greeting_night')
+  if (h < 12) return t('patrika_greeting_morning')
+  if (h < 17) return t('patrika_greeting_afternoon')
+  if (h < 21) return t('patrika_greeting_evening')
+  return t('patrika_greeting_night')
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
@@ -285,9 +287,8 @@ export default function DailyPatrikaHero({
   firstName, edition, dayScore, chapterLabelFn, oneAction, onRefresh, onReaction,
   cardReactions,
 }) {
-  useTranslation() // subscribe so the date locale follows the language
-  const locale = localeFor(currentLanguage())
-  const dateStr = new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
+  const { t } = useTranslation() // also re-renders on a language change
+  const dateStr = formatDate(new Date(), { weekday: "long", day: "numeric", month: "long" })
 
   const chapter = edition?.chapter
   const score = dayScore?.score
@@ -310,14 +311,14 @@ export default function DailyPatrikaHero({
           {/* Top: greeting + date */}
           <div className="sj-top-row">
             <div>
-              <p className="sj-greet">{greet()}</p>
+              <p className="sj-greet">{greet(t)}</p>
               <p className="sj-name">{firstName}</p>
             </div>
             <div className="sj-datebox">
-              <p className="sj-eyebrow-gold">Today's Patrika</p>
+              <p className="sj-eyebrow-gold">{t('patrika_eyebrow')}</p>
               <p className="sj-datestr">{dateStr}</p>
               {chapter && (
-                <p className="sj-chapday">Day {chapter.day} · {chapterLabelFn?.(chapter.md) ?? chapter.md}</p>
+                <p className="sj-chapday">{t('patrika_day_md', { day: chapter.day, md: chapterLabelFn?.(chapter.md) ?? chapter.md })}</p>
               )}
             </div>
           </div>

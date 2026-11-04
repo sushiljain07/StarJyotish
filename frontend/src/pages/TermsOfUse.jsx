@@ -3,13 +3,16 @@
 // See PrivacyPolicy.jsx's header comment for the bracketed-placeholder and
 // English-first rationale — same applies here.
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
+import LegalLanguageNote from '../components/LegalLanguageNote'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2 scroll-mt-20'
 const ul = 'list-disc pl-5 space-y-1.5'
 
 export default function TermsOfUse() {
+  const { t } = useTranslation()
   return (
     <>
       <Seo
@@ -17,7 +20,8 @@ export default function TermsOfUse() {
         description="The terms governing your use of Star Jyotish — eligibility, the nature of AI-generated astrology content, payments, liability, and your rights as a user."
         path="/terms"
       />
-      <StaticPageLayout title="Terms of Use" maxWidth="max-w-3xl">
+      <StaticPageLayout title={t('footer_bottom_terms')} maxWidth="max-w-3xl">
+        <LegalLanguageNote />
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
           <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
           <ul className="space-y-1.5 text-sm text-ink">

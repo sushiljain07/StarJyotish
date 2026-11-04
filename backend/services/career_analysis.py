@@ -1304,9 +1304,10 @@ def generate_career_report(
     report["llm_provider"] = provider
     # Deterministic — matches the Rajyogas tab and free Reading tab exactly,
     # since all three now read from the same check_all_yogas() call.
+    # The prompt above used the English list; the response is localized.
     report["active_yogas"] = [
         {"name": y["yoga"], "description": y["description"]}
-        for y in combinations if y["present"]
+        for y in check_all_yogas(planets, lagna_idx, language=language) if y["present"]
     ]
 
     # ── Astrological Evidence — purely surfacing data already computed

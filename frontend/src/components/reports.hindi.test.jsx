@@ -1,13 +1,14 @@
 // The AI pages and reports must render with no English in Hindi, in each
 // state: idle (signed out), loading, error (503) and done. Responses are
 // stubbed with Hindi values, so any English left is UI copy that was not
-// translated. The Rajyoga fixture was captured from the local backend.
+// translated. The Rajyoga and active_yogas fixtures were captured from the local backend (language hi).
 import { render, screen, act, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n'
 import { expectNoEnglish } from '../test/expectNoEnglish'
 import rajyogas from '../test/fixtures/rajyogas_hi.json'
+import activeYogas from '../test/fixtures/active_yogas_hi.json'
 
 let authState
 let premium
@@ -43,7 +44,7 @@ const READING = {
     health: 'स्वास्थ्य सामान्यतः अच्छा रहेगा।',
     relationships: 'संबंधों में सामंजस्य बना रहेगा।',
   },
-  active_yogas: [{ name: 'गजकेसरी योग' }, { name: 'धन योग' }, { name: 'सरस्वती योग' }],
+  active_yogas: activeYogas,
   llm_provider: 'Gemini',
 }
 
@@ -87,7 +88,7 @@ const CAREER = {
       { name: 'Saturn', sign: 'Capricorn', house: 6, dignity: 'exalted', retrograde: true },
     ],
   },
-  active_yogas: [{ name: 'गजकेसरी योग' }, { name: 'धन योग' }, { name: 'सरस्वती योग' }],
+  active_yogas: activeYogas,
   llm_provider: 'Gemini',
 }
 

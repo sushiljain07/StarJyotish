@@ -24,6 +24,8 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: t
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Insights from './Insights'
+import '../i18n'
+import en from '../i18n/en.json'
 
 function renderInsights(topic, search = '') {
   const input = { date: '1990-01-01', time: '12:00', place: 'Delhi', topic }
@@ -47,7 +49,7 @@ describe('Insights career report mounting', () => {
     renderInsights('career')
     await screen.findByText('READING')
     expect(mounts.CareerReportTab ?? 0).toBe(0)
-    fireEvent.click(screen.getByRole('button', { name: 'Career' }))
+    fireEvent.click(screen.getByRole('button', { name: en.landing_topic_career_label }))
     expect(await screen.findByText('CAREER')).toBeInTheDocument()
     // The mount counter is bumped in an effect, which may run just after
     // the text appears under load.
@@ -56,10 +58,10 @@ describe('Insights career report mounting', () => {
 
   it('keeps the career report mounted when switching away and back', async () => {
     renderInsights('career')
-    fireEvent.click(await screen.findByRole('button', { name: 'Career' }))
+    fireEvent.click(await screen.findByRole('button', { name: en.landing_topic_career_label }))
     await screen.findByText('CAREER')
     fireEvent.click(screen.getByRole('button', { name: /reading/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Career' }))
+    fireEvent.click(screen.getByRole('button', { name: en.landing_topic_career_label }))
     expect(mounts.CareerReportTab).toBe(1)
   })
   it('opens the sub-tab named in the URL (and counts it as opened)', async () => {

@@ -29,10 +29,10 @@ function TabLoader() {
 function buildSubtabs(t, topicId) {
   const reading = { id: 'reading', label: t('nav_reading', 'Reading') }
   if (topicId === 'career') {
-    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: 'Career' }]
+    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: t('landing_topic_career_label') }]
   }
   if (topicId === 'health' || topicId === 'relationship' || topicId === 'finance') {
-    return [reading, { id: topicId, label: topicId.charAt(0).toUpperCase() + topicId.slice(1) }]
+    return [reading, { id: topicId, label: t(`landing_topic_${topicId}_label`) }]
   }
   return [reading]
 }
@@ -79,13 +79,13 @@ export default function Insights() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Seo title="Chart Insights" description="AI-powered reading of your Vedic birth chart." path="/insights" noindex />
+      <Seo title={t('insights_seo_title')} description={t('insights_seo_description')} path="/insights" noindex />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
           <div className="pt-2 pb-1">
             <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
-              Insights
+              {t('insights_header')}
             </p>
           </div>
 

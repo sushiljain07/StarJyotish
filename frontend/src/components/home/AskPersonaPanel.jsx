@@ -23,7 +23,6 @@ import { currentLanguage } from '../../i18n/languages'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
-const PERSONA_NAME = 'Jyoti' // matches the existing "Ask Jyoti" voice used elsewhere on this page
 
 function quotaKey(userId) {
   return `sj_ask_jyoti_quota_v1:${userId ?? 'anon'}`
@@ -55,6 +54,7 @@ function saveQuota(userId, count) {
 export default function AskPersonaPanel({ userId, input }) {
   const { t } = useTranslation()
   const { user, authedRequest } = useAuth()
+  const personaName = t('ask_persona_name')
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [count, setCount] = useState(() => loadQuota(userId))
@@ -132,8 +132,8 @@ export default function AskPersonaPanel({ userId, input }) {
           <JyotiAvatar />
         </span>
         <span className="text-left">
-          <span className="block text-xs font-bold text-parchment">Ask {PERSONA_NAME}</span>
-          <span className="block text-[10px] text-sage">● your chart, on call</span>
+          <span className="block text-xs font-bold text-parchment">{t('ask_persona_button', { name: personaName })}</span>
+          <span className="block text-[10px] text-sage">{t('ask_persona_status')}</span>
         </span>
       </button>
 
@@ -150,8 +150,8 @@ export default function AskPersonaPanel({ userId, input }) {
             <JyotiAvatar />
           </span>
           <div>
-            <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{PERSONA_NAME}</h3>
-            <p className="text-[11px] text-ink-onnight/50">Your personal chart guide</p>
+            <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{personaName}</h3>
+            <p className="text-[11px] text-ink-onnight/50">{t('ask_persona_tagline')}</p>
           </div>
           <button onClick={() => setOpen(false)} className="ml-auto text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
         </div>
@@ -159,8 +159,7 @@ export default function AskPersonaPanel({ userId, input }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
           {messages.length === 0 && (
             <div className="max-w-[92%] bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed text-ink-muted">
-              Namaste 🙏 I only know your birth chart and today&apos;s transits — ask me anything about your career,
-              relationships, health, or timing. I can&apos;t answer outside your kundli.
+              {t('ask_persona_welcome')}
             </div>
           )}
           {messages.map((m, i) => (

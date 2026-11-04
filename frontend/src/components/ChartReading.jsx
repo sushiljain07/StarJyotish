@@ -31,14 +31,15 @@ function KundliWheelBg() {
   )
 }
 
-// Section display config — ordered as they appear in the prediction
+// Section display config — ordered as they appear in the prediction.
+// Titles are the reading_section_<key> locale keys.
 const SECTION_CONFIG = [
-  { key: 'identity',       title: 'Your Cosmic Identity',          icon: '🌟' },
-  { key: 'strengths',      title: 'Your Career Domain & Strengths',icon: '💪' },
-  { key: 'currentperiod',  title: 'Your Current Life Period',       icon: '⏳' },
-  { key: 'prediction',     title: 'Your Next 2–3 Years',           icon: '🔮' },
-  { key: 'health',         title: 'Your Health & Vitality',        icon: '💚' },
-  { key: 'relationships',  title: 'Your Love & Relationships',      icon: '💫' },
+  { key: 'identity',       icon: '🌟' },
+  { key: 'strengths',      icon: '💪' },
+  { key: 'currentperiod',  icon: '⏳' },
+  { key: 'prediction',     icon: '🔮' },
+  { key: 'health',         icon: '💚' },
+  { key: 'relationships',  icon: '💫' },
 ]
 
 export default function ChartReading({ input, topic, onOpenRajyogas }) {
@@ -136,7 +137,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
         {t('reading_idle_body')}
       </p>
       <Button size="lg" onClick={() => generate()}>
-        Reveal My Prediction
+        {t('reading_reveal_btn')}
       </Button>
       <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
     </div>
@@ -150,12 +151,12 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="font-medium text-primary-dark">Reading your birth chart…</p>
+      <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full animate-pulse"
              style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
       </div>
-      <p className="text-xs text-ink-faint mt-3">Identifying Raj Yogas in your chart…</p>
+      <p className="text-xs text-ink-faint mt-3">{t('reading_loading_sub')}</p>
     </div>
   )
 
@@ -165,7 +166,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
       <Button onClick={() => generate()}>
-        Try Again
+        {t('topic_report_try_again')}
       </Button>
     </div>
   )
@@ -175,7 +176,8 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
     <div className="max-w-2xl mx-auto py-4 px-2 space-y-4">
 
       {/* ── PREDICTION SECTIONS ─────────────────────────────────────────────── */}
-      {SECTION_CONFIG.map(({ key, title, icon }) => {
+      {SECTION_CONFIG.map(({ key, icon }) => {
+        const title = t(`reading_section_${key}`)
         const content = predSections[key]
         if (!content) return null
         const isVisible = visible.includes(key)
@@ -243,17 +245,17 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">👑</span>
               <h3 className="font-extrabold text-lg" style={{ color: '#D4AF37' }}>
-                You have {activeYogas.length} active Raj Yoga{activeYogas.length > 1 ? 's' : ''}
+                {t('reading_yogas_title', { count: activeYogas.length })}
               </h3>
             </div>
             <p className="text-white text-sm leading-relaxed font-medium mb-4">
-              Including {activeYogas.slice(0, 2).map(y => y.name).join(' and ')}
-              {activeYogas.length > 2 ? ', and more' : ''} — see the full breakdown of what each one means for you.
+              {t(activeYogas.length > 2 ? 'reading_yogas_body_more' : 'reading_yogas_body',
+                { names: activeYogas.slice(0, 2).map(y => y.name).join(t('reading_list_and')) })}
             </p>
             <button onClick={onOpenRajyogas}
               className="px-4 py-2 rounded-lg font-semibold text-sm"
               style={{ background: '#D4AF37', color: '#1A0A3B' }}>
-              See my Raj Yogas →
+              {t('reading_see_yogas')}
             </button>
           </div>
         </div>
@@ -262,7 +264,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       <div className="text-center pb-4">
         <button onClick={() => generate({ force: true })}
           className="text-sm text-primary hover:text-primary-dark transition">
-          ↺ Regenerate Prediction
+          {t('reading_regenerate_btn')}
         </button>
       </div>
 

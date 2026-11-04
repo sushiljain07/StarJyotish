@@ -56,8 +56,8 @@ describe('state-less pages rebuild from the last chart', () => {
   }
   it.each([
     ['/kundli', () => import('./Result'), /kundli_chip_lagna/],
-    ['/insights', () => import('./Insights'), /Insights/],
-    ['/ask', () => import('./AskPage'), /Ask Your Chart/],
+    ['/insights', () => import('./Insights'), /insights_header/],
+    ['/ask', () => import('./AskPage'), /ask_page_title/],
   ])('%s with a saved last chart renders instead of redirecting', async (path, load, marker) => {
     const { saveLastChart } = await import('../services/lastChart')
     saveLastChart(LAST)

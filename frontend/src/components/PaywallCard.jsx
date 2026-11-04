@@ -3,7 +3,10 @@
 // Shown instead of locked tab content when hasPremiumAccess() is false.
 // See src/config/entitlements.js for how the lock itself is controlled.
 
+import { useTranslation } from 'react-i18next'
+
 export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }) {
+  const { t } = useTranslation()
   return (
     <div className="max-w-md mx-auto py-10 px-6 text-center">
       <div className="text-4xl mb-3">{icon}</div>
@@ -25,7 +28,7 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
         onClick={() => alert('Checkout is coming soon — your full report will unlock right here.')}
         className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-6 py-2.5 rounded-full shadow transition"
       >
-        Unlock Full Report
+        {t('paywall_unlock_btn')}
       </button>
     </div>
   )

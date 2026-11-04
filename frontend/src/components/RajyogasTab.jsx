@@ -7,365 +7,45 @@ import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
 import { errorMessage } from '../api/errors'
 
+// Icons by stable backend id. The reference text (meaning, characteristics,
+// benefits) lives in the locale files as rajyoga_ref_<id>_<part>.
 const YOGA_ICONS = {
-  'Raja Yoga':                  '👑',
-  'Dharma-Karma Adhipati Yoga': '⚖️',
-  'Budha-Aditya Yoga':          '☀️',
-  'Gaja-Kesari Yoga':           '🐘',
-  'Hamsa Yoga':                 '🦢',
-  'Malavya Yoga':               '💎',
-  'Sasa Yoga':                  '🪐',
-  'Bhadra Yoga':                '📚',
-  'Ruchaka Yoga':               '⚔️',
-  'Amala Yoga':                 '🌸',
-  'Adhi Yoga':                  '🏛️',
-  'Dhana Yoga':                 '💰',
-  'Kendra-Trikona Rajyoga':     '🔺',
-  'Yogakaraka Planet':          '🌟',
-  'Neecha Bhanga Rajyoga':      '🔄',
-  'Vipareeta Rajyoga':          '🌪️',
-  'Kahala Yoga':                '🦁',
-  'Lakshmi Yoga':               '🌺',
-  'Saraswati Yoga':             '🎶',
-  'Chamara Yoga':               '🪭',
+  raja_yoga:      '👑',
+  dharma_karma:   '⚖️',
+  budha_aditya:   '☀️',
+  gaja_kesari:    '🐘',
+  hamsa:          '🦢',
+  malavya:        '💎',
+  sasa:           '🪐',
+  bhadra:         '📚',
+  ruchaka:        '⚔️',
+  amala:          '🌸',
+  adhi:           '🏛️',
+  dhana:          '💰',
+  kendra_trikona: '🔺',
+  yogakaraka:     '🌟',
+  neecha_bhanga:  '🔄',
+  vipareeta:      '🌪️',
+  kahala:         '🦁',
+  lakshmi:        '🌺',
+  saraswati:      '🎶',
+  chamara:        '🪭',
 }
 
-const YOGA_DETAILS = {
-  'Raja Yoga': {
-    meaning: 'The king-making yoga formed when the lords of fortune (9th house) and action (10th house) unite in the same house, combining dharma and karma.',
-    characteristics: [
-      'Bestows authority and high social standing',
-      'Native rises to prominent positions in career or public life',
-      'Strong leadership qualities and decision-making power',
-      'Recognition and respect from peers and superiors',
-    ],
-    benefits: [
-      'Political power, government positions, or corporate leadership',
-      'Fame and name that spreads far beyond birthplace',
-      'Ability to command large organizations or institutions',
-      'Success multiplies during the dashas of the involved planets',
-    ],
-  },
-  'Dharma-Karma Adhipati Yoga': {
-    meaning: 'Formed by a sign exchange (Parivartana) between the 9th and 10th house lords. Fortune and career destiny become deeply intertwined.',
-    characteristics: [
-      'Career path aligns naturally with one\'s higher purpose',
-      'Success comes through ethical and righteous action',
-      'Strong moral compass guides professional decisions',
-      'The native\'s work often benefits society at large',
-    ],
-    benefits: [
-      'Sustained career success built on a solid ethical foundation',
-      'Recognition as a person of integrity and virtue',
-      'Spiritual advancement alongside material success',
-      'Long-lasting legacy that outlives the native',
-    ],
-  },
-  'Budha-Aditya Yoga': {
-    meaning: 'Sun (soul and authority) and Mercury (intellect and communication) conjunct in the same house — intellect is illuminated by the light of the self.',
-    characteristics: [
-      'Exceptionally sharp and articulate mind',
-      'Ability to express ideas with clarity and confidence',
-      'Intelligence combined with natural authority',
-      'Strong memory and analytical reasoning',
-    ],
-    benefits: [
-      'Success in careers requiring intelligence: consulting, writing, academics',
-      'Favor from government and authority figures',
-      'Persuasive communication that wins trust',
-      'Excellence in research, teaching, and advisory roles',
-    ],
-  },
-  'Gaja-Kesari Yoga': {
-    meaning: 'Elephant (Gaja) and Lion (Kesari) — Jupiter in a kendra (1st/4th/7th/10th) from Moon. Wisdom and courage combine for lasting greatness.',
-    characteristics: [
-      'Broad wisdom and generous nature',
-      'Natural charisma and presence in public',
-      'Good fortune through learning and mentorship',
-      'Prosperous and dignified social life',
-    ],
-    benefits: [
-      'Fame and reputation that endures long after death',
-      'Material prosperity alongside spiritual wisdom',
-      'Respected as a teacher, guide, or community leader',
-      'Blessings of good health and long life',
-    ],
-  },
-  'Hamsa Yoga': {
-    meaning: 'One of the Pancha Mahapurusha Yogas — Jupiter in its own or exalted sign in a kendra. The swan symbolizes purity, wisdom, and discernment.',
-    characteristics: [
-      'Noble character and high spiritual inclination',
-      'Deep wisdom and philosophical insight',
-      'Generous and compassionate disposition',
-      'Well-respected for integrity and learning',
-    ],
-    benefits: [
-      'Prominence in education, law, spirituality, or philosophy',
-      'Respected and honored by scholars and wise persons',
-      'Beautiful home, devoted family, and comfortable life',
-      'Capacity to guide others toward the right path',
-    ],
-  },
-  'Malavya Yoga': {
-    meaning: 'Pancha Mahapurusha Yoga — Venus in own or exalted sign in a kendra. Named after the prosperous Malwa region, it grants beauty and luxury.',
-    characteristics: [
-      'Refined aesthetic sense and artistic talent',
-      'Charming personality and magnetic social presence',
-      'Love of luxury, beauty, and sensory pleasures',
-      'Skilled in music, arts, fashion, or entertainment',
-    ],
-    benefits: [
-      'Wealth and material comforts accumulated with ease',
-      'Success in creative fields, fashion, entertainment, luxury goods',
-      'Happy marriage and pleasurable domestic life',
-      'Fame in arts and culture; admired for beauty and talent',
-    ],
-  },
-  'Sasa Yoga': {
-    meaning: 'Pancha Mahapurusha Yoga — Saturn in own or exalted sign in a kendra. The hare (Sasa) represents patience, endurance, and mastery over time.',
-    characteristics: [
-      'Highly disciplined, methodical, and hardworking',
-      'Ability to manage and lead large groups of people',
-      'Skilled in administration, law, and public service',
-      'Rises slowly but builds a strong and lasting foundation',
-    ],
-    benefits: [
-      'Leadership roles in large institutions, corporations, or government',
-      'Accumulation of land, property, and wealth over time',
-      'Authority over servants, workers, and subordinates',
-      'Longevity and the ability to withstand adversity',
-    ],
-  },
-  'Bhadra Yoga': {
-    meaning: 'Pancha Mahapurusha Yoga — Mercury in own or exalted sign in a kendra. "Bhadra" means auspicious — this yoga blesses with brilliant intellect.',
-    characteristics: [
-      'Razor-sharp analytical and mathematical mind',
-      'Eloquent speech and masterful writing ability',
-      'Skill in trade, commerce, and financial analysis',
-      'Quick learner with excellent memory and wit',
-    ],
-    benefits: [
-      'Distinguished career in finance, CA, commerce, IT, or communication',
-      'Wealth from business, trade, and intellectual ventures',
-      'Admired for intelligence and rhetorical skill',
-      'Success in media, publishing, and consulting',
-    ],
-  },
-  'Ruchaka Yoga': {
-    meaning: 'Pancha Mahapurusha Yoga — Mars in own or exalted sign in a kendra. Named after Sage Ruchaka, this yoga creates warriors and leaders.',
-    characteristics: [
-      'Exceptionally courageous, energetic, and competitive',
-      'Strong physical constitution and willpower',
-      'Executive authority and commanding presence',
-      'Natural instinct for strategy and decisive action',
-    ],
-    benefits: [
-      'Distinguished career in military, police, surgery, or sports',
-      'Fame as a bold leader and decisive executive',
-      'Success in real estate, engineering, and construction',
-      'Ability to overcome enemies and overcome adversity',
-    ],
-  },
-  'Amala Yoga': {
-    meaning: '"Amala" means spotless or pure. Formed when a natural benefic (Jupiter, Venus, Mercury, or Moon) occupies the 10th house from lagna.',
-    characteristics: [
-      'Unblemished professional reputation throughout life',
-      'Career built on integrity, compassion, and service',
-      'Naturally positive and uplifting presence in the workplace',
-      'Work that serves or benefits others',
-    ],
-    benefits: [
-      'A spotless legacy — name is untarnished even after death',
-      'Success through honest and ethical means only',
-      'Popularity and love from the community',
-      'Long-lasting good name that benefits descendants',
-    ],
-  },
-  'Adhi Yoga': {
-    meaning: 'Formed when Mercury, Venus, and Jupiter (at least 2) occupy the 6th, 7th, and 8th houses from the Moon. "Adhi" means superior or prime.',
-    characteristics: [
-      'Natural aptitude for high administrative roles',
-      'Strong diplomatic and negotiating skills',
-      'Ability to transform adversaries into allies',
-      'Well-rounded intellect covering law, arts, and wisdom',
-    ],
-    benefits: [
-      'Equivalent of a chief minister or prime minister in modern terms',
-      'Commanding authority over rivals and competitors',
-      'Freedom from serious illness and longevity',
-      'Happiness, wealth, and freedom from worry',
-    ],
-  },
-  'Dhana Yoga': {
-    meaning: 'Wealth yoga formed when the lords of the 2nd house (accumulated wealth) and 11th house (income and gains) are strong in their signs.',
-    characteristics: [
-      'Strong financial instincts and money-attracting qualities',
-      'Multiple sources of income and steady wealth accumulation',
-      'Generous nature that still retains prosperity',
-      'Financial success through career or enterprise',
-    ],
-    benefits: [
-      'Significant financial gains and wealth accumulation',
-      'Economic security for self and family',
-      'Ability to generate wealth across multiple dashas',
-      'Freedom from financial hardship throughout life',
-    ],
-  },
-  'Kendra-Trikona Rajyoga': {
-    meaning: 'The highest-grade Rajyoga in Vedic astrology. A lord of a kendra (1/4/7/10 — power) and a lord of a trikona (1/5/9 — fortune) conjoin in the same house.',
-    characteristics: [
-      'Fortune (trikona) and power (kendra) work in complete harmony',
-      'Rapid rise to positions of prominence and authority',
-      'Success feels natural and unstoppable during relevant dashas',
-      'Combination of luck, skill, and destiny all aligned',
-    ],
-    benefits: [
-      'The most potent indicator of royalty, kingship, or equivalent',
-      'Extraordinary career success and social elevation',
-      'Wealth, fame, and power achieved simultaneously',
-      'Results are especially strong in the dasha of the planets involved',
-    ],
-  },
-  'Yogakaraka Planet': {
-    meaning: 'A single planet that simultaneously rules both a kendra and a trikona house for the native\'s lagna. This makes it the supreme benefic for the chart.',
-    characteristics: [
-      'One planet becomes the key to all success in the chart',
-      'Its dasha periods produce the most transformative results',
-      'Acts as both fortune-giver (trikona) and power-giver (kendra)',
-      'Well-placed Yogakaraka elevates the entire chart\'s quality',
-    ],
-    benefits: [
-      'Exceptional career and life success during its dasha and antardasha',
-      'Wearing the gem of the Yogakaraka can amplify positive results',
-      'A well-dignified Yogakaraka alone can deliver a prosperous life',
-      'Fame, wealth, authority, and spiritual merit all at once',
-    ],
-  },
-  'Neecha Bhanga Rajyoga': {
-    meaning: '"Neecha Bhanga" means cancellation of debilitation. When a planet\'s weakness is cancelled by specific conditions, it turns into extraordinary strength.',
-    characteristics: [
-      'What was initially a weakness becomes the greatest strength',
-      'Native often faces early struggles before dramatic rise',
-      'Resilience, grit, and the ability to bounce back from failures',
-      'The debilitated planet\'s qualities manifest powerfully once cancelled',
-    ],
-    benefits: [
-      'Dramatic and unexpected rise after a period of hardship',
-      'Greater success than those who never faced difficulties',
-      'The planet becomes extremely strong in its area of life',
-      'Transformation of enemies and obstacles into stepping-stones',
-    ],
-  },
-  'Vipareeta Rajyoga': {
-    meaning: '"Vipareeta" means reversed or contrary. Lords of dusthana houses (6th/8th/12th) placed in each other\'s houses cause adversity to self-destruct.',
-    characteristics: [
-      'Native benefits from the downfall of enemies or rivals',
-      'Hidden strength — troubles and losses ultimately become gains',
-      'May appear to struggle on the surface while gaining internally',
-      'Events that seem negative at first reverse into blessings',
-    ],
-    benefits: [
-      'Unexpected rise through circumstances that harm others',
-      'Gains from inherited property, insurance, or foreign sources',
-      'Ability to overcome hidden enemies and recover from setbacks',
-      'A protective shield against life\'s major misfortunes',
-    ],
-  },
-  'Kahala Yoga': {
-    meaning: 'Formed when the 4th and 9th house lords conjoin, or when their ruler occupies a kendra or trikona. "Kahala" means bold, courageous, or adventurous.',
-    characteristics: [
-      'Fearless, direct, and commanding personality',
-      'Strong connection between fortune and domestic happiness',
-      'Blessed with land, property, vehicles, and comforts',
-      'Natural authority and the ability to lead boldly',
-    ],
-    benefits: [
-      'Wealth in land, real estate, and immovable property',
-      'Authority over many subordinates and followers',
-      'Good fortune from father, gurus, and higher education',
-      'A bold approach to life that attracts success',
-    ],
-  },
-  'Lakshmi Yoga': {
-    meaning: 'Named after Goddess Lakshmi (divine wealth). Formed when the 9th lord is in its own or exalted sign and placed in a kendra or trikona house.',
-    characteristics: [
-      'Blessed with divine grace and material abundance',
-      'Beautiful, charming, and deeply fortunate personality',
-      'Strong dharmic instincts that attract prosperity',
-      'Wealth comes naturally without extreme effort',
-    ],
-    benefits: [
-      'Immense wealth, luxury, and material comforts',
-      'Fame and beauty that attract opportunities effortlessly',
-      'Divine protection and blessings of the goddess of prosperity',
-      'Charitable nature combined with ever-replenishing abundance',
-    ],
-  },
-  'Saraswati Yoga': {
-    meaning: 'Named after Goddess Saraswati (wisdom and arts). Formed when Mercury, Venus, and Jupiter (at least 2) occupy a kendra, trikona, or the 2nd house.',
-    characteristics: [
-      'Exceptional intelligence combined with artistic sensibility',
-      'Eloquent, learned, and deeply cultivated mind',
-      'Mastery over language, music, or a specialized field of knowledge',
-      'Respected as an intellectual and creative authority',
-    ],
-    benefits: [
-      'Outstanding academic achievements and literary fame',
-      'Excellence in teaching, writing, music, or philosophy',
-      'Honored by scholars, artists, and learned institutions',
-      'Lasting fame through intellectual or creative contributions',
-    ],
-  },
-  'Chamara Yoga': {
-    meaning: '"Chamara" means a royal fan — used to honor kings. Formed when Jupiter is in a kendra and the lagna lord is exalted/own, or Jupiter itself is exalted in a kendra.',
-    characteristics: [
-      'Scholarly, noble, and learned personality',
-      'Honored and respected like royalty in one\'s field',
-      'Deep wisdom combined with executive authority',
-      'Attracts patronage from powerful and influential persons',
-    ],
-    benefits: [
-      'Fame as a learned, wise, and respected figure',
-      'Royal or government patronage and honors',
-      'Success in advisory, scholarly, and leadership roles',
-      'A life filled with dignity, recognition, and intellectual prestige',
-    ],
-  },
-}
-
-// The backend names yogas in the active language, so icons and details are
-// looked up by its stable id (the English name is the key into the tables).
-const YOGA_ID_TO_KEY = {
-  raja_yoga: 'Raja Yoga', dharma_karma: 'Dharma-Karma Adhipati Yoga',
-  budha_aditya: 'Budha-Aditya Yoga', gaja_kesari: 'Gaja-Kesari Yoga',
-  hamsa: 'Hamsa Yoga', malavya: 'Malavya Yoga', sasa: 'Sasa Yoga',
-  bhadra: 'Bhadra Yoga', ruchaka: 'Ruchaka Yoga', amala: 'Amala Yoga',
-  adhi: 'Adhi Yoga', dhana: 'Dhana Yoga', kendra_trikona: 'Kendra-Trikona Rajyoga',
-  yogakaraka: 'Yogakaraka Planet', neecha_bhanga: 'Neecha Bhanga Rajyoga',
-  vipareeta: 'Vipareeta Rajyoga', kahala: 'Kahala Yoga', lakshmi: 'Lakshmi Yoga',
-  saraswati: 'Saraswati Yoga', chamara: 'Chamara Yoga',
-}
-
-function getInfo(yoga) {
-  const yogaName = YOGA_ID_TO_KEY[yoga.id] ?? yoga.yoga
-  for (const [key, info] of Object.entries(YOGA_DETAILS)) {
-    if (yogaName.startsWith(key)) return info
-  }
-  return null
-}
-
-function getIcon(yoga) {
-  const yogaName = YOGA_ID_TO_KEY[yoga.id] ?? yoga.yoga
-  for (const [key, icon] of Object.entries(YOGA_ICONS)) {
-    if (yogaName.startsWith(key)) return icon
-  }
-  return '✨'
-}
+const REF_LIST = [1, 2, 3, 4]
 
 function YogaCard({ yoga, defaultOpen }) {
+  const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(defaultOpen ?? false)
-  const icon = getIcon(yoga)
-  const info = getInfo(yoga)
+  const icon = YOGA_ICONS[yoga.id] ?? '✨'
+  const refKey = part => `rajyoga_ref_${yoga.id}_${part}`
+  const info = i18n.exists(refKey('meaning'))
+    ? {
+        meaning: t(refKey('meaning')),
+        characteristics: REF_LIST.map(n => t(refKey(`c${n}`))),
+        benefits: REF_LIST.map(n => t(refKey(`b${n}`))),
+      }
+    : null
 
   const isPresent = yoga.present
 
@@ -387,8 +67,8 @@ function YogaCard({ yoga, defaultOpen }) {
               {yoga.yoga}
             </h3>
             {isPresent
-              ? <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Present</span>
-              : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">Not present</span>
+              ? <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t('rajyogas_present')}</span>
+              : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">{t('rajyogas_absent')}</span>
             }
           </div>
           <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-ink-muted' : 'text-ink-faint'}`}>
@@ -406,7 +86,7 @@ function YogaCard({ yoga, defaultOpen }) {
           {/* Meaning */}
           <div className="mt-3">
             <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-primary-dark' : 'text-ink-faint'}`}>
-              What is this yoga?
+              {t('rajyogas_what_is')}
             </p>
             <p className={`text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
               {info.meaning}
@@ -417,7 +97,7 @@ function YogaCard({ yoga, defaultOpen }) {
             {/* Characteristics */}
             <div className={`rounded-lg p-3 ${isPresent ? 'bg-primary-light' : 'bg-night/10'}`}>
               <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-primary-dark' : 'text-ink-muted'}`}>
-                Characteristics
+                {t('rajyogas_characteristics')}
               </p>
               <ul className="space-y-1">
                 {info.characteristics.map((c, i) => (
@@ -432,7 +112,7 @@ function YogaCard({ yoga, defaultOpen }) {
             {/* Benefits */}
             <div className={`rounded-lg p-3 ${isPresent ? 'bg-emerald-50' : 'bg-night/10'}`}>
               <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-emerald-700' : 'text-ink-muted'}`}>
-                Benefits
+                {t('rajyogas_benefits')}
               </p>
               <ul className="space-y-1">
                 {info.benefits.map((b, i) => (
@@ -451,7 +131,7 @@ function YogaCard({ yoga, defaultOpen }) {
 }
 
 export default function RajyogasTab({ input }) {
-  useTranslation() // re-render when the language changes
+  const { t } = useTranslation()
   const lang = currentLanguage()
   const [status, setStatus]     = useState('idle')
   const beginRequest = useLatestRequest()
@@ -479,13 +159,9 @@ export default function RajyogasTab({ input }) {
     return (
       <PaywallCard
         icon="👑"
-        title="The Complete Raj Yoga Reference"
-        body="Your free Reading already named the Raj Yogas the AI noticed in your chart. This tab is the full technical breakdown — every one of the 19 classical combinations checked against your exact planetary positions, not a narrative summary."
-        bullets={[
-          'All 19 yogas — present AND absent, with the exact reasoning for each',
-          'Precise planetary/house justification, not a generated paraphrase',
-          'See exactly which yogas you\u2019re missing and why',
-        ]}
+        title={t('rajyogas_paywall_title')}
+        body={t('rajyogas_paywall_body')}
+        bullets={[t('rajyogas_paywall_bullet_1'), t('rajyogas_paywall_bullet_2'), t('rajyogas_paywall_bullet_3')]}
       />
     )
   }
@@ -497,13 +173,13 @@ export default function RajyogasTab({ input }) {
     setStatus('loading')
     setErrorMsg('')
     try {
-      const data = await fetchReport('/api/rajyogas', { ...chartBody(input), language: lang }, { fallback: 'Something went wrong. Please try again.' })
+      const data = await fetchReport('/api/rajyogas', { ...chartBody(input), language: lang }, { fallback: t('rajyogas_error_generic') })
       if (!isCurrent()) return
       setResult(data)
       setStatus('done')
     } catch (e) {
       if (!isCurrent()) return
-      setErrorMsg(errorMessage(e, 'Something went wrong. Please try again.'))
+      setErrorMsg(errorMessage(e, t('rajyogas_error_generic')))
       setStatus('error')
     }
   }
@@ -518,7 +194,7 @@ export default function RajyogasTab({ input }) {
               style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>
-        <p className="text-sm text-ink-muted">Scanning your chart for yogas…</p>
+        <p className="text-sm text-ink-muted">{t('rajyogas_scanning')}</p>
       </div>
     )
   }
@@ -528,7 +204,7 @@ export default function RajyogasTab({ input }) {
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="text-3xl">⚠️</div>
         <p className="text-sm text-vermillion">{errorMsg}</p>
-        <button onClick={load} className="text-sm text-primary-dark underline">Try again</button>
+        <button onClick={load} className="text-sm text-primary-dark underline">{t('rajyogas_try_again')}</button>
       </div>
     )
   }
@@ -542,16 +218,16 @@ export default function RajyogasTab({ input }) {
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">👑</span>
           <div>
-            <h2 className="font-bold text-lg leading-tight">Your Rajyogas</h2>
+            <h2 className="font-bold text-lg leading-tight">{t('rajyogas_title')}</h2>
             <p className="text-ink-onnight text-xs">
-              Classical Vedic yogas present in your birth chart — tap any card to see full details
+              {t('rajyogas_subtitle')}
             </p>
           </div>
         </div>
         <div className="mt-3">
           <div className="bg-primary/15 rounded-xl px-4 py-2 text-center inline-block">
             <div className="text-2xl font-extrabold text-primary-light">{present.length}</div>
-            <div className="text-xs text-primary-light">Yogas Active in Your Chart</div>
+            <div className="text-xs text-primary-light">{t('rajyogas_active_label')}</div>
           </div>
         </div>
       </div>
@@ -560,7 +236,7 @@ export default function RajyogasTab({ input }) {
       {present.length > 0 ? (
         <div>
           <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide mb-3 px-1">
-            Active Yogas in Your Chart ({present.length})
+            {t('rajyogas_active_heading', { count: present.length })}
           </h3>
           <div className="space-y-3">
             {present.map((y, i) => <YogaCard key={i} yoga={y} defaultOpen={true} />)}
@@ -569,8 +245,8 @@ export default function RajyogasTab({ input }) {
       ) : (
         <div className="bg-parchment-card rounded-xl p-6 text-center border border-line shadow-sm">
           <div className="text-3xl mb-2">🌱</div>
-          <p className="text-ink-muted text-sm">No classical Rajyogas detected in this chart.</p>
-          <p className="text-ink-faint text-xs mt-1">This does not limit success — many planetary combinations outside these yogas can bring excellent results.</p>
+          <p className="text-ink-muted text-sm">{t('rajyogas_none')}</p>
+          <p className="text-ink-faint text-xs mt-1">{t('rajyogas_none_note')}</p>
         </div>
       )}
     </div>

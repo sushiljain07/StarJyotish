@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { askKundli } from '../api/astro'
 import { useAuth } from '../contexts/AuthContext'
+import { errorMessage } from '../api/errors'
 
 // Matches AskPersonaPanel.jsx's home-page persona limit — previously this
 // was 10 while the home page's "Ask Jyoti" was 5, an inconsistency with no
@@ -80,8 +81,9 @@ export default function AskChart({ input, initialQuestion = null }) {
       setProvider(data.llm_provider || null)
       setCount(prev => prev + 1)
     } catch (e) {
-      setErrorMsg(e.message || t('ask_error'))
+      setErrorMsg(errorMessage(e, t('ask_error')))
       setMessages(prev => prev.slice(0, -1))
+      setInputValue(question)  // keep it so one tap on Send retries
     } finally {
       setLoading(false)
     }

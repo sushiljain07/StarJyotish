@@ -6,6 +6,7 @@ import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
+import { errorFromResponse, errorMessage } from '../api/errors'
 
 // icon/style metadata per section key — content ordering now comes from
 // SECTION_GROUPS below, grouped into the report's information architecture.
@@ -670,13 +671,12 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
         }),
       })
       if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}))
-        throw new Error(err.detail ?? 'Career analysis failed. Please try again.')
+        throw await errorFromResponse(resp, t('career_report_error_generic'))
       }
       setReport(await resp.json())
       setStatus('done')
     } catch (e) {
-      setErrorMsg(e.message || 'Something went wrong. Please try again.')
+      setErrorMsg(errorMessage(e, t('career_report_error_generic')))
       setStatus('error')
     }
   }
@@ -717,7 +717,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
       <button
-        onClick={() => setStatus('idle')}
+        onClick={() => generate()}
         className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
       >
         Try Again
@@ -755,7 +755,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     <>
       <div className="text-center mt-6 pb-2 space-x-4">
         <button
-          onClick={() => setStatus('idle')}
+          onClick={() => generate()}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
         >
           ↺ Regenerate Report

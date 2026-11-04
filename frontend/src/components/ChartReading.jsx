@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import { Button } from './ui'
+import { errorFromResponse, errorMessage } from '../api/errors'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -71,8 +72,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
         body: JSON.stringify({ ...input, language: lang }),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || 'Error generating prediction')
+        throw await errorFromResponse(res, 'Error generating prediction')
       }
       const data = await res.json()
 
@@ -92,7 +92,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       const base = count * 380 + 300
       setTimeout(() => setShowWa(true), base + 400)
     } catch (e) {
-      setErrorMsg(e.message || 'Error generating prediction')
+      setErrorMsg(errorMessage(e, t('error_something_wrong')))
       setStatus('error')
     }
   }
@@ -165,7 +165,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
-      <Button onClick={() => setStatus('idle')}>
+      <Button onClick={() => generate()}>
         Try Again
       </Button>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { API_BASE } from '../api/config'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
+import { errorFromResponse, errorMessage } from '../api/errors'
 
 const YOGA_ICONS = {
   'Raja Yoga':                  '👑',
@@ -469,14 +470,13 @@ export default function RajyogasTab({ input }) {
         body: JSON.stringify(input),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || `Server error ${res.status}`)
+        throw await errorFromResponse(res, `Server error ${res.status}`)
       }
       const data = await res.json()
       setResult(data)
       setStatus('done')
     } catch (e) {
-      setErrorMsg(e.message)
+      setErrorMsg(errorMessage(e, 'Something went wrong. Please try again.'))
       setStatus('error')
     }
   }

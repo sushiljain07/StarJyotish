@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -14,12 +15,14 @@ from services.health_analysis import generate_health_report
 from services.skill_loader import (
     load_relationship_skills, load_wealth_skills, load_health_skills, load_gemstone_remedy_skills,
 )
+from services.llm import AI_UNAVAILABLE_MESSAGE
 from services.rate_limit import limiter, LLM_LIMIT
 from services.persistence import save_report_if_requested
 from db.models.report import ReportType
 from db.session import get_db_optional
 
 router = APIRouter()
+logger = logging.getLogger("starjyotish.reports")
 
 # Loaded once at module startup (cached in memory), same pattern as
 # career_report.py's _SKILLS_CONTEXT/_GEMSTONE_CONTEXT.
@@ -89,8 +92,11 @@ def get_relationship_report(request: Request, body: BirthInput, db=Depends(get_d
             language=body.language,
             marital_status=body.marital_status or "unmarried",
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Relationship analysis failed: {e}")
+        logger.exception("Relationship analysis failed")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from e
 
     response = _build_topic_report(report_data)
 
@@ -130,8 +136,11 @@ def get_wealth_report(request: Request, body: BirthInput, db=Depends(get_db_opti
             gemstone_context=_GEMSTONE_CONTEXT,
             language=body.language,
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Wealth analysis failed: {e}")
+        logger.exception("Wealth analysis failed")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from e
 
     response = _build_topic_report(report_data)
 
@@ -170,8 +179,11 @@ def get_health_report(request: Request, body: BirthInput, db=Depends(get_db_opti
             gemstone_context=_GEMSTONE_CONTEXT,
             language=body.language,
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Health analysis failed: {e}")
+        logger.exception("Health analysis failed")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from e
 
     response = _build_topic_report(report_data)
 

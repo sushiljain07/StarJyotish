@@ -38,6 +38,13 @@ _DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
 ANTHROPIC_MAX_RETRIES = 1
 
 
+# What users see when every provider fails. Per-provider reasons (key errors,
+# HTTP codes, request IDs) are logged server-side only, never sent to clients.
+AI_UNAVAILABLE_MESSAGE = (
+    "Our AI astrologer is busy right now. Please try again in a minute."
+)
+
+
 class LLMUnavailable(RuntimeError):
     """Every provider was skipped or failed. `reasons` lists why, per provider."""
 

@@ -29,10 +29,10 @@ function TabLoader() {
 function buildSubtabs(t, topicId) {
   const reading = { id: 'reading', label: t('nav_reading', 'Reading') }
   if (topicId === 'career') {
-    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: t('landing_topic_career_label') }]
+    return [reading, { id: 'rajyogas', label: t('nav_rajyogas', 'Rajyogas') }, { id: 'career', label: t('insights_subtab_career') }]
   }
   if (topicId === 'health' || topicId === 'relationship' || topicId === 'finance') {
-    return [reading, { id: topicId, label: t(`landing_topic_${topicId}_label`) }]
+    return [reading, { id: topicId, label: t(`insights_subtab_${topicId}`) }]
   }
   return [reading]
 }

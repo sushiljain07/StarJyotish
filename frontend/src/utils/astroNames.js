@@ -1,4 +1,3 @@
-import { formatDate } from './format'
 // Localized astrological names. The data lives in the locale files
 // (planets.*, signs.*, nakshatras.*, planet_abbr.*); nothing here knows a
 // language. An unknown name is shown as itself.
@@ -28,11 +27,13 @@ export const eclipseName = (t, eclipse) => {
   })
 }
 
-// The backend formats an eclipse date as "03 Mar 2026"; show it localized.
-const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-export function localizeBackendDate(text) {
+// The backend formats dates as "03 Mar 2026" (day, English short month, year);
+// the month comes from the locale files (month_short_jan ... month_short_dec),
+// so English reads exactly as sent and other languages are localized.
+const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+export function localizeBackendDate(t, text) {
   const m = /^(\d{1,2}) ([A-Za-z]{3}) (\d{4})$/.exec(text ?? '')
-  const month = m ? EN_MONTHS.indexOf(m[2]) : -1
-  if (month < 0) return text
-  return formatDate(new Date(Number(m[3]), month, Number(m[1])), { day: '2-digit', month: 'short', year: 'numeric' })
+  const key = m ? MONTH_KEYS[['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2].toLowerCase())] : null
+  if (!key) return text
+  return `${m[1]} ${t(`month_short_${key}`)} ${m[3]}`
 }

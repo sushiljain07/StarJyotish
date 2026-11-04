@@ -244,6 +244,20 @@ describe('Panchang pages', () => {
     expectHindi(container)
   })
 
+  it('eclipse date keeps the backend text in English and is localized in Hindi', async () => {
+    const eclipse = { type: 'solar', kind: 'Partial', name: 'x', date: '03 Sep 2026', peak_time_local: '6:12 PM' }
+    stubFetch({ ...panchang, upcoming_eclipse: eclipse })
+    await act(async () => { await i18n.changeLanguage('en') })
+    const en1 = renderPage(<PanchangDetail />, '/panchang')
+    await settled(en1.container, '03 Sep 2026')
+    expect(en1.container.textContent).not.toContain('Sept')
+    en1.unmount()
+    await act(async () => { await i18n.changeLanguage('hi') })
+    const hi1 = renderPage(<PanchangDetail />, '/panchang')
+    await settled(hi1.container, '03 सित॰ 2026')
+    expectHindi(hi1.container)
+  })
+
   it('WeekAhead has no English', async () => {
     const { container } = renderPage(<WeekAhead />, '/week-ahead')
     await settled(container, hi.tithi_Ekadashi)

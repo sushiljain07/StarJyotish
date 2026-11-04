@@ -373,8 +373,8 @@ function TodayTab({ location, date, onSetLocation }) {
               <p className="text-[11px] uppercase tracking-widest text-primary-dark font-bold mb-1">{t('panchang_upcoming_eclipse')}</p>
               <p className="text-sm text-ink">
                 {data.upcoming_eclipse.peak_time_local
-                  ? t('panchang_eclipse_line_at', { name: eclipseName(t, data.upcoming_eclipse), date: localizeBackendDate(data.upcoming_eclipse.date), time: data.upcoming_eclipse.peak_time_local })
-                  : t('panchang_eclipse_line', { name: eclipseName(t, data.upcoming_eclipse), date: localizeBackendDate(data.upcoming_eclipse.date) })}
+                  ? t('panchang_eclipse_line_at', { name: eclipseName(t, data.upcoming_eclipse), date: localizeBackendDate(t, data.upcoming_eclipse.date), time: data.upcoming_eclipse.peak_time_local })
+                  : t('panchang_eclipse_line', { name: eclipseName(t, data.upcoming_eclipse), date: localizeBackendDate(t, data.upcoming_eclipse.date) })}
               </p>
             </div>
           )}

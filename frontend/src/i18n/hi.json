@@ -1991,5 +1991,17 @@
   "home_charts_D9_name": "नवमांश",
   "home_charts_D9_blurb": "आपकी विवाह कुंडली",
   "home_charts_D60_name": "षष्ट्यंश",
-  "home_charts_D60_blurb": "सबसे बारीक विवरण"
+  "home_charts_D60_blurb": "सबसे बारीक विवरण",
+  "month_short_jan": "जन॰",
+  "month_short_feb": "फ़र॰",
+  "month_short_mar": "मार्च",
+  "month_short_apr": "अप्रैल",
+  "month_short_may": "मई",
+  "month_short_jun": "जून",
+  "month_short_jul": "जुल॰",
+  "month_short_aug": "अग॰",
+  "month_short_sep": "सित॰",
+  "month_short_oct": "अक्टू॰",
+  "month_short_nov": "नव॰",
+  "month_short_dec": "दिस॰"
 }

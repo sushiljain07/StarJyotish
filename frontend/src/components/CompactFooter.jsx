@@ -16,6 +16,7 @@
 // mobile — fix: always visible, wraps naturally on small screens.
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { LANGUAGES, currentLanguage } from '../i18n/languages'
 
 // Link set mirrors Footer.jsx's bottom bar + key destinations, and the
 // EN/हि toggle matches Footer.jsx, so the two footers never disagree on
@@ -57,15 +58,15 @@ export default function CompactFooter() {
             {t('footer_copyright', { year: FOOTER_YEAR })}
           </p>
           <div className="flex gap-1">
-            {['en', 'hi'].map(lang => (
+            {LANGUAGES.map(({ code, label }) => (
               <button
-                key={lang}
-                onClick={() => i18n.changeLanguage(lang)}
+                key={code}
+                onClick={() => i18n.changeLanguage(code)}
                 className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition ${
-                  i18n.language.startsWith(lang) ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
+                  currentLanguage() === code ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
                 }`}
               >
-                {lang === 'en' ? 'EN' : 'हि'}
+                {label}
               </button>
             ))}
           </div>

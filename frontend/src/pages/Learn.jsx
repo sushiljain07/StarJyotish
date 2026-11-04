@@ -28,13 +28,14 @@ import {
   FEATURED_GUIDES,
   WHY_LEARN_POINTS,
 } from '../config/learnContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../i18n/languages'
 
 export default function Learn() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   return (
     <div className="min-h-screen bg-parchment">

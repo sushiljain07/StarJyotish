@@ -3,6 +3,7 @@
 
 import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
+import { currentLanguage } from '../i18n/languages'
 
 // 0-indexed sign → grid cell [row, col]  (4×4, centre 4 cells are empty)
 const SIGN_TO_CELL = {
@@ -35,6 +36,8 @@ const ABBR_HI = {
   Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
 }
 
+const ABBR_BY_LANG = { en: ABBR_EN, hi: ABBR_HI }
+
 const SIGN_ABBR = ['Ar', 'Ta', 'Ge', 'Ca', 'Le', 'Vi', 'Li', 'Sc', 'Sg', 'Cp', 'Aq', 'Pi']
 
 function cellXY(row, col) {
@@ -51,8 +54,8 @@ export default function SouthIndiaChart({
   title = 'South Indian Chart',
   transitPlanets = null,
 }) {
-  const { i18n } = useTranslation()
-  const abbr = i18n.language === 'hi' ? ABBR_HI : ABBR_EN
+  useTranslation() // subscribe so this re-renders when the language changes
+  const abbr = ABBR_BY_LANG[currentLanguage()] ?? ABBR_EN
 
   const ascIdx = ascendant?.sign_index ?? 0
 

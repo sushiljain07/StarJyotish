@@ -47,6 +47,7 @@ import {
   ARIES_FAQ,
   ARIES_CTA,
 } from '../../../config/ariesContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 // ── Article prose helpers ────────────────────────────────────────────────────
 // Local — if a second guide needs these, promote to components/knowledge/.
@@ -78,8 +79,8 @@ function QualityList({ items }) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function AriesGuide() {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
   const guide = getGuide('zodiac-aries')
   const learningPathSteps = getLearningPathSteps('zodiac')  // main curriculum position
   const { prev, next } = getSignNavigation('zodiac-aries')  // sign-level nav

@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from services.i18n import SUPPORTED_LANGUAGES
+
 
 class _ORMModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -159,8 +161,10 @@ class ProfileUpdateRequest(BaseModel):
     @field_validator("preferred_language")
     @classmethod
     def _validate_lang(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and v not in ("en", "hi"):
-            raise ValueError("preferred_language must be 'en' or 'hi'")
+        if v is not None and v not in SUPPORTED_LANGUAGES:
+            raise ValueError(
+                "preferred_language must be one of: " + ", ".join(SUPPORTED_LANGUAGES)
+            )
         return v
 
     @field_validator("avatar_url")

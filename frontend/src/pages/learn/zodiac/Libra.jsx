@@ -35,6 +35,7 @@ import {
   LIBRA_FAQ,
   LIBRA_CTA,
 } from '../../../config/libraContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -62,8 +63,8 @@ function QualityList({ items }) {
 }
 
 export default function LibraGuide() {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
   const guide = getGuide('zodiac-libra')
   const learningPathSteps = getLearningPathSteps('zodiac')
   const { prev, next } = getSignNavigation('zodiac-libra')

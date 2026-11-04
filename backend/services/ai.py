@@ -7,6 +7,7 @@ from typing import Optional
 from fastapi import HTTPException
 
 from services.astro_utils import get_planet_dignity
+from services.i18n import language_name, text
 from services.llm import AI_UNAVAILABLE_MESSAGE, LLMUnavailable, complete as llm_complete
 
 _SKILLS_BASE = Path(__file__).parent.parent.parent / "astro-skills"
@@ -48,6 +49,25 @@ _SKILL_LABELS: dict[str, str] = {
     "nakshatra/SKILL.md":                          "Nakshatra Guide",
     "rudraksha/SKILL.md":                          "Rudraksha Guide",
     "vedic-kundli/SKILL.md":                       "Vedic Kundli Reader",
+}
+
+_READING_LANG_RULE = {
+    "en": {
+        "rule": "LANGUAGE RULE: Write entirely in English. Every word must be in English.",
+    },
+    "hi": {
+        "rule": (
+            "LANGUAGE RULE — NON-NEGOTIABLE: Write EVERY SINGLE WORD in Hindi (Devanagari script). "
+            "This includes all section content, yoga names (translate them to Hindi), "
+            "timeline descriptions, character descriptions, bullet points, and all closing messages. "
+            "Do NOT write any English words anywhere in your output — pure Hindi only."
+        ),
+    },
+}
+
+_CHART_EXPLAIN_LANG = {
+    "en": {"instruction": "Respond in clear, warm English."},
+    "hi": {"instruction": "Respond in Hindi (Devanagari script)."},
 }
 
 _SECTION_NAMES = [
@@ -629,7 +649,7 @@ def build_prompt(
     D9 is always drawn from chart['navamsa_planets'] (pre-computed in astro_calc).
     All other charts are passed in from the route.
     """
-    lang_instruction = "Hindi" if language == "hi" else "English"
+    lang_instruction = language_name(language)
     asc       = chart["ascendant"]
     div_charts = div_charts or {}
 
@@ -848,14 +868,7 @@ def build_prediction_prompt(
         f"═══════════════════════════════════\n{reference_tables}\n"
     ) if reference_tables else ""
 
-    lang_note = (
-        "LANGUAGE RULE — NON-NEGOTIABLE: Write EVERY SINGLE WORD in Hindi (Devanagari script). "
-        "This includes all section content, yoga names (translate them to Hindi), "
-        "timeline descriptions, character descriptions, bullet points, and all closing messages. "
-        "Do NOT write any English words anywhere in your output — pure Hindi only."
-    ) if language == "hi" else (
-        "LANGUAGE RULE: Write entirely in English. Every word must be in English."
-    )
+    lang_note = text(_READING_LANG_RULE, language, "rule")
     ad_line = f"\n  Sub-period: {ad.get('planet', '')} (ends {ad.get('end', '')})" if ad else ""
 
     _TOPIC_FOCUS = {
@@ -1090,10 +1103,7 @@ def generate_chart_highlight(
 
     planet_summary = "\n".join(planet_lines[:10]) if planet_lines else "  (no planet data)"
 
-    lang_instruction = (
-        "Respond in Hindi (Devanagari script)." if language.startswith("hi")
-        else "Respond in clear, warm English."
-    )
+    lang_instruction = text(_CHART_EXPLAIN_LANG, language, "instruction")
 
     prompt = f"""You are Jyotish Guru, a wise and encouraging Vedic astrology guide on Star Jyotish.
 
@@ -1166,7 +1176,7 @@ def ask_chart(
     Skill knowledge is loaded from astro-skills/ and cross-references are
     resolved per index.md's "Skill Compatibility" table.
     """
-    lang_instruction = "Hindi" if language == "hi" else "English"
+    lang_instruction = language_name(language)
     asc  = chart["ascendant"]
     moon = next((p for p in chart["planets"] if p["name"] == "Moon"), None)
     md   = dasha["current_mahadasha"]

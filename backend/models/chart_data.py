@@ -1,9 +1,19 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing import Optional
+
+from services.i18n import normalize_language
 
 
 class _Flexible(BaseModel):
     model_config = ConfigDict(extra="ignore")
+
+
+class _LanguageMixin(BaseModel):
+    @field_validator("language", mode="before", check_fields=False)
+    @classmethod
+    def _normalize_language(cls, v):
+        # Unknown codes fall back to English rather than a 422.
+        return normalize_language(v)
 
 
 class PlanetData(_Flexible):
@@ -77,11 +87,11 @@ class ChartResponse(_Flexible):
     dasha: DashaData
 
 
-class ReadingRequest(_Flexible):
+class ReadingRequest(_Flexible, _LanguageMixin):
     date: str       # "YYYY-MM-DD"
     time: str       # "HH:MM" (24-hr)
     place: str = Field(max_length=200)
-    language: str   # "en" or "hi"
+    language: str   # any registered code; unknown becomes "en"
     topic: Optional[str] = None  # 'career' | 'relationship' | 'health' | 'finance' —
                                   # set when the user arrived via a landing-page topic
                                   # card; see services/ai.py build_prediction_prompt().
@@ -103,7 +113,7 @@ class ReadingResponse(_Flexible):
     llm_provider: str = ""
 
 
-class AskRequest(_Flexible):
+class AskRequest(_Flexible, _LanguageMixin):
     date: str       # "YYYY-MM-DD"
     time: str       # "HH:MM" (24-hr)
     place: str = Field(max_length=200)

@@ -886,6 +886,7 @@ def identify_career_fields(
 # The provider chain lives in services/llm.py and the JSON handling in
 # report_utils.call_llm (shared with relationship/health/wealth); the thin
 # wrapper below just supplies career's Groq prompt and log prefix.
+from services.i18n import text
 from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
 from services.report_utils import call_llm as _report_call_llm
 
@@ -901,6 +902,18 @@ def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict
 
 
 # ── Prompt Builder ────────────────────────────────────────────────────────────
+
+_CAREER_LANG_RULE = {
+    "en": {"rule": "LANGUAGE RULE: Write all 'title' and 'content' values in English."},
+    "hi": {
+        "rule": (
+            "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' string and every 'content' string) "
+            "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown. "
+            "Every word inside the values must be in Hindi — no English words in the output values."
+        ),
+    },
+}
+
 
 def _build_career_prompt(
     chart_data: dict,
@@ -1102,13 +1115,7 @@ def _build_career_prompt(
     else:
         _gemstone_section = ""
 
-    _lang_rule = (
-        "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' string and every 'content' string) "
-        "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown. "
-        "Every word inside the values must be in Hindi — no English words in the output values."
-    ) if language == "hi" else (
-        "LANGUAGE RULE: Write all 'title' and 'content' values in English."
-    )
+    _lang_rule = text(_CAREER_LANG_RULE, language, "rule")
 
     prompt = f"""You are a compassionate Vedic career astrologer writing a deeply personalized, uplifting career report.
 

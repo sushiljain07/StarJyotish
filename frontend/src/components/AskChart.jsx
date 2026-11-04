@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { askKundli } from '../api/astro'
 import { useAuth } from '../contexts/AuthContext'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
 
 // Matches AskPersonaPanel.jsx's home-page persona limit — previously this
 // was 10 while the home page's "Ask Jyoti" was 5, an inconsistency with no
@@ -12,7 +13,7 @@ import { errorMessage } from '../api/errors'
 const MAX_QUESTIONS = 5
 
 export default function AskChart({ input, initialQuestion = null }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { user, authedRequest } = useAuth()
   const [messages, setMessages]     = useState([])
   const [questionCount, setCount]   = useState(0)
@@ -50,7 +51,7 @@ export default function AskChart({ input, initialQuestion = null }) {
     const question = (questionOverride ?? inputValue).trim()
     if (!question || loading || limitReached) return
 
-    const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
+    const lang = currentLanguage()
     setMessages(prev => [...prev, { role: 'user', text: question }])
     setInputValue('')
     setLoading(true)

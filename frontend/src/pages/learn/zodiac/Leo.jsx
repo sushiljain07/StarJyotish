@@ -35,6 +35,7 @@ import {
   LEO_FAQ,
   LEO_CTA,
 } from '../../../config/leoContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -62,8 +63,8 @@ function QualityList({ items }) {
 }
 
 export default function LeoGuide() {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
   const guide = getGuide('zodiac-leo')
   const learningPathSteps = getLearningPathSteps('zodiac')
   const { prev, next } = getSignNavigation('zodiac-leo')

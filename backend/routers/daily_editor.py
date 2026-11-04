@@ -10,11 +10,12 @@ v2 changes:
   already holds, used to detect natal-return transits without recomputing.
 """
 from fastapi import APIRouter, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, Dict, Any
 
 from services.chart_context import resolve_birth_context
 from services.daily_editor import compose_daily_edition
+from services.i18n import normalize_language
 from services.rate_limit import limiter, LLM_LIMIT
 
 router = APIRouter()
@@ -37,9 +38,14 @@ class DailyEditionInput(BaseModel):
     md_end: Optional[str] = None
     abhijit_start: Optional[str] = None
     abhijit_end: Optional[str] = None
-    language: str = Field("en", pattern="^(en|hi)$")
+    language: str = "en"
     variation: int = Field(0, ge=0, le=99, description="Content rotation index — 0=daily baseline, 1+=fresh card")
     natal_planets: Optional[List[PlanetData]] = Field(None, description="Natal planet positions for return detection")
+
+    @field_validator("language", mode="before")
+    @classmethod
+    def _normalize_language(cls, v):
+        return normalize_language(v)
 
 
 @router.post("/daily-edition")

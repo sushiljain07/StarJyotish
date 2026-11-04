@@ -5,6 +5,7 @@ import { fetchReport, readingBody } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import { Button } from './ui'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -41,7 +42,7 @@ const SECTION_CONFIG = [
 ]
 
 export default function ChartReading({ input, topic, onOpenRajyogas }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
 
   const [status, setStatus]           = useState('idle')
@@ -54,7 +55,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   const [visible, setVisible]         = useState([])
 
 
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const lang = currentLanguage()
   const beginRequest = useLatestRequest()
 
   // Section fade-in timers, cleared on a new request and on unmount.

@@ -37,6 +37,7 @@ import swisseph as swe
 from services.astro_calc import PLANET_IDS, CALC_FLAGS, SIGNS, NAKSHATRAS
 from services.transit_calc import calculate_transit
 from services.ai import _call_llm
+from services.i18n import language_instruction
 
 IST = pytz.timezone("Asia/Kolkata")
 
@@ -252,7 +253,7 @@ def _rarity_label(planet: str) -> Optional[str]:
 
 def _prompt_headline(label: str, event: dict, md: str, ad: Optional[str],
                      best_window: Optional[dict], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     window = (f"Best action window: {best_window['start']}–{best_window['end']} (Abhijit Muhurta)."
               if best_window else "No special window noted.")
     return f"""You are Jyoti, {label}'s personal Vedic astrologer. Write the front-page line of their daily patrika.
@@ -268,7 +269,7 @@ Write EXACTLY 2 sentences, max 42 words. Sentence 1: what is happening and in wh
 
 
 def _prompt_question(label: str, event: dict, md: str, ad: Optional[str], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     return f"""You are Jyoti, {label}'s Vedic astrologer. Write ONE probing reflection question based on the sky today.
 
 FACT: {event['planet']} in {event['sign']}, {event['house']}th house ({event['theme']}). Dasha: {md}.
@@ -278,7 +279,7 @@ Write ONE question only. Max 25 words. It should feel personally relevant and sp
 
 def _prompt_opportunity(label: str, event: dict, md: str, ad: Optional[str],
                         best_window: Optional[dict], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     window = f"Best window: {best_window['start']}–{best_window['end']}." if best_window else ""
     return f"""You are Jyoti, {label}'s Vedic astrologer. Identify ONE specific opportunity available to them right now.
 
@@ -288,7 +289,7 @@ Write 1-2 sentences, max 35 words. Frame this as a door that is open right now �
 
 
 def _prompt_watch(label: str, event: dict, md: str, ad: Optional[str], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     return f"""You are Jyoti, {label}'s Vedic astrologer. Name ONE thing to watch or be careful of today.
 
 FACT: {event['planet']} {'(retrograde)' if event.get('retrograde') else ''} in {event['sign']}, {event['house']}th house ({event['theme']}). Dasha: {md}.
@@ -297,7 +298,7 @@ Write 1-2 sentences, max 35 words. Not fear — just awareness. Name a specific 
 
 
 def _prompt_nakshatra(label: str, event: dict, language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     nak = event.get("nakshatra", "")
     quality = event.get("nakshatra_quality", "active")
     return f"""You are Jyoti, {label}'s Vedic astrologer. The Moon is in {nak} nakshatra today — a {quality} energy.
@@ -306,7 +307,7 @@ Write 2 sentences, max 35 words. Sentence 1: the quality of the day's emotional 
 
 
 def _prompt_timing(label: str, event: dict, best_window: Optional[dict], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     window = f"{best_window['start']}–{best_window['end']} (Abhijit Muhurta)" if best_window else "mid-day"
     return f"""You are Jyoti, {label}'s Vedic astrologer. Explain the ideal timing window for today.
 
@@ -318,7 +319,7 @@ Write 2 sentences, max 35 words. Name what kind of task, call, or decision is be
 def _prompt_dasha_whisper(label: str, md: str, ad: Optional[str],
                            md_start: Optional[str], md_end: Optional[str],
                            chapter: Optional[dict], language: str) -> str:
-    lang = "Write in Hindi (Devanagari)." if language == "hi" else "Write in English."
+    lang = language_instruction(language)
     progress = f"Day {chapter['day']} of {chapter['total_days']} ({chapter['pct']}% complete)." if chapter else ""
     return f"""You are Jyoti, {label}'s Vedic astrologer. Share a brief whisper about what their {md} Mahadasha chapter means for them right now.
 

@@ -17,6 +17,7 @@ import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 import { subscribeNewsletter } from '../api/newsletter'
+import { LANGUAGES, currentLanguage } from '../i18n/languages'
 
 const FOOTER_YEAR = new Date().getFullYear()
 
@@ -175,15 +176,15 @@ export default function Footer() {
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}
         </p>
         <div className="flex gap-1">
-          {['en', 'hi'].map(lang => (
+          {LANGUAGES.map(({ code, label }) => (
             <button
-              key={lang}
-              onClick={() => i18n.changeLanguage(lang)}
+              key={code}
+              onClick={() => i18n.changeLanguage(code)}
               className={`px-2 py-1 rounded-full text-[11px] font-semibold transition ${
-                i18n.language.startsWith(lang) ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
+                currentLanguage() === code ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
               }`}
             >
-              {lang === 'en' ? 'EN' : 'हि'}
+              {label}
             </button>
           ))}
         </div>

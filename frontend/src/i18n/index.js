@@ -1,19 +1,27 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import en from './en.json'
-import hi from './hi.json'
+import { LANGUAGES, DEFAULT_LANGUAGE, scriptFor } from './languages'
 
 export const LANG_STORAGE_KEY = 'kundli_lang'
-export const SUPPORTED_LANGS = ['en', 'hi']
+export const SUPPORTED_LANGS = LANGUAGES.map(l => l.code)
+
+// Every ./xx.json beside this file whose code is in the registry becomes a
+// resource bundle automatically.
+const localeModules = import.meta.glob('./*.json', { eager: true })
+const resources = {}
+for (const code of SUPPORTED_LANGS) {
+  const mod = localeModules[`./${code}.json`]
+  if (mod) resources[code] = { translation: mod.default ?? mod }
+}
 
 // Runs at import time, before React or any error boundary exists, so a
 // browser that blocks storage must not throw here.
 function readSavedLang() {
   try {
     const saved = localStorage.getItem(LANG_STORAGE_KEY)
-    return SUPPORTED_LANGS.includes(saved) ? saved : 'en'
+    return SUPPORTED_LANGS.includes(saved) ? saved : DEFAULT_LANGUAGE
   } catch {
-    return 'en'
+    return DEFAULT_LANGUAGE
   }
 }
 
@@ -28,22 +36,20 @@ function saveLang(lng) {
 const initialLang = readSavedLang()
 
 i18n.use(initReactI18next).init({
-  resources: {
-    en: { translation: en },
-    hi: { translation: hi },
-  },
+  resources,
   lng: initialLang,
-  fallbackLng: 'en',
+  fallbackLng: DEFAULT_LANGUAGE,
   interpolation: { escapeValue: false },
 })
 
 // index.html hardcodes lang="en" since it's static markup served before any
-// JS runs — correct for the default case, but it never updated when someone
-// switched to Hindi via the language toggles. Screen
-// readers and search engines both read this attribute, so keep it in sync
-// here rather than leaving it permanently wrong for Hindi users.
+// JS runs. Screen readers and search engines read lang, and CSS keys the
+// font stack off data-script, so keep both in sync with the active language.
 function syncHtmlLang(lng) {
-  document.documentElement.lang = lng.startsWith('hi') ? 'hi' : 'en'
+  const base = String(lng).toLowerCase().split('-')[0]
+  const code = SUPPORTED_LANGS.includes(base) ? base : DEFAULT_LANGUAGE
+  document.documentElement.lang = code
+  document.documentElement.dataset.script = scriptFor(code)
 }
 syncHtmlLang(initialLang)
 i18n.on('languageChanged', lng => {

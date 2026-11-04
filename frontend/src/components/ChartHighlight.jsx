@@ -10,6 +10,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
+import { currentLanguage } from '../i18n/languages'
 
 // Faint wheel watermark — re-used from ChartReading, kept in sync
 function WheelBg() {
@@ -57,14 +58,14 @@ const CHART_META = {
 }
 
 export default function ChartHighlight({ input, chartType = 'D1', autoLoad = false }) {
-  const { i18n } = useTranslation()
   const [status, setStatus] = useState('idle')  // idle | loading | done | error
   const [text, setText] = useState('')
   const [provider, setProvider] = useState('')
   const fetchedRef = useRef(false)
 
   const meta = CHART_META[chartType] ?? { label: chartType, icon: '🪐', life: 'this area of life' }
-  const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
+  useTranslation() // subscribe so this re-renders when the language changes
+  const lang = currentLanguage()
 
   async function loadHighlight() {
     if (fetchedRef.current) return

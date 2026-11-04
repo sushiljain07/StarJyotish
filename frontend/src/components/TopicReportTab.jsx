@@ -17,6 +17,7 @@ import { fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import SegmentedToggle from './SegmentedToggle'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
 
 const TOPIC_CONFIG = {
   relationship: {
@@ -214,7 +215,7 @@ function HighlightCard({ h }) {
 }
 
 export default function TopicReportTab({ topic, input }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
@@ -239,7 +240,7 @@ export default function TopicReportTab({ topic, input }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, topic])
 
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const lang = currentLanguage()
   const beginRequest = useLatestRequest()
   // Relationship's Regenerate goes back to the marital-status screen; the
   // next Generate there must still reach the server, not the cache.

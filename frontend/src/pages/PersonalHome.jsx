@@ -78,6 +78,7 @@ import {
   buildComingUpEvents, computeOneAction,
 } from '../utils/dailyInsights'
 import { formatDate } from '../utils/format'
+import { currentLanguage } from '../i18n/languages'
 
 // One "beat" on the home thread: gold dot on the hairline, serif gold
 // heading, optional sub + view-full CTA. Pure design tokens
@@ -108,7 +109,7 @@ function Beat({ id, title, subtitle, cta, onCta, delay = 0, children }) {
 }
 
 export default function PersonalHome() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, accessToken } = useAuth()
 
@@ -124,7 +125,7 @@ export default function PersonalHome() {
   const { location } = useCurrentLocation()
   const panchang = usePanchang(location)
   const { transit, outlook } = useChartExtras(profile)
-  const editorLang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const editorLang = currentLanguage()
   const { edition, requestRefresh } = useDailyEditor(profile, panchang.data, editorLang)
   const { summary: journeySummary, recordReaction, cardReactions } = useUserJourney(accessToken)
 

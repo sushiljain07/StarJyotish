@@ -19,6 +19,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import JyotiAvatar from './JyotiAvatar'
 import { localDateStr } from '../../utils/localDate'
 import { errorMessage } from '../../api/errors'
+import { currentLanguage } from '../../i18n/languages'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -52,7 +53,7 @@ function saveQuota(userId, count) {
 }
 
 export default function AskPersonaPanel({ userId, input }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { user, authedRequest } = useAuth()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
@@ -86,7 +87,7 @@ export default function AskPersonaPanel({ userId, input }) {
     const question = value.trim()
     if (!question || loading || limitReached || !input) return
 
-    const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
+    const lang = currentLanguage()
     setMessages(prev => [...prev, { role: 'user', text: question }])
     setValue('')
     setLoading(true)

@@ -22,6 +22,7 @@ import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
 import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
+import { currentLanguage, localeFor } from '../i18n/languages'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -165,7 +166,7 @@ export default function Profile() {
   }
 
   const memberSince = user?.created_at
-    ? new Date(user.created_at).toLocaleDateString(i18n.language.startsWith('hi') ? 'hi-IN' : 'en-IN', {
+    ? new Date(user.created_at).toLocaleDateString(localeFor(currentLanguage()), {
         year: 'numeric', month: 'long', day: 'numeric',
       })
     : null

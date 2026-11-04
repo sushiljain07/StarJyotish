@@ -28,6 +28,7 @@ import {
   YOGAS_FAQ,
   YOGAS_CTA,
 } from '../../../config/yogasContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function YogaCard({ yoga }) {
   const typeColor = yoga.type === 'Auspicious' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -66,10 +67,10 @@ function YogaCard({ yoga }) {
 
 export default function YogasGuide() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   const guide = getGuide('yogas')
   const learningPathSteps = getLearningPathSteps('yogas')

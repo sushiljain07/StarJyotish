@@ -8,6 +8,7 @@ import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
 
 // icon/style metadata per section key — content ordering now comes from
 // SECTION_GROUPS below, grouped into the report's information architecture.
@@ -562,7 +563,7 @@ function buildAskSeedQuestion(careerContext) {
 }
 
 export default function CareerReportTab({ input, onOpenRajyogas }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
@@ -633,7 +634,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     generate(resolved)
   }
 
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const lang = currentLanguage()
   const beginRequest = useLatestRequest()
 
   // A finished report follows the language toggle (the other language is

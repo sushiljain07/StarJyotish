@@ -7,6 +7,7 @@
   "form_place": "Place of Birth",
   "form_error_invalid_date": "That date doesn't exist. Please check the day and month.",
   "form_error_future_date": "Birth date can't be in the future.",
+  "form_error_pick_place": "Please pick your birth place from the list.",
   "form_time_accuracy_label": "How sure are you of the birth time?",
   "form_submit": "Generate Chart",
   "tab_birth_chart": "Birth Chart",

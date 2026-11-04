@@ -7,6 +7,7 @@
   "form_place": "जन्म स्थान",
   "form_error_invalid_date": "यह तारीख मौजूद नहीं है। कृपया दिन और महीना जाँचें।",
   "form_error_future_date": "जन्म तिथि भविष्य की नहीं हो सकती।",
+  "form_error_pick_place": "कृपया सूची से अपना जन्म स्थान चुनें।",
   "form_time_accuracy_label": "आप जन्म समय के बारे में कितने आश्वस्त हैं?",
   "form_submit": "कुंडली बनाएं",
   "tab_birth_chart": "जन्म कुंडली",

@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
 import VerifiedContactField from '../components/auth/VerifiedContactField'
 import AvatarUpload from '../components/auth/AvatarUpload'
+import PlaceCombobox from '../components/PlaceCombobox'
 import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile, deleteProfile, createProfile, UNKNOWN_BIRTH_TIME_DEFAULT } from '../services/astrologyProfiles'
 import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
@@ -62,7 +63,6 @@ export default function Profile() {
   const [astroSaving, setAstroSaving] = useState(false)
   const [astroError, setAstroError] = useState('')
   const [astroPlaceQuery, setAstroPlaceQuery] = useState('')
-  const [showAstroPlaceSuggestions, setShowAstroPlaceSuggestions] = useState(false)
   const astroPlaceSuggestions = usePlaceSuggestions(astroPlaceQuery)
   const [astroLocationStatus, setAstroLocationStatus] = useState('idle') // idle | requesting | denied
   const [astroManualLocationQuery, setAstroManualLocationQuery] = useState('')
@@ -322,26 +322,17 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="relative">
-                  <label className={labelCls}>{t('profile_astro_birth_place')}</label>
-                  <input
-                    type="text"
-                    value={astroForm.place}
-                    onChange={e => { setAstroForm(f => ({ ...f, place: e.target.value })); setAstroPlaceQuery(e.target.value); setShowAstroPlaceSuggestions(true) }}
-                    onBlur={() => setTimeout(() => setShowAstroPlaceSuggestions(false), 200)}
-                    className={inputCls}
+                <div>
+                  <label htmlFor="profile-birth-place" className={labelCls}>{t('profile_astro_birth_place')}</label>
+                  <PlaceCombobox
+                    id="profile-birth-place"
                     required
+                    value={astroForm.place}
+                    items={astroPlaceSuggestions}
+                    className={inputCls}
+                    onInputChange={text => { setAstroForm(f => ({ ...f, place: text })); setAstroPlaceQuery(text) }}
+                    onSelect={item => setAstroForm(f => ({ ...f, place: item }))}
                   />
-                  {showAstroPlaceSuggestions && astroPlaceSuggestions.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto text-left">
-                      {astroPlaceSuggestions.map((s, i) => (
-                        <li key={i} onMouseDown={() => { setAstroForm(f => ({ ...f, place: s })); setShowAstroPlaceSuggestions(false) }}
-                            className="px-4 py-2.5 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
 
                 <div>
@@ -369,24 +360,18 @@ export default function Profile() {
                     >
                       {astroLocationStatus === 'requesting' ? t('profile_current_location_requesting') : t('profile_current_location_use_gps')}
                     </button>
-                    <div className="relative flex-1 min-w-[180px]">
-                      <input
-                        type="text"
+                    <div className="flex-1 min-w-[180px]">
+                      <PlaceCombobox
+                        id="profile-current-location"
                         value={astroManualLocationQuery}
-                        onChange={e => setAstroManualLocationQuery(e.target.value)}
+                        items={astroManualLocationMatches}
+                        getLabel={m => m.display_name}
                         placeholder={t('profile_current_location_search_placeholder')}
                         className={inputCls}
+                        inputProps={{ 'aria-label': t('profile_current_location_search_placeholder') }}
+                        onInputChange={setAstroManualLocationQuery}
+                        onSelect={chooseManualLocationForAstro}
                       />
-                      {astroManualLocationMatches.length > 0 && (
-                        <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto text-left">
-                          {astroManualLocationMatches.map((m, i) => (
-                            <li key={i} onMouseDown={() => chooseManualLocationForAstro(m)}
-                                className="px-4 py-2.5 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
-                              {m.display_name}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
                     </div>
                   </div>
                   {astroLocationStatus === 'denied' && (

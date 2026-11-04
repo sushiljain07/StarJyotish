@@ -5,6 +5,7 @@ import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { isValidBirthDate } from '../utils/birthDate'
 import { UNKNOWN_BIRTH_TIME_DEFAULT } from '../services/astrologyProfiles'
 import BirthTimeSelector from './onboarding/BirthTimeSelector'
+import PlaceCombobox from './PlaceCombobox'
 import { Button } from './ui'
 
 const MONTHS = [
@@ -35,8 +36,11 @@ export default function BirthForm({ onSubmit, loading }) {
   const [accuracy, setAccuracy] = useState('exact')
   const [time, setTime] = useState({ hour: '', minute: '', ampm: '' })
 
-  const [place,   setPlace]   = useState('')
-  const [showSug, setShowSug] = useState(false)
+  const [place, setPlace] = useState('')
+  // True once a suggestion is picked; typing again clears it. A pick is
+  // required only while suggestions are on offer: with none (service down
+  // or a rare town) free text is fine, the backend geocodes it.
+  const [placePicked, setPlacePicked] = useState(false)
   const suggestions = usePlaceSuggestions(place)
 
   const [error, setError] = useState('')
@@ -47,6 +51,10 @@ export default function BirthForm({ onSubmit, loading }) {
     const needsTime = accuracy !== 'unknown'
     if (!day || !month || !year || !place) return
     if (needsTime && (!time.hour || !time.minute || !time.ampm)) return
+    if (!placePicked && suggestions.length > 0) {
+      setError(t('form_error_pick_place'))
+      return
+    }
 
     const y = Number(year), m = Number(month), d = Number(day)
     if (!isValidBirthDate(y, m, d)) {
@@ -118,27 +126,20 @@ export default function BirthForm({ onSubmit, loading }) {
       </fieldset>
 
       {/* ── Place ── */}
-      <div className="relative">
+      <div>
         <label htmlFor={`${ids}-place`} className={labelCls}>
           {t('form_place')}
         </label>
-        <input
+        <PlaceCombobox
           id={`${ids}-place`}
-          type="text" required value={place} placeholder="e.g. New Delhi, India"
-          onChange={e => { setPlace(e.target.value); setShowSug(true) }}
-          onBlur={() => setTimeout(() => setShowSug(false), 200)}
+          required
+          value={place}
+          items={suggestions}
+          placeholder="e.g. New Delhi, India"
           className={inputCls}
+          onInputChange={text => { setPlace(text); setPlacePicked(false) }}
+          onSelect={item => { setPlace(item); setPlacePicked(true) }}
         />
-        {showSug && suggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
-            {suggestions.map((s, i) => (
-              <li key={i} onMouseDown={() => { setPlace(s); setShowSug(false) }}
-                className="px-3 py-2 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
-                {s}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       {error && <p role="alert" className="text-sm text-vermillion">{error}</p>}

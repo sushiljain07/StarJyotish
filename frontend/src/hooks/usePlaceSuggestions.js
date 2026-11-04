@@ -14,16 +14,19 @@ export function usePlaceSuggestions(query) {
 
   useEffect(() => {
     if (query.length < 3) { setSuggestions([]); return }
+    // Set by the cleanup when the query changes, so a slow reply for an
+    // older query can't overwrite the suggestions for the newer one.
+    let cancelled = false
     clearTimeout(timer.current)
     timer.current = setTimeout(async () => {
       try {
         const results = await fetchPlaceSuggestions(query)
-        setSuggestions(results)
+        if (!cancelled) setSuggestions(results)
       } catch {
-        setSuggestions([])
+        if (!cancelled) setSuggestions([])
       }
     }, 400)
-    return () => clearTimeout(timer.current)
+    return () => { cancelled = true; clearTimeout(timer.current) }
   }, [query])
 
   return suggestions

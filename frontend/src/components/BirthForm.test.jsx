@@ -54,4 +54,13 @@ describe('BirthForm', () => {
     submit()
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ time: '19:05', timeAccuracy: 'exact' }))
   })
+  it('asks to pick a place when suggestions are showing', () => {
+    suggestions = ['Delhi, India']
+    fireEvent.change(screen.getByLabelText(en.form_place), { target: { value: 'Delh' } })
+    fillDate('16', '8', '1990')
+    fireEvent.click(screen.getByRole('button', { name: en.onboarding_time_unknown }))
+    submit()
+    expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_pick_place)
+    expect(spy).not.toHaveBeenCalled()
+  })
 })

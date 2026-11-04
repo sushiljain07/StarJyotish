@@ -14,6 +14,7 @@ import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
+import ReadingTeaser from '../components/ReadingTeaser'
 
 const KPChart             = lazy(() => import('../components/KPChart'))
 const DivisionalCharts    = lazy(() => import('../components/DivisionalCharts'))
@@ -244,6 +245,7 @@ export default function Result() {
         <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
 
           <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
+            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state })} />
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />

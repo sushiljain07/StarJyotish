@@ -1,4 +1,5 @@
 import { API_BASE } from './config'
+import { errorFromResponse } from './errors'
 
 async function postJson(path, body) {
   const resp = await fetch(`${API_BASE}${path}`, {
@@ -119,11 +120,6 @@ export async function askKundli(payload, token = null) {
     },
     body: JSON.stringify(payload),
   })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}))
-    const e = new Error(err.detail ?? 'Server error')
-    e.status = resp.status
-    throw e
-  }
+  if (!resp.ok) throw await errorFromResponse(resp, 'Server error')
   return resp.json()
 }

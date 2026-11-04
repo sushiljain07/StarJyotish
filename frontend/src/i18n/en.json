@@ -815,6 +815,7 @@
   "career_loading_step4": "Analysing career yogas…",
   "career_loading_step5": "Generating AI report…",
   "career_report_error_generic": "Career analysis failed. Please try again.",
+  "ai_unavailable": "Our AI astrologer is busy right now. Please try again in a minute.",
   "error_something_wrong": "Something went wrong. Please try again.",
   "status_current_time": "Current time",
   "status_favorable": "Favorable",

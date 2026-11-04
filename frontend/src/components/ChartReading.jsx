@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import { Button } from './ui'
+import { errorFromResponse } from '../api/errors'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -71,8 +72,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
         body: JSON.stringify({ ...input, language: lang }),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || 'Error generating prediction')
+        throw await errorFromResponse(res, 'Error generating prediction')
       }
       const data = await res.json()
 

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import SegmentedToggle from './SegmentedToggle'
+import { errorFromResponse } from '../api/errors'
 
 const TOPIC_CONFIG = {
   relationship: {
@@ -260,8 +261,7 @@ export default function TopicReportTab({ topic, input }) {
         }),
       })
       if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}))
-        throw new Error(err.detail ?? t('topic_report_error_generic'))
+        throw await errorFromResponse(resp, t('topic_report_error_generic'))
       }
       setReport(await resp.json())
       setStatus('done')

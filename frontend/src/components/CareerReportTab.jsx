@@ -6,6 +6,7 @@ import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
+import { errorFromResponse } from '../api/errors'
 
 // icon/style metadata per section key — content ordering now comes from
 // SECTION_GROUPS below, grouped into the report's information architecture.
@@ -670,8 +671,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
         }),
       })
       if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}))
-        throw new Error(err.detail ?? 'Career analysis failed. Please try again.')
+        throw await errorFromResponse(resp, t('career_report_error_generic'))
       }
       setReport(await resp.json())
       setStatus('done')

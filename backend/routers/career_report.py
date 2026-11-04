@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -14,12 +15,14 @@ from services.dasha import calculate_vimshottari
 from services.transit_calc import calculate_transit
 from services.career_analysis import generate_career_report
 from services.skill_loader import load_career_skills, load_gemstone_remedy_skills
+from services.llm import AI_UNAVAILABLE_MESSAGE
 from services.rate_limit import limiter, LLM_LIMIT
 from services.persistence import save_report_if_requested
 from db.models.report import ReportType
 from db.session import get_db_optional
 
 router = APIRouter()
+logger = logging.getLogger("starjyotish.reports")
 
 # Load skill files once at module startup (cached in memory)
 _SKILLS_CONTEXT: str = load_career_skills()
@@ -67,8 +70,11 @@ def get_career_report(request: Request, body: BirthInput, db=Depends(get_db_opti
             career_concerns=body.career_concerns,
             d2_chart=d2,
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Career analysis failed: {e}")
+        logger.exception("Career analysis failed")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from e
 
     # 7. Helper to build an optional CareerSection from report data
     def _section(key: str) -> Optional[CareerSection]:

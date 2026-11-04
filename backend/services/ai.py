@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import HTTPException
 
 from services.astro_utils import get_planet_dignity
-from services.llm import LLMUnavailable, complete as llm_complete
+from services.llm import AI_UNAVAILABLE_MESSAGE, LLMUnavailable, complete as llm_complete
 
 _SKILLS_BASE = Path(__file__).parent.parent.parent / "astro-skills"
 
@@ -765,7 +765,8 @@ def _call_llm(messages: list[dict], json_mode: bool = False) -> tuple[str, str]:
     try:
         return llm_complete(messages, json_mode=json_mode, max_tokens=4096, timeout=60, log_prefix="ai")
     except LLMUnavailable as exc:
-        raise HTTPException(status_code=503, detail=f"AI unavailable — {'; '.join(exc.reasons)}")
+        logger.error("AI unavailable — %s", "; ".join(exc.reasons))
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from exc
 
 
 _PREDICTION_BANNED = [
@@ -1009,7 +1010,8 @@ def generate_reading(
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"LLM error: {exc}") from exc
+        logger.exception("LLM error")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from exc
 
     pred_sections, teasers = parse_prediction(raw)
     prediction_text = "\n\n".join(pred_sections.values())
@@ -1312,4 +1314,5 @@ def ask_chart(
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"LLM error: {exc}") from exc
+        logger.exception("LLM error")
+        raise HTTPException(status_code=503, detail=AI_UNAVAILABLE_MESSAGE) from exc

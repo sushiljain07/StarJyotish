@@ -19,6 +19,7 @@ import ProgressIndicator from '../components/onboarding/ProgressIndicator'
 import QuestionCard from '../components/onboarding/QuestionCard'
 import BirthTimeSelector from '../components/onboarding/BirthTimeSelector'
 import PlaceCombobox from '../components/PlaceCombobox'
+import { loadLastChart } from '../services/lastChart'
 import ReviewCard from '../components/onboarding/ReviewCard'
 import LoadingState from '../components/onboarding/LoadingState'
 import CompletionCelebration from '../components/onboarding/CompletionCelebration'
@@ -51,6 +52,16 @@ const YEARS = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYe
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1)
 
 const bigSelCls = 'flex-1 border border-line rounded-xl px-3 py-3 bg-parchment text-ink text-base text-center focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer'
+
+// '19:05' → { hour: '07', minute: '05', ampm: 'PM' }, the shape the time
+// selects use.
+function from24Hour(time) {
+  const [h, minute] = time.split(':')
+  const h24 = parseInt(h, 10)
+  const ampm = h24 >= 12 ? 'PM' : 'AM'
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12
+  return { hour: String(h12).padStart(2, '0'), minute, ampm }
+}
 
 function to24Hour(hour, ampm) {
   let h = parseInt(hour, 10)
@@ -107,6 +118,25 @@ export default function Onboarding() {
 
   function update(patch) {
     setDraft(d => ({ ...d, ...patch }))
+  }
+
+  // A chart made just before signing up (see services/lastChart.js) can
+  // fill in this profile, so the user doesn't type it all again. Offered,
+  // not assumed: people also make charts for someone else.
+  const lastInput = loadLastChart()?.input
+  const canUseLast = Boolean(lastInput?.date && lastInput?.place && lastInput?.time)
+
+  function applyLastChart() {
+    const [year, month, day] = lastInput.date.split('-')
+    const accuracy = lastInput.timeAccuracy ?? 'exact'
+    update({
+      year, month: String(Number(month)), day: String(Number(day)),
+      birthDate: lastInput.date,
+      birthTimeAccuracy: accuracy,
+      ...(accuracy === 'unknown' ? {} : from24Hour(lastInput.time)),
+      place: lastInput.place,
+    })
+    setStep('review')
   }
 
   function skip() {
@@ -211,13 +241,30 @@ export default function Onboarding() {
       >
         {showProgress && <ProgressIndicator current={questionIndex} total={QUESTION_STEPS.length} />}
 
-        {step === 'welcome' && (
+        {step === 'welcome' && !canUseLast && (
           <QuestionCard
             title={t('onboarding_welcome_title')}
             helperText={t('onboarding_welcome_body')}
             primaryLabel={t('onboarding_welcome_cta')}
             onPrimary={() => setStep('birthDate')}
           />
+        )}
+
+        {step === 'welcome' && canUseLast && (
+          <QuestionCard
+            title={t('onboarding_use_last_heading')}
+            helperText={[lastInput.name, lastInput.date, lastInput.place].filter(Boolean).join(' · ')}
+            primaryLabel={t('onboarding_use_last_yes')}
+            onPrimary={applyLastChart}
+          >
+            <button
+              type="button"
+              onClick={() => setStep('birthDate')}
+              className="w-full min-h-[44px] text-sm font-medium text-primary-dark hover:underline"
+            >
+              {t('onboarding_use_last_no')}
+            </button>
+          </QuestionCard>
         )}
 
         {step === 'birthDate' && (

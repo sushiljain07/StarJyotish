@@ -25,10 +25,10 @@ vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Insights from './Insights'
 
-function renderInsights(topic) {
+function renderInsights(topic, search = '') {
   const input = { date: '1990-01-01', time: '12:00', place: 'Delhi', topic }
   return render(
-    <MemoryRouter initialEntries={[{ pathname: '/insights', state: { input } }]}>
+    <MemoryRouter initialEntries={[{ pathname: '/insights', search, state: { input } }]}>
       <Routes><Route path="/insights" element={<Insights />} /></Routes>
     </MemoryRouter>,
   )
@@ -59,5 +59,22 @@ describe('Insights career report mounting', () => {
     fireEvent.click(screen.getByRole('button', { name: /reading/i }))
     fireEvent.click(screen.getByRole('button', { name: 'Career' }))
     expect(mounts.CareerReportTab).toBe(1)
+  })
+  it('opens the sub-tab named in the URL (and counts it as opened)', async () => {
+    renderInsights('career', '?sub=career')
+    expect(await screen.findByText('CAREER')).toBeInTheDocument()
+    expect(mounts.CareerReportTab).toBe(1)
+  })
+
+  it('takes the topic from the URL', async () => {
+    renderInsights(undefined, '?topic=career&sub=career')
+    expect(await screen.findByText('CAREER')).toBeInTheDocument()
+  })
+
+  it('falls back to Reading for a sub-tab the topic does not offer', async () => {
+    renderInsights('career', '?sub=finance')
+    expect(await screen.findByText('READING')).toBeInTheDocument()
+    expect(screen.getByText('READING').closest('.hidden')).toBeNull()
+    expect(mounts.TopicReportTab ?? 0).toBe(0)
   })
 })

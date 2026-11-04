@@ -91,7 +91,43 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
    - Native review of the wording the implementers flagged: legend words, nakshatra, sign and planet short forms, Sarvatobhadra corners, अमात्यकारक, तालमेल, रोडमैप, राज योग vs राजयोग, house ordinals (1ला/4था), Panchang yoga and masa spellings, Rajyoga phrasing ("भाग्य और करियर का भाग्य", "नीचता भंग हुई"), and the masculine "कर रहा हूँ" in `career_scenario_prompt`.
 3. **Backend `career_alignment.explanation` in Hindi**, through `services/i18n.text`, with English byte-identical.
 4. **Real-browser check** (Task 10): `kundli_lang=hi` at 390px and 1440px across /generate, /kundli (all tabs), /insights, /panchang, /pricing and /terms; a Latin-word count; Devanagari font in use; screenshots.
-5. **Deferred minors** from the Phase 3 task reviews (in the PR description).
+5. **Deferred minors** from the Phase 3 task and final reviews. Triage each one:
+   - SUPPORTED_LANGS computed once at import, so a runtime-registered language is rejected by readSavedLang
+   - thin unit tests for localeFor/scriptFor/registerLanguage replace semantics
+   - mid-file 'from services.i18n import' placement in career/health/wealth analysis
+   - Hindi ordinal is '{n}वें' for all n (brief-mandated)
+   - English date locale moved en-GB → en-IN via registry (DailyPatrikaHero); no test covers DailyPatrikaHero (Task 7's journey test will)
+   - AccountMenu switcher row role=menuitem wraps interactive buttons (use role=none/group)
+   - LanguageSwitcher doesn't catch a synchronous throw from updateMyProfile; no rejecting-path test
+   - Profile <option>s lack lang attribute; extra 'tone' prop beyond brief
+   - Tiro Devanagari Hindi has only weight 400 — Hindi serif bold is synthesized (visual QA)
+   - body line-height rule only partly effective under Tailwind leading/text utilities; text-2xs/3xs/leading-none rules untested
+   - astroNames parity test imports ../../../backend via ?raw — breaks if frontend is tested without backend/
+   - planetAbbr fallback for unknown names is 2 Latin letters (pre-existing behaviour)
+   - Hindi legend words (वक्री, अस्त, उच्च, नीच, वर्गोत्तम) to verify in Task 9 glossary
+   - chartLagna.test English assertion /12.{0,2}La/ is loose
+   - SarvatobhadraChakra.jsx:119 unused fullName field (falls back to Latin 'Abhijit')
+   - hi chart_sarvato_corner_Saturn 'शनि\n(शनि)' redundant
+   - KPKP allow-list workaround — expectNoEnglish should join text nodes with spaces
+   - Hindi prose/abbreviations (nak/sign/planet short forms, Sarvatobhadra corners/vowels) need native review (Task 9 / owner)
+   - test_yoga_i18n ids subset check only covers the last chart (ids overwritten per loop)
+   - render_yoga mutates its input entry
+   - no vitest for RajyogasTab language-follow effect
+   - Hindi phrasing 'भाग्य और करियर का भाग्य' (yoga_text.py:784) and 'नीचता भंग हुई' (:834) — native review
+   - mislabelled 'context form with a stage and concern picked' test
+   - career_scenario_prompt uses masculine 'कर रहा हूँ'; native review
+   - paywall copy says 19 yogas (there are 20); PaywallCard alert() English (Phase 4)
+   - wording review — अमात्यकारक, तालमेल, रोडमैप, 'राज योग' vs 'राजयोग'
+   - Insights sub-tab labels intentionally diverge from landing_topic_*_label — note in release notes
+   - LocationSection 'Birth place' → 'birth place' capitalisation (unused component)
+   - KnowledgeCapsule teasers stay English on Hindi PersonalHome (articles English-only) — Phase 3B/content phase
+   - pre-existing '1th/2th/3th house' English in patrika_why_house
+   - test allow-list extras (AM|PM regex, 'Star JyotishAI') — remove once Task 8 (3B) hardens expectNoEnglish
+   - MONTH_KEYS duplicated inline in localizeBackendDate; no test for dailyInsights coming-up date path
+   - eager loading of all locales (+~47 KB gzip for English users)
+   - yoga_text._mahapurusha hardcodes a 2-language tuple; Profile.jsx '|| en' should use DEFAULT_LANGUAGE
+   - leftover English — PaywallCard alert (Phase 4), Disclaimer plain-language box, backend N/A/? placeholders in career evidence
+   - savedLanguageChoice storage-blocked path untested; check_all_yogas computed twice per reading/career request; Hindi fixture covers one chart
 
 ---
 

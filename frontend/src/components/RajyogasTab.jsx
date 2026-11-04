@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { currentLanguage } from '../i18n/languages'
 import { chartBody, fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import { hasPremiumAccess } from '../config/entitlements'
@@ -331,14 +333,29 @@ const YOGA_DETAILS = {
   },
 }
 
-function getInfo(yogaName) {
+// The backend names yogas in the active language, so icons and details are
+// looked up by its stable id (the English name is the key into the tables).
+const YOGA_ID_TO_KEY = {
+  raja_yoga: 'Raja Yoga', dharma_karma: 'Dharma-Karma Adhipati Yoga',
+  budha_aditya: 'Budha-Aditya Yoga', gaja_kesari: 'Gaja-Kesari Yoga',
+  hamsa: 'Hamsa Yoga', malavya: 'Malavya Yoga', sasa: 'Sasa Yoga',
+  bhadra: 'Bhadra Yoga', ruchaka: 'Ruchaka Yoga', amala: 'Amala Yoga',
+  adhi: 'Adhi Yoga', dhana: 'Dhana Yoga', kendra_trikona: 'Kendra-Trikona Rajyoga',
+  yogakaraka: 'Yogakaraka Planet', neecha_bhanga: 'Neecha Bhanga Rajyoga',
+  vipareeta: 'Vipareeta Rajyoga', kahala: 'Kahala Yoga', lakshmi: 'Lakshmi Yoga',
+  saraswati: 'Saraswati Yoga', chamara: 'Chamara Yoga',
+}
+
+function getInfo(yoga) {
+  const yogaName = YOGA_ID_TO_KEY[yoga.id] ?? yoga.yoga
   for (const [key, info] of Object.entries(YOGA_DETAILS)) {
     if (yogaName.startsWith(key)) return info
   }
   return null
 }
 
-function getIcon(yogaName) {
+function getIcon(yoga) {
+  const yogaName = YOGA_ID_TO_KEY[yoga.id] ?? yoga.yoga
   for (const [key, icon] of Object.entries(YOGA_ICONS)) {
     if (yogaName.startsWith(key)) return icon
   }
@@ -347,8 +364,8 @@ function getIcon(yogaName) {
 
 function YogaCard({ yoga, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen ?? false)
-  const icon = getIcon(yoga.yoga)
-  const info = getInfo(yoga.yoga)
+  const icon = getIcon(yoga)
+  const info = getInfo(yoga)
 
   const isPresent = yoga.present
 
@@ -434,6 +451,8 @@ function YogaCard({ yoga, defaultOpen }) {
 }
 
 export default function RajyogasTab({ input }) {
+  useTranslation() // re-render when the language changes
+  const lang = currentLanguage()
   const [status, setStatus]     = useState('idle')
   const beginRequest = useLatestRequest()
   const [result, setResult]     = useState(null)
@@ -446,6 +465,15 @@ export default function RajyogasTab({ input }) {
   useEffect(() => {
     if (hasPremiumAccess()) load()
   }, [])
+
+  // A loaded (or loading) result follows the language toggle.
+  const shownLangRef = useRef(lang)
+  useEffect(() => {
+    if (shownLangRef.current === lang) return
+    shownLangRef.current = lang
+    if (hasPremiumAccess() && (status === 'done' || status === 'loading')) load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
 
   if (!hasPremiumAccess()) {
     return (
@@ -469,7 +497,7 @@ export default function RajyogasTab({ input }) {
     setStatus('loading')
     setErrorMsg('')
     try {
-      const data = await fetchReport('/api/rajyogas', chartBody(input), { fallback: 'Something went wrong. Please try again.' })
+      const data = await fetchReport('/api/rajyogas', { ...chartBody(input), language: lang }, { fallback: 'Something went wrong. Please try again.' })
       if (!isCurrent()) return
       setResult(data)
       setStatus('done')

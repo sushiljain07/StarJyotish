@@ -2,6 +2,7 @@ from datetime import date as _date
 from typing import Optional
 
 from services.ashtakavarga import calculate_ashtakavarga
+from services.yoga_text import YOGA_TEXT, render_yoga  # noqa: F401  (YOGA_TEXT re-exported)
 
 # ── Vedic Astrology Constants ─────────────────────────────────────────────────
 # Generic constants (SIGNS, SIGN_LORDS, dignity tables, dasha order) now live
@@ -317,7 +318,16 @@ def _in_trikona(h: Optional[int]) -> bool:
     return h in {1, 5, 9}
 
 
-def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
+def _yoga(yoga_id: str, state: str, present: bool, language: str, **params) -> dict:
+    """One yoga result. "yoga"/"description" are rendered from YOGA_TEXT in
+    `language`; "id", "state" and "params" are the language-neutral facts."""
+    return render_yoga(
+        {"id": yoga_id, "state": state, "present": present, "params": params},
+        language,
+    )
+
+
+def check_special_combinations(planets: list, lagna_sign_idx: int, language: str = "en") -> list:
     """Check 12 classical career yogas and return presence/description for each."""
 
     _house_of, _sign_of = _planet_lookups(planets)
@@ -329,53 +339,30 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
     lord_10 = _house_lord(lagna_sign_idx, 10)
     h9, h10 = _house_of(lord_9), _house_of(lord_10)
     if h9 and h10 and h9 == h10:
-        results.append({
-            "yoga": "Raja Yoga",
-            "present": True,
-            "description": (f"9th lord ({lord_9}) and 10th lord ({lord_10}) conjunct "
-                            f"in house {h9} — powerful status and career elevation."),
-        })
+        results.append(_yoga("raja_yoga", "present", True, language,
+                             lord_9=lord_9, lord_10=lord_10, house=h9))
     else:
-        results.append({
-            "yoga": "Raja Yoga",
-            "present": False,
-            "description": f"9th lord ({lord_9}) and 10th lord ({lord_10}) are not conjunct.",
-        })
+        results.append(_yoga("raja_yoga", "absent", False, language,
+                             lord_9=lord_9, lord_10=lord_10))
 
     # 2. Dharma-Karma Adhipati Yoga — 9th/10th lords exchange signs
     sign_9  = _house_sign(lagna_sign_idx, 9)
     sign_10 = _house_sign(lagna_sign_idx, 10)
     p9_sign, p10_sign = _sign_of(lord_9), _sign_of(lord_10)
     if p9_sign == sign_10 and p10_sign == sign_9:
-        results.append({
-            "yoga": "Dharma-Karma Adhipati Yoga",
-            "present": True,
-            "description": (f"{lord_9} (9th lord) and {lord_10} (10th lord) exchange signs "
-                            "— fortune and career destiny are intertwined."),
-        })
+        results.append(_yoga("dharma_karma", "present", True, language,
+                             lord_9=lord_9, lord_10=lord_10))
     else:
-        results.append({
-            "yoga": "Dharma-Karma Adhipati Yoga",
-            "present": False,
-            "description": f"No sign exchange between 9th lord ({lord_9}) and 10th lord ({lord_10}).",
-        })
+        results.append(_yoga("dharma_karma", "absent", False, language,
+                             lord_9=lord_9, lord_10=lord_10))
 
     # 3. Budha-Aditya Yoga — Sun and Mercury conjunct
     sun  = _planet_by_name(planets, "Sun")
     merc = _planet_by_name(planets, "Mercury")
     if sun and merc and sun.get("house") == merc.get("house"):
-        results.append({
-            "yoga": "Budha-Aditya Yoga",
-            "present": True,
-            "description": (f"Sun and Mercury conjunct in house {sun['house']} "
-                            "— sharp intellect and strong communication in career."),
-        })
+        results.append(_yoga("budha_aditya", "present", True, language, house=sun["house"]))
     else:
-        results.append({
-            "yoga": "Budha-Aditya Yoga",
-            "present": False,
-            "description": "Sun and Mercury are not conjunct.",
-        })
+        results.append(_yoga("budha_aditya", "absent", False, language))
 
     # 4. Gaja-Kesari Yoga — Jupiter in kendra from Moon
     moon = _planet_by_name(planets, "Moon")
@@ -383,49 +370,32 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
     if moon and jup:
         angular_diff = (jup["house"] - moon["house"]) % 12
         if angular_diff in {0, 3, 6, 9}:
-            results.append({
-                "yoga": "Gaja-Kesari Yoga",
-                "present": True,
-                "description": "Jupiter in kendra from Moon — wisdom, reputation, and career prosperity.",
-            })
+            results.append(_yoga("gaja_kesari", "present", True, language))
         else:
-            results.append({
-                "yoga": "Gaja-Kesari Yoga",
-                "present": False,
-                "description": "Jupiter is not in kendra from Moon.",
-            })
+            results.append(_yoga("gaja_kesari", "absent", False, language))
     else:
-        results.append({"yoga": "Gaja-Kesari Yoga", "present": False,
-                        "description": "Moon or Jupiter not found in chart."})
+        results.append(_yoga("gaja_kesari", "missing", False, language))
 
     # 5–9. Pancha Mahapurusha Yogas — planet in kendra in own/exalted sign
     mahapurusha = [
-        ("Hamsa Yoga",   "Jupiter", "wisdom, nobility, and elevated status"),
-        ("Malavya Yoga", "Venus",   "charm, artistry, and material prosperity"),
-        ("Sasa Yoga",    "Saturn",  "discipline and leadership in large institutions"),
-        ("Bhadra Yoga",  "Mercury", "intellectual brilliance and analytical career"),
-        ("Ruchaka Yoga", "Mars",    "courage, executive authority, and leadership"),
+        ("hamsa",   "Jupiter"),
+        ("malavya", "Venus"),
+        ("sasa",    "Saturn"),
+        ("bhadra",  "Mercury"),
+        ("ruchaka", "Mars"),
     ]
-    for yoga_name, planet_name, quality in mahapurusha:
+    for yoga_id, planet_name in mahapurusha:
         p = _planet_by_name(planets, planet_name)
         if p:
             dignity = get_planet_dignity(planet_name, p["sign_index"])
             if _in_kendra(p.get("house")) and dignity in {"own", "exalted"}:
-                results.append({
-                    "yoga": f"{yoga_name} (Pancha Mahapurusha)",
-                    "present": True,
-                    "description": (f"{planet_name} in {p['sign']} (H{p['house']}, {dignity}) "
-                                    f"— {quality}."),
-                })
+                results.append(_yoga(yoga_id, "present", True, language, planet=planet_name,
+                                     sign=p["sign"], house=p["house"], dignity=dignity))
             else:
-                results.append({
-                    "yoga": yoga_name,
-                    "present": False,
-                    "description": f"{planet_name} in H{p.get('house', '?')} ({dignity}) — yoga not formed.",
-                })
+                results.append(_yoga(yoga_id, "absent", False, language, planet=planet_name,
+                                     house=p.get("house", "?"), dignity=dignity))
         else:
-            results.append({"yoga": yoga_name, "present": False,
-                            "description": f"{planet_name} not found in chart."})
+            results.append(_yoga(yoga_id, "missing", False, language, planet=planet_name))
 
     # 10. Amala Yoga — natural benefic in 10th house from lagna
     benefics_10th = [
@@ -433,18 +403,9 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
         if p.get("house") == 10 and p["name"] in {"Jupiter", "Venus", "Mercury", "Moon"}
     ]
     if benefics_10th:
-        results.append({
-            "yoga": "Amala Yoga",
-            "present": True,
-            "description": (f"{', '.join(benefics_10th)} in 10th house "
-                            "— pure and untarnished career reputation."),
-        })
+        results.append(_yoga("amala", "present", True, language, planets=benefics_10th))
     else:
-        results.append({
-            "yoga": "Amala Yoga",
-            "present": False,
-            "description": "No natural benefic placed in 10th house.",
-        })
+        results.append(_yoga("amala", "absent", False, language))
 
     # 11. Adhi Yoga — Mercury, Venus, Jupiter in 6th/7th/8th from Moon
     if moon:
@@ -455,21 +416,11 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
             if (p := _planet_by_name(planets, name)) and p.get("house") in adhi_houses
         ]
         if len(found_adhi) >= 2:
-            results.append({
-                "yoga": "Adhi Yoga",
-                "present": True,
-                "description": (f"{', '.join(found_adhi)} in 6th/7th/8th from Moon "
-                                "— high administrative position and leadership."),
-            })
+            results.append(_yoga("adhi", "present", True, language, planets=found_adhi))
         else:
-            results.append({
-                "yoga": "Adhi Yoga",
-                "present": False,
-                "description": "Need at least 2 of Mercury/Venus/Jupiter in 6th–8th from Moon.",
-            })
+            results.append(_yoga("adhi", "absent", False, language))
     else:
-        results.append({"yoga": "Adhi Yoga", "present": False,
-                        "description": "Moon not found in chart."})
+        results.append(_yoga("adhi", "missing", False, language))
 
     # 12. Dhana Yoga — 2nd and 11th lords strong
     lord_2  = _house_lord(lagna_sign_idx, 2)
@@ -478,27 +429,13 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
     p11 = _planet_by_name(planets, lord_11)
     d2  = get_planet_dignity(lord_2,  p2["sign_index"])  if p2  else "unknown"
     d11 = get_planet_dignity(lord_11, p11["sign_index"]) if p11 else "unknown"
+    dhana = dict(lord_2=lord_2, dignity_2=d2, lord_11=lord_11, dignity_11=d11)
     if d2 in {"exalted", "own"} and d11 in {"exalted", "own", "friendly"}:
-        results.append({
-            "yoga": "Dhana Yoga",
-            "present": True,
-            "description": (f"2nd lord ({lord_2}, {d2}) and 11th lord ({lord_11}, {d11}) "
-                            "are strong — significant financial gains through career."),
-        })
+        results.append(_yoga("dhana", "present", True, language, **dhana))
     elif d2 in {"exalted", "own"} or d11 in {"exalted", "own"}:
-        results.append({
-            "yoga": "Dhana Yoga (Partial)",
-            "present": True,
-            "description": (f"2nd lord ({lord_2}, {d2}) or 11th lord ({lord_11}, {d11}) "
-                            "is strong — good but not exceptional wealth from career."),
-        })
+        results.append(_yoga("dhana", "partial", True, language, **dhana))
     else:
-        results.append({
-            "yoga": "Dhana Yoga",
-            "present": False,
-            "description": (f"2nd lord ({lord_2}, {d2}) and 11th lord ({lord_11}, {d11}) "
-                            "need strengthening for significant wealth yoga."),
-        })
+        results.append(_yoga("dhana", "absent", False, language, **dhana))
 
     return results  # exactly 12 entries
 
@@ -510,7 +447,7 @@ def check_special_combinations(planets: list, lagna_sign_idx: int) -> list:
 # the Rajyogas tab saw these 7 extra ones too, so the two tabs could report
 # different yoga counts for the same chart.
 
-def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
+def check_extra_yogas(planets: list, lagna_sign_idx: int, language: str = "en") -> list:
     """Check additional classical Rajyogas beyond the check_special_combinations set."""
 
     _house_of, _sign_of = _planet_lookups(planets)
@@ -530,21 +467,12 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
             kl_h = _house_of(kl)
             tl_h = _house_of(tl)
             if kl_h and tl_h and kl_h == tl_h:
-                found_kt.append(
-                    f"{kl} (lord of H{kh}) + {tl} (lord of H{th}) conjunct in H{kl_h}"
-                )
+                found_kt.append({"lord_kendra": kl, "house_kendra": kh,
+                                 "lord_trikona": tl, "house_trikona": th, "house": kl_h})
     if found_kt:
-        results.append({
-            "yoga": "Kendra-Trikona Rajyoga",
-            "present": True,
-            "description": "; ".join(found_kt) + " — highest-grade Rajyoga for power and status.",
-        })
+        results.append(_yoga("kendra_trikona", "present", True, language, items=found_kt))
     else:
-        results.append({
-            "yoga": "Kendra-Trikona Rajyoga",
-            "present": False,
-            "description": "No kendra lord conjunct a trikona lord in the chart.",
-        })
+        results.append(_yoga("kendra_trikona", "absent", False, language))
 
     # ── Yogakaraka Planet ───────────────────────────────────────────────────────
     yk_found = []
@@ -555,21 +483,12 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
             p = _planet_by_name(planets, planet_name)
             if p:
                 dignity = get_planet_dignity(planet_name, p["sign_index"])
-                yk_found.append(
-                    f"{planet_name} in {p['sign']} (H{p['house']}, {dignity})"
-                )
+                yk_found.append({"planet": planet_name, "sign": p["sign"],
+                                 "house": p["house"], "dignity": dignity})
     if yk_found:
-        results.append({
-            "yoga": "Yogakaraka Planet",
-            "present": True,
-            "description": ", ".join(yk_found) + " — single planet rules both a kendra and a trikona, bestowing kingship.",
-        })
+        results.append(_yoga("yogakaraka", "present", True, language, items=yk_found))
     else:
-        results.append({
-            "yoga": "Yogakaraka Planet",
-            "present": False,
-            "description": "No planet simultaneously rules a kendra and a trikona for this lagna.",
-        })
+        results.append(_yoga("yogakaraka", "absent", False, language))
 
     # ── Neecha Bhanga Rajyoga ───────────────────────────────────────────────────
     nb_found = []
@@ -587,35 +506,23 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
         # Condition 1: lord of debilitation sign in kendra from lagna
         dsl_planet = _planet_by_name(planets, deb_sign_lord)
         if dsl_planet and _in_kendra(dsl_planet.get("house")):
-            nb_found.append(
-                f"{planet_name} debilitated but {deb_sign_lord} (sign lord) in kendra H{dsl_planet['house']}"
-            )
+            nb_found.append({"kind": "sign_lord", "planet": planet_name,
+                             "lord": deb_sign_lord, "house": dsl_planet["house"]})
             continue
         # Condition 2: exaltation sign lord in kendra from lagna
         if exalt_lord:
             el_planet = _planet_by_name(planets, exalt_lord)
             if el_planet and _in_kendra(el_planet.get("house")):
-                nb_found.append(
-                    f"{planet_name} debilitated but {exalt_lord} (exaltation sign lord) in kendra H{el_planet['house']}"
-                )
+                nb_found.append({"kind": "exaltation_lord", "planet": planet_name,
+                                 "lord": exalt_lord, "house": el_planet["house"]})
                 continue
         # Condition 3: debilitated planet itself in kendra
         if _in_kendra(p.get("house")):
-            nb_found.append(
-                f"{planet_name} debilitated in kendra (H{p['house']}) — self-cancellation"
-            )
+            nb_found.append({"kind": "self", "planet": planet_name, "house": p["house"]})
     if nb_found:
-        results.append({
-            "yoga": "Neecha Bhanga Rajyoga",
-            "present": True,
-            "description": "; ".join(nb_found) + " — debilitation cancelled, turning weakness into extraordinary strength.",
-        })
+        results.append(_yoga("neecha_bhanga", "present", True, language, items=nb_found))
     else:
-        results.append({
-            "yoga": "Neecha Bhanga Rajyoga",
-            "present": False,
-            "description": "No debilitated planet with sufficient cancellation factors found.",
-        })
+        results.append(_yoga("neecha_bhanga", "absent", False, language))
 
     # ── Vipareeta Rajyoga ───────────────────────────────────────────────────────
     dusthana_lords = {
@@ -628,19 +535,11 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
     for own_house, lord_name in dusthana_lords.items():
         lord_h = _house_of(lord_name)
         if lord_h and lord_h in (dusthanas - {own_house}):
-            vr_found.append(f"{lord_name} (lord of H{own_house}) placed in H{lord_h}")
+            vr_found.append({"lord": lord_name, "house_own": own_house, "house": lord_h})
     if vr_found:
-        results.append({
-            "yoga": "Vipareeta Rajyoga",
-            "present": True,
-            "description": "; ".join(vr_found) + " — dusthana lords in each other's houses transform hardship into unexpected rise.",
-        })
+        results.append(_yoga("vipareeta", "present", True, language, items=vr_found))
     else:
-        results.append({
-            "yoga": "Vipareeta Rajyoga",
-            "present": False,
-            "description": "No 6th/8th/12th lord placed in another dusthana house.",
-        })
+        results.append(_yoga("vipareeta", "absent", False, language))
 
     # ── Kahala Yoga ─────────────────────────────────────────────────────────────
     lord_4 = _house_lord(lagna_sign_idx, 4)
@@ -649,26 +548,15 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
     if lord_4 == lord_9:
         p = _planet_by_name(planets, lord_4)
         if p and (_in_kendra(p.get("house")) or _in_trikona(p.get("house"))):
-            results.append({
-                "yoga": "Kahala Yoga",
-                "present": True,
-                "description": f"{lord_4} rules both 4th and 9th houses and is in H{p['house']} — boldness, fortune, and authority.",
-            })
+            results.append(_yoga("kahala", "present", True, language,
+                                 lord_4=lord_4, house=p["house"]))
         else:
-            results.append({"yoga": "Kahala Yoga", "present": False,
-                            "description": f"4th/9th lord ({lord_4}) not in kendra or trikona."})
+            results.append(_yoga("kahala", "same_lord_weak", False, language, lord_4=lord_4))
     elif h4l and h9l and h4l == h9l:
-        results.append({
-            "yoga": "Kahala Yoga",
-            "present": True,
-            "description": f"{lord_4} (H4 lord) and {lord_9} (H9 lord) conjunct in H{h4l} — boldness, fortune, and authority.",
-        })
+        results.append(_yoga("kahala", "conjunct", True, language,
+                             lord_4=lord_4, lord_9=lord_9, house=h4l))
     else:
-        results.append({
-            "yoga": "Kahala Yoga",
-            "present": False,
-            "description": f"4th lord ({lord_4}) and 9th lord ({lord_9}) are not conjunct.",
-        })
+        results.append(_yoga("kahala", "absent", False, language, lord_4=lord_4, lord_9=lord_9))
 
     # ── Lakshmi Yoga ────────────────────────────────────────────────────────────
     lord_9_planet = _planet_by_name(planets, lord_9)
@@ -676,40 +564,23 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
         dignity_9 = get_planet_dignity(lord_9, lord_9_planet["sign_index"])
         h9_pos = lord_9_planet.get("house")
         if dignity_9 in {"exalted", "own"} and (_in_kendra(h9_pos) or _in_trikona(h9_pos)):
-            results.append({
-                "yoga": "Lakshmi Yoga",
-                "present": True,
-                "description": (f"9th lord {lord_9} in {lord_9_planet['sign']} "
-                                f"(H{h9_pos}, {dignity_9}) — immense wealth, fame, and divine grace."),
-            })
+            results.append(_yoga("lakshmi", "present", True, language, lord_9=lord_9,
+                                 sign=lord_9_planet["sign"], house=h9_pos, dignity=dignity_9))
         else:
-            results.append({
-                "yoga": "Lakshmi Yoga",
-                "present": False,
-                "description": f"9th lord ({lord_9}) needs to be in own/exalted sign in kendra or trikona.",
-            })
+            results.append(_yoga("lakshmi", "absent", False, language, lord_9=lord_9))
     else:
-        results.append({"yoga": "Lakshmi Yoga", "present": False,
-                        "description": f"9th lord ({lord_9}) not found in chart."})
+        results.append(_yoga("lakshmi", "missing", False, language, lord_9=lord_9))
 
     # ── Saraswati Yoga ──────────────────────────────────────────────────────────
     sar_found = []
     for name in ["Mercury", "Venus", "Jupiter"]:
         p = _planet_by_name(planets, name)
         if p and (_in_kendra(p.get("house")) or _in_trikona(p.get("house")) or p.get("house") == 2):
-            sar_found.append(f"{name} in H{p['house']}")
+            sar_found.append({"planet": name, "house": p["house"]})
     if len(sar_found) >= 2:
-        results.append({
-            "yoga": "Saraswati Yoga",
-            "present": True,
-            "description": ", ".join(sar_found) + " — exceptional intelligence, learning, and artistic excellence.",
-        })
+        results.append(_yoga("saraswati", "present", True, language, items=sar_found))
     else:
-        results.append({
-            "yoga": "Saraswati Yoga",
-            "present": False,
-            "description": "Need at least 2 of Mercury/Venus/Jupiter in kendra, trikona, or 2nd house.",
-        })
+        results.append(_yoga("saraswati", "absent", False, language))
 
     # ── Chamara Yoga ────────────────────────────────────────────────────────────
     jup = _planet_by_name(planets, "Jupiter")
@@ -719,37 +590,29 @@ def check_extra_yogas(planets: list, lagna_sign_idx: int) -> list:
         jup_dignity = get_planet_dignity("Jupiter", jup["sign_index"])
         ll_dignity  = get_planet_dignity(lagna_lord, lagna_lord_p["sign_index"])
         if _in_kendra(jup.get("house")) and ll_dignity in {"exalted", "own"}:
-            results.append({
-                "yoga": "Chamara Yoga",
-                "present": True,
-                "description": (f"Jupiter in kendra (H{jup['house']}) and lagna lord {lagna_lord} "
-                                f"in {lagna_lord_p['sign']} ({ll_dignity}) — royal bearing and learned fame."),
-            })
+            results.append(_yoga("chamara", "present", True, language, house=jup["house"],
+                                 lord=lagna_lord, sign=lagna_lord_p["sign"], dignity=ll_dignity))
         elif jup_dignity in {"exalted", "own"} and _in_kendra(jup.get("house")):
-            results.append({
-                "yoga": "Chamara Yoga",
-                "present": True,
-                "description": (f"Jupiter exalted/own in kendra (H{jup['house']}) "
-                                "— wisdom and kingly honors."),
-            })
+            results.append(_yoga("chamara", "exalted", True, language, house=jup["house"]))
         else:
-            results.append({"yoga": "Chamara Yoga", "present": False,
-                            "description": "Jupiter must be in kendra with lagna lord exalted/own (or Jupiter itself exalted in kendra)."})
+            results.append(_yoga("chamara", "absent", False, language))
     else:
-        results.append({"yoga": "Chamara Yoga", "present": False,
-                        "description": "Jupiter or lagna lord not found in chart."})
+        results.append(_yoga("chamara", "missing", False, language))
 
     return results
 
 
-def check_all_yogas(planets: list, lagna_sign_idx: int) -> list:
+def check_all_yogas(planets: list, lagna_sign_idx: int, language: str = "en") -> list:
     """
     Single source of truth for 'every yoga we check' — the 12 from
     check_special_combinations() plus the 7 extra classical Rajyogas from
     check_extra_yogas(). Both the Reading tab's free-prediction prompt and
     the Rajyogas tab call this, so they always see the same chart-wide list.
+    `language` only changes the rendered "yoga"/"description" text; the
+    default keeps every other caller (LLM prompts) in English.
     """
-    return check_special_combinations(planets, lagna_sign_idx) + check_extra_yogas(planets, lagna_sign_idx)
+    return (check_special_combinations(planets, lagna_sign_idx, language)
+            + check_extra_yogas(planets, lagna_sign_idx, language))
 
 
 # ── 5. D10 Analysis ───────────────────────────────────────────────────────────

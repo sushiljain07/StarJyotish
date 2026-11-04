@@ -23,11 +23,16 @@ function renderAt(path, element, { state } = {}) {
         <Route path="/admin" element={<div>ADMIN</div>} />
         <Route path="/blog" element={<div>BLOG LIST</div>} />
         <Route path="/generate" element={<StateProbe label="GENERATE" />} />
+        <Route path="/insights" element={<SearchProbe label="INSIGHTS" />} />
       </Routes>
     </MemoryRouter>,
   )
 }
 
+
+function SearchProbe({ label }) {
+  return <div>{label} {useLocation().search}</div>
+}
 
 function StateProbe({ label }) {
   return <div>{label} {JSON.stringify(useLocation().state)}</div>
@@ -72,5 +77,39 @@ describe('Login', () => {
     const { default: Login } = await import('./Login')
     renderAt('/login', <Login />, { state: { next: '/generate', topic: 'career', presetQuestion: 'When?' } })
     expect(await screen.findByText('GENERATE {"topic":"career","presetQuestion":"When?"}')).toBeInTheDocument()
+  })
+})
+
+describe('/career-report (retired page)', () => {
+  it('sends signed-out visitors to /generate for the career topic', async () => {
+    const { default: CareerReportRedirect } = await import('./CareerReportRedirect')
+    render(
+      <MemoryRouter initialEntries={['/career-report']}>
+        <Routes>
+          <Route path="/career-report" element={<CareerReportRedirect />} />
+          <Route path="/generate" element={<SearchProbe label="GENERATE" />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    expect(await screen.findByText('GENERATE ?topic=career')).toBeInTheDocument()
+  })
+
+  it('sends signed-in users to Insights › Career', async () => {
+    auth.isAuthenticated = true
+    const { default: CareerReportRedirect } = await import('./CareerReportRedirect')
+    renderAt('/career-report', <CareerReportRedirect />)
+    expect(await screen.findByText('INSIGHTS ?topic=career&sub=career')).toBeInTheDocument()
+  })
+})
+
+describe('/generate?topic=', () => {
+  it('reads the topic from the query string', async () => {
+    const { default: Home } = await import('./Home')
+    render(
+      <MemoryRouter initialEntries={['/generate?topic=career']}>
+        <Routes><Route path="/generate" element={<Home />} /></Routes>
+      </MemoryRouter>,
+    )
+    expect(await screen.findByText(/landing_topic_career_label/)).toBeInTheDocument()
   })
 })

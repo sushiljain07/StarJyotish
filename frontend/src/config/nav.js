@@ -6,8 +6,8 @@
 // desktop untranslated, mobile translated).
 //
 // isNavActive() is prefix-based with aliases, so sub-destinations keep
-// their parent tab lit: /week-ahead is part of the Home story, /ask and
-// /career-report are part of AI Guidance. Before this, /week-ahead showed
+// their parent tab lit: /week-ahead is part of the Home story, /ask is
+// part of AI Guidance. Before this, /week-ahead showed
 // NO active tab at all.
 
 export const NAV_ITEMS = [
@@ -30,7 +30,6 @@ export const PUBLIC_NAV_ITEMS = [
 const TAB_ALIASES = {
   '/week-ahead':    '/home',
   '/ask':           '/insights',
-  '/career-report': '/insights',
 }
 
 function matches(pathname, base) {

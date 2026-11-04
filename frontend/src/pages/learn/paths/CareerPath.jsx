@@ -106,7 +106,7 @@ export default function CareerPath() {
           title={CAREER_PATH_CTA.title}
           description={CAREER_PATH_CTA.description}
           buttonLabel={CAREER_PATH_CTA.buttonLabel}
-          to="/career-report"
+          to="/generate?topic=career"
           variant="full"
         />
       }

@@ -18,7 +18,6 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 import { subscribeNewsletter } from '../api/newsletter'
 
-const PAYMENT_PLACEHOLDERS = ['Razorpay', 'UPI', 'Visa', 'Mastercard']
 const FOOTER_YEAR = new Date().getFullYear()
 
 function FooterLink({ to, state, children }) {
@@ -91,7 +90,7 @@ export default function Footer() {
         <FooterColumn heading={t('footer_company_heading')} isMobile={isMobile}>
           <ul className="space-y-2.5">
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
-            <FooterLink to="/pricing">{t('footer_link_pricing')}</FooterLink>
+            <FooterLink to="/pricing">{t('nav_early_access')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>
           <p className="flex items-center gap-1.5 text-sm text-ink-onnight/80 mt-4">
@@ -155,17 +154,11 @@ export default function Footer() {
         <p className="max-w-6xl mx-auto px-6 pb-4 text-[11px] text-ink-onnight/50 md:text-right">🔒 {t('footer_newsletter_note')}</p>
       </div>
 
-      {/* ── Trust badges + payment placeholders ── */}
+      {/* ── Trust badges ── */}
       <div className="max-w-6xl mx-auto px-6 py-6 flex flex-wrap items-center gap-2 border-t border-white/10">
         {TRUST_BADGE_KEYS.map(key => (
           <span key={key} className="bg-primary/10 text-primary text-[11px] font-medium px-3 py-1 rounded-full border border-primary/30">
             {t(key)}
-          </span>
-        ))}
-        <span className="text-[11px] font-semibold tracking-wide uppercase text-ink-onnight/40 ml-2">{t('footer_payment_heading')}</span>
-        {PAYMENT_PLACEHOLDERS.map(name => (
-          <span key={name} className="bg-white/5 border border-white/10 text-ink-onnight/70 text-[11px] px-3 py-1 rounded">
-            {name}
           </span>
         ))}
       </div>

@@ -22,7 +22,7 @@ export const NAV_ITEMS = [
 export const PUBLIC_NAV_ITEMS = [
   { id: 'panchang', key: 'nav_panchang_tab', fallback: 'Panchang', to: '/panchang' },
   { id: 'explore',  key: 'nav_explore',      fallback: 'Explore',  to: '/learn' },
-  { id: 'pricing',  key: 'nav_pricing',      fallback: 'Pricing',  to: '/pricing' },
+  { id: 'pricing',  key: 'nav_early_access', fallback: 'Free Access', to: '/pricing' },
   { id: 'blog',     key: 'nav_blog',         fallback: 'Blog',     to: '/blog' },
 ]
 

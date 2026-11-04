@@ -22,6 +22,7 @@ export default function BirthTimeSelector({ t, accuracy, onAccuracyChange, hour,
         {ACCURACY_OPTIONS.map(id => (
           <button
             key={id}
+            type="button"
             onClick={() => onAccuracyChange(id)}
             aria-pressed={accuracy === id}
             className={`w-full text-left flex items-center gap-3 rounded-xl border-2 px-4 py-3 transition ${
@@ -37,16 +38,16 @@ export default function BirthTimeSelector({ t, accuracy, onAccuracyChange, hour,
       {showTimePicker && (
         <div className="mt-4">
           <div className="flex gap-2 items-center">
-            <select value={hour} onChange={e => onTimeChange({ hour: e.target.value, minute, ampm })} className={selCls}>
+            <select aria-label="Hour" value={hour} onChange={e => onTimeChange({ hour: e.target.value, minute, ampm })} className={selCls}>
               <option value="">HH</option>
               {HOURS_12.map(h => <option key={h} value={h}>{h}</option>)}
             </select>
             <span className="text-ink-faint font-bold text-lg">:</span>
-            <select value={minute} onChange={e => onTimeChange({ hour, minute: e.target.value, ampm })} className={selCls}>
+            <select aria-label="Minute" value={minute} onChange={e => onTimeChange({ hour, minute: e.target.value, ampm })} className={selCls}>
               <option value="">MM</option>
               {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select value={ampm} onChange={e => onTimeChange({ hour, minute, ampm: e.target.value })} className={selCls}>
+            <select aria-label="AM/PM" value={ampm} onChange={e => onTimeChange({ hour, minute, ampm: e.target.value })} className={selCls}>
               <option value="">AM/PM</option>
               <option value="AM">AM</option>
               <option value="PM">PM</option>

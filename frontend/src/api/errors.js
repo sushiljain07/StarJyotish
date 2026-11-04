@@ -14,3 +14,14 @@ export async function errorFromResponse(resp, fallback) {
   err.status = resp.status
   return err
 }
+
+// Text to show for an error caught around an API call. API errors (built by
+// errorFromResponse, so they carry a `status`) are already user-facing. A
+// fetch that never got a response rejects with a TypeError whose message
+// varies by browser ("Failed to fetch", "Load failed", ...), so replace it
+// with a translated connection message. Anything else gets `fallback`.
+export function errorMessage(e, fallback) {
+  if (e?.status) return e.message || fallback
+  if (e instanceof TypeError) return i18n.t('network_error')
+  return fallback
+}

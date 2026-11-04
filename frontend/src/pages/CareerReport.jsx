@@ -5,7 +5,7 @@ import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
-import { errorFromResponse } from '../api/errors'
+import { errorFromResponse, errorMessage } from '../api/errors'
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 const SECTIONS = [
@@ -191,7 +191,7 @@ export default function CareerReport() {
       setReport(await resp.json())
       setStatus('done')
     } catch (e) {
-      setErrorMsg(e.message || t('error_something_wrong'))
+      setErrorMsg(errorMessage(e, t('error_something_wrong')))
       setStatus('error')
     }
   }

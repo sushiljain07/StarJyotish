@@ -18,6 +18,7 @@ import { askKundli } from '../../api/astro'
 import { useAuth } from '../../contexts/AuthContext'
 import JyotiAvatar from './JyotiAvatar'
 import { localDateStr } from '../../utils/localDate'
+import { errorMessage } from '../../api/errors'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -105,8 +106,9 @@ export default function AskPersonaPanel({ userId, input }) {
       setCount(next)
       saveQuota(userId, next)
     } catch (e) {
-      setError(e.message || t('ask_error'))
+      setError(errorMessage(e, t('ask_error')))
       setMessages(prev => prev.slice(0, -1))
+      setValue(question)  // keep it so one tap on Send retries
     } finally {
       setLoading(false)
     }

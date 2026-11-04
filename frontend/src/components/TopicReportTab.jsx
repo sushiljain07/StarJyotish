@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { API_BASE } from '../api/config'
 import SegmentedToggle from './SegmentedToggle'
-import { errorFromResponse } from '../api/errors'
+import { errorFromResponse, errorMessage } from '../api/errors'
 
 const TOPIC_CONFIG = {
   relationship: {
@@ -266,7 +266,7 @@ export default function TopicReportTab({ topic, input }) {
       setReport(await resp.json())
       setStatus('done')
     } catch (e) {
-      setErrorMsg(e.message || t('topic_report_error_generic'))
+      setErrorMsg(errorMessage(e, t('topic_report_error_generic')))
       setStatus('error')
     }
   }
@@ -318,7 +318,7 @@ export default function TopicReportTab({ topic, input }) {
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
       <button
-        onClick={() => setStatus('idle')}
+        onClick={() => generate()}
         className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
       >
         {t('topic_report_try_again')}
@@ -351,7 +351,7 @@ export default function TopicReportTab({ topic, input }) {
 
       <div className="text-center mt-6 pb-2">
         <button
-          onClick={() => setStatus('idle')}
+          onClick={() => (skipIdleScreen ? generate() : setStatus('idle'))}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
         >
           ↺ {t('topic_report_regenerate')}

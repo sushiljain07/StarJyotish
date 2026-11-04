@@ -240,7 +240,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       )}
 
       <div className="text-center pb-4">
-        <button onClick={() => setStatus('idle')}
+        <button onClick={() => generate()}
           className="text-sm text-primary hover:text-primary-dark transition">
           ↺ Regenerate Prediction
         </button>

@@ -30,6 +30,8 @@ describe('Early access page', () => {
     const { container } = renderPricing()
     expect(screen.getByRole('heading', { level: 1, name: en.early_access_heading })).toBeInTheDocument()
     expect(container.textContent).not.toMatch(/₹|\/month|Razorpay/)
+    // Rate limits and the 5-question Ask cap exist, so don't promise "no limits".
+    expect(container.textContent).not.toMatch(/no hidden limits/i)
   })
 
   it('does not read admin pricing plans', () => {

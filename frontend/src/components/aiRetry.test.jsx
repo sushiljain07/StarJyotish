@@ -105,3 +105,16 @@ describe('WhatsApp opt-in removed', () => {
     vi.useRealTimers()
   })
 })
+
+describe('Regenerate after a finished reading', () => {
+  it('ChartReading (signed in): Regenerate re-requests instead of spinning forever', async () => {
+    fetchMock
+      .mockResolvedValueOnce(ok({ prediction_sections: { identity: 'First.' } }))
+      .mockResolvedValueOnce(ok({ prediction_sections: { identity: 'Second.' } }))
+    render(<ChartReading input={INPUT} />)
+    await screen.findByText('First.')
+    fireEvent.click(screen.getByRole('button', { name: /regenerate/i }))
+    expect(await screen.findByText('Second.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+})

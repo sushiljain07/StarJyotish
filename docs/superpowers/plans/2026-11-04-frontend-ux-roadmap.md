@@ -75,6 +75,26 @@ Goal: a Hindi user sees no English on the main journey.
 
 ---
 
+## Phase 3B: Hindi follow-ups (moved out of Phase 3 by the owner on 4 Nov 2026)
+
+Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language registry, switcher, typography, name and date helpers, and Hindi for the Kundli page, AI reports, Rajyogas (backend), forms, home, Panchang and site pages. What's left:
+
+1. **Guardrails** (Phase 3 plan, Task 8):
+   - a key-parity and placeholder test across all registered locales, plus a script check;
+   - a hardcoded-English ratchet with a baseline;
+   - `noLanguageLiterals` tests on the frontend and backend that match **single and double quotes** (Task 0 review);
+   - harden `expectNoEnglish`: assert the container is non-empty and contains the target script; join adjacent text nodes with spaces so "KPKP" and "Star JyotishAI" stop needing allow-list hacks; assert that loading states show loading copy.
+2. **Glossary and wording pass** (Task 9):
+   - `docs/i18n-glossary.md`, one section per language;
+   - unify पुनः प्रयास करें / चंद्र / गुरु / कुंडली;
+   - i18next plurals for `coming_in_weeks`; fix `patrika_rarity`.
+   - Native review of the wording the implementers flagged: legend words, nakshatra, sign and planet short forms, Sarvatobhadra corners, अमात्यकारक, तालमेल, रोडमैप, राज योग vs राजयोग, house ordinals (1ला/4था), Panchang yoga and masa spellings, Rajyoga phrasing ("भाग्य और करियर का भाग्य", "नीचता भंग हुई"), and the masculine "कर रहा हूँ" in `career_scenario_prompt`.
+3. **Backend `career_alignment.explanation` in Hindi**, through `services/i18n.text`, with English byte-identical.
+4. **Real-browser check** (Task 10): `kundli_lang=hi` at 390px and 1440px across /generate, /kundli (all tabs), /insights, /panchang, /pricing and /terms; a Latin-word count; Devanagari font in use; screenshots.
+5. **Deferred minors** from the Phase 3 task reviews (in the PR description).
+
+---
+
 ## Phase 4: Mobile and navigation polish (1–2 days)
 
 1. **Safe areas** (N-H3): add `viewport-fit=cover` to `index.html`, and set the raised NavBar to `bottom: calc(60px + env(safe-area-inset-bottom))`. Check on an iPhone-sized emulator with a home indicator.
@@ -154,6 +174,7 @@ Goal: a Hindi user sees no English on the main journey.
 |---|---|---|---|
 | 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — PR open |
 | 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
-| 3 | `feat/phase3-hindi` | to write | — |
+| 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — PR open |
+| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | — |
 | 4 | `fix/phase4-mobile-nav` | to write | — |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

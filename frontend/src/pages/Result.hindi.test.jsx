@@ -125,4 +125,10 @@ describe('Kundli page in Hindi', () => {
     await waitFor(() => expect(container.textContent).toContain('तुलना बंद करें'))
     expectNoEnglish(container, ALLOW)
   })
+
+  it('labels the Chart sub-tab कुंडली (glossary wording, never चार्ट)', () => {
+    renderAt('?tab=birth_chart&sub=chart')
+    expect(screen.getAllByRole('button', { name: 'कुंडली' }).length).toBeGreaterThan(0)
+    expect(screen.queryAllByRole('button', { name: 'चार्ट' })).toHaveLength(0)
+  })
 })

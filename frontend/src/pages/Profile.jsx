@@ -23,6 +23,7 @@ import { usePlaceMatches } from '../hooks/usePlaceMatches'
 import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
 import { LANGUAGES, currentLanguage, localeFor } from '../i18n/languages'
+import { markLanguageChosenByUser } from '../i18n'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -156,7 +157,10 @@ export default function Profile() {
         timezone: form.timezone || null,
       }
       const updated = await updateMyProfile(payload)
-      if (updated.preferred_language !== i18n.language) i18n.changeLanguage(updated.preferred_language)
+      if (updated.preferred_language !== i18n.language) {
+        i18n.changeLanguage(updated.preferred_language)
+        markLanguageChosenByUser()
+      }
       setSavedAt(Date.now())
     } catch (err) {
       setError(err.message)

@@ -22,8 +22,8 @@ import {
   verifyEmailLinkOtp as apiVerifyEmailLinkOtp,
 } from '../api/auth'
 import { clearChartSession } from '../services/lastChart'
-import i18n from '../i18n'
-import { languageEntry, currentLanguage } from '../i18n/languages'
+import i18n, { savedLanguageChoice, markLanguageFromProfile } from '../i18n'
+import { LANGUAGES, currentLanguage } from '../i18n/languages'
 
 const AuthContext = createContext(null)
 
@@ -56,18 +56,6 @@ export function AuthProvider({ children }) {
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [])
-
-  // Apply the saved profile language when a person signs in or resumes.
-  // Keyed on the id only, so a toggle mid-session isn't undone by the
-  // profile update that follows it.
-  const userId = user?.id
-  const profileLanguage = user?.preferred_language
-  useEffect(() => {
-    if (userId && languageEntry(profileLanguage) && profileLanguage !== currentLanguage()) {
-      i18n.changeLanguage(profileLanguage)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId])
 
   const loginWithPhone = useCallback(async (phoneNumber, code) => {
     const data = await apiVerifyOtp(phoneNumber, code)
@@ -117,6 +105,29 @@ export function AuthProvider({ children }) {
       return updated
     })
   ), [authedRequest])
+
+  // Reconcile device and profile language when a person signs in or resumes.
+  // A language chosen on this device wins and is pushed to the profile;
+  // otherwise the profile's applies. Keyed on the id only, so a toggle
+  // mid-session isn't undone by the profile update that follows it.
+  const userId = user?.id
+  const profileLanguage = user?.preferred_language
+  useEffect(() => {
+    if (!userId) return
+    const known = code => LANGUAGES.some(l => l.code === code)
+    const saved = savedLanguageChoice()
+    if (saved.source === 'user' && known(saved.code)) {
+      if (saved.code !== profileLanguage) {
+        Promise.resolve(updateMyProfile({ preferred_language: saved.code })).catch(() => {})
+      }
+      return
+    }
+    if (known(profileLanguage) && profileLanguage !== currentLanguage()) {
+      i18n.changeLanguage(profileLanguage)
+      markLanguageFromProfile()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   // Adding/changing the phone number is a two-step OTP flow scoped to the
   // already-logged-in account (see api/auth.js's comment on why this

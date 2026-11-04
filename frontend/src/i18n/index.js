@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next'
 import { LANGUAGES, DEFAULT_LANGUAGE, scriptFor } from './languages'
 
 export const LANG_STORAGE_KEY = 'kundli_lang'
+// Who picked the saved language: 'user' (an explicit choice on this device)
+// or 'profile' (applied from the account at sign-in).
+export const LANG_SOURCE_KEY = 'kundli_lang_source'
 export const SUPPORTED_LANGS = LANGUAGES.map(l => l.code)
 
 // Every ./xx.json beside this file whose code is in the registry becomes a
@@ -30,6 +33,35 @@ function saveLang(lng) {
     localStorage.setItem(LANG_STORAGE_KEY, lng)
   } catch {
     // Storage blocked: the choice still applies for this visit.
+  }
+}
+
+export function markLanguageChosenByUser() {
+  try {
+    localStorage.setItem(LANG_SOURCE_KEY, 'user')
+  } catch {
+    // Storage blocked: nothing to remember.
+  }
+}
+
+export function markLanguageFromProfile() {
+  try {
+    localStorage.setItem(LANG_SOURCE_KEY, 'profile')
+  } catch {
+    // Storage blocked: nothing to remember.
+  }
+}
+
+// A saved code with no source predates this key: the old footer toggle was
+// the only way to set it, so it was a user choice.
+export function savedLanguageChoice() {
+  try {
+    const code = localStorage.getItem(LANG_STORAGE_KEY)
+    if (!code) return { code: null, source: null }
+    const source = localStorage.getItem(LANG_SOURCE_KEY) === 'profile' ? 'profile' : 'user'
+    return { code, source }
+  } catch {
+    return { code: null, source: null }
   }
 }
 

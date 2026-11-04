@@ -3,6 +3,7 @@
 // select. The choice is saved to the profile when signed in (best effort).
 import { useTranslation } from 'react-i18next'
 import { LANGUAGES, currentLanguage } from '../i18n/languages'
+import { markLanguageChosenByUser } from '../i18n'
 import { useAuth } from '../contexts/AuthContext'
 
 const MAX_BUTTONS = 3
@@ -24,6 +25,7 @@ export default function LanguageSwitcher({ size = 'md', tone = 'night' }) {
 
   function choose(lng) {
     i18n.changeLanguage(lng)
+    markLanguageChosenByUser()
     if (auth?.user && auth.updateMyProfile) {
       Promise.resolve(auth.updateMyProfile({ preferred_language: lng })).catch(() => {})
     }

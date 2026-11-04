@@ -22,7 +22,7 @@ import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
 import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
-import { currentLanguage, localeFor } from '../i18n/languages'
+import { LANGUAGES, currentLanguage, localeFor } from '../i18n/languages'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -229,8 +229,7 @@ export default function Profile() {
             <div>
               <label className={labelCls}>{t('profile_preferred_language')}</label>
               <select value={form.preferred_language} onChange={e => setField('preferred_language', e.target.value)} className={inputCls}>
-                <option value="en">English</option>
-                <option value="hi">हिन्दी</option>
+                {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.nativeName}</option>)}
               </select>
             </div>
             <div>

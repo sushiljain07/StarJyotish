@@ -17,7 +17,7 @@ import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 import { subscribeNewsletter } from '../api/newsletter'
-import { LANGUAGES, currentLanguage } from '../i18n/languages'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const FOOTER_YEAR = new Date().getFullYear()
 
@@ -57,7 +57,7 @@ function FooterColumn({ heading, children, isMobile }) {
 }
 
 export default function Footer() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const isMobile = useIsMobile()
   const [newsletterEmail, setNewsletterEmail] = React.useState('')
   const [newsletterStatus, setNewsletterStatus] = React.useState('idle')
@@ -175,19 +175,7 @@ export default function Footer() {
         <p className="text-ink-onnight/50 text-center">
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}
         </p>
-        <div className="flex gap-1">
-          {LANGUAGES.map(({ code, label }) => (
-            <button
-              key={code}
-              onClick={() => i18n.changeLanguage(code)}
-              className={`px-2 py-1 rounded-full text-[11px] font-semibold transition ${
-                currentLanguage() === code ? 'bg-primary text-night' : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <LanguageSwitcher size="sm" />
       </div>
     </footer>
   )

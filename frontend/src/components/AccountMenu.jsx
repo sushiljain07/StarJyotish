@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import LanguageSwitcher from './LanguageSwitcher'
 
 function initialFor(user) {
   const source = user?.name || user?.email || user?.phone_number || '?'
@@ -125,6 +126,10 @@ export default function AccountMenu() {
               My Dashboard
             </Link>
           )}
+          <div role="menuitem" className="flex items-center justify-between gap-2 px-3.5 py-2 border-t border-line">
+            <span className="text-sm text-ink">{t('lang_toggle_label')}</span>
+            <LanguageSwitcher size="sm" tone="light" />
+          </div>
           <button
             onClick={() => { setOpen(false); logout(); navigate('/') }}
             role="menuitem"

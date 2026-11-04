@@ -22,6 +22,8 @@ import {
   verifyEmailLinkOtp as apiVerifyEmailLinkOtp,
 } from '../api/auth'
 import { clearChartSession } from '../services/lastChart'
+import i18n from '../i18n'
+import { languageEntry, currentLanguage } from '../i18n/languages'
 
 const AuthContext = createContext(null)
 
@@ -54,6 +56,18 @@ export function AuthProvider({ children }) {
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [])
+
+  // Apply the saved profile language when a person signs in or resumes.
+  // Keyed on the id only, so a toggle mid-session isn't undone by the
+  // profile update that follows it.
+  const userId = user?.id
+  const profileLanguage = user?.preferred_language
+  useEffect(() => {
+    if (userId && languageEntry(profileLanguage) && profileLanguage !== currentLanguage()) {
+      i18n.changeLanguage(profileLanguage)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   const loginWithPhone = useCallback(async (phoneNumber, code) => {
     const data = await apiVerifyOtp(phoneNumber, code)

@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AccountMenu from './AccountMenu'
+import LanguageSwitcher from './LanguageSwitcher'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
 
@@ -105,6 +106,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
 
         {/* Right: auth actions */}
         <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden sm:block"><LanguageSwitcher size="sm" /></div>
           {!isAuthenticated && (
             <button
               onClick={signIn}
@@ -166,6 +168,10 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
                 </button>
               )
             })}
+            <div className="sm:hidden flex items-center justify-between py-3">
+              <span className="text-sm text-primary-light/70">{t('lang_toggle_label')}</span>
+              <LanguageSwitcher size="sm" />
+            </div>
           </div>
         </nav>
       )}

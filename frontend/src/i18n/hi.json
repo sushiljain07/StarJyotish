@@ -842,5 +842,6 @@
   "nav_my_charts": "मेरी कुंडली",
   "nav_ai_guidance": "AI मार्गदर्शन",
   "nav_explore": "एक्सप्लोर",
-  "nav_panchang_tab": "पंचांग"
+  "nav_panchang_tab": "पंचांग",
+  "lang_toggle_label": "भाषा"
 }

@@ -842,5 +842,6 @@
   "nav_my_charts": "My Charts",
   "nav_ai_guidance": "AI Guidance",
   "nav_explore": "Explore",
-  "nav_panchang_tab": "Panchang"
+  "nav_panchang_tab": "Panchang",
+  "lang_toggle_label": "Language"
 }

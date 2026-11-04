@@ -67,7 +67,7 @@ export default function SouthIndiaChart({
     if (isAsc && ascendant) {
       items.push(
         <text key="la" x={cx + 4} y={cy + 14} fontSize="9" fill="#FF6B00" fontWeight="bold">
-          {Math.floor(ascendant.degree)}° La
+          {Math.floor(ascendant.degree)}° {abbr('Ascendant')}
         </text>
       )
     }

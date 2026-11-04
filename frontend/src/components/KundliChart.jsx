@@ -214,7 +214,7 @@ export default function KundliChart({
                       textAnchor="middle" fontSize="15"
                       fill="#FF6B00" fontWeight="bold">
                   <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                  <tspan dy="3">La</tspan>
+                  <tspan dy="3">{abbr('Ascendant')}</tspan>
                 </text>
               )
             }

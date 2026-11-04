@@ -1,5 +1,7 @@
 // Sarvatobhadra Chakra — 9×9 grid showing 28 nakshatras + 4 weekday corners
 // Used for transit analysis: highlights which nakshatras current transits occupy
+import { useTranslation } from 'react-i18next'
+import { planetName, nakshatraName } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
 
 const NAKSHATRAS_27 = [
@@ -24,49 +26,49 @@ const NAKSHATRAS_27 = [
 // For 27 naks in 28 outer non-corner cells: we place Abhijit between U.Ashadha and Shravana
 const OUTER_CELLS = [
   // Top row left→right (row=0, cols 1–7)
-  { row: 0, col: 1, nak: 3,  abbr: 'Roh' },
-  { row: 0, col: 2, nak: 4,  abbr: 'Mri' },
-  { row: 0, col: 3, nak: 5,  abbr: 'Ard' },
-  { row: 0, col: 4, nak: 6,  abbr: 'Pun' },
-  { row: 0, col: 5, nak: 7,  abbr: 'Pus' },
-  { row: 0, col: 6, nak: 8,  abbr: 'Ash' },
-  { row: 0, col: 7, nak: 9,  abbr: 'Mag' },
+  { row: 0, col: 1, nak: 3,  },
+  { row: 0, col: 2, nak: 4,  },
+  { row: 0, col: 3, nak: 5,  },
+  { row: 0, col: 4, nak: 6,  },
+  { row: 0, col: 5, nak: 7,  },
+  { row: 0, col: 6, nak: 8,  },
+  { row: 0, col: 7, nak: 9,  },
   // Right col top→bottom (col=8, rows 1–7)
-  { row: 1, col: 8, nak: 10, abbr: 'PPh' },
-  { row: 2, col: 8, nak: 11, abbr: 'UPh' },
-  { row: 3, col: 8, nak: 12, abbr: 'Has' },
-  { row: 4, col: 8, nak: 13, abbr: 'Chi' },
-  { row: 5, col: 8, nak: 14, abbr: 'Swa' },
-  { row: 6, col: 8, nak: 15, abbr: 'Vis' },
-  { row: 7, col: 8, nak: 16, abbr: 'Anu' },
+  { row: 1, col: 8, nak: 10, },
+  { row: 2, col: 8, nak: 11, },
+  { row: 3, col: 8, nak: 12, },
+  { row: 4, col: 8, nak: 13, },
+  { row: 5, col: 8, nak: 14, },
+  { row: 6, col: 8, nak: 15, },
+  { row: 7, col: 8, nak: 16, },
   // Bottom row right→left (row=8, cols 7–1)
-  { row: 8, col: 7, nak: 17, abbr: 'Jye' },
-  { row: 8, col: 6, nak: 18, abbr: 'Mul' },
-  { row: 8, col: 5, nak: 19, abbr: 'PAs' },
-  { row: 8, col: 4, nak: -1, abbr: 'Abh' }, // Abhijit
-  { row: 8, col: 3, nak: 20, abbr: 'UAs' },
-  { row: 8, col: 2, nak: 21, abbr: 'Shr' },
-  { row: 8, col: 1, nak: 22, abbr: 'Dha' },
+  { row: 8, col: 7, nak: 17, },
+  { row: 8, col: 6, nak: 18, },
+  { row: 8, col: 5, nak: 19, },
+  { row: 8, col: 4, nak: -1, }, // Abhijit
+  { row: 8, col: 3, nak: 20, },
+  { row: 8, col: 2, nak: 21, },
+  { row: 8, col: 1, nak: 22, },
   // Left col bottom→top (col=0, rows 7–1)
-  { row: 7, col: 0, nak: 23, abbr: 'Sha' },
-  { row: 6, col: 0, nak: 24, abbr: 'PBh' },
-  { row: 5, col: 0, nak: 25, abbr: 'UBh' },
-  { row: 4, col: 0, nak: 26, abbr: 'Rev' },
-  { row: 3, col: 0, nak: 0,  abbr: 'Ash' },
-  { row: 2, col: 0, nak: 1,  abbr: 'Bha' },
-  { row: 1, col: 0, nak: 2,  abbr: 'Kri' },
+  { row: 7, col: 0, nak: 23, },
+  { row: 6, col: 0, nak: 24, },
+  { row: 5, col: 0, nak: 25, },
+  { row: 4, col: 0, nak: 26, },
+  { row: 3, col: 0, nak: 0,  },
+  { row: 2, col: 0, nak: 1,  },
+  { row: 1, col: 0, nak: 2,  },
 ]
 
 const CORNER_CELLS = [
-  { row: 0, col: 0, label: 'Ra\n(Sun)', color: '#FFA500' },
-  { row: 0, col: 8, label: 'So\n(Mon)', color: '#7B61FF' },
-  { row: 8, col: 0, label: 'Gu\n(Jup)', color: '#2563EB' },
-  { row: 8, col: 8, label: 'Sha\n(Sat)', color: '#374151' },
+  { row: 0, col: 0, planet: 'Sun',     color: '#FFA500' },
+  { row: 0, col: 8, planet: 'Moon',    color: '#7B61FF' },
+  { row: 8, col: 0, planet: 'Jupiter', color: '#2563EB' },
+  { row: 8, col: 8, planet: 'Saturn',  color: '#374151' },
 ]
 
 // Inner ring signs (12 signs, 2 cells each in the 7×7 inner ring border)
 // 24 cells in the inner ring border
-const SIGN_ABBR_2 = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
+const SIGN_KEYS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 
 // Inner ring border cells (rows 1-7, cols 1-7, only the outermost of that 7×7)
 const INNER_RING = []
@@ -78,13 +80,13 @@ for (let r = 6; r >= 2; r--) { INNER_RING.push({ row: r, col: 1 }) } // left
 const INNER_CELLS = INNER_RING.map((cell, i) => ({
   ...cell,
   signIdx: Math.floor(i / 2),
-  abbr: SIGN_ABBR_2[Math.floor(i / 2)],
 }))
 
 const CELL = 46  // cell size px
 const GRID = 9
 
 export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets = [] }) {
+  const { t } = useTranslation()
   // Which nakshatra index is each planet in?
   function planetsInNak(planets, nakIdx) {
     const NAK_SPAN = 360 / 27
@@ -104,16 +106,17 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
   )
 
   CORNER_CELLS.forEach(c => {
-    grid[c.row][c.col] = { type: 'corner', label: c.label, color: c.color }
+    grid[c.row][c.col] = { type: 'corner', label: t(`chart_sarvato_corner_${c.planet}`), color: c.color }
   })
 
   OUTER_CELLS.forEach(c => {
     const transitHere = planetsInNak(transitPlanets, c.nak)
     const natalHere = planetsInNak(natalPlanets, c.nak)
+    const nakName = c.nak >= 0 ? NAKSHATRAS_27[c.nak] : 'Abhijit'
     grid[c.row][c.col] = {
       type: 'nak',
-      abbr: c.abbr,
-      fullName: c.nak >= 0 ? NAKSHATRAS_27[c.nak] : 'Abhijit',
+      abbr: t(`nak_abbr.${nakName}`),
+      fullName: nakshatraName(t, nakName),
       nakIdx: c.nak,
       transitPlanets: transitHere,
       natalPlanets: natalHere,
@@ -124,13 +127,12 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
 
   INNER_CELLS.forEach(c => {
     if (grid[c.row][c.col].type === 'empty') {
-      grid[c.row][c.col] = { type: 'sign', abbr: c.abbr, signIdx: c.signIdx }
+      grid[c.row][c.col] = { type: 'sign', abbr: t(`sign_abbr.${SIGN_KEYS[c.signIdx]}`), signIdx: c.signIdx }
     }
   })
 
   // Centre 5×5 (rows 2-6, cols 2-6) — show day vowels / decorative
-  const VOWELS = ['a','aa','i','ii','u','uu','e','ai','o','au','am','ah',
-                  'ka','kha','ga','gha','nga','cha','chha','ja','jha']
+  const VOWELS = t('chart_sarvato_vowels').split(',')
   let vi = 0
   for (let r = 2; r <= 6; r++) {
     for (let c = 2; c <= 6; c++) {
@@ -146,10 +148,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
   return (
     <div className="space-y-4">
       <div className="bg-mauve-light border border-mauve/30 rounded-xl p-4">
-        <h2 className="text-mauve font-bold text-base">Sarvatobhadra Chakra</h2>
+        <h2 className="text-mauve font-bold text-base">{t('chart_sarvato_title')}</h2>
         <p className="text-mauve text-xs mt-1">
-          9×9 grid used for transit analysis. Outer ring = 28 Nakshatras, inner ring = 12 Signs.
-          Green = transit planet, yellow = natal planet.
+          {t('chart_sarvato_intro')}
         </p>
       </div>
 
@@ -271,16 +272,16 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-xs text-ink-muted px-1">
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-primary"></span> Transit planet (circle)
+          <span className="inline-block w-3 h-3 rounded-full bg-primary"></span> {t('chart_sarvato_legend_transit')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-amber-400 opacity-70"></span> Natal planet (square)
+          <span className="inline-block w-3 h-3 rounded bg-amber-400 opacity-70"></span> {t('chart_sarvato_legend_natal')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-green-100 border border-green-500"></span> Transit nakshatra
+          <span className="inline-block w-4 h-3 rounded bg-green-100 border border-green-500"></span> {t('chart_sarvato_legend_transit_nak')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-yellow-100 border border-amber-500"></span> Natal nakshatra
+          <span className="inline-block w-4 h-3 rounded bg-yellow-100 border border-amber-500"></span> {t('chart_sarvato_legend_natal_nak')}
         </span>
       </div>
 
@@ -288,15 +289,15 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
       {(transitPlanets.length > 0 || natalPlanets.length > 0) && (
         <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
           <div className="px-4 py-3 bg-night/[0.03] border-b">
-            <h3 className="font-semibold text-ink text-sm">Planet Nakshatra Positions</h3>
+            <h3 className="font-semibold text-ink text-sm">{t('chart_sarvato_positions')}</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-night/[0.03]">
-                  <th className="p-2 text-left border-b">Planet</th>
-                  <th className="p-2 text-left border-b">Natal Nakshatra</th>
-                  <th className="p-2 text-left border-b">Transit Nakshatra</th>
+                  <th className="p-2 text-left border-b">{t('col_planet')}</th>
+                  <th className="p-2 text-left border-b">{t('chart_sarvato_col_natal')}</th>
+                  <th className="p-2 text-left border-b">{t('chart_sarvato_col_transit')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,11 +307,11 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                     <tr key={np.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                       <td className="p-2 border-b font-bold"
                           style={{ color: PLANET_COLORS[np.name] ?? '#333' }}>
-                        {np.name}
+                        {planetName(t, np.name)}
                       </td>
-                      <td className="p-2 border-b">{np.nakshatra} (H{np.house})</td>
+                      <td className="p-2 border-b">{nakshatraName(t, np.nakshatra)} (H{np.house})</td>
                       <td className="p-2 border-b text-primary-dark">
-                        {tp ? `${tp.nakshatra} (H${tp.house})` : '–'}
+                        {tp ? `${nakshatraName(t, tp.nakshatra)} (H${tp.house})` : '–'}
                       </td>
                     </tr>
                   )

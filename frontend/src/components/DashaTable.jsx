@@ -1,6 +1,9 @@
 // frontend/src/components/DashaTable.jsx
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { formatDate } from '../utils/format'
+import { planetName } from '../utils/astroNames'
+
 
 function pct(start, end) {
   const now = Date.now()
@@ -15,11 +18,11 @@ function daysBetween(start, end) {
   return Math.round((new Date(end) - new Date(start)) / 86400000)
 }
 
-function durationLabel(start, end) {
+function durationLabel(t, start, end) {
   const d = daysBetween(start, end)
-  if (d < 30)  return `${d}d`
-  if (d < 365) return `${Math.round(d / 30.4)}m`
-  return `${(d / 365.25).toFixed(1)}y`
+  if (d < 30)  return t('dasha_days_short', { n: d })
+  if (d < 365) return t('dasha_months_short', { n: Math.round(d / 30.4) })
+  return t('dasha_years_short', { n: (d / 365.25).toFixed(1) })
 }
 
 const LEVEL_COLORS = {
@@ -28,26 +31,27 @@ const LEVEL_COLORS = {
   pratyantar: { active: 'bg-vermillion', activeText: 'text-white',  light: 'bg-vermillion-light', border: 'border-vermillion/30', text: 'text-vermillion',   bar: 'bg-vermillion' },
 }
 
-const TABS = [
-  { id: 'mahadasha',  label: 'Mahadasha' },
-  { id: 'antardasha', label: 'Antardasha' },
-  { id: 'pratyantar', label: 'Pratyantar' },
+const tabsFor = t => [
+  { id: 'mahadasha',  label: t('dasha_mahadasha') },
+  { id: 'antardasha', label: t('dasha_antardasha') },
+  { id: 'pratyantar', label: t('dasha_pratyantar') },
 ]
 
 function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
+  const { t } = useTranslation()
   if (!rows || rows.length === 0)
-    return <p className="text-sm text-ink-faint italic">No data available.</p>
+    return <p className="text-sm text-ink-faint italic">{t('dasha_no_data')}</p>
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className={`${color.light} ${color.text}`}>
-            <th className="text-left p-2 border border-line">Period</th>
-            <th className="text-left p-2 border border-line">Start</th>
-            <th className="text-left p-2 border border-line">End</th>
-            <th className="text-left p-2 border border-line">Duration</th>
-            <th className="p-2 border border-line w-24">Progress</th>
+            <th className="text-left p-2 border border-line">{t('dasha_col_period')}</th>
+            <th className="text-left p-2 border border-line">{t('dasha_col_start')}</th>
+            <th className="text-left p-2 border border-line">{t('dasha_col_end')}</th>
+            <th className="text-left p-2 border border-line">{t('dasha_col_duration')}</th>
+            <th className="p-2 border border-line w-24">{t('dasha_col_progress')}</th>
           </tr>
         </thead>
         <tbody>
@@ -64,7 +68,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
                 </td>
                 <td className="p-2 border border-line">{formatDate(r.start)}</td>
                 <td className="p-2 border border-line">{formatDate(r.end)}</td>
-                <td className="p-2 border border-line">{durationLabel(r.start, r.end)}</td>
+                <td className="p-2 border border-line">{durationLabel(t, r.start, r.end)}</td>
                 <td className="p-2 border border-line">
                   <div className="h-2 bg-night/10 rounded-full">
                     <div className={`h-2 rounded-full ${isCurrent ? color.bar : isPast ? 'bg-ink-faint/50' : 'bg-ink-faint/25'}`}
@@ -81,6 +85,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
 }
 
 export default function DashaTable({ dasha }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('mahadasha')
 
   if (!dasha) return null
@@ -102,15 +107,15 @@ export default function DashaTable({ dasha }) {
 
       {/* Current chain banner */}
       <div className="bg-primary-light border border-primary/30 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
-        <span className="font-bold text-primary-dark">{md.planet} MD</span>
-        {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{ad.planet} AD</span></>}
-        {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{pd.planet} PD</span></>}
-        <span className="ml-auto text-xs text-ink-muted">{yrsLeft}y left in MD</span>
+        <span className="font-bold text-primary-dark">{planetName(t, md.planet)} {t('dasha_md')}</span>
+        {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
+        {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
+        <span className="ml-auto text-xs text-ink-muted">{t('dasha_left_in_md', { years: yrsLeft })}</span>
       </div>
 
       {/* Sub-tabs */}
       <div className="flex gap-1 flex-wrap">
-        {TABS.map(tab => (
+        {tabsFor(t).map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                     activeTab === tab.id
@@ -126,17 +131,17 @@ export default function DashaTable({ dasha }) {
       {activeTab === 'mahadasha' && (
         <div className="space-y-4">
           <div className={`${c.light} border ${c.border} rounded-lg p-4`}>
-            <div className={`text-xs ${c.text} uppercase tracking-wide mb-1`}>Current Mahadasha</div>
+            <div className={`text-xs ${c.text} uppercase tracking-wide mb-1`}>{t('dasha_current_md')}</div>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-2xl font-bold text-primary-dark">{md.planet}</span>
-              <span className="text-sm text-ink-muted">{formatDate(md.start)} – {formatDate(md.end)} · {md.years}y</span>
+              <span className="text-2xl font-bold text-primary-dark">{planetName(t, md.planet)}</span>
+              <span className="text-sm text-ink-muted">{formatDate(md.start)} – {formatDate(md.end)} · {t('dasha_years_short', { n: md.years })}</span>
             </div>
             <div className="mt-2 h-2 bg-primary-light rounded-full">
               <div className="h-2 bg-primary rounded-full" style={{ width: `${pct(md.start, md.end)}%` }} />
             </div>
           </div>
           <div>
-            <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">Full Dasha Sequence</h3>
+            <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">{t('dasha_full_sequence')}</h3>
             <div className="flex flex-wrap gap-2">
               {full_sequence.map((m, i) => {
                 const isCurr = m.planet === md.planet && m.start === md.start
@@ -145,7 +150,7 @@ export default function DashaTable({ dasha }) {
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
                           isCurr ? 'bg-primary text-night' : 'bg-primary-light text-primary-dark'
                         }`}>
-                    {m.planet} · {m.years}y
+                    {planetName(t, m.planet)} · {t('dasha_years_short', { n: m.years })}
                   </span>
                 )
               })}
@@ -161,7 +166,7 @@ export default function DashaTable({ dasha }) {
           currentPlanet={ad?.planet}
           currentStart={ad?.start}
           color={c}
-          labelFn={r => `${md.planet}–${r.planet}`}
+          labelFn={r => `${planetName(t, md.planet)}–${planetName(t, r.planet)}`}
         />
       )}
 
@@ -170,8 +175,9 @@ export default function DashaTable({ dasha }) {
         <div className="space-y-3">
           {ad && (
             <div className={`${c.light} border ${c.border} rounded-lg px-3 py-2 text-xs ${c.text}`}>
-              Pratyantar periods within <strong>{md.planet}–{ad.planet}</strong> Antardasha
-              ({formatDate(ad.start)} to {formatDate(ad.end)})
+              <Trans i18nKey="dasha_pratyantar_within"
+                     values={{ chain: `${planetName(t, md.planet)}–${planetName(t, ad.planet)}`, start: formatDate(ad.start), end: formatDate(ad.end) }}
+                     components={{ strong: <strong /> }} />
             </div>
           )}
           <PeriodTable
@@ -179,7 +185,7 @@ export default function DashaTable({ dasha }) {
             currentPlanet={pd?.planet}
             currentStart={pd?.start}
             color={c}
-            labelFn={r => `${md.planet}–${ad?.planet}–${r.planet}`}
+            labelFn={r => `${planetName(t, md.planet)}–${planetName(t, ad?.planet)}–${planetName(t, r.planet)}`}
           />
         </div>
       )}

@@ -55,7 +55,7 @@ describe('state-less pages rebuild from the last chart', () => {
     input: { name: 'Asha', date: '1990-08-16', time: '19:05', place: 'Delhi, India' },
   }
   it.each([
-    ['/kundli', () => import('./Result'), /Lagna: Virgo/],
+    ['/kundli', () => import('./Result'), /kundli_chip_lagna/],
     ['/insights', () => import('./Insights'), /Insights/],
     ['/ask', () => import('./AskPage'), /Ask Your Chart/],
   ])('%s with a saved last chart renders instead of redirecting', async (path, load, marker) => {

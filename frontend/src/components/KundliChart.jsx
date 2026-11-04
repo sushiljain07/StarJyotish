@@ -92,7 +92,7 @@ export default function KundliChart({
   planets = [],
   ascendant = null,
   navamsaPlanets = null,
-  title = 'Lagna Chart',
+  title,
   transitPlanets = null,
 }) {
   const { t } = useTranslation()
@@ -127,7 +127,7 @@ export default function KundliChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-primary-dark">{title}</div>
+      <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_lagna_title')}</div>
 
       <svg
         width="100%"
@@ -224,7 +224,7 @@ export default function KundliChart({
                       textAnchor="middle" fontSize="13"
                       fill={item.color} opacity="0.65" fontStyle="italic">
                   <tspan fontSize="9" dy="-2">{item.deg}</tspan>
-                  <tspan dy="2">T:{item.name}</tspan>
+                  <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
                 </text>
               )
             }

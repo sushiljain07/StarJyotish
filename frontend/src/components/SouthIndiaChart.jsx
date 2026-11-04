@@ -25,7 +25,7 @@ const CELL_SIZE = 120  // px per cell in a 480×480 viewport
 const W = 480
 const H = 480
 
-const SIGN_ABBR = ['Ar', 'Ta', 'Ge', 'Ca', 'Le', 'Vi', 'Li', 'Sc', 'Sg', 'Cp', 'Aq', 'Pi']
+const SIGN_KEYS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces']
 
 function cellXY(row, col) {
   return [col * CELL_SIZE, row * CELL_SIZE]
@@ -38,7 +38,7 @@ function isCentreCell(row, col) {
 export default function SouthIndiaChart({
   planets = [],
   ascendant = null,
-  title = 'South Indian Chart',
+  title,
   transitPlanets = null,
 }) {
   const { t } = useTranslation() // re-renders when the language changes
@@ -79,7 +79,7 @@ export default function SouthIndiaChart({
               fontSize="10" fill={PLANET_COLORS[p.name] ?? '#333'} fontWeight="500">
           {abbr(p.name)}
           <tspan fontSize="8">{Math.floor(p.degree)}°</tspan>
-          {p.retrograde && <tspan fontSize="8" fill="#888">R</tspan>}
+          {p.retrograde && <tspan fontSize="8" fill="#888">{t('col_retrograde')}</tspan>}
         </text>
       )
       yOff += 12
@@ -90,7 +90,7 @@ export default function SouthIndiaChart({
         <text key={`t_${p.name}`} x={cx + 4} y={cy + yOff}
               fontSize="9" fill={PLANET_COLORS[p.name] ?? '#888'}
               fontStyle="italic" opacity="0.75">
-          T:{abbr(p.name)}<tspan fontSize="7">{Math.floor(p.degree)}°</tspan>
+          {t('chart_transit_marker')}{abbr(p.name)}<tspan fontSize="7">{Math.floor(p.degree)}°</tspan>
         </text>
       )
       yOff += 11
@@ -117,7 +117,7 @@ export default function SouthIndiaChart({
             <text key="centre-label" x={x + CELL_SIZE} y={y + CELL_SIZE}
                   textAnchor="middle" dominantBaseline="middle"
                   fontSize="13" fill="#b5451b" fontWeight="bold" opacity="0.35">
-              South Indian
+              {t('chart_south_centre')}
             </text>
           )
         }
@@ -141,7 +141,7 @@ export default function SouthIndiaChart({
           {/* Sign abbreviation top-right */}
           <text x={x + CELL_SIZE - 4} y={y + 12}
                 textAnchor="end" fontSize="9" fill="#b5451b" fontWeight="bold">
-            {SIGN_ABBR[signIdx]}
+            {t(`sign_abbr.${SIGN_KEYS[signIdx]}`)}
           </text>
           {/* House number bottom-right */}
           <text x={x + CELL_SIZE - 4} y={y + CELL_SIZE - 4}
@@ -167,14 +167,14 @@ export default function SouthIndiaChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-3 w-full">
-        <div className="text-sm font-semibold text-primary-dark">{title}</div>
+        <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_south_title')}</div>
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 480 }} className="font-sans">
           {cells}
         </svg>
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-ink-muted px-2">
-          <span>Orange double-line = Lagna</span>
-          <span>R = Retrograde</span>
-          {transitPlanets && <span className="italic">T: = Transit planet</span>}
+          <span>{t('chart_legend_lagna_line')}</span>
+          <span>{t('kundli_planets_legend_r')}</span>
+          {transitPlanets && <span className="italic">{t('chart_legend_transit')}</span>}
         </div>
       </div>
     </div>

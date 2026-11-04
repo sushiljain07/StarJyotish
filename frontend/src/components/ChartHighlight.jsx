@@ -38,23 +38,23 @@ function WheelBg() {
 
 // Chart meta for display names + icons
 const CHART_META = {
-  D1:  { label: 'Lagna',         icon: '🌅', life: 'Personality & Life Path' },
-  D2:  { label: 'Hora',          icon: '💰', life: 'Wealth & Finances' },
-  D3:  { label: 'Drekkana',      icon: '⚔️',  life: 'Courage & Siblings' },
-  D4:  { label: 'Chaturthamsha', icon: '🏠', life: 'Home & Fortune' },
-  D6:  { label: 'Shashthamsha',  icon: '💚', life: 'Health & Service' },
-  D7:  { label: 'Saptamsha',     icon: '👶', life: 'Children & Creativity' },
-  D9:  { label: 'Navamsha',      icon: '💍', life: 'Marriage & Soul Purpose' },
-  D10: { label: 'Dashamsha',     icon: '🏆', life: 'Career & Reputation' },
-  D12: { label: 'Dwadashamsha',  icon: '🌳', life: 'Parents & Ancestry' },
-  D16: { label: 'Shodashamsha',  icon: '🚗', life: 'Vehicles & Comforts' },
-  D20: { label: 'Vimshamsha',    icon: '🕉️',  life: 'Spiritual Progress' },
-  D24: { label: 'Siddhamsha',    icon: '📚', life: 'Education & Learning' },
-  D27: { label: 'Nakshatramsha', icon: '💪', life: 'Strength & Vitality' },
-  D30: { label: 'Trimshamsha',   icon: '🔮', life: 'Karmic Debts' },
-  D40: { label: 'Khavedamsha',   icon: '✨', life: 'Auspicious Patterns' },
-  D45: { label: 'Akshavedamsha', icon: '⚖️',  life: 'General Well-being' },
-  D60: { label: 'Shashtiamsha',  icon: '♾️',  life: 'Past-life Karma' },
+  D1: { icon: '🌅' },
+  D2: { icon: '💰' },
+  D3: { icon: '⚔️' },
+  D4: { icon: '🏠' },
+  D6: { icon: '💚' },
+  D7: { icon: '👶' },
+  D9: { icon: '💍' },
+  D10: { icon: '🏆' },
+  D12: { icon: '🌳' },
+  D16: { icon: '🚗' },
+  D20: { icon: '🕉️' },
+  D24: { icon: '📚' },
+  D27: { icon: '💪' },
+  D30: { icon: '🔮' },
+  D40: { icon: '✨' },
+  D45: { icon: '⚖️' },
+  D60: { icon: '♾️' },
 }
 
 export default function ChartHighlight({ input, chartType = 'D1', autoLoad = false }) {
@@ -63,8 +63,11 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
   const [provider, setProvider] = useState('')
   const fetchedRef = useRef(false)
 
-  const meta = CHART_META[chartType] ?? { label: chartType, icon: '🪐', life: 'this area of life' }
-  useTranslation() // subscribe so this re-renders when the language changes
+  const { t } = useTranslation() // also re-renders when the language changes
+  const baseMeta = CHART_META[chartType]
+  const meta = baseMeta
+    ? { icon: baseMeta.icon, label: t(`chart_meta_${chartType}_label`), life: t(`chart_meta_${chartType}_life`) }
+    : { label: chartType, icon: '🪐', life: t('chart_highlight_default_life') }
   const lang = currentLanguage()
 
   async function loadHighlight() {
@@ -108,7 +111,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
         style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.4)', color: '#D4AF37' }}
       >
         <span>{meta.icon}</span>
-        <span>Get AI Insight for this Chart</span>
+        <span>{t('chart_highlight_get')}</span>
         <span style={{ opacity: 0.6 }}>✦</span>
       </button>
     </div>
@@ -121,10 +124,10 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
       <div className="text-xl animate-spin shrink-0">⏳</div>
       <div>
         <p className="text-sm font-medium" style={{ color: '#D4AF37' }}>
-          Reading your {meta.label} chart…
+          {t('chart_highlight_loading', { label: meta.label })}
         </p>
         <p className="text-xs mt-0.5" style={{ color: 'rgba(212,175,55,0.5)' }}>
-          Identifying key patterns in {meta.life}
+          {t('chart_highlight_loading_sub', { life: meta.life })}
         </p>
       </div>
     </div>
@@ -135,7 +138,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
     <div className="mt-4 text-center">
       <button onClick={() => { fetchedRef.current = false; setStatus('idle') }}
         className="text-xs text-ink-faint hover:text-primary transition">
-        ↺ Retry AI insight
+        {t('chart_highlight_retry')}
       </button>
     </div>
   )
@@ -152,7 +155,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider"
                style={{ color: 'rgba(212,175,55,0.6)' }}>
-              AI Insight · {meta.label}
+              {t('chart_highlight_title', { label: meta.label })}
             </p>
             <p className="text-[11px]" style={{ color: 'rgba(212,175,55,0.4)' }}>{meta.life}</p>
           </div>
@@ -167,7 +170,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
         {/* Footer */}
         {provider && (
           <p className="text-[10px] mt-3 text-right" style={{ color: 'rgba(212,175,55,0.3)' }}>
-            Powered by {provider}
+            {t('chart_highlight_powered', { provider })}
           </p>
         )}
       </div>

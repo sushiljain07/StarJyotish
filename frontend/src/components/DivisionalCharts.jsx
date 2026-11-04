@@ -9,6 +9,7 @@
 // Every division the backend computes is reachable from at least one group.
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
 import ChartHighlight from './ChartHighlight'
 import { API_BASE } from '../api/config'
@@ -20,197 +21,72 @@ const GROUPS = [
   // ── Life ──────────────────────────────────────────────────────────────────
   {
     id: 'life',
-    label: 'Life',
     emoji: '🧑',
     charts: [
-      {
-        area: 'Life Path',
-        chart: 'Rashi / Lagna',
-        code: 'D1',
-        d: 1,
-        governs: "Overall life, personality, physical body, and destiny. The birth chart itself — the lens through which all other divisional charts are interpreted.",
-      },
-      {
-        area: 'Strengths & Talents',
-        chart: 'Saptavimshamsa',
-        code: 'D27',
-        d: 27,
-        governs: "Inner strengths, weaknesses, resilience, and abilities. The D27 gives a nakshatra-level view of your raw energetic capacity, natural talents, and areas of constitutional strength.",
-      },
-      {
-        area: 'Challenges & Obstacles',
-        chart: 'Trimshamsha',
-        code: 'D30',
-        d: 30,
-        governs: "Misfortunes, suffering, hidden weaknesses, and karmic challenges. The D30 reveals what difficulties are karmically prescribed and how to work with — rather than against — them.",
-      },
-      {
-        area: 'Past Karma',
-        chart: 'Shashtiamsa',
-        code: 'D60',
-        d: 60,
-        governs: "Past-life karma and the deepest karmic influences shaping this life. The D60 is the subtlest and most powerful chart — used to trace unexplained patterns and fated events across lifetimes.",
-      },
+      { code: 'D1', d: 1 },
+      { code: 'D27', d: 27 },
+      { code: 'D30', d: 30 },
+      { code: 'D60', d: 60 },
     ],
   },
   // ── Career ────────────────────────────────────────────────────────────────
   {
     id: 'career',
-    label: 'Career',
     emoji: '💼',
     charts: [
-      {
-        area: 'Career & Profession',
-        chart: 'Dasamsa',
-        code: 'D10',
-        d: 10,
-        governs: "Career, profession, reputation, and success. The D10 reveals what you are built to create in the public world and which planetary periods accelerate your professional rise.",
-      },
-      {
-        area: 'Education & Learning',
-        chart: 'Chaturvimshamsa',
-        code: 'D24',
-        d: 24,
-        governs: "Education, learning, knowledge, and wisdom. The D24 reveals where your mind excels, which fields of study are karmically supported, and the depth of your intellectual potential.",
-      },
-      {
-        area: 'Strengths & Talents',
-        chart: 'Saptavimshamsa',
-        code: 'D27',
-        d: 27,
-        governs: "Inner strengths, weaknesses, resilience, and abilities. The D27 gives a nakshatra-level view of your raw energetic capacity, natural talents, and areas of constitutional strength.",
-      },
+      { code: 'D10', d: 10 },
+      { code: 'D24', d: 24 },
+      { code: 'D27', d: 27 },
     ],
   },
   // ── Relationships ─────────────────────────────────────────────────────────
   {
     id: 'relationships',
-    label: 'Relationships',
     emoji: '❤️',
     charts: [
-      {
-        area: 'Marriage & Relationships',
-        chart: 'Navamsa',
-        code: 'D9',
-        d: 9,
-        governs: "Marriage, spouse, relationships, dharma, and inner strength. The D9 is considered equally important as the birth chart — a strong Navamsa elevates everything indicated in D1.",
-      },
-      {
-        area: 'Children & Family',
-        chart: 'Saptamsa',
-        code: 'D7',
-        d: 7,
-        governs: "Children, fertility, parenting, and creative output. The D7 is consulted for timing of childbirth, fertility questions, and the karmic quality of the parent-child bond.",
-      },
-      {
-        area: 'Parents & Heritage',
-        chart: 'Dwadashamsa',
-        code: 'D12',
-        d: 12,
-        governs: "Parents, ancestors, lineage, and family heritage. The D12 illuminates the karmic quality of the parent-child bond and the patterns you carry forward from your bloodline.",
-      },
-      {
-        area: 'Courage & Siblings',
-        chart: 'Drekkana',
-        code: 'D3',
-        d: 3,
-        governs: "Siblings, courage, initiative, and communication. The D3 reveals the quality of your will, your bonds with siblings, and how you navigate challenges with initiative.",
-      },
+      { code: 'D9', d: 9 },
+      { code: 'D7', d: 7 },
+      { code: 'D12', d: 12 },
+      { code: 'D3', d: 3 },
     ],
   },
   // ── Wealth ────────────────────────────────────────────────────────────────
   {
     id: 'wealth',
-    label: 'Wealth',
     emoji: '💰',
     charts: [
-      {
-        area: 'Wealth & Money',
-        chart: 'Hora',
-        code: 'D2',
-        d: 2,
-        governs: "Wealth, income, financial stability, and assets. The D2 shows whether wealth flows through Solar effort or Lunar inheritance — only two signs, so patterns are very clear.",
-      },
-      {
-        area: 'Home & Property',
-        chart: 'Chaturthamsa',
-        code: 'D4',
-        d: 4,
-        governs: "Property, home, vehicles, and inheritance. The D4 is the chart of fixed assets — where you settle, what you accumulate, and the security of your physical foundation.",
-      },
-      {
-        area: 'Comforts & Lifestyle',
-        chart: 'Shodashamsa',
-        code: 'D16',
-        d: 16,
-        governs: "Vehicles, luxuries, comforts, and happiness. The D16 reveals the ease or difficulty surrounding material pleasures, lifestyle quality, and conveyances in your life.",
-      },
+      { code: 'D2', d: 2 },
+      { code: 'D4', d: 4 },
+      { code: 'D16', d: 16 },
     ],
   },
   // ── Health ────────────────────────────────────────────────────────────────
   {
     id: 'health',
-    label: 'Health',
     emoji: '💚',
     charts: [
-      {
-        area: 'Health & Wellness',
-        chart: 'Shashtamsa',
-        code: 'D6',
-        d: 6,
-        governs: "Diseases, health challenges, enemies, and recovery. The D6 reveals constitutional vulnerabilities, immunity, the nature of illnesses, and the path to recovery.",
-      },
-      {
-        area: 'Longevity & Transformation',
-        chart: 'Ashtamsa',
-        code: 'D8',
-        d: 8,
-        governs: "Longevity, obstacles, hidden events, and deep transformation. The D8 reveals karmic debts that manifest as sudden crises — and the resilience available to meet them.",
-      },
+      { code: 'D6', d: 6 },
+      { code: 'D8', d: 8 },
     ],
   },
   // ── Spiritual ─────────────────────────────────────────────────────────────
   {
     id: 'spiritual',
-    label: 'Spiritual',
     emoji: '🙏',
     charts: [
-      {
-        area: 'Spiritual Journey',
-        chart: 'Vimshamsa',
-        code: 'D20',
-        d: 20,
-        governs: "Spirituality, devotion, and religious practices. The D20 shows the quality of your inner practice and which deity, mantra, or path is naturally aligned with your soul.",
-      },
-      {
-        area: 'Fortune & Grace',
-        chart: 'Khavedamsa',
-        code: 'D40',
-        d: 40,
-        governs: "Maternal blessings, fortune, and auspicious karma. The D40 reveals fortunate combinations inherited through the maternal lineage and the quality of divine grace available in this life.",
-      },
-      {
-        area: 'Character & Values',
-        chart: 'Akshavedamsa',
-        code: 'D45',
-        d: 45,
-        governs: "Character, ethics, paternal blessings, and virtues. The D45 integrates multiple dimensions of the chart for a holistic view of your essential nature and dharmic path.",
-      },
-      {
-        area: 'Past Karma',
-        chart: 'Shashtiamsa',
-        code: 'D60',
-        d: 60,
-        governs: "Past-life karma and the deepest karmic influences shaping this life. The D60 is the subtlest and most powerful chart — used to trace unexplained patterns and fated events across lifetimes.",
-      },
+      { code: 'D20', d: 20 },
+      { code: 'D40', d: 40 },
+      { code: 'D45', d: 45 },
+      { code: 'D60', d: 60 },
     ],
   },
 ]
 
 // Flat lookup for defaultDivision prop — first match wins
-const ALL_CHARTS = GROUPS.flatMap(g => g.charts.map(c => ({ ...c, groupLabel: g.label })))
+const ALL_CHARTS = GROUPS.flatMap(g => g.charts.map(c => ({ ...c, groupId: g.id })))
 
 export default function DivisionalCharts({ input, defaultDivision }) {
+  const { t } = useTranslation()
   const [selected, setSelected]   = useState(null)
   const [chartData, setChartData] = useState(null)
   const [loading, setLoading]     = useState(false)
@@ -237,7 +113,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       if (!res.ok) throw new Error('Failed')
       setChartData(await res.json())
     } catch {
-      setError('Could not load chart. Please try again.')
+      setError('kundli_div_error')
     }
     setLoading(false)
   }
@@ -255,14 +131,13 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         {/* Header */}
         <div className="mb-6 pb-4" style={{ borderBottom: '2px solid #EAE1CC' }}>
           <p className="text-[11px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#D9A441' }}>
-            Divisional Charts
+            {t('kundli_div_header')}
           </p>
           <h2 className="font-serif font-bold text-xl text-ink mb-1">
-            Explore Every Dimension of Your Life
+            {t('kundli_div_title')}
           </h2>
           <p className="text-sm text-ink-muted leading-relaxed">
-            Each chart zooms into one life domain with precision the birth chart alone cannot offer.
-            Select an area to view the chart that governs it.
+            {t('kundli_div_intro')}
           </p>
         </div>
 
@@ -272,24 +147,24 @@ export default function DivisionalCharts({ input, defaultDivision }) {
             <div key={group.id}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-base">{group.emoji}</span>
-                <h3 className="font-serif font-bold text-base text-ink">{group.label}</h3>
+                <h3 className="font-serif font-bold text-base text-ink">{t(`kundli_div_group_${group.id}`)}</h3>
               </div>
               <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #EAE1CC' }}>
                 {group.charts.map((chart, idx) => (
                   <button
                     key={`${group.id}-${chart.d}`}
-                    onClick={() => openChart({ ...chart, groupLabel: group.label })}
+                    onClick={() => openChart({ ...chart, groupId: group.id })}
                     className="w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-primary-light/40"
                     style={{ borderBottom: idx < group.charts.length - 1 ? '1px solid #EAE1CC' : 'none' }}
                   >
                     <div className="min-w-0">
-                      <span className="text-sm font-semibold text-ink">{chart.area}</span>
+                      <span className="text-sm font-semibold text-ink">{t(`kundli_div_${chart.code}_area`)}</span>
                       <span className="text-xs ml-2 text-ink-muted">
-                        {chart.chart} · {chart.code}
+                        {t(`kundli_div_${chart.code}_chart`)} · {chart.code}
                       </span>
                     </div>
                     <span className="shrink-0 ml-3 text-xs font-semibold" style={{ color: '#D9A441' }}>
-                      View →
+                      {t('kundli_div_view')}
                     </span>
                   </button>
                 ))}
@@ -308,30 +183,30 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         onClick={back}
         className="flex items-center gap-1.5 text-sm font-semibold text-ink-muted hover:text-ink transition-colors"
       >
-        ← Life Areas
+        {t('kundli_div_back')}
       </button>
 
       <div className="pb-4" style={{ borderBottom: '1px solid #EAE1CC' }}>
         <p className="text-[11px] font-semibold uppercase tracking-widest mb-0.5" style={{ color: '#D9A441' }}>
-          {selected.groupLabel}
+          {t(`kundli_div_group_${selected.groupId}`)}
         </p>
-        <h2 className="font-serif font-bold text-xl text-ink leading-tight">{selected.area}</h2>
+        <h2 className="font-serif font-bold text-xl text-ink leading-tight">{t(`kundli_div_${selected.code}_area`)}</h2>
         <p className="text-xs font-semibold mt-0.5 text-ink-muted">
-          {selected.chart} · {selected.code}
+          {t(`kundli_div_${selected.code}_chart`)} · {selected.code}
         </p>
       </div>
 
       <div className="rounded-xl px-4 py-3.5 bg-parchment-card" style={{ border: '1px solid #EAE1CC' }}>
         <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#D9A441' }}>
-          This chart governs
+          {t('kundli_div_governs_label')}
         </p>
-        <p className="text-sm leading-relaxed text-ink">{selected.governs}</p>
+        <p className="text-sm leading-relaxed text-ink">{t(`kundli_div_${selected.code}_governs`)}</p>
       </div>
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-14">
           <div className="text-3xl animate-spin mb-3">🪐</div>
-          <p className="text-sm font-medium text-ink-muted">Calculating {selected.code}…</p>
+          <p className="text-sm font-medium text-ink-muted">{t('kundli_div_calculating', { code: selected.code })}</p>
           <div className="mt-3 w-40 h-1 rounded-full overflow-hidden bg-line">
             <div className="h-full rounded-full animate-pulse bg-primary w-3/4" />
           </div>
@@ -340,8 +215,8 @@ export default function DivisionalCharts({ input, defaultDivision }) {
 
       {error && (
         <div className="rounded-xl p-4 text-sm bg-vermillion-light border border-vermillion/30 text-vermillion">
-          ⚠️ {error}
-          <button onClick={() => openChart(selected)} className="ml-3 underline text-xs">Retry</button>
+          ⚠️ {t(error)}
+          <button onClick={() => openChart(selected)} className="ml-3 underline text-xs">{t('kundli_div_retry')}</button>
         </div>
       )}
 
@@ -352,7 +227,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
               <KundliChart
                 planets={chartData.planets}
                 ascendant={chartData.ascendant}
-                title={`${selected.code} — ${selected.chart}`}
+                title={`${selected.code} — ${t(`kundli_div_${selected.code}_chart`)}`}
               />
             </div>
           </div>

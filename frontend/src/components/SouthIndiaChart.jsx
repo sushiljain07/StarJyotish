@@ -3,7 +3,7 @@
 
 import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
-import { currentLanguage } from '../i18n/languages'
+import { planetAbbr } from '../utils/astroNames'
 
 // 0-indexed sign → grid cell [row, col]  (4×4, centre 4 cells are empty)
 const SIGN_TO_CELL = {
@@ -25,19 +25,6 @@ const CELL_SIZE = 120  // px per cell in a 480×480 viewport
 const W = 480
 const H = 480
 
-const ABBR_EN = {
-  Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me',
-  Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke',
-  Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
-}
-const ABBR_HI = {
-  Sun: 'सू', Moon: 'च', Mars: 'मं', Mercury: 'बु',
-  Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के',
-  Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
-}
-
-const ABBR_BY_LANG = { en: ABBR_EN, hi: ABBR_HI }
-
 const SIGN_ABBR = ['Ar', 'Ta', 'Ge', 'Ca', 'Le', 'Vi', 'Li', 'Sc', 'Sg', 'Cp', 'Aq', 'Pi']
 
 function cellXY(row, col) {
@@ -54,8 +41,8 @@ export default function SouthIndiaChart({
   title = 'South Indian Chart',
   transitPlanets = null,
 }) {
-  useTranslation() // subscribe so this re-renders when the language changes
-  const abbr = ABBR_BY_LANG[currentLanguage()] ?? ABBR_EN
+  const { t } = useTranslation() // re-renders when the language changes
+  const abbr = name => planetAbbr(t, name)
 
   const ascIdx = ascendant?.sign_index ?? 0
 
@@ -90,7 +77,7 @@ export default function SouthIndiaChart({
       items.push(
         <text key={p.name} x={cx + 4} y={cy + yOff}
               fontSize="10" fill={PLANET_COLORS[p.name] ?? '#333'} fontWeight="500">
-          {abbr[p.name] ?? p.name.slice(0, 2)}
+          {abbr(p.name)}
           <tspan fontSize="8">{Math.floor(p.degree)}°</tspan>
           {p.retrograde && <tspan fontSize="8" fill="#888">R</tspan>}
         </text>
@@ -103,7 +90,7 @@ export default function SouthIndiaChart({
         <text key={`t_${p.name}`} x={cx + 4} y={cy + yOff}
               fontSize="9" fill={PLANET_COLORS[p.name] ?? '#888'}
               fontStyle="italic" opacity="0.75">
-          T:{abbr[p.name] ?? p.name.slice(0, 2)}<tspan fontSize="7">{Math.floor(p.degree)}°</tspan>
+          T:{abbr(p.name)}<tspan fontSize="7">{Math.floor(p.degree)}°</tspan>
         </text>
       )
       yOff += 11

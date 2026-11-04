@@ -4,13 +4,30 @@
 // The backend always sends dates as "YYYY-MM-DD" and times as "HH:MM" (24h) —
 // keep using those raw strings for any date math (new Date(), comparisons,
 // sorting). Only wrap the JSX *display* output with these.
+import { currentLanguage, localeFor } from '../i18n/languages'
 
-// "YYYY-MM-DD" -> "DD-MM-YYYY"
-export function formatDate(dateStr) {
-  if (!dateStr || typeof dateStr !== 'string') return dateStr
-  const [y, m, d] = dateStr.split('-')
-  if (!y || !m || !d) return dateStr
+// With no options: "YYYY-MM-DD" -> "DD-MM-YYYY" (numeric, language-neutral).
+// With Intl options: localized in the current UI language. Accepts a Date or
+// a "YYYY-MM-DD" string (read as a local date).
+export function formatDate(date, opts) {
+  if (opts) {
+    let d = date
+    if (typeof date === 'string') {
+      const [y, m, day] = date.split('-').map(Number)
+      if (!y || !m || !day) return date
+      d = new Date(y, m - 1, day)
+    }
+    if (!(d instanceof Date) || Number.isNaN(d.getTime())) return date
+    return d.toLocaleDateString(localeFor(currentLanguage()), opts)
+  }
+  if (!date || typeof date !== 'string') return date
+  const [y, m, d] = date.split('-')
+  if (!y || !m || !d) return date
   return `${d}-${m}-${y}`
+}
+
+export function formatNumber(n, opts) {
+  return new Intl.NumberFormat(localeFor(currentLanguage()), opts).format(n)
 }
 
 // "HH:MM" (24h) -> "H:MM AM/PM"

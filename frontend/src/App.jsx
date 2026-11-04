@@ -25,7 +25,7 @@ const PanchangDetail = lazy(() => import('./pages/PanchangDetail'))
 const WeekAhead = lazy(() => import('./pages/WeekAhead'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 const Result = lazy(() => import('./pages/Result'))
-const CareerReport = lazy(() => import('./pages/CareerReport'))
+const CareerReportRedirect = lazy(() => import('./pages/CareerReportRedirect'))
 const Login = lazy(() => import('./pages/Login'))
 const Profile = lazy(() => import('./pages/Profile'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
@@ -108,7 +108,7 @@ export default function App() {
               <Route path="/kundli" element={<Result />} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/ask" element={<AskPage />} />
-              <Route path="/career-report" element={<CareerReport />} />
+              <Route path="/career-report" element={<CareerReportRedirect />} />
               <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
               <Route path="/astrologer" element={<RoleRoute role="astrologer"><AstrologerDashboard /></RoleRoute>} />

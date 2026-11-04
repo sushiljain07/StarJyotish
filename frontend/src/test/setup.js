@@ -5,4 +5,5 @@ import { afterEach } from 'vitest'
 afterEach(() => {
   cleanup()
   try { localStorage.clear() } catch { /* jsdom always has it */ }
+  try { sessionStorage.clear() } catch { /* jsdom always has it */ }
 })

@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
+import { useLatestRequest } from '../hooks/useLatestRequest'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
-import { errorFromResponse, errorMessage } from '../api/errors'
+import { errorMessage } from '../api/errors'
 
 // icon/style metadata per section key — content ordering now comes from
 // SECTION_GROUPS below, grouped into the report's information architecture.
@@ -632,6 +633,21 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     generate(resolved)
   }
 
+  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const beginRequest = useLatestRequest()
+
+  // A finished report follows the language toggle (the other language is
+  // fetched once, then cached).
+  const shownLangRef = useRef(lang)
+  useEffect(() => {
+    if (shownLangRef.current === lang) return
+    shownLangRef.current = lang
+    // While loading, the new request makes the old one stale (its reply
+    // is still cached).
+    if (status === 'done' || status === 'loading') generate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
+
   if (!hasPremiumAccess()) {
     return (
       <PaywallCard
@@ -653,29 +669,26 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
 
   // ctxOverride avoids a stale-closure read of the `careerContext` state
   // when called right after handleContextDone resolves it in the same tick.
-  async function generate(ctxOverride) {
+  // Cached per chart + language + career context for the session;
+  // Regenerate passes force to reach the server again.
+  async function generate(ctxOverride, { force = false } = {}) {
     const ctx = ctxOverride !== undefined ? ctxOverride : careerContext
+    const { isCurrent } = beginRequest()
     setStatus('loading')
     setReport(null)
     setErrorMsg('')
-    const language = i18n.language?.startsWith('hi') ? 'hi' : 'en'
     try {
-      const resp = await fetch(`${API_BASE}/api/career-report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: input.date, time: input.time, place: input.place, language,
-          career_stage: ctx?.career_stage,
-          current_profession: ctx?.current_profession,
-          career_concerns: ctx?.career_concerns,
-        }),
-      })
-      if (!resp.ok) {
-        throw await errorFromResponse(resp, t('career_report_error_generic'))
-      }
-      setReport(await resp.json())
+      const data = await fetchReport('/api/career-report', {
+        date: input.date, time: input.time, place: input.place, language: lang,
+        career_stage: ctx?.career_stage,
+        current_profession: ctx?.current_profession,
+        career_concerns: ctx?.career_concerns,
+      }, { force, fallback: t('career_report_error_generic') })
+      if (!isCurrent()) return
+      setReport(data)
       setStatus('done')
     } catch (e) {
+      if (!isCurrent()) return
       setErrorMsg(errorMessage(e, t('career_report_error_generic')))
       setStatus('error')
     }
@@ -755,7 +768,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     <>
       <div className="text-center mt-6 pb-2 space-x-4">
         <button
-          onClick={() => generate()}
+          onClick={() => generate(undefined, { force: true })}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
         >
           ↺ Regenerate Report

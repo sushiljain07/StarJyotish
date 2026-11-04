@@ -1,10 +1,11 @@
 // frontend/src/pages/Insights.jsx
 // Standalone page for AI readings, Rajyogas, and topic reports.
 // Promoted from the old "Insights" tab inside /kundli to its own URL.
-import { useState, lazy, Suspense } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useState, lazy, Suspense } from 'react'
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
+import { resolveChartState } from '../services/lastChart'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import Seo from '../components/Seo'
 import { getTopic } from '../config/topics'
@@ -38,28 +39,43 @@ function buildSubtabs(t, topicId) {
 
 export default function Insights() {
   const { t } = useTranslation()
-  const { state }   = useLocation()
-  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  const { isAuthenticated, user, loading: authLoading } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile.
+  const state = resolveChartState(location.state, user)
 
-  // All hooks before any early return
-  const [activeSub, setActiveSub] = useState('reading')
+  // Sub-tab and topic live in the URL (?sub=&topic=) so refresh, Back and
+  // shared links keep them. All hooks before any early return.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlSub = searchParams.get('sub')
   // The career report auto-generates (a ~20s LLM call) when it mounts, so
   // mount it only once its tab has been opened, then keep it mounted.
-  const [careerOpened, setCareerOpened] = useState(false)
-  function selectSub(id) {
-    if (id === 'career') setCareerOpened(true)
-    setActiveSub(id)
-  }
+  const [careerOpenedFlag, setCareerOpenedFlag] = useState(false)
+  useEffect(() => {
+    if (urlSub === 'career') setCareerOpenedFlag(true)
+  }, [urlSub])
 
   const homeDestination = isAuthenticated ? '/home' : '/'
+
+  // On a hard page load the saved profile is only known once sign-in
+  // has resolved; redirecting before then would bounce a signed-in user.
+  if (!state?.input && authLoading) return null
 
   // <Navigate>, not navigate() — see Result.jsx.
   if (!state?.input) return <Navigate to={homeDestination} replace />
 
   const { input } = state
-  const topic   = getTopic(input?.topic)
+  const topic   = getTopic(searchParams.get('topic') ?? input?.topic)
   const topicId = topic?.id ?? null
   const SUBTABS = buildSubtabs(t, topicId)
+  const activeSub = SUBTABS.some(tab => tab.id === urlSub) ? urlSub : 'reading'
+  const careerOpened = careerOpenedFlag || activeSub === 'career'
+
+  function selectSub(id) {
+    const next = new URLSearchParams(searchParams)
+    next.set('sub', id)
+    setSearchParams(next, { replace: true, state: location.state })
+  }
 
   return (
     <div className="flex-1 flex flex-col">
@@ -84,14 +100,14 @@ export default function Insights() {
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
         <Suspense fallback={<TabLoader />}>
           <div className={activeSub === 'reading' ? 'tab-fade' : 'hidden'}>
-            <ChartReading input={input} topic={topicId} onOpenRajyogas={() => setActiveSub('rajyogas')} />
+            <ChartReading input={input} topic={topicId} onOpenRajyogas={() => selectSub('rajyogas')} />
           </div>
           <div className={activeSub === 'rajyogas' ? 'tab-fade' : 'hidden'}>
             <RajyogasTab input={input} />
           </div>
           {topicId === 'career' && careerOpened && (
             <div className={activeSub === 'career' ? 'tab-fade' : 'hidden'}>
-              <CareerReportTab input={input} onOpenRajyogas={() => setActiveSub('rajyogas')} />
+              <CareerReportTab input={input} onOpenRajyogas={() => selectSub('rajyogas')} />
             </div>
           )}
           {(topicId === 'relationship' || topicId === 'finance' || topicId === 'health') && (

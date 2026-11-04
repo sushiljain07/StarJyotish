@@ -21,6 +21,7 @@ import {
   sendEmailLinkOtp as apiSendEmailLinkOtp,
   verifyEmailLinkOtp as apiVerifyEmailLinkOtp,
 } from '../api/auth'
+import { clearChartSession } from '../services/lastChart'
 
 const AuthContext = createContext(null)
 
@@ -77,6 +78,7 @@ export function AuthProvider({ children }) {
     }
     setAccessToken(null)
     setUser(null)
+    clearChartSession()
   }, [])
 
   // Runs `fn(accessToken)` and, if it fails with a 401 (the access token

@@ -18,6 +18,8 @@ import OnboardingLayout from '../components/onboarding/OnboardingLayout'
 import ProgressIndicator from '../components/onboarding/ProgressIndicator'
 import QuestionCard from '../components/onboarding/QuestionCard'
 import BirthTimeSelector from '../components/onboarding/BirthTimeSelector'
+import PlaceCombobox from '../components/PlaceCombobox'
+import { loadLastChart } from '../services/lastChart'
 import ReviewCard from '../components/onboarding/ReviewCard'
 import LoadingState from '../components/onboarding/LoadingState'
 import CompletionCelebration from '../components/onboarding/CompletionCelebration'
@@ -51,6 +53,16 @@ const DAYS = Array.from({ length: 31 }, (_, i) => i + 1)
 
 const bigSelCls = 'flex-1 border border-line rounded-xl px-3 py-3 bg-parchment text-ink text-base text-center focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer'
 
+// '19:05' → { hour: '07', minute: '05', ampm: 'PM' }, the shape the time
+// selects use.
+function from24Hour(time) {
+  const [h, minute] = time.split(':')
+  const h24 = parseInt(h, 10)
+  const ampm = h24 >= 12 ? 'PM' : 'AM'
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12
+  return { hour: String(h12).padStart(2, '0'), minute, ampm }
+}
+
 function to24Hour(hour, ampm) {
   let h = parseInt(hour, 10)
   if (ampm === 'AM' && h === 12) h = 0
@@ -81,7 +93,6 @@ export default function Onboarding() {
   const [manualLocationQuery, setManualLocationQuery] = useState('')
   const manualLocationMatches = usePlaceMatches(manualLocationQuery)
   const [placeQuery, setPlaceQuery] = useState('')
-  const [showPlaceSuggestions, setShowPlaceSuggestions] = useState(false)
   const [generationError, setGenerationError] = useState(null)
   const [createdProfile, setCreatedProfile] = useState(null)
   const placeSuggestions = usePlaceSuggestions(placeQuery)
@@ -107,6 +118,25 @@ export default function Onboarding() {
 
   function update(patch) {
     setDraft(d => ({ ...d, ...patch }))
+  }
+
+  // A chart made just before signing up (see services/lastChart.js) can
+  // fill in this profile, so the user doesn't type it all again. Offered,
+  // not assumed: people also make charts for someone else.
+  const lastInput = loadLastChart()?.input
+  const canUseLast = Boolean(lastInput?.date && lastInput?.place && lastInput?.time)
+
+  function applyLastChart() {
+    const [year, month, day] = lastInput.date.split('-')
+    const accuracy = lastInput.timeAccuracy ?? 'exact'
+    update({
+      year, month: String(Number(month)), day: String(Number(day)),
+      birthDate: lastInput.date,
+      birthTimeAccuracy: accuracy,
+      ...(accuracy === 'unknown' ? {} : from24Hour(lastInput.time)),
+      place: lastInput.place,
+    })
+    setStep('review')
   }
 
   function skip() {
@@ -211,13 +241,30 @@ export default function Onboarding() {
       >
         {showProgress && <ProgressIndicator current={questionIndex} total={QUESTION_STEPS.length} />}
 
-        {step === 'welcome' && (
+        {step === 'welcome' && !canUseLast && (
           <QuestionCard
             title={t('onboarding_welcome_title')}
             helperText={t('onboarding_welcome_body')}
             primaryLabel={t('onboarding_welcome_cta')}
             onPrimary={() => setStep('birthDate')}
           />
+        )}
+
+        {step === 'welcome' && canUseLast && (
+          <QuestionCard
+            title={t('onboarding_use_last_heading')}
+            helperText={[lastInput.name, lastInput.date, lastInput.place].filter(Boolean).join(' · ')}
+            primaryLabel={t('onboarding_use_last_yes')}
+            onPrimary={applyLastChart}
+          >
+            <button
+              type="button"
+              onClick={() => setStep('birthDate')}
+              className="w-full min-h-[44px] text-sm font-medium text-primary-dark hover:underline"
+            >
+              {t('onboarding_use_last_no')}
+            </button>
+          </QuestionCard>
         )}
 
         {step === 'birthDate' && (
@@ -277,27 +324,16 @@ export default function Onboarding() {
             primaryDisabled={!draft.place.trim()}
             onPrimary={() => setStep('review')}
           >
-            <div className="relative">
-              <input
-                type="text"
-                autoFocus
-                value={draft.place}
-                onChange={e => { update({ place: e.target.value }); setPlaceQuery(e.target.value); setShowPlaceSuggestions(true) }}
-                onBlur={() => setTimeout(() => setShowPlaceSuggestions(false), 200)}
-                placeholder={t('onboarding_place_placeholder')}
-                className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              {showPlaceSuggestions && placeSuggestions.length > 0 && (
-                <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto text-left">
-                  {placeSuggestions.map((s, i) => (
-                    <li key={i} onMouseDown={() => { update({ place: s }); setShowPlaceSuggestions(false) }}
-                        className="px-4 py-2.5 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <PlaceCombobox
+              id="onboarding-birth-place"
+              value={draft.place}
+              items={placeSuggestions}
+              placeholder={t('onboarding_place_placeholder')}
+              className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center focus:outline-none focus:ring-2 focus:ring-primary"
+              inputProps={{ autoFocus: true, 'aria-label': t('onboarding_place_placeholder') }}
+              onInputChange={text => { update({ place: text }); setPlaceQuery(text) }}
+              onSelect={item => update({ place: item })}
+            />
           </QuestionCard>
         )}
 
@@ -353,25 +389,17 @@ export default function Onboarding() {
                     <p className="text-xs text-vermillion text-center">{t('onboarding_current_location_denied')}</p>
                   )}
 
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={manualLocationQuery}
-                      onChange={e => setManualLocationQuery(e.target.value)}
-                      placeholder={t('onboarding_current_location_manual_placeholder')}
-                      className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    {manualLocationMatches.length > 0 && (
-                      <ul className="absolute z-10 w-full bg-parchment-card border border-line rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto text-left">
-                        {manualLocationMatches.map((m, i) => (
-                          <li key={i} onMouseDown={() => chooseManualLocation(m)}
-                              className="px-4 py-2.5 text-sm text-ink hover:bg-primary-light cursor-pointer border-b border-line last:border-0">
-                            {m.display_name}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                  <PlaceCombobox
+                    id="onboarding-current-location"
+                    value={manualLocationQuery}
+                    items={manualLocationMatches}
+                    getLabel={m => m.display_name}
+                    placeholder={t('onboarding_current_location_manual_placeholder')}
+                    className="w-full border border-line rounded-xl px-4 py-3 bg-parchment text-ink text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                    inputProps={{ 'aria-label': t('onboarding_current_location_manual_placeholder') }}
+                    onInputChange={setManualLocationQuery}
+                    onSelect={chooseManualLocation}
+                  />
                 </>
               )}
               <button type="button" onClick={generate} className="w-full text-xs text-ink-muted underline pt-1">

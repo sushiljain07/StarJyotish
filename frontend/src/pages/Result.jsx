@@ -1,7 +1,8 @@
-import { useState, lazy, Suspense } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState, lazy, Suspense } from 'react'
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
+import { resolveChartState, saveLastChart } from '../services/lastChart'
 
 import { StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
@@ -13,6 +14,7 @@ import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
+import ReadingTeaser from '../components/ReadingTeaser'
 
 const KPChart             = lazy(() => import('../components/KPChart'))
 const DivisionalCharts    = lazy(() => import('../components/DivisionalCharts'))
@@ -68,6 +70,10 @@ const ANALYSIS_SUBTABS = [
   { id: 'sarvatobhadra', label: 'Sarvatobhadra' },
 ]
 
+const MAIN_TAB_IDS = MAIN_TABS.map(tab => tab.id)
+const BIRTH_SUB_IDS = BIRTH_SUBTABS.map(tab => tab.id)
+const ANALYSIS_SUB_IDS = ANALYSIS_SUBTABS.map(tab => tab.id)
+
 const CHART_STYLES = [
   { id: 'north', label: 'North' },
   { id: 'kp',    label: 'KP' },
@@ -79,30 +85,58 @@ function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
 
 export default function Result() {
   const { t } = useTranslation()
-  const { state } = useLocation()
+  const location  = useLocation()
   const navigate  = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, loading: authLoading } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile.
+  const state = resolveChartState(location.state, user)
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
-  const initTab = state?.activeTab ?? 'birth_chart'
-  const initSub = state?.activeSubtab ?? 'chart'
+  // Tabs live in the URL (?tab=&sub=) so refresh, Back and shared links
+  // keep them. Without ?tab, fall back to the { activeTab, activeSubtab }
+  // router state older in-app links still pass.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlTab = searchParams.get('tab')
+  const urlSub = searchParams.get('sub')
 
   const legacyMainMap = {
     kundli: 'birth_chart', advanced: 'analysis',
     birth_chart: 'birth_chart', divisional: 'divisional',
     analysis: 'analysis', download: 'download',
   }
-  const resolvedMain = legacyMainMap[initTab] ?? 'birth_chart'
   const legacyBirthMap = { birth_chart: 'chart', planets: 'planets', dasha: 'dasha', transit: 'transit' }
-  const resolvedBirthSub = legacyBirthMap[initSub] ?? initSub
 
-  const [activeMain, setActiveMain]         = useState(resolvedMain)
-  const [activeBirthSub, setActiveBirthSub] = useState(
-    ['chart','planets','dasha','transit'].includes(resolvedBirthSub) ? resolvedBirthSub : 'chart'
-  )
-  const [activeAnalysisSub, setActiveAnalysisSub] = useState('bhava')
+  const activeMain = urlTab
+    ? (MAIN_TAB_IDS.includes(urlTab) ? urlTab : 'birth_chart')
+    : (legacyMainMap[state?.activeTab] ?? 'birth_chart')
+  const legacySub = urlTab ? null : (legacyBirthMap[state?.activeSubtab] ?? state?.activeSubtab)
+  const activeBirthSub = BIRTH_SUB_IDS.includes(urlSub) ? urlSub
+    : BIRTH_SUB_IDS.includes(legacySub) ? legacySub : 'chart'
+  const activeAnalysisSub = ANALYSIS_SUB_IDS.includes(urlSub) ? urlSub : 'bhava'
+
+  // A main-tab change is a new history entry (Back returns to the previous
+  // main tab); a sub-tab change replaces it. Router state is carried along
+  // so the chart and any preset question survive.
+  function selectMain(id) {
+    if (id === activeMain) return
+    setSearchParams({ tab: id }, { state: location.state })
+  }
+  function selectSub(id) {
+    setSearchParams({ tab: activeMain, sub: id }, { replace: true, state: location.state })
+  }
+
   const [chartStyle, setChartStyle]               = useState('north')
+
+  // Remember a chart that arrived by navigation, so a refresh or a
+  // sign-in round-trip comes back to it (see services/lastChart.js).
+  useEffect(() => {
+    if (location.state?.data) saveLastChart(location.state)
+  }, [location.state])
+
+  // On a hard page load the saved profile is only known once sign-in
+  // has resolved; redirecting before then would bounce a signed-in user.
+  if (!state?.data && authLoading) return null
 
   // <Navigate>, not navigate(): navigate() during render is ignored by
   // React Router, which left a blank page for bookmarked/refreshed URLs.
@@ -188,7 +222,7 @@ export default function Result() {
             <AnimatedTabRow
               tabs={MAIN_TABS}
               active={activeMain}
-              onChange={setActiveMain}
+              onChange={selectMain}
               renderIcon={tab => tab.icon.startsWith('/')
                 ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
                 : <TabIcon id={tab.icon} className="w-4 h-4" />}
@@ -199,10 +233,10 @@ export default function Result() {
           {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
             <div className="border-t border-line/40 py-2">
               {activeMain === 'birth_chart' && (
-                <SubTabBar subtabs={BIRTH_SUBTABS} active={activeBirthSub} onChange={setActiveBirthSub} />
+                <SubTabBar subtabs={BIRTH_SUBTABS} active={activeBirthSub} onChange={selectSub} />
               )}
               {activeMain === 'analysis' && (
-                <SubTabBar subtabs={ANALYSIS_SUBTABS} active={activeAnalysisSub} onChange={setActiveAnalysisSub} accent="sage" />
+                <SubTabBar subtabs={ANALYSIS_SUBTABS} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
               )}
             </div>
           )}
@@ -216,6 +250,7 @@ export default function Result() {
         <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
 
           <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
+            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state })} />
             <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />
@@ -285,7 +320,7 @@ export default function Result() {
 
       </div>
 
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={setActiveMain} raised={isAuthenticated} />
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={isAuthenticated} />
     </div>
   )
 }

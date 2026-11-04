@@ -2,9 +2,9 @@
 // screen's "Try Again" must actually re-request the report. Signed-in
 // users skip the idle "Generate" screen, so resetting to 'idle' alone left
 // them on a loading spinner forever.
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
-import '../i18n'
+import i18n from '../i18n'
 import en from '../i18n/en.json'
 
 let authState = { isAuthenticated: true }
@@ -116,5 +116,82 @@ describe('Regenerate after a finished reading', () => {
     fireEvent.click(screen.getByRole('button', { name: /regenerate/i }))
     expect(await screen.findByText('Second.')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('Report cache', () => {
+  const reading = text => ok({ prediction_sections: { identity: text } })
+  const bodyOf = call => JSON.parse(call[1].body)
+
+  it('(a) a remounted reading comes from the cache, not a new request', async () => {
+    fetchMock.mockResolvedValueOnce(reading('Cached.'))
+    const first = render(<ChartReading input={INPUT} />)
+    await screen.findByText('Cached.')
+    first.unmount()
+    render(<ChartReading input={INPUT} />)
+    expect(await screen.findByText('Cached.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('(b) switching language fetches that language; switching back is cached', async () => {
+    fetchMock.mockResolvedValueOnce(reading('English.')).mockResolvedValueOnce(reading('हिंदी।'))
+    render(<ChartReading input={INPUT} />)
+    await screen.findByText('English.')
+    await act(() => i18n.changeLanguage('hi'))
+    expect(await screen.findByText('हिंदी।')).toBeInTheDocument()
+    expect(bodyOf(fetchMock.mock.calls[1]).language).toBe('hi')
+    await act(() => i18n.changeLanguage('en'))
+    expect(await screen.findByText('English.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('(c) Regenerate reaches the server even when the reading is cached', async () => {
+    fetchMock.mockResolvedValueOnce(reading('One.')).mockResolvedValueOnce(reading('Two.'))
+    render(<ChartReading input={INPUT} />)
+    await screen.findByText('One.')
+    fireEvent.click(screen.getByRole('button', { name: /regenerate/i }))
+    expect(await screen.findByText('Two.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('(d) a reply that lands after unmount is cached, not shown', async () => {
+    let resolve
+    fetchMock.mockReturnValueOnce(new Promise(r => { resolve = r }))
+    const errors = vi.spyOn(console, 'error')
+    const first = render(<ChartReading input={INPUT} />)
+    first.unmount()
+    await act(async () => { resolve(reading('Late.')) })
+    expect(errors).not.toHaveBeenCalled()
+    render(<ChartReading input={INPUT} />)
+    expect(await screen.findByText('Late.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Report cache keys and language during load', () => {
+  const reading = text => ok({ prediction_sections: { identity: text } })
+
+  it('a language switch while loading ends on the new language', async () => {
+    let resolveEn
+    fetchMock
+      .mockReturnValueOnce(new Promise(r => { resolveEn = r }))
+      .mockResolvedValueOnce(reading('हिंदी।'))
+    render(<ChartReading input={INPUT} />)
+    await act(() => i18n.changeLanguage('hi'))
+    await act(async () => { resolveEn(reading('English.')) })
+    expect(await screen.findByText('हिंदी।')).toBeInTheDocument()
+    expect(screen.queryByText('English.')).toBeNull()
+    await act(() => i18n.changeLanguage('en'))
+  })
+
+  it('the reading is cached by chart and language only', async () => {
+    fetchMock.mockResolvedValueOnce(reading('Once.'))
+    const first = render(<ChartReading input={{ ...INPUT, name: 'Asha', topic: 'career', timeAccuracy: 'exact' }} />)
+    await screen.findByText('Once.')
+    first.unmount()
+    render(<ChartReading input={INPUT} />)
+    expect(await screen.findByText('Once.')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(Object.keys(JSON.parse(fetchMock.mock.calls[0][1].body)).sort()).toEqual(['date', 'language', 'place', 'time'])
   })
 })

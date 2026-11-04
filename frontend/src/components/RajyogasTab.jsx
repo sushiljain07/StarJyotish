@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { API_BASE } from '../api/config'
+import { chartBody, fetchReport } from '../api/reportCache'
+import { useLatestRequest } from '../hooks/useLatestRequest'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
-import { errorFromResponse, errorMessage } from '../api/errors'
+import { errorMessage } from '../api/errors'
 
 const YOGA_ICONS = {
   'Raja Yoga':                  '👑',
@@ -434,6 +435,7 @@ function YogaCard({ yoga, defaultOpen }) {
 
 export default function RajyogasTab({ input }) {
   const [status, setStatus]     = useState('idle')
+  const beginRequest = useLatestRequest()
   const [result, setResult]     = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -460,22 +462,19 @@ export default function RajyogasTab({ input }) {
     )
   }
 
+  // Rule-based, but still cached for the session so revisiting the tab
+  // is instant.
   async function load() {
+    const { isCurrent } = beginRequest()
     setStatus('loading')
     setErrorMsg('')
     try {
-      const res = await fetch(`${API_BASE}/api/rajyogas`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
-      })
-      if (!res.ok) {
-        throw await errorFromResponse(res, `Server error ${res.status}`)
-      }
-      const data = await res.json()
+      const data = await fetchReport('/api/rajyogas', chartBody(input), { fallback: 'Something went wrong. Please try again.' })
+      if (!isCurrent()) return
       setResult(data)
       setStatus('done')
     } catch (e) {
+      if (!isCurrent()) return
       setErrorMsg(errorMessage(e, 'Something went wrong. Please try again.'))
       setStatus('error')
     }

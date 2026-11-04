@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
-import { API_BASE } from '../api/config'
+import { fetchReport, readingBody } from '../api/reportCache'
+import { useLatestRequest } from '../hooks/useLatestRequest'
 import { Button } from './ui'
-import { errorFromResponse, errorMessage } from '../api/errors'
+import { errorMessage } from '../api/errors'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -53,23 +54,28 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   const [visible, setVisible]         = useState([])
 
 
-  async function generate() {
+  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const beginRequest = useLatestRequest()
+
+  // Section fade-in timers, cleared on a new request and on unmount.
+  const timersRef = useRef([])
+  const clearTimers = () => { timersRef.current.forEach(clearTimeout); timersRef.current = [] }
+  useEffect(() => clearTimers, [])
+
+  // Cached per chart + language for the session (api/reportCache.js);
+  // Regenerate passes force to reach the server again.
+  async function generate({ force = false } = {}) {
+    const { isCurrent } = beginRequest()
+    clearTimers()
     setStatus('loading')
     setPredSections({})
     setVisible([])
     setErrorMsg('')
 
     try {
-      const lang = i18n.language.startsWith('hi') ? 'hi' : 'en'
-      const res = await fetch(`${API_BASE}/api/kundli/reading`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...input, language: lang }),
-      })
-      if (!res.ok) {
-        throw await errorFromResponse(res, 'Error generating prediction')
-      }
-      const data = await res.json()
+      const data = await fetchReport('/api/kundli/reading', readingBody(input, lang),
+        { force, fallback: 'Error generating prediction' })
+      if (!isCurrent()) return
 
       const secs = data.prediction_sections || {}
       setPredSections(secs)
@@ -80,14 +86,27 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       // Stagger each section's fade-in, 380ms apart
       SECTION_CONFIG.forEach((c, i) => {
         if (secs[c.key]) {
-          setTimeout(() => setVisible(prev => [...prev, c.key]), i * 380)
+          timersRef.current.push(setTimeout(() => setVisible(prev => [...prev, c.key]), i * 380))
         }
       })
     } catch (e) {
+      if (!isCurrent()) return
       setErrorMsg(errorMessage(e, t('error_something_wrong')))
       setStatus('error')
     }
   }
+
+  // A finished reading follows the language toggle (the other language is
+  // fetched once, then cached).
+  const shownLangRef = useRef(lang)
+  useEffect(() => {
+    if (shownLangRef.current === lang) return
+    shownLangRef.current = lang
+    // While loading, the new request makes the old one stale (its reply
+    // is still cached).
+    if (status === 'done' || status === 'loading') generate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
 
   // Auto-reveal for signed-in visitors — the "Reveal My Prediction" click
   // gate exists for the anonymous funnel (it's a deliberate curiosity/
@@ -115,7 +134,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       <p className="text-ink-muted text-sm mb-6 max-w-sm">
         {t('reading_idle_body')}
       </p>
-      <Button size="lg" onClick={generate}>
+      <Button size="lg" onClick={() => generate()}>
         Reveal My Prediction
       </Button>
       <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
@@ -240,7 +259,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       )}
 
       <div className="text-center pb-4">
-        <button onClick={() => generate()}
+        <button onClick={() => generate({ force: true })}
           className="text-sm text-primary hover:text-primary-dark transition">
           ↺ Regenerate Prediction
         </button>

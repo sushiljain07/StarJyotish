@@ -42,6 +42,15 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Come back to this page after signing in (Login forwards `next`); the
+  // chart on it is rebuilt from the session (services/lastChart.js). From
+  // the landing page there's nothing to return to, so Login picks /home.
+  function signIn() {
+    const here = location.pathname
+    const next = here === '/' || here === '/login' ? undefined : here + location.search
+    navigate('/login', next ? { state: { next } } : undefined)
+  }
   const { user, isAuthenticated } = useAuth()
   const profile = isAuthenticated ? getPrimaryProfile(user) : null
   const [menuOpen, setMenuOpen] = useState(false)
@@ -98,7 +107,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
         <div className="flex items-center gap-2 shrink-0">
           {!isAuthenticated && (
             <button
-              onClick={() => navigate('/login')}
+              onClick={signIn}
               className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
             >
               {t('nav_sign_in')}

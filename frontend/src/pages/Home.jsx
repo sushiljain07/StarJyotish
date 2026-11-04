@@ -1,12 +1,13 @@
 // frontend/src/pages/Home.jsx
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import BirthForm from '../components/BirthForm'
 import { fetchKundli } from '../api/astro'
 import { getTopic } from '../config/topics'
 import { markFreeKundliUsed } from '../config/auth'
 import { useAuth } from '../contexts/AuthContext'
+import { saveLastChart } from '../services/lastChart'
 import TopicIcon from '../components/TopicIcon'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import Seo from '../components/Seo'
@@ -19,7 +20,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const topicId = state?.topic ?? null
+  const [searchParams] = useSearchParams()
+  // Router state from in-app links, or ?topic= from plain links such as
+  // the Knowledge Center CTA and the /career-report redirect.
+  const topicId = state?.topic ?? searchParams.get('topic') ?? null
   const topic = getTopic(topicId)
   // Carried over from the landing page's AI persona spotlight (see
   // Landing.jsx → AskPersonaCard.jsx) — lets Result.jsx land the visitor
@@ -43,6 +47,7 @@ export default function Home() {
       // route signed-out repeat visitors to /login), so there's nothing
       // to mark for them.
       if (!topicId && !isAuthenticated) markFreeKundliUsed()
+      saveLastChart({ data, input })
       navigate('/kundli', { state: { data, input, presetQuestion, landToAsk } })
     } catch (err) {
       setError(

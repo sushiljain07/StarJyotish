@@ -13,9 +13,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
+import { useLatestRequest } from '../hooks/useLatestRequest'
 import SegmentedToggle from './SegmentedToggle'
-import { errorFromResponse, errorMessage } from '../api/errors'
+import { errorMessage } from '../api/errors'
 
 const TOPIC_CONFIG = {
   relationship: {
@@ -238,6 +239,24 @@ export default function TopicReportTab({ topic, input }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, topic])
 
+  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const beginRequest = useLatestRequest()
+  // Relationship's Regenerate goes back to the marital-status screen; the
+  // next Generate there must still reach the server, not the cache.
+  const forceNextRef = useRef(false)
+
+  // A finished report follows the language toggle (the other language is
+  // fetched once, then cached).
+  const shownLangRef = useRef(lang)
+  useEffect(() => {
+    if (shownLangRef.current === lang) return
+    shownLangRef.current = lang
+    // While loading, the new request makes the old one stale (its reply
+    // is still cached).
+    if (status === 'done' || status === 'loading') generate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
+
   if (!cfg) return null
 
   const maritalStatusOptions = [
@@ -246,26 +265,24 @@ export default function TopicReportTab({ topic, input }) {
     { id: 'divorced_widowed', label: t('relationship_marital_status_divorced_widowed') },
   ]
 
-  async function generate() {
+  // Cached per chart + language (+ marital status) for the session.
+  async function generate({ force = false } = {}) {
+    const { isCurrent } = beginRequest()
+    const forced = force || forceNextRef.current
+    forceNextRef.current = false
     setStatus('loading')
     setReport(null)
     setErrorMsg('')
-    const language = i18n.language?.startsWith('hi') ? 'hi' : 'en'
     try {
-      const resp = await fetch(`${API_BASE}${cfg.endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: input.date, time: input.time, place: input.place, language,
-          ...(cfg.requiresMaritalStatus ? { marital_status: maritalStatus } : {}),
-        }),
-      })
-      if (!resp.ok) {
-        throw await errorFromResponse(resp, t('topic_report_error_generic'))
-      }
-      setReport(await resp.json())
+      const data = await fetchReport(cfg.endpoint, {
+        date: input.date, time: input.time, place: input.place, language: lang,
+        ...(cfg.requiresMaritalStatus ? { marital_status: maritalStatus } : {}),
+      }, { force: forced, fallback: t('topic_report_error_generic') })
+      if (!isCurrent()) return
+      setReport(data)
       setStatus('done')
     } catch (e) {
+      if (!isCurrent()) return
       setErrorMsg(errorMessage(e, t('topic_report_error_generic')))
       setStatus('error')
     }
@@ -290,7 +307,7 @@ export default function TopicReportTab({ topic, input }) {
         </div>
       )}
       <button
-        onClick={generate}
+        onClick={() => generate()}
         className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"
       >
         {t(`topic_report_${topic}_generate_button`)}
@@ -351,7 +368,11 @@ export default function TopicReportTab({ topic, input }) {
 
       <div className="text-center mt-6 pb-2">
         <button
-          onClick={() => (skipIdleScreen ? generate() : setStatus('idle'))}
+          onClick={() => {
+            if (skipIdleScreen) { generate({ force: true }); return }
+            forceNextRef.current = true
+            setStatus('idle')
+          }}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
         >
           ↺ {t('topic_report_regenerate')}

@@ -16,9 +16,11 @@
 //     target, closer to how native apps present a "jump to" menu.
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import AnimatedTabRow from './AnimatedTabRow'
 
 export default function SectionJumpNav({ sections, className = '' }) {
+  const { t } = useTranslation()
   const [active, setActive] = useState(sections[0]?.id)
   const [sheetOpen, setSheetOpen] = useState(false)
   const observerRef = useRef(null)
@@ -97,11 +99,11 @@ export default function SectionJumpNav({ sections, className = '' }) {
             />
             <div className="relative w-full bg-parchment-card rounded-t-2xl max-h-[70vh] overflow-y-auto pb-safe shadow-2xl animate-fade-in-fast">
               <div className="sticky top-0 bg-parchment-card border-b border-line px-4 py-3 flex items-center justify-between">
-                <span className="font-bold text-ink text-sm">Jump to section</span>
+                <span className="font-bold text-ink text-sm">{t('jump_nav_title')}</span>
                 <button
                   type="button"
                   onClick={() => setSheetOpen(false)}
-                  aria-label="Close"
+                  aria-label={t('jump_nav_close')}
                   className="text-ink-faint text-xl leading-none px-2"
                 >
                   ×

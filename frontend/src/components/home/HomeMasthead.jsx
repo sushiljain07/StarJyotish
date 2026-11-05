@@ -19,6 +19,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { localDateStr } from '../../utils/localDate'
+import { formatDate } from '../../utils/format'
+import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
 // 12-hour strings with an AM/PM suffix (see services/panchang.py's _fmt).
@@ -115,9 +117,10 @@ function useCheckInStreak() {
 // right-aligned, so on days with no streak (or even with one) the whole
 // left half read as dead space.
 function TodayDateLabel() {
+  const { i18n } = useTranslation() // recompute when the language changes
   const label = useMemo(
-    () => new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }),
-    [],
+    () => formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' }),
+    [i18n.language],
   )
   return <span className="text-2xs font-mono text-ink-onnight/45 whitespace-nowrap">{label}</span>
 }
@@ -127,7 +130,7 @@ function StreakPill({ streak, beads, t }) {
   return (
     <div
       className="flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] rounded-full px-3 py-1.5 shrink-0"
-      title={t('home_streak_title', 'Daily check-in streak')}
+      title={t('home_streak_title')}
     >
       <div className="flex items-center gap-[3px]">
         {beads.map((lit, i) => (
@@ -139,7 +142,7 @@ function StreakPill({ streak, beads, t }) {
         ))}
       </div>
       <span className="text-2xs text-primary-glow whitespace-nowrap">
-        {t('home_streak_label', { defaultValue: '{{n}}-day sky streak', n: streak })}
+        {t('home_streak_label', { n: streak })}
       </span>
     </div>
   )
@@ -155,10 +158,7 @@ function dayOfYear() {
 function EditionChip({ t }) {
   return (
     <p className="inline-flex items-center text-3xs text-primary bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
-      {t('home_edition_chip', {
-        defaultValue: 'Edition #{{n}} — this page turns at sunrise',
-        n: dayOfYear(),
-      })}
+      {t('home_edition_chip', { n: dayOfYear() })}
     </p>
   )
 }
@@ -166,14 +166,15 @@ function EditionChip({ t }) {
 // ── Tithi line ───────────────────────────────────────────────────────────────
 function TithiLine({ panchang, t }) {
   if (!panchang) return null
-  const tithiName = panchang.tithi?.name
-  const nakName = typeof panchang.nakshatra === 'object' ? panchang.nakshatra?.name : panchang.nakshatra
+  const tithiName = panchangName(t, 'tithi', panchang.tithi?.name)
+  const nakRaw = typeof panchang.nakshatra === 'object' ? panchang.nakshatra?.name : panchang.nakshatra
+  const nakName = nakRaw ? nakshatraName(t, nakRaw) : nakRaw
   const horaName = typeof panchang.hora === 'object' ? panchang.hora?.name : panchang.hora
 
   const parts = []
   if (tithiName) parts.push(tithiName)
-  if (nakName) parts.push(t('home_tithi_moon_in', { defaultValue: 'Moon in {{nak}}', nak: nakName }))
-  if (horaName) parts.push(t('home_tithi_hora', { defaultValue: '{{planet}} hora', planet: horaName }))
+  if (nakName) parts.push(t('home_tithi_moon_in', { nak: nakName }))
+  if (horaName) parts.push(t('home_tithi_hora', { planet: planetName(t, horaName) }))
 
   if (!parts.length) return null
   return <p className="text-xs text-ink-onnight/55 mt-1.5">{parts.join(' · ')}</p>
@@ -279,7 +280,7 @@ function MoonDisc({ t, size = 52 }) {
         style={{ filter: `drop-shadow(0 0 ${Math.round(size * 0.27)}px rgba(240,203,128,0.32))` }}
       />
       <p className="text-3xs text-ink-onnight/45 mt-1 whitespace-nowrap">
-        {waxing ? t('home_moon_waxing', 'Waxing') : t('home_moon_waning', 'Waning')}
+        {waxing ? t('home_moon_waxing') : t('home_moon_waning')}
         {' · '}
         {Math.round(illum * 100)}%
       </p>
@@ -354,12 +355,12 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
             <div className="flex gap-2 mt-1.5 flex-wrap">
               {currentCity && (
                 <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-                  Current: {currentCity}
+                  {t('home_masthead_current', { city: currentCity })}
                 </span>
               )}
               {birthCity && (
                 <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
-                  Birth: {birthCity}
+                  {t('home_masthead_birth', { city: birthCity })}
                 </span>
               )}
             </div>
@@ -374,12 +375,12 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
           <div className="flex gap-2 flex-wrap mt-4">
             {dashaTags.mahadasha && (
               <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
-                Mahadasha · {dashaTags.mahadasha}
+                {t('home_masthead_mahadasha', { planet: planetName(t, dashaTags.mahadasha) })}
               </span>
             )}
             {dashaTags.antardasha && (
               <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
-                Antardasha · {dashaTags.antardasha}
+                {t('home_masthead_antardasha', { planet: planetName(t, dashaTags.antardasha) })}
               </span>
             )}
           </div>

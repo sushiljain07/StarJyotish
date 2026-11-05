@@ -29,6 +29,7 @@ import {
   PLANETS_FAQ,
   PLANETS_HUB_CTA,
 } from '../../../config/planetsHubContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function PlanetCard({ planet }) {
   return (
@@ -56,10 +57,10 @@ function PlanetCard({ planet }) {
 
 export default function PlanetsGuideHub() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   const guide = getGuide('planets')
   const learningPathSteps = getLearningPathSteps('planets')

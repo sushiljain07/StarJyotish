@@ -31,6 +31,7 @@ import {
   DASHAS_FAQ,
   DASHAS_CTA,
 } from '../../../config/dashasHubContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function DashaRow({ dasha, index }) {
   return (
@@ -52,10 +53,10 @@ function DashaRow({ dasha, index }) {
 
 export default function DashasGuide() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   const guide = getGuide('dashas')
   const learningPathSteps = getLearningPathSteps('dashas')

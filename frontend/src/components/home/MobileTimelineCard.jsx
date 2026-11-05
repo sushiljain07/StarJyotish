@@ -40,13 +40,14 @@ function fmt(min) {
 
 // ─── Window detail content ────────────────────────────────────────────────────
 
+// Item keys; the text lives in the locale files (slot_<id>_do_<n> / _avoid_<n>).
 const SLOT_DETAILS = {
-  sunrise:   { do: ['Morning prayers / meditation', 'Starting new ventures', 'Physical activity'],               avoid: ['Oversleeping this window'] },
-  gulika:    { do: ['Routine admin work', 'Desk work and correspondence'],                                        avoid: ['Starting new projects', 'Financial commitments', 'Beginning travel'] },
-  yamaganda: { do: ['Reading, study, inner work'],                                                                avoid: ['Signing documents', 'New negotiations', 'Medical procedures'] },
-  abhijit:   { do: ['Financial conversations', 'Interviews & negotiations', 'Starting anything important'],       avoid: ['Emotional confrontations'] },
-  rahu:      { do: ['Routine tasks', 'Exercise', 'Reading'],                                                     avoid: ['Signing contracts', 'New investments', 'Starting travel'] },
-  sunset:    { do: ['Evening prayers', 'Reflection & journaling', 'Family time'],                                 avoid: [] },
+  sunrise: { do: ['slot_sunrise_do_1', 'slot_sunrise_do_2', 'slot_sunrise_do_3'], avoid: ['slot_sunrise_avoid_1'] },
+  gulika: { do: ['slot_gulika_do_1', 'slot_gulika_do_2'], avoid: ['slot_gulika_avoid_1', 'slot_gulika_avoid_2', 'slot_gulika_avoid_3'] },
+  yamaganda: { do: ['slot_yamaganda_do_1'], avoid: ['slot_yamaganda_avoid_1', 'slot_yamaganda_avoid_2', 'slot_yamaganda_avoid_3'] },
+  abhijit: { do: ['slot_abhijit_do_1', 'slot_abhijit_do_2', 'slot_abhijit_do_3'], avoid: ['slot_abhijit_avoid_1'] },
+  rahu: { do: ['slot_rahu_do_1', 'slot_rahu_do_2', 'slot_rahu_do_3'], avoid: ['slot_rahu_avoid_1', 'slot_rahu_avoid_2', 'slot_rahu_avoid_3'] },
+  sunset: { do: ['slot_sunset_do_1', 'slot_sunset_do_2', 'slot_sunset_do_3'], avoid: [] },
 }
 
 // ─── Slot builder ─────────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
           </p>
           {slot && (
             <p style={{ fontSize: 12, color: 'rgba(248,242,228,0.55)', marginTop: 2 }}>
-              {t(slot.labelKey)}{slot.kind !== 'anchor' && slot.end != null ? ` · until ${fmt(slot.end)}` : ''}
+              {t(slot.labelKey)}{slot.kind !== 'anchor' && slot.end != null ? ` · ${t('timeline_until', { time: fmt(slot.end) })}` : ''}
             </p>
           )}
         </div>
@@ -146,7 +147,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
 
 const BAR_COLOR = { avoid: '#A23B3B', good: '#5B7A5E', neutral: '#262B4A' }
 
-function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
+function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin, t }) {
   const START = sunriseMin ?? 360
   const END   = sunsetMin  ?? 1110
   const SPAN  = END - START
@@ -196,18 +197,18 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin }) {
 
       {/* Axis labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5, position: 'relative' }}>
-        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌅 Sunrise</span>
+        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌅 {t('slot_sunrise_label')}</span>
         {showNow && (
           <span style={{ fontSize: 9, fontWeight: 800, color: '#F8F3E7', background: 'rgba(80,80,80,0.8)', borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
-            NOW
+            {t('sky_now')}
           </span>
         )}
-        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌇 Sunset</span>
+        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌇 {t('slot_sunset_label')}</span>
       </div>
 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
-        {[['#A23B3B', 'Avoid'], ['#5B7A5E', 'Favorable'], ['#262B4A', 'Neutral']].map(([color, label]) => (
+        {[['#A23B3B', t('slot_badge_avoid')], ['#5B7A5E', t('status_favorable')], ['#262B4A', t('status_neutral')]].map(([color, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
             <span style={{ fontSize: 9, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>{label}</span>
@@ -244,7 +245,7 @@ function WindowRow({ slot, isNow, t }) {
             <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(248,242,228,0.9)' }}>{t(slot.labelKey)}</span>
             {isNow && (
               <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: '#D9A441', background: 'rgba(217,164,65,0.15)', borderRadius: 4, padding: '1px 5px', textTransform: 'uppercase' }}>
-                NOW
+                {t('sky_now')}
               </span>
             )}
           </div>
@@ -265,7 +266,7 @@ function WindowRow({ slot, isNow, t }) {
             {details.do.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
                 <span style={{ color: '#5B7A5E', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
-                <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{item}</span>
+                <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{t(item)}</span>
               </div>
             ))}
           </div>
@@ -275,7 +276,7 @@ function WindowRow({ slot, isNow, t }) {
               ? details.avoid.map((item, i) => (
                   <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
                     <span style={{ color: '#A23B3B', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
-                    <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{item}</span>
+                    <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{t(item)}</span>
                   </div>
                 ))
               : <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.3)' }}>{t('timeline_no_restrictions')}</span>
@@ -343,7 +344,7 @@ export default function MobileTimelineCard({ panchang }) {
   return (
     <div style={{ background: '#171B33', borderRadius: 14, padding: '14px 12px 12px', overflow: 'hidden' }}>
       <StatusCard slot={active} nowMin={nowMin} slots={slots} t={t} />
-      <BarTimeline slots={slots} nowMin={nowMin} sunriseMin={sunriseMin} sunsetMin={sunsetMin} />
+      <BarTimeline slots={slots} nowMin={nowMin} sunriseMin={sunriseMin} sunsetMin={sunsetMin} t={t} />
 
       <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(248,242,228,0.35)', margin: '12px 0 4px 4px' }}>
         {t('timeline_windows_heading')}

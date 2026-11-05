@@ -109,18 +109,23 @@ def get_reading(request: Request, body: ReadingRequest, db=Depends(get_db_option
 
     # Compute active rajyogas for the upsell section — uses the same
     # check_all_yogas() the Rajyogas tab uses, so both surfaces agree.
-    active_yogas = [
-        {"name": y["yoga"], "description": y["description"]}
-        for y in check_all_yogas(
-            chart["planets"], chart["ascendant"]["sign_index"]
-        )
-        if y["present"]
-    ]
+    # The LLM prompt keeps the English yoga text; only the names returned in
+    # the response follow the request language.
+    def _teasers(language):
+        return [
+            {"name": y["yoga"], "description": y["description"]}
+            for y in check_all_yogas(
+                chart["planets"], chart["ascendant"]["sign_index"], language=language
+            )
+            if y["present"]
+        ]
+
+    active_yogas = _teasers("en")
 
     reading = generate_reading(chart, dasha_raw, body.language, div_charts, active_yogas=active_yogas)
     response = ReadingResponse(
         sections=[ReadingSection(**s) for s in reading.get("sections", [])],
-        active_yogas=active_yogas,
+        active_yogas=_teasers(body.language),
         prediction_text=reading.get("prediction_text"),
         prediction_sections=reading.get("prediction_sections"),
         teasers=reading.get("teasers"),

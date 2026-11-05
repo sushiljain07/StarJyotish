@@ -5,6 +5,8 @@
 // (chart math, scoring) is language-agnostic; only the output strings
 // that surface in the UI go through t().
 
+import { signName, localizeBackendDate } from './astroNames'
+
 const CHANDRA_BALA_FAVORABLE = new Set([3, 6, 7, 10, 11])
 
 const DIGNITY = {
@@ -50,7 +52,9 @@ function ordinalSuffix(n) {
 // the full English ordinal suffix ("1st", "4th") would read oddly in Hindi.
 // Hindi uses bare ordinals ("पहला", "चौथा") but for brevity the key just
 // passes the number and the translation handles the phrasing.
-function houseStr(n) { return `${n}${ordinalSuffix(n)}` }
+function houseStr(n, t) {
+  return t ? t('house_ordinal', { count: n, ordinal: true }) : `${n}${ordinalSuffix(n)}`
+}
 
 export function computeDayScore(chart, transitPlanets, t) {
   const natalMoon = findPlanet(chart.planets, 'Moon')
@@ -105,7 +109,7 @@ export function computeDoAvoid(chart, transitPlanets, panchang, t) {
     const moonHouse = ((transitMoon.sign_index - ascSignIndex + 12) % 12) + 1
     doItems.push(t('insight_moon_do', {
       action: t(`house_do_${moonHouse}`),
-      house: houseStr(moonHouse),
+      house: houseStr(moonHouse, t),
       theme: t(`house_name_${moonHouse}`),
     }))
     avoidItems.push(t('insight_moon_avoid', {
@@ -182,9 +186,9 @@ export function computeLifeAreas(chart, transitPlanets, t) {
     const lordHouse = natalLord ? natalLord.house_number : null
     const nugget = natalLord && lordHouse && t
       ? t('insight_nugget', {
-          houseN: houseStr(area.house),
+          houseN: houseStr(area.house, t),
           lord: t(`planet_${lord}`, lord),
-          lordHouseN: houseStr(lordHouse),
+          lordHouseN: houseStr(lordHouse, t),
           theme: t(`house_name_${lordHouse}`),
         })
       : null
@@ -264,7 +268,7 @@ export function computeSpotlight(chart, transitPlanets, t) {
       house,
       sign: transitMoon.sign,
       text: t('insight_moon_transit_text', {
-        house: houseStr(house),
+        house: houseStr(house, t),
         theme: t(`house_name_${house}`),
         action: t(`house_do_${house}`),
       }),
@@ -320,8 +324,8 @@ export function buildComingUpEvents(chart, outlook, formatDate, t) {
     if (!change || !t) continue
     const weeks = Math.max(1, Math.round(change.days_away / 7))
     events.push({
-      when: t('coming_in_weeks', { weeks, s: weeks === 1 ? '' : 's', date: change.date }),
-      title: t('coming_enters_sign', { planet: t(`planet_${planet}`, planet), sign: change.to_sign }),
+      when: t('coming_in_weeks', { weeks, s: weeks === 1 ? '' : 's', date: localizeBackendDate(t, change.date) }),
+      title: t('coming_enters_sign', { planet: t(`planet_${planet}`, planet), sign: signName(t, change.to_sign) }),
       description: t(`coming_sign_change_${planet.toLowerCase()}`),
     })
   }

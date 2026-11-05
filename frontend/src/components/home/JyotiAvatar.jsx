@@ -12,9 +12,12 @@
 // to swap the SVG below for an <img> — every consumer (AskPersonaPanel's
 // FAB + panel header) already just renders <JyotiAvatar className="..." />,
 // not raw markup.
+import { useTranslation } from 'react-i18next'
+
 export default function JyotiAvatar({ className = 'w-full h-full' }) {
+  const { t } = useTranslation()
   return (
-    <svg viewBox="0 0 100 100" className={className} role="img" aria-label="Jyoti">
+    <svg viewBox="0 0 100 100" className={className} role="img" aria-label={t('ask_persona_name')}>
       <defs>
         <linearGradient id="jyotiSkin" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#E8B98A" />

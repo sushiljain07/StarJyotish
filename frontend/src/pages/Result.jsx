@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { planetName, signName } from '../utils/astroNames'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState, saveLastChart } from '../services/lastChart'
 
@@ -31,51 +32,52 @@ function TabLoader() {
 }
 
 function SummaryChips({ data }) {
+  const { t } = useTranslation()
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
     <div className="flex flex-wrap gap-1.5 py-2">
       <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-        Lagna: {data.ascendant.sign}
+        {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </span>
       {moon && (
         <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-          Rashi: {moon.sign}
+          {t('kundli_chip_rashi', { sign: signName(t, moon.sign) })}
         </span>
       )}
       <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-        Mahadasha: {md.planet}
+        {t('kundli_chip_mahadasha', { planet: planetName(t, md.planet) })}
       </span>
     </div>
   )
 }
 
-const MAIN_TABS = [
-  { id: 'birth_chart', label: 'Birth Chart', icon: '/starjyotish.svg' },
-  { id: 'divisional',  label: 'Life Areas',  icon: 'insights' },
-  { id: 'analysis',    label: 'Analysis',    icon: 'advanced' },
-  { id: 'download',    label: 'Download',    icon: 'ask' },
+const mainTabs = t => [
+  { id: 'birth_chart', label: t('tab_birth_chart'),        icon: '/starjyotish.svg' },
+  { id: 'divisional',  label: t('kundli_tab_life_areas'),  icon: 'insights' },
+  { id: 'analysis',    label: t('kundli_tab_analysis'),    icon: 'advanced' },
+  { id: 'download',    label: t('nav_download'),           icon: 'ask' },
 ]
 
-const BIRTH_SUBTABS = [
-  { id: 'chart',   label: 'Chart' },
-  { id: 'planets', label: 'Planets' },
-  { id: 'dasha',   label: 'Dasha' },
-  { id: 'transit', label: 'Transit' },
+const birthSubtabs = t => [
+  { id: 'chart',   label: t('kundli_sub_chart') },
+  { id: 'planets', label: t('tab_planets') },
+  { id: 'dasha',   label: t('tab_dasha') },
+  { id: 'transit', label: t('nav_transit') },
 ]
 
-const ANALYSIS_SUBTABS = [
-  { id: 'bhava',         label: 'Bhava Chalit' },
-  { id: 'ashtakavarga',  label: 'Ashtakavarga' },
-  { id: 'sarvatobhadra', label: 'Sarvatobhadra' },
+const analysisSubtabs = t => [
+  { id: 'bhava',         label: t('nav_bhava') },
+  { id: 'ashtakavarga',  label: t('nav_ashtakavarga') },
+  { id: 'sarvatobhadra', label: t('nav_sarvatobhadra') },
 ]
 
-const MAIN_TAB_IDS = MAIN_TABS.map(tab => tab.id)
-const BIRTH_SUB_IDS = BIRTH_SUBTABS.map(tab => tab.id)
-const ANALYSIS_SUB_IDS = ANALYSIS_SUBTABS.map(tab => tab.id)
+const MAIN_TAB_IDS = mainTabs(k => k).map(tab => tab.id)
+const BIRTH_SUB_IDS = birthSubtabs(k => k).map(tab => tab.id)
+const ANALYSIS_SUB_IDS = analysisSubtabs(k => k).map(tab => tab.id)
 
-const CHART_STYLES = [
-  { id: 'north', label: 'North' },
+const chartStyles = t => [
+  { id: 'north', label: t('kundli_style_north') },
   { id: 'kp',    label: 'KP' },
 ]
 
@@ -127,6 +129,7 @@ export default function Result() {
   }
 
   const [chartStyle, setChartStyle]               = useState('north')
+  const MAIN_TABS = mainTabs(t)
 
   // Remember a chart that arrived by navigation, so a refresh or a
   // sign-in round-trip comes back to it (see services/lastChart.js).
@@ -152,11 +155,11 @@ export default function Result() {
           <div className="w-full sm:w-[460px]">
             <KundliChart planets={data.planets} ascendant={data.ascendant}
                          navamsaPlanets={data.navamsa_planets}
-                         title={t('tab_birth_chart', 'Lagna Chart')} />
+                         title={t('tab_birth_chart')} />
           </div>
           <div className="w-full sm:w-[460px]">
             <KundliChart planets={data.navamsa_planets} ascendant={data.navamsa_ascendant}
-                         title={t('tab_navamsa', 'Navamsa (D9)')} />
+                         title={t('tab_navamsa')} />
           </div>
         </div>
       )
@@ -182,11 +185,11 @@ export default function Result() {
           <div className="flex items-center gap-3">
             <span className="text-xl">✨</span>
             <div className="text-left">
-              <p className="text-sm font-semibold text-ink">Insights &amp; Reading</p>
-              <p className="text-xs text-ink-muted">AI reading of your chart</p>
+              <p className="text-sm font-semibold text-ink">{t('kundli_insights_title')}</p>
+              <p className="text-xs text-ink-muted">{t('kundli_insights_sub')}</p>
             </div>
           </div>
-          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>Open →</span>
+          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_open')}</span>
         </button>
         <button
           onClick={() => navigate('/ask', { state: { ...state, presetQuestion } })}
@@ -196,11 +199,11 @@ export default function Result() {
           <div className="flex items-center gap-3">
             <span className="text-xl">💬</span>
             <div className="text-left">
-              <p className="text-sm font-semibold text-ink">Ask a Question</p>
-              <p className="text-xs text-ink-muted">Timing, decisions, anything</p>
+              <p className="text-sm font-semibold text-ink">{t('kundli_ask_title')}</p>
+              <p className="text-xs text-ink-muted">{t('kundli_ask_sub')}</p>
             </div>
           </div>
-          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>Ask →</span>
+          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_ask_cta')}</span>
         </button>
       </div>
     )
@@ -208,7 +211,7 @@ export default function Result() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Seo title="Your Kundli" description="Your personalized Vedic Kundli." path="/kundli" noindex />
+      <Seo title={t('kundli_seo_title')} description={t('kundli_seo_description')} path="/kundli" noindex />
 
       {/* ── Sticky context bar ──────────────────────────────────────────── */}
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
@@ -233,10 +236,10 @@ export default function Result() {
           {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
             <div className="border-t border-line/40 py-2">
               {activeMain === 'birth_chart' && (
-                <SubTabBar subtabs={BIRTH_SUBTABS} active={activeBirthSub} onChange={selectSub} />
+                <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
               )}
               {activeMain === 'analysis' && (
-                <SubTabBar subtabs={ANALYSIS_SUBTABS} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
+                <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
               )}
             </div>
           )}
@@ -251,7 +254,7 @@ export default function Result() {
 
           <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
             <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state })} />
-            <SegmentedToggle label="Style" options={CHART_STYLES} active={chartStyle} onChange={setChartStyle} className="mb-4" />
+            <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />
           </div>
@@ -260,10 +263,9 @@ export default function Result() {
             <div className="mb-4 rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>Planet Positions</p>
+                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_planets_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
-                Every planet&#39;s sign, house, nakshatra, and dignity at the moment of your birth.
-                Retrograde (R) planets express their energy inward — more reflective, sometimes delayed, always deep.
+                {t('kundli_planets_intro_body')}
               </p>
             </div>
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
@@ -273,10 +275,9 @@ export default function Result() {
             <div className="mb-4 rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>Vimshottari Dasha</p>
+                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_dasha_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
-                Your life unfolds in planetary time cycles. Your active Mahadasha shapes the decade;
-                Antardasha refines the year. The highlighted row is your present period.
+                {t('kundli_dasha_intro_body')}
               </p>
             </div>
             <DashaTable dasha={data.dasha} />

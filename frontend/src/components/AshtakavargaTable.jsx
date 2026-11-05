@@ -1,9 +1,11 @@
 // Ashtakavarga table: Bhinnashtakavarga + Sarvashtakavarga
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { planetName, planetShort } from '../utils/astroNames'
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS } from '../config/planetColors'
 
-const SIGN_ABBR = ['Ar','Ta','Ge','Ca','Le','Vi','Li','Sc','Sg','Cp','Aq','Pi']
+const SIGN_KEYS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
 
 function PointCell({ value, max = 8 }) {
@@ -29,6 +31,8 @@ function SarvaCell({ value }) {
 }
 
 export default function AshtakavargaTable({ input }) {
+  const { t } = useTranslation()
+  const SIGN_ABBR = SIGN_KEYS.map(k => t(`sign_abbr.${k}`))
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -46,7 +50,7 @@ export default function AshtakavargaTable({ input }) {
       if (!res.ok) throw new Error('Failed')
       setData(await res.json())
     } catch {
-      setError('Could not load Ashtakavarga data.')
+      setError('ashtakavarga_error')
     }
     setLoading(false)
   }
@@ -58,18 +62,18 @@ export default function AshtakavargaTable({ input }) {
   return (
     <div className="space-y-4">
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-        <h2 className="text-primary-dark font-bold text-base">Ashtakavarga</h2>
+        <h2 className="text-primary-dark font-bold text-base">{t('ashtakavarga_title')}</h2>
         <p className="text-primary-dark text-xs mt-1">
-          Shows benefic point scores for each planet across all 12 signs. Higher scores (green) indicate stronger positions.
+          {t('ashtakavarga_intro')}
         </p>
         <button onClick={load} disabled={loading}
                 className="mt-3 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
-          {loading ? 'Calculating…' : 'Refresh'}
+          {loading ? t('ashtakavarga_calculating') : t('transit_refresh')}
         </button>
       </div>
 
       {error && (
-        <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {error}</div>
+        <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {t(error)}</div>
       )}
       {loading && (
         <div className="flex justify-center py-12">
@@ -87,7 +91,7 @@ export default function AshtakavargaTable({ input }) {
                         ? 'bg-primary border-primary text-night'
                         : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
                     }`}>
-              Sarvashtakavarga (Total)
+              {t('ashtakavarga_tab_sarva')}
             </button>
             {PLANETS.map(p => (
               <button key={p} onClick={() => setActiveTab(p)}
@@ -97,7 +101,7 @@ export default function AshtakavargaTable({ input }) {
                           : 'bg-parchment-card border-line text-ink-muted hover:border-ink-faint'
                       }`}
                       style={activeTab === p ? { backgroundColor: PLANET_COLORS[p] ?? '#666' } : {}}>
-                {p.slice(0, 3)}
+                {planetShort(t, p)}
               </button>
             ))}
           </div>
@@ -107,7 +111,7 @@ export default function AshtakavargaTable({ input }) {
             <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-3 bg-primary-light border-b">
                 <h3 className="font-semibold text-primary-dark text-sm">
-                  Sarvashtakavarga — Total Benefic Points per Sign (Max 56)
+                  {t('ashtakavarga_sarva_title')}
                 </h3>
               </div>
               <div className="overflow-x-auto p-3">
@@ -128,9 +132,9 @@ export default function AshtakavargaTable({ input }) {
                   </tbody>
                 </table>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>Strong (≥28)</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>Average (25-28)</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-100 mr-1 align-middle"></span>Weak (&lt;25)</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_strong')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_average')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-red-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_weak')}</span>
                 </div>
               </div>
             </div>
@@ -143,7 +147,7 @@ export default function AshtakavargaTable({ input }) {
                    style={{ backgroundColor: PLANET_COLORS[activeTab] + '18' }}>
                 <h3 className="font-semibold text-sm"
                     style={{ color: PLANET_COLORS[activeTab] }}>
-                  {activeTab} Bhinnashtakavarga (Max 8 points per sign)
+                  {t('ashtakavarga_bhinna_title', { planet: planetName(t, activeTab) })}
                 </h3>
               </div>
               <div className="overflow-x-auto p-3">
@@ -164,10 +168,10 @@ export default function AshtakavargaTable({ input }) {
                   </tbody>
                 </table>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>Strong (≥6)</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>Average (4-5)</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-200 mr-1 align-middle"></span>Weak (3)</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-300 mr-1 align-middle"></span>Very Weak (&lt;3)</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_strong')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_average')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-red-200 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_weak')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-red-300 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_very_weak')}</span>
                 </div>
               </div>
             </div>
@@ -177,17 +181,17 @@ export default function AshtakavargaTable({ input }) {
           {activeTab === 'sarva' && (
             <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-3 bg-night/[0.03] border-b">
-                <h3 className="font-semibold text-ink text-sm">All Planets Overview</h3>
+                <h3 className="font-semibold text-ink text-sm">{t('ashtakavarga_overview')}</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-night/[0.03]">
-                      <th className="p-2 text-left border border-line">Planet</th>
+                      <th className="p-2 text-left border border-line">{t('col_planet')}</th>
                       {SIGN_ABBR.map(s => (
                         <th key={s} className="p-1 text-center border border-line">{s}</th>
                       ))}
-                      <th className="p-2 text-center border border-line">Total</th>
+                      <th className="p-2 text-center border border-line">{t('ashtakavarga_total')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -199,7 +203,7 @@ export default function AshtakavargaTable({ input }) {
                         <tr key={planet} className={pi % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                           <td className="p-2 border border-line font-bold"
                               style={{ color: PLANET_COLORS[planet] ?? '#333' }}>
-                            {planet.slice(0, 3)}
+                            {planetShort(t, planet)}
                           </td>
                           {row.map((cell, i) => (
                             <PointCell key={i} value={cell.points} />
@@ -212,7 +216,7 @@ export default function AshtakavargaTable({ input }) {
                     })}
                     {/* Sarva total row */}
                     <tr className="bg-primary-light font-bold">
-                      <td className="p-2 border border-primary/40 text-primary-dark">Total</td>
+                      <td className="p-2 border border-primary/40 text-primary-dark">{t('ashtakavarga_total')}</td>
                       {data.sarvashtakavarga.map((cell, i) => (
                         <SarvaCell key={i} value={cell.points} />
                       ))}

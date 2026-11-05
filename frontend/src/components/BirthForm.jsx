@@ -1,17 +1,13 @@
 // frontend/src/components/BirthForm.jsx
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatDate } from '../utils/format'
 import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { isValidBirthDate } from '../utils/birthDate'
 import { UNKNOWN_BIRTH_TIME_DEFAULT } from '../services/astrologyProfiles'
 import BirthTimeSelector from './onboarding/BirthTimeSelector'
 import PlaceCombobox from './PlaceCombobox'
 import { Button } from './ui'
-
-const MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
-]
 
 const currentYear = new Date().getFullYear()
 const YEARS  = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i)
@@ -23,6 +19,8 @@ const labelCls = "block text-sm font-medium text-ink mb-1"
 
 export default function BirthForm({ onSubmit, loading }) {
   const { t } = useTranslation()
+  // Month names follow the UI language (en: January…, hi: जनवरी…).
+  const months = Array.from({ length: 12 }, (_, m) => formatDate(new Date(2000, m, 1), { month: 'long' }))
   const ids = useId()
 
   const [name,   setName]   = useState('')
@@ -88,7 +86,7 @@ export default function BirthForm({ onSubmit, loading }) {
         </label>
         <input
           id={`${ids}-name`}
-          type="text" required value={name} placeholder="e.g. Arjun Sharma"
+          type="text" required value={name} placeholder={t('form_name_placeholder')}
           onChange={e => setName(e.target.value)}
           className={inputCls}
         />
@@ -98,16 +96,16 @@ export default function BirthForm({ onSubmit, loading }) {
       <fieldset>
         <legend className={labelCls}>{t('form_date')}</legend>
         <div className="flex gap-2">
-          <select aria-label="Day" value={day} onChange={e => setDay(e.target.value)} required className={selCls}>
-            <option value="">Day</option>
+          <select aria-label={t('form_day')} value={day} onChange={e => setDay(e.target.value)} required className={selCls}>
+            <option value="">{t('form_day')}</option>
             {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select aria-label="Month" value={month} onChange={e => setMonth(e.target.value)} required className={`${selCls} flex-[2]`}>
-            <option value="">Month</option>
-            {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+          <select aria-label={t('form_month')} value={month} onChange={e => setMonth(e.target.value)} required className={`${selCls} flex-[2]`}>
+            <option value="">{t('form_month')}</option>
+            {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
-          <select aria-label="Year" value={year} onChange={e => setYear(e.target.value)} required className={`${selCls} flex-[1.5]`}>
-            <option value="">Year</option>
+          <select aria-label={t('form_year')} value={year} onChange={e => setYear(e.target.value)} required className={`${selCls} flex-[1.5]`}>
+            <option value="">{t('form_year')}</option>
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
@@ -138,7 +136,7 @@ export default function BirthForm({ onSubmit, loading }) {
           required
           value={place}
           items={suggestions}
-          placeholder="e.g. New Delhi, India"
+          placeholder={t('form_place_placeholder')}
           className={inputCls}
           onInputChange={text => { setPlace(text); setPlacePicked(false) }}
           onSelect={item => { setPlace(item); setPlacePicked(true) }}

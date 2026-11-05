@@ -35,6 +35,7 @@ import {
   CAPRICORN_FAQ,
   CAPRICORN_CTA,
 } from '../../../config/capricornContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -62,8 +63,8 @@ function QualityList({ items }) {
 }
 
 export default function CapricornGuide() {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
   const guide = getGuide('zodiac-capricorn')
   const learningPathSteps = getLearningPathSteps('zodiac')
   const { prev, next } = getSignNavigation('zodiac-capricorn')

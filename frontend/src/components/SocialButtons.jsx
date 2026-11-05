@@ -7,6 +7,8 @@
 // import this. Still placeholder-only — no real profile links exist yet,
 // per Footer.jsx's original comment — that hasn't changed, just where the
 // markup lives.
+import { useTranslation } from 'react-i18next'
+
 const SOCIAL_ICONS = {
   instagram: (
     <>
@@ -31,10 +33,11 @@ const SOCIAL_ICONS = {
 }
 
 function SocialButton({ icon, dark }) {
+  const { t } = useTranslation()
   return (
     <button
       type="button"
-      aria-label={icon}
+      aria-label={t(`social_${icon}`)}
       className={`w-8 h-8 rounded-full border flex items-center justify-center transition ${
         dark
           ? 'bg-white/5 border-white/10 text-ink-onnight hover:text-primary hover:border-primary/40'

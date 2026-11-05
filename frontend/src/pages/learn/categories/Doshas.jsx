@@ -28,6 +28,7 @@ import {
   DOSHAS_FAQ,
   DOSHAS_CTA,
 } from '../../../config/doshasContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function DoshaCard({ dosha }) {
   return (
@@ -67,10 +68,10 @@ function DoshaCard({ dosha }) {
 
 export default function DoshasGuide() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   const guide = getGuide('doshas')
   const learningPathSteps = getLearningPathSteps('doshas')

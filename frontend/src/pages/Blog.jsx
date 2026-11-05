@@ -34,19 +34,20 @@ const CATEGORY_COLORS = {
 }
 
 function ArticleCard({ article, featured = false, onClick }) {
+  const { t } = useTranslation()
   if (featured) {
     return (
       <button onClick={onClick} className="w-full text-left bg-night rounded-2xl overflow-hidden hover:opacity-95 transition group">
         <div className="p-7 sm:p-9">
           <div className="flex items-center gap-2.5 mb-4">
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink-muted'}`}>{article.category}</span>
-            <span className="text-ink-onnight text-xs">{article.readMin} min read</span>
+            <span className="text-ink-onnight text-xs">{t('blog_read_min_long', { n: article.readMin })}</span>
           </div>
           <h2 className="font-serif font-semibold text-xl sm:text-2xl text-primary-light leading-snug group-hover:text-primary transition mb-3">{article.title}</h2>
           <p className="text-ink-onnight text-sm leading-relaxed line-clamp-3">{article.excerpt}</p>
           <div className="flex items-center justify-between mt-6">
             <span className="text-ink-onnight text-xs">{article.date}</span>
-            <span className="text-primary text-sm font-medium group-hover:translate-x-0.5 transition-transform">Read article →</span>
+            <span className="text-primary text-sm font-medium group-hover:translate-x-0.5 transition-transform">{t('blog_read_article')}</span>
           </div>
         </div>
       </button>
@@ -56,13 +57,13 @@ function ArticleCard({ article, featured = false, onClick }) {
     <button onClick={onClick} className="w-full text-left bg-parchment-card rounded-xl border border-line hover:border-primary/30 hover:shadow-md transition group p-5 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-3">
         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink-muted'}`}>{article.category}</span>
-        <span className="text-ink-faint text-[11px]">{article.readMin} min</span>
+        <span className="text-ink-faint text-[11px]">{t('blog_read_min_short', { n: article.readMin })}</span>
       </div>
       <h3 className="font-semibold text-sm text-ink leading-snug group-hover:text-primary-dark transition mb-2 flex-1">{article.title}</h3>
       <p className="text-xs text-ink-muted leading-relaxed line-clamp-3 mb-4">{article.excerpt}</p>
       <div className="flex items-center justify-between pt-3 border-t border-line">
         <span className="text-ink-faint text-[11px]">{article.date}</span>
-        <span className="text-primary-dark text-xs font-medium">Read →</span>
+        <span className="text-primary-dark text-xs font-medium">{t('blog_read')}</span>
       </div>
     </button>
   )
@@ -131,7 +132,7 @@ export default function Blog() {
       <div className="bg-night px-6 pt-24 pb-10">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
-            <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Vedic Astrology</p>
+            <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">{t('blog_eyebrow')}</p>
             <h1 className="font-serif font-semibold text-3xl sm:text-4xl text-primary-light mb-3">{t('blog_heading')}</h1>
             <p className="text-ink-onnight text-sm max-w-md mx-auto">{t('blog_subhead')}</p>
           </Reveal>
@@ -158,8 +159,8 @@ export default function Blog() {
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-ink-faint text-sm mb-4">No articles published yet.</p>
-            <p className="text-ink-faint text-xs">Check back soon — content is on the way.</p>
+            <p className="text-ink-faint text-sm mb-4">{t('blog_none')}</p>
+            <p className="text-ink-faint text-xs">{t('blog_none_hint')}</p>
           </div>
         ) : (
           <>
@@ -208,7 +209,7 @@ export default function Blog() {
                 className="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto"
               >
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="Your email"
+                  placeholder={t('blog_email_placeholder')}
                   className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
                 <button type="submit" disabled={notifyStatus === 'sending'}
                   className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2.5 rounded-full transition sm:whitespace-nowrap">

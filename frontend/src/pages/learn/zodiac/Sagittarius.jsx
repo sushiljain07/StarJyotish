@@ -35,6 +35,7 @@ import {
   SAGITTARIUS_FAQ,
   SAGITTARIUS_CTA,
 } from '../../../config/sagittariusContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -62,8 +63,8 @@ function QualityList({ items }) {
 }
 
 export default function SagittariusGuide() {
-  const { i18n } = useTranslation()
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
   const guide = getGuide('zodiac-sagittarius')
   const learningPathSteps = getLearningPathSteps('zodiac')
   const { prev, next } = getSignNavigation('zodiac-sagittarius')

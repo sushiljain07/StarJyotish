@@ -77,3 +77,14 @@
     animation: starTwinkle var(--star-dur, 3s) ease-in-out infinite;
   }
 }
+
+/* Non-Latin scripts (Devanagari today). Keyed on the script that
+   src/i18n/index.js writes to <html data-script>, never on a language code,
+   so a future Bengali or Tamil entry gets these rules automatically.
+   Latin tracking and uppercase are tuned for Inter at small sizes; they
+   break Devanagari conjuncts and matras, and Devanagari has no case. */
+html:not([data-script="latn"]) [class*="tracking-"] { letter-spacing: 0 !important; }
+html:not([data-script="latn"]) .uppercase { text-transform: none; }
+html:not([data-script="latn"]) body { line-height: 1.6; }
+html:not([data-script="latn"]) .text-3xs, html:not([data-script="latn"]) .text-2xs { font-size: 0.75rem; line-height: 1.35; }
+html:not([data-script="latn"]) .leading-none { line-height: 1.25; }

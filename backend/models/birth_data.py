@@ -2,6 +2,8 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator
 from datetime import date, time
 
+from services.i18n import normalize_language
+
 
 class BirthInput(BaseModel):
     date: str   # "YYYY-MM-DD"
@@ -50,6 +52,12 @@ class BirthInput(BaseModel):
     # old client still sending it is silently ignored (extra fields are
     # dropped by pydantic).
     save_report: bool = False
+
+    @field_validator("language", mode="before")
+    @classmethod
+    def _normalize_language(cls, v):
+        # Unknown codes fall back to English rather than a 422.
+        return normalize_language(v)
 
     @field_validator("date")
     @classmethod

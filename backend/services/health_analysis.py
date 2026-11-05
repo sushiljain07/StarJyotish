@@ -1,6 +1,8 @@
 from datetime import date as _date
 from typing import Optional
 
+from services.i18n import VALUES_LANGUAGE_RULE, text
+
 from services.astro_utils import (
     SIGNS, get_planet_dignity, planet_by_name, house_sign, house_lord, house_occupants,
 )
@@ -203,12 +205,7 @@ def _build_health_prompt(
   },
 '''
 
-    _lang_rule = (
-        "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' and every 'content' string) "
-        "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown."
-    ) if language == "hi" else (
-        "LANGUAGE RULE: Write all 'title' and 'content' values in English."
-    )
+    _lang_rule = text(VALUES_LANGUAGE_RULE, language, "rule")
 
     prompt = f"""You are a compassionate Vedic astrologer writing a warm, empowering wellbeing report. You are NOT a doctor and this report NEVER diagnoses, names a disease, or predicts a medical event — it describes constitutional tendencies and routine/lifestyle guidance only.
 

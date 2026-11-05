@@ -8,14 +8,15 @@
 import { useTranslation } from 'react-i18next'
 import { peekReport, readingBody } from '../api/reportCache'
 import { Card } from './ui'
+import { currentLanguage } from '../i18n/languages'
 
 // Same order ChartReading shows its sections in. Kept here so the chart
 // page doesn't pull ChartReading's code into its own bundle.
 const SECTION_ORDER = ['identity', 'strengths', 'currentperiod', 'prediction', 'health', 'relationships']
 
 export default function ReadingTeaser({ input, onOpen }) {
-  const { t, i18n } = useTranslation()
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const { t } = useTranslation()
+  const lang = currentLanguage()
   const cached = peekReport('/api/kundli/reading', readingBody(input, lang))
   const sections = cached?.prediction_sections ?? {}
   const preview = SECTION_ORDER.map(key => sections[key]).find(text => text?.trim())

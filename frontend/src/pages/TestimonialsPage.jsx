@@ -1,6 +1,7 @@
 // frontend/src/pages/TestimonialsPage.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
@@ -39,6 +40,7 @@ function TestimonialCard({ t, i }) {
 }
 
 function SubmitForm() {
+  const { t } = useTranslation()
   const [form, setForm]       = useState({ display_name: '', location: '', text: '', detail: '' })
   const [saving, setSaving]   = useState(false)
   const [success, setSuccess] = useState(false)
@@ -47,7 +49,7 @@ function SubmitForm() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (form.text.trim().length < 20) { setError('Please write at least 20 characters.'); return }
+    if (form.text.trim().length < 20) { setError(t('testimonials_error_short')); return }
     setSaving(true); setError('')
     try {
       const r = await fetch(`${API_BASE}/api/testimonials/submit`, {
@@ -62,7 +64,7 @@ function SubmitForm() {
         }),
       })
       const data = await r.json()
-      if (!r.ok) throw new Error(data.detail ?? 'Submission failed')
+      if (!r.ok) throw new Error(data.detail ?? t('testimonials_error_failed'))
       setSuccess(true)
       setForm({ display_name: '', location: '', text: '', detail: '' })
     } catch (e) { setError(e.message) }
@@ -73,57 +75,57 @@ function SubmitForm() {
     return (
       <div className="bg-sage-light border border-sage/30 rounded-2xl px-6 py-8 text-center">
         <div className="text-3xl mb-3">🙏</div>
-        <div className="font-semibold text-ink mb-2">Thank you for sharing your experience</div>
-        <p className="text-sm text-ink-muted">Your testimonial has been submitted for review. Once approved by our team, it will appear on this page and may be featured on the homepage.</p>
+        <div className="font-semibold text-ink mb-2">{t('testimonials_thanks_title')}</div>
+        <p className="text-sm text-ink-muted">{t('testimonials_thanks_body')}</p>
       </div>
     )
   }
 
   return (
     <div className="bg-parchment-card border border-line rounded-2xl p-6 sm:p-8">
-      <h3 className="font-serif font-semibold text-xl text-ink mb-1">Share your experience</h3>
-      <p className="text-xs text-ink-muted mb-6">Your testimonial will be reviewed before it appears publicly. We only show genuine experiences — no edits to your words without asking.</p>
+      <h3 className="font-serif font-semibold text-xl text-ink mb-1">{t('testimonials_share_title')}</h3>
+      <p className="text-xs text-ink-muted mb-6">{t('testimonials_share_intro')}</p>
 
       {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-4">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs text-ink-muted mb-1 block">Your name *</label>
+            <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_name')}</label>
             <input required value={form.display_name} onChange={e => setForm(p => ({...p, display_name: e.target.value}))}
-              placeholder="e.g. Priya M."
+              placeholder={t('testimonials_placeholder_name')}
               className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
           </div>
           <div>
-            <label className="text-xs text-ink-muted mb-1 block">City / Location</label>
+            <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_location')}</label>
             <input value={form.location} onChange={e => setForm(p => ({...p, location: e.target.value}))}
-              placeholder="e.g. Bengaluru"
+              placeholder={t('testimonials_placeholder_location')}
               className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
           </div>
         </div>
 
         <div>
-          <label className="text-xs text-ink-muted mb-1 block">What you used <span className="text-ink-faint">(optional)</span></label>
+          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_detail')} <span className="text-ink-faint">{t('testimonials_optional')}</span></label>
           <input value={form.detail} onChange={e => setForm(p => ({...p, detail: e.target.value}))}
-            placeholder="e.g. Career report + full Kundli"
+            placeholder={t('testimonials_placeholder_detail')}
             className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
         </div>
 
         <div>
-          <label className="text-xs text-ink-muted mb-1 block">Your experience * <span className="text-ink-faint">(20–500 characters)</span></label>
+          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_text')} <span className="text-ink-faint">{t('testimonials_text_range')}</span></label>
           <textarea required rows={5} value={form.text} onChange={e => setForm(p => ({...p, text: e.target.value}))}
-            placeholder="What did you find useful or surprising? What would you tell someone considering using Star Jyotish?"
+            placeholder={t('testimonials_placeholder_text')}
             className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark resize-none" />
           <div className={`text-xs mt-1 text-right ${remaining < 50 ? 'text-vermillion' : 'text-ink-faint'}`}>
-            {remaining} characters remaining
+            {t('testimonials_remaining', { n: remaining })}
           </div>
         </div>
 
-        <p className="text-xs text-ink-faint">By submitting, you agree that your name, location, and testimonial may be displayed publicly on starjyotish.com. We will not edit your words without asking.</p>
+        <p className="text-xs text-ink-faint">{t('testimonials_consent')}</p>
 
         <button type="submit" disabled={saving || form.text.length < 20}
           className="w-full py-3 bg-primary-dark text-night text-sm font-semibold rounded-xl hover:opacity-90 transition disabled:opacity-50">
-          {saving ? 'Submitting…' : 'Submit Testimonial'}
+          {saving ? t('testimonials_submitting') : t('testimonials_submit')}
         </button>
       </form>
     </div>
@@ -131,6 +133,7 @@ function SubmitForm() {
 }
 
 export default function TestimonialsPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const scrollProgress = useScrollProgress(80)
   const [items, setItems]     = useState([])
@@ -167,9 +170,9 @@ export default function TestimonialsPage() {
       {/* Header */}
       <div className="bg-night px-6 pt-24 pb-12 text-center">
         <Reveal>
-          <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Real experiences</p>
-          <h1 className="font-serif font-semibold text-3xl sm:text-4xl text-primary-light mb-3">What people are discovering</h1>
-          <p className="text-ink-onnight text-sm max-w-md mx-auto">Every testimonial here was written by a real user and reviewed by our team before being shown.</p>
+          <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">{t('testimonials_eyebrow')}</p>
+          <h1 className="font-serif font-semibold text-3xl sm:text-4xl text-primary-light mb-3">{t('testimonials_page_heading')}</h1>
+          <p className="text-ink-onnight text-sm max-w-md mx-auto">{t('testimonials_page_subhead')}</p>
         </Reveal>
       </div>
 
@@ -189,7 +192,7 @@ export default function TestimonialsPage() {
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-ink-faint text-sm">No testimonials yet — be the first to share your experience.</p>
+            <p className="text-ink-faint text-sm">{t('testimonials_empty')}</p>
           </div>
         ) : (
           <>
@@ -204,7 +207,7 @@ export default function TestimonialsPage() {
               <div className="text-center mb-10">
                 <button onClick={() => loadMore(offset)} disabled={loading}
                   className="px-6 py-2.5 border border-line bg-parchment-card text-ink text-sm rounded-lg hover:border-primary/30 transition disabled:opacity-50">
-                  {loading ? 'Loading…' : 'Load more'}
+                  {loading ? t('testimonials_loading') : t('testimonials_load_more')}
                 </button>
               </div>
             )}

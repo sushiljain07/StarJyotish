@@ -34,6 +34,7 @@ import {
   NAKSHATRA_FAQ,
   NAKSHATRA_CTA,
 } from '../../../config/nakshatraContent'
+import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function SystemCard({ system, accent = false }) {
   return (
@@ -75,10 +76,10 @@ function NakshatraCard({ nakshatra }) {
 
 export default function NakshatrasGuide() {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
   const { isAuthenticated } = useAuth()
   const scrollProgress = useScrollProgress(80)
-  const isHindi = i18n.language?.startsWith('hi')
+  useTranslation() // subscribe so this re-renders when the language changes
+  const isHindi = currentLanguage() !== DEFAULT_LANGUAGE
 
   const guide = getGuide('nakshatra')
   const learningPathSteps = getLearningPathSteps('nakshatra')

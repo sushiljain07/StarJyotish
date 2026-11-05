@@ -24,6 +24,7 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: t
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Insights from './Insights'
+import '../i18n'
 
 function renderInsights(topic, search = '') {
   const input = { date: '1990-01-01', time: '12:00', place: 'Delhi', topic }

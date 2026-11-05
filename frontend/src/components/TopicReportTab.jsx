@@ -17,12 +17,13 @@ import { fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import SegmentedToggle from './SegmentedToggle'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
+import { planetName } from '../utils/astroNames'
 
 const TOPIC_CONFIG = {
   relationship: {
     icon: '💕',
     endpoint: '/api/relationship-report',
-    loadingSubtext: 'D9 · 7th House · Darakaraka · Marriage Timing',
     // The single biggest accuracy failure this report can make is
     // confidently predicting a future marriage to someone already married —
     // this one extra question is what lets the backend tell the difference.
@@ -47,7 +48,6 @@ const TOPIC_CONFIG = {
   finance: {
     icon: '💰',
     endpoint: '/api/wealth-report',
-    loadingSubtext: '2nd & 11th House · D2 Hora · Future Dashas',
     sections: [
       { key: 'wealth_destiny_brief',  icon: '✨', style: 'gold'     },
       { key: 'natural_wealth_style',  icon: '📈', style: 'gradient' },
@@ -67,7 +67,6 @@ const TOPIC_CONFIG = {
   health: {
     icon: '🌿',
     endpoint: '/api/health-report',
-    loadingSubtext: '6th House · Lagna Lord · D6 Shashthamsha',
     sections: [
       { key: 'health_destiny_brief',           icon: '✨', style: 'gold'     },
       { key: 'natural_constitution',           icon: '🌱', style: 'gradient' },
@@ -174,6 +173,7 @@ function SectionCard({ icon, section, style }) {
 }
 
 function HighlightCard({ h }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const effortCls = EFFORT_COLOR[h.effort_required] ?? EFFORT_COLOR.medium
   return (
@@ -186,7 +186,7 @@ function HighlightCard({ h }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{h.title}</span>
             {h.category && <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{h.category}</span>}
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>{h.effort_required} effort</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</span>
           </div>
           {h.timeline && <p className="text-xs text-ink-faint mt-0.5">{h.timeline}</p>}
         </div>
@@ -196,14 +196,14 @@ function HighlightCard({ h }) {
         <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">
           {h.reason && (
             <div>
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">Why this fits your chart</p>
+              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">{t('report_why_fits')}</p>
               <p className="text-xs text-ink-muted leading-relaxed">{h.reason}</p>
             </div>
           )}
           {h.key_planets?.length > 0 && (
             <div className="flex gap-1 flex-wrap">
               {h.key_planets.map(p => (
-                <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{p}</span>
+                <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
               ))}
             </div>
           )}
@@ -214,7 +214,7 @@ function HighlightCard({ h }) {
 }
 
 export default function TopicReportTab({ topic, input }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
@@ -239,7 +239,7 @@ export default function TopicReportTab({ topic, input }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, topic])
 
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const lang = currentLanguage()
   const beginRequest = useLatestRequest()
   // Relationship's Regenerate goes back to the marital-status screen; the
   // next Generate there must still reach the server, not the cache.
@@ -323,7 +323,7 @@ export default function TopicReportTab({ topic, input }) {
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>
-      <p className="text-xs text-ink-faint mt-1">{cfg.loadingSubtext}</p>
+      <p className="text-xs text-ink-faint mt-1">{t(`topic_report_${topic}_loading_sub`)}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>

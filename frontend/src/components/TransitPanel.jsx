@@ -1,10 +1,13 @@
 // Transit chart panel: shows current planet positions on natal chart
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import KundliChart from './KundliChart'
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS } from '../config/planetColors'
 
 export default function TransitPanel({ input, natalData }) {
+  const { t } = useTranslation()
   const [transitData, setTransitData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -20,7 +23,7 @@ export default function TransitPanel({ input, natalData }) {
       if (!res.ok) throw new Error('Failed')
       setTransitData(await res.json())
     } catch {
-      setError('Could not load transit data.')
+      setError('transit_error')
     }
     setLoading(false)
   }
@@ -35,18 +38,18 @@ export default function TransitPanel({ input, natalData }) {
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-primary-dark font-bold text-base">Transit Chart</h2>
+            <h2 className="text-primary-dark font-bold text-base">{t('transit_title')}</h2>
             <p className="text-primary-dark text-xs mt-0.5">
-              Current planetary positions overlaid on your natal chart
+              {t('transit_subtitle')}
             </p>
           </div>
           <button onClick={loadTransit}
                   className="text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
-            Refresh
+            {t('transit_refresh')}
           </button>
         </div>
         {transitData && (
-          <p className="text-xs text-primary-dark mt-2">As of: {transitData.transit_date}</p>
+          <p className="text-xs text-primary-dark mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
         )}
       </div>
 
@@ -54,13 +57,13 @@ export default function TransitPanel({ input, natalData }) {
         <div className="flex justify-center py-16">
           <div className="text-center">
             <div className="text-3xl animate-spin mb-3">🌍</div>
-            <p className="text-ink-muted text-sm">Loading transit positions…</p>
+            <p className="text-ink-muted text-sm">{t('transit_loading')}</p>
           </div>
         </div>
       )}
       {error && (
         <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">
-          ⚠️ {error}
+          ⚠️ {t(error)}
         </div>
       )}
 
@@ -72,7 +75,7 @@ export default function TransitPanel({ input, natalData }) {
               <KundliChart
                 planets={natalPlanets}
                 ascendant={natalAsc}
-                title="Transit on Natal (North Indian)"
+                title={t('transit_chart_title')}
                 transitPlanets={transitData.transit_planets}
               />
             </div>
@@ -81,18 +84,18 @@ export default function TransitPanel({ input, natalData }) {
           {/* Transit planet table */}
           <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
             <div className="px-4 py-3 bg-primary-light border-b border-primary/30">
-              <h3 className="font-semibold text-primary-dark text-sm">Current Transit Positions</h3>
+              <h3 className="font-semibold text-primary-dark text-sm">{t('transit_positions')}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-night/[0.03] text-ink-muted">
-                    <th className="p-2 text-left border-b">Planet</th>
-                    <th className="p-2 text-left border-b">Transit Sign</th>
-                    <th className="p-2 text-right border-b">Degree</th>
-                    <th className="p-2 text-left border-b">Nakshatra</th>
-                    <th className="p-2 text-center border-b">Natal House</th>
-                    <th className="p-2 text-left border-b">Natal Sign</th>
+                    <th className="p-2 text-left border-b">{t('col_planet')}</th>
+                    <th className="p-2 text-left border-b">{t('transit_col_sign')}</th>
+                    <th className="p-2 text-right border-b">{t('col_degree')}</th>
+                    <th className="p-2 text-left border-b">{t('col_nakshatra')}</th>
+                    <th className="p-2 text-center border-b">{t('transit_col_natal_house')}</th>
+                    <th className="p-2 text-left border-b">{t('transit_col_natal_sign')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,19 +106,19 @@ export default function TransitPanel({ input, natalData }) {
                           className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                         <td className="p-2 border-b font-medium"
                             style={{ color: PLANET_COLORS[tp.name] ?? '#333' }}>
-                          {tp.name}
-                          {tp.retrograde && <span className="text-vermillion ml-1">R</span>}
+                          {planetName(t, tp.name)}
+                          {tp.retrograde && <span className="text-vermillion ml-1">{t('col_retrograde')}</span>}
                         </td>
-                        <td className="p-2 border-b">{tp.sign}</td>
+                        <td className="p-2 border-b">{signName(t, tp.sign)}</td>
                         <td className="p-2 border-b text-right tabular-nums">
                           {tp.degree.toFixed(1)}°
                         </td>
-                        <td className="p-2 border-b text-ink-muted">{tp.nakshatra}</td>
+                        <td className="p-2 border-b text-ink-muted">{nakshatraName(t, tp.nakshatra)}</td>
                         <td className="p-2 border-b text-center text-primary-dark font-medium">
                           {tp.house}
                         </td>
                         <td className="p-2 border-b text-ink-muted">
-                          {natal ? `${natal.sign} ${natal.degree.toFixed(0)}°` : '–'}
+                          {natal ? `${signName(t, natal.sign)} ${natal.degree.toFixed(0)}°` : '–'}
                         </td>
                       </tr>
                     )

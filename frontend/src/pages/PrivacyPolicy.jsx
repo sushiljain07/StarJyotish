@@ -12,13 +12,16 @@
 // entity is registered yet. Everything else here reflects what the app
 // actually does today, verified against the codebase (see PROGRESS notes
 // in the audit), not generic boilerplate.
+import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
+import LegalLanguageNote from '../components/LegalLanguageNote'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2 scroll-mt-20'
 const ul = 'list-disc pl-5 space-y-1.5'
 
 export default function PrivacyPolicy() {
+  const { t } = useTranslation()
   return (
     <>
       <Seo
@@ -26,7 +29,8 @@ export default function PrivacyPolicy() {
         description="How Star Jyotish collects, uses, and protects your birth details and personal data when you generate a Vedic astrology chart or AI reading."
         path="/privacy"
       />
-      <StaticPageLayout title="Privacy Policy" maxWidth="max-w-3xl">
+      <StaticPageLayout title={t('footer_bottom_privacy')} maxWidth="max-w-3xl">
+        <LegalLanguageNote />
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
           <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
           <ul className="space-y-1.5 text-sm text-ink">

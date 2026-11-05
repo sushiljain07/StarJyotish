@@ -12,7 +12,7 @@ import BirthForm from './BirthForm'
 
 const select = (label, value) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
-function fillDate(d, m, y) { select('Day', d); select('Month', m); select('Year', y) }
+function fillDate(d, m, y) { select(en.form_day, d); select(en.form_month, m); select(en.form_year, y) }
 
 let spy
 beforeEach(async () => {
@@ -43,14 +43,14 @@ describe('BirthForm', () => {
   it('allows an unknown birth time and sends the default time', () => {
     fillDate('16', '8', '1990')
     fireEvent.click(screen.getByRole('button', { name: en.onboarding_time_unknown }))
-    expect(screen.queryByLabelText('Hour')).toBeNull()
+    expect(screen.queryByLabelText(en.form_hour)).toBeNull()
     submit()
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ date: '1990-08-16', time: '12:00', timeAccuracy: 'unknown' }))
   })
 
   it('converts an exact 12-hour time to 24-hour', () => {
     fillDate('16', '8', '1990')
-    select('Hour', '07'); select('Minute', '05'); select('AM/PM', 'PM')
+    select(en.form_hour, '07'); select(en.form_minute, '05'); select(en.form_ampm, 'PM')
     submit()
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ time: '19:05', timeAccuracy: 'exact' }))
   })
@@ -65,7 +65,7 @@ describe('BirthForm', () => {
   })
   it('says so when the birth time is incomplete', () => {
     fillDate('16', '8', '1990')
-    select('Hour', '07'); select('Minute', '05')
+    select(en.form_hour, '07'); select(en.form_minute, '05')
     submit()
     expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_time)
     expect(spy).not.toHaveBeenCalled()

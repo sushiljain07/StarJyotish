@@ -1,5 +1,6 @@
 // frontend/src/components/KundliChart.jsx
 import { useTranslation } from 'react-i18next'
+import { planetAbbr } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
 
 // ── 500×500 chart geometry ───────────────────────────────────────────────────
@@ -49,17 +50,6 @@ const RASHI_POS = [
   [462,  25],  // H12
 ]
 
-const ABBR_EN = {
-  Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me',
-  Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke',
-  Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
-}
-const ABBR_HI = {
-  Sun: 'सू', Moon: 'च', Mars: 'मं', Mercury: 'बु',
-  Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के',
-  Neptune: 'Ne', Uranus: 'Ur', Pluto: 'Pl',
-}
-
 // AstroSage-style planet colours
 // Vedic exaltation / debilitation signs (sign_index 0=Aries … 11=Pisces)
 const EXALTATION   = { Sun:0, Moon:1, Mars:9, Mercury:5, Jupiter:3, Venus:11, Saturn:6 }
@@ -102,11 +92,11 @@ export default function KundliChart({
   planets = [],
   ascendant = null,
   navamsaPlanets = null,
-  title = 'Lagna Chart',
+  title,
   transitPlanets = null,
 }) {
-  const { i18n } = useTranslation()
-  const abbr = i18n.language === 'hi' ? ABBR_HI : ABBR_EN
+  const { t } = useTranslation()
+  const abbr = name => planetAbbr(t, name)
 
   // Derive houses from ascendant sign
   const ascIdx = ascendant?.sign_index ?? 0
@@ -137,7 +127,7 @@ export default function KundliChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-primary-dark">{title}</div>
+      <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_lagna_title')}</div>
 
       <svg
         width="100%"
@@ -186,7 +176,7 @@ export default function KundliChart({
             allItems.push({
               type:   'planet',
               color:  PLANET_COLORS[p.name] ?? '#333',
-              name:   abbr[p.name] ?? p.name.slice(0, 2),
+              name:   abbr(p.name),
               deg:    Math.floor(p.degree),
               status: getPlanetStatus(p, sun, navamsaPlanets),
             })
@@ -197,7 +187,7 @@ export default function KundliChart({
             allItems.push({
               type:  'transit',
               color: PLANET_COLORS[p.name] ?? '#888',
-              name:  abbr[p.name] ?? p.name.slice(0, 2),
+              name:  abbr(p.name),
               deg:   Math.floor(p.degree),
             })
           })
@@ -224,7 +214,7 @@ export default function KundliChart({
                       textAnchor="middle" fontSize="15"
                       fill="#FF6B00" fontWeight="bold">
                   <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                  <tspan dy="3">La</tspan>
+                  <tspan dy="3">{abbr('Ascendant')}</tspan>
                 </text>
               )
             }
@@ -234,7 +224,7 @@ export default function KundliChart({
                       textAnchor="middle" fontSize="13"
                       fill={item.color} opacity="0.65" fontStyle="italic">
                   <tspan fontSize="9" dy="-2">{item.deg}</tspan>
-                  <tspan dy="2">T:{item.name}</tspan>
+                  <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
                 </text>
               )
             }
@@ -255,11 +245,11 @@ export default function KundliChart({
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-ink-muted px-2">
-        <span>* Retrograde</span>
-        <span>^ Combust</span>
-        <span>↑ Exalted</span>
-        <span>↓ Debilitated</span>
-        <span>□ Vargottama</span>
+        <span>{t('chart_legend_retrograde')}</span>
+        <span>{t('chart_legend_combust')}</span>
+        <span>{t('chart_legend_exalted')}</span>
+        <span>{t('chart_legend_debilitated')}</span>
+        <span>{t('chart_legend_vargottama')}</span>
       </div>
     </div>
     </div>

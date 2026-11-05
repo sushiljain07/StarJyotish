@@ -5,6 +5,7 @@
 // No hardcoded content — everything is managed from the admin dashboard.
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link, Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
@@ -99,6 +100,7 @@ function ReadingProgressBar() {
 }
 
 export default function BlogArticle() {
+  const { t } = useTranslation()
   const { slug } = useParams()
   const navigate = useNavigate()
   const scrollProgress = useScrollProgress(80)
@@ -153,7 +155,7 @@ export default function BlogArticle() {
             <div className="max-w-2xl mx-auto">
               <Reveal>
                 <div className="flex items-center gap-2.5 mb-5">
-                  <Link to="/blog" className="text-ink-onnight hover:text-primary text-xs transition">← Blog</Link>
+                  <Link to="/blog" className="text-ink-onnight hover:text-primary text-xs transition">{t('blog_article_back')}</Link>
                   <span className="text-ink-onnight/40 text-xs">/</span>
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink'}`}>{article.category}</span>
                 </div>
@@ -161,7 +163,7 @@ export default function BlogArticle() {
                 <div className="flex items-center gap-4 text-ink-onnight text-xs">
                   <span>{article.date}</span>
                   <span>·</span>
-                  <span>{article.readMin} min read</span>
+                  <span>{t('blog_read_min_long', { n: article.readMin })}</span>
                 </div>
               </Reveal>
             </div>
@@ -187,24 +189,24 @@ export default function BlogArticle() {
           {/* CTA */}
           <div className="bg-night px-6 py-10 text-center">
             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Star Jyotish</p>
-            <h2 className="font-serif font-semibold text-xl text-primary-light mb-2">See this in your own chart</h2>
-            <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">Everything in this article becomes personal when you generate your free Kundli.</p>
+            <h2 className="font-serif font-semibold text-xl text-primary-light mb-2">{t('blog_article_cta_title')}</h2>
+            <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">{t('blog_article_cta_body')}</p>
             <button onClick={() => navigate('/generate')} className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition">
-              Generate My Free Kundli →
+              {t('learn_cta_button')}
             </button>
           </div>
 
           {/* Related articles */}
           {related.length > 0 && (
             <section className="max-w-2xl mx-auto px-4 py-10">
-              <h3 className="font-semibold text-sm text-ink-muted uppercase tracking-wide mb-5">Related reading</h3>
+              <h3 className="font-semibold text-sm text-ink-muted uppercase tracking-wide mb-5">{t('blog_article_related')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {related.map(rel => (
                   <Link key={rel.slug} to={`/blog/${rel.slug}`}
                     className="group bg-parchment-card rounded-xl border border-line p-4 hover:border-primary/30 hover:shadow-md transition">
                     <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full mb-2 ${CATEGORY_COLORS[rel.category] ?? ''}`}>{rel.category}</span>
                     <p className="font-semibold text-sm text-ink group-hover:text-primary-dark transition leading-snug">{rel.title}</p>
-                    <p className="text-xs text-ink-faint mt-1">{rel.readMin} min read</p>
+                    <p className="text-xs text-ink-faint mt-1">{t('blog_read_min_long', { n: rel.readMin })}</p>
                   </Link>
                 ))}
               </div>

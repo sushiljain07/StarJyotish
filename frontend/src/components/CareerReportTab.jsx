@@ -8,6 +8,9 @@ import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
 import { errorMessage } from '../api/errors'
+import { currentLanguage } from '../i18n/languages'
+import { planetName, signName } from '../utils/astroNames'
+import { formatDate } from '../utils/format'
 
 // icon/style metadata per section key — content ordering now comes from
 // SECTION_GROUPS below, grouped into the report's information architecture.
@@ -57,18 +60,19 @@ const SECTION_GROUPS = {
   legacy: ['lagna_personality', 'job_vs_business', 'tenth_house_d1', 'd10_analysis', 'amatyakaraka', 'career_fields', 'student_streams', 'yogas_combinations', 'dasha_predictions', 'transit_impact', 'remedies', 'conclusion'],
 }
 
+// Labels are the career_jump_<name> locale keys (see jumpSections()).
 const JUMP_SECTIONS = [
-  { id: 'career-overview',    label: 'Overview' },
-  { id: 'career-current',     label: 'Current Career' },
-  { id: 'career-dna',         label: 'Career DNA' },
-  { id: 'career-directions',  label: 'Directions' },
-  { id: 'career-growth',      label: 'Growth' },
-  { id: 'career-money',       label: 'Money' },
-  { id: 'career-challenges',  label: 'Challenges' },
-  { id: 'career-timing',      label: 'Timing' },
-  { id: 'career-roadmap',     label: 'Roadmap' },
-  { id: 'career-evidence',    label: 'Evidence' },
-  { id: 'career-ask-ai',      label: 'Ask AI' },
+  { id: 'career-overview',    key: 'overview' },
+  { id: 'career-current',     key: 'current' },
+  { id: 'career-dna',         key: 'dna' },
+  { id: 'career-directions',  key: 'directions' },
+  { id: 'career-growth',      key: 'growth' },
+  { id: 'career-money',       key: 'money' },
+  { id: 'career-challenges',  key: 'challenges' },
+  { id: 'career-timing',      key: 'timing' },
+  { id: 'career-roadmap',     key: 'roadmap' },
+  { id: 'career-evidence',    key: 'evidence' },
+  { id: 'career-ask-ai',      key: 'ask_ai' },
 ]
 
 // Which anchors to front-load, per stated concern (from CAREER_CONCERNS
@@ -88,10 +92,10 @@ const CONCERN_PRIORITY = {
   'What is the next major turning point in my career?': ['career-timing', 'career-roadmap'],
 }
 
-function reorderSections(careerContext) {
+function reorderSections(careerContext, t) {
   const concern  = careerContext?.career_concerns?.[0]
   const priority = CONCERN_PRIORITY[concern] || []
-  const [overview, ...rest] = JUMP_SECTIONS
+  const [overview, ...rest] = JUMP_SECTIONS.map(s => ({ id: s.id, label: t(`career_jump_${s.key}`) }))
   const prioritized = priority.map(id => rest.find(s => s.id === id)).filter(Boolean)
   const remaining   = rest.filter(s => !priority.includes(s.id))
   return [overview, ...prioritized, ...remaining]
@@ -105,16 +109,12 @@ const EFFORT_COLOR = {
 
 const CAREER_CONTEXT_KEY = 'starjyotish_career_context'
 
-const CAREER_STAGES = [
-  { value: 'student',     label: 'Student / Pre-career' },
-  { value: '0_3_years',   label: '0–3 years experience' },
-  { value: 'experienced', label: 'Experienced professional' },
-  { value: 'senior',      label: 'Senior / Executive' },
-  { value: 'entrepreneur',label: 'Entrepreneur / Business owner' },
-  { value: 'transition',  label: 'Career transition' },
-  { value: 'job_seeker',  label: 'Job seeker / Career break' },
-]
+// Stage labels are the career_stage_<value> locale keys.
+const CAREER_STAGES = ['student', '0_3_years', 'experienced', 'senior', 'entrepreneur', 'transition', 'job_seeker']
 
+// The English text is the stable id: it is what the API receives, what is
+// saved in localStorage and what CONCERN_PRIORITY is keyed by. The shown
+// label is the career_concern_<index> locale key, same order.
 const CAREER_CONCERNS = [
   'Am I in the right career?',
   'How far can I progress?',
@@ -129,6 +129,10 @@ const CAREER_CONCERNS = [
   'Are foreign opportunities or relocation favorable?',
   'What is the next major turning point in my career?',
 ]
+const concernLabel = (t, concern) => {
+  const i = CAREER_CONCERNS.indexOf(concern)
+  return i < 0 ? concern : t(`career_concern_${i}`)
+}
 
 const MAX_CONCERNS = 3
 
@@ -150,6 +154,7 @@ function saveCareerContext(ctx) {
 }
 
 function CareerContextForm({ initial, onDone }) {
+  const { t } = useTranslation()
   const [careerStage, setCareerStage] = useState(initial?.career_stage || '')
   const [profession, setProfession]   = useState(initial?.current_profession || '')
   const [concerns, setConcerns]       = useState(initial?.career_concerns || [])
@@ -174,42 +179,42 @@ function CareerContextForm({ initial, onDone }) {
     <div className="max-w-2xl mx-auto py-6 px-2 space-y-6">
       <div className="text-center">
         <div className="text-4xl mb-3">💼</div>
-        <h2 className="text-xl font-bold text-ink mb-1">Tell us a little about your career</h2>
+        <h2 className="text-xl font-bold text-ink mb-1">{t('career_form_title')}</h2>
         <p className="text-ink-muted text-sm">
-          Optional — this helps the report speak to your actual situation instead of a generic one.
+          {t('career_form_sub')}
         </p>
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-ink mb-2">Where are you in your career?</p>
+        <p className="text-sm font-semibold text-ink mb-2">{t('career_form_stage_q')}</p>
         <div className="flex flex-wrap gap-2">
-          {CAREER_STAGES.map(s => (
-            <button key={s.value} type="button" onClick={() => setCareerStage(s.value)}
+          {CAREER_STAGES.map(value => (
+            <button key={value} type="button" onClick={() => setCareerStage(value)}
               className={`px-3 py-1.5 rounded-full text-sm border transition ${
-                careerStage === s.value
+                careerStage === value
                   ? 'bg-primary text-night border-primary font-semibold'
                   : 'bg-parchment-card text-ink-muted border-line hover:border-primary/50'
               }`}>
-              {s.label}
+              {t(`career_stage_${value}`)}
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-ink mb-2">What's your current profession?</p>
+        <p className="text-sm font-semibold text-ink mb-2">{t('career_form_profession_q')}</p>
         <input
           type="text"
           value={profession}
           onChange={e => setProfession(e.target.value)}
-          placeholder="e.g. Software Engineer, Teacher, Business Owner"
+          placeholder={t('career_form_profession_ph')}
           className="w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
 
       <div>
         <p className="text-sm font-semibold text-ink mb-2">
-          What do you want to know? <span className="text-ink-faint font-normal">(pick up to {MAX_CONCERNS})</span>
+          {t('career_form_concerns_q')} <span className="text-ink-faint font-normal">{t('career_form_concerns_hint', { count: MAX_CONCERNS })}</span>
         </p>
         <div className="flex flex-wrap gap-2">
           {CAREER_CONCERNS.map(c => (
@@ -220,7 +225,7 @@ function CareerContextForm({ initial, onDone }) {
                   ? 'bg-primary text-night border-primary font-semibold'
                   : 'bg-parchment-card text-ink-muted border-line hover:border-primary/50'
               }`}>
-              {c}
+              {concernLabel(t, c)}
             </button>
           ))}
         </div>
@@ -229,11 +234,11 @@ function CareerContextForm({ initial, onDone }) {
       <div className="flex items-center justify-between pt-2">
         <button type="button" onClick={() => onDone(null)}
           className="text-sm text-ink-muted hover:text-ink transition">
-          Skip for now
+          {t('career_form_skip')}
         </button>
         <button type="button" onClick={submit}
           className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
-          Continue
+          {t('career_form_continue')}
         </button>
       </div>
     </div>
@@ -332,6 +337,7 @@ function SectionCard({ icon, section, style }) {
 }
 
 function CareerOptionCard({ opt }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const effortCls = EFFORT_COLOR[opt.effort_required] ?? EFFORT_COLOR.medium
   return (
@@ -348,7 +354,7 @@ function CareerOptionCard({ opt }) {
             <span className="font-bold text-ink text-sm">{opt.title}</span>
             <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{opt.field}</span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>
-              {opt.effort_required} effort
+              {t('report_effort_label', { level: t(`report_effort_${opt.effort_required}`, { defaultValue: opt.effort_required }) })}
             </span>
           </div>
           {opt.timeline && (
@@ -362,25 +368,25 @@ function CareerOptionCard({ opt }) {
         <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">
           {opt.reason && (
             <div>
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">Why this career?</p>
+              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">{t('career_why_this')}</p>
               <p className="text-xs text-ink-muted leading-relaxed">{opt.reason}</p>
             </div>
           )}
           <div className="flex flex-wrap gap-4">
             {opt.key_planets?.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-ink-muted mb-1">Key Planets</p>
+                <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_key_planets')}</p>
                 <div className="flex gap-1 flex-wrap">
                   {opt.key_planets.map(p => (
-                    <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{p}</span>
+                    <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
                   ))}
                 </div>
               </div>
             )}
             {opt.favorable_dasha && (
               <div>
-                <p className="text-xs font-semibold text-ink-muted mb-1">Best Dasha</p>
-                <span className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{opt.favorable_dasha}</span>
+                <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_best_dasha')}</p>
+                <span className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, opt.favorable_dasha)}</span>
               </div>
             )}
           </div>
@@ -390,26 +396,37 @@ function CareerOptionCard({ opt }) {
   )
 }
 
+// The backend sends English planet/sign names, "<Sign> H<n>" placements and
+// lowercase dignity words for the evidence; show them in the UI language.
 function AstrologicalEvidenceCard({ evidence }) {
+  const { t } = useTranslation()
   const [showAllPlanets, setShowAllPlanets] = useState(false)
   if (!evidence) return null
+  const sign = s => signName(t, s)
+  const placement = text => {
+    const m = /^(.*?) H(\d+)$/.exec(String(text ?? ''))
+    return m ? `${sign(m[1])} · ${t('career_house_abbr', { n: m[2] })}` : text
+  }
   const rows = [
-    ['Lagna (Ascendant)', evidence.lagna],
-    ['Moon Sign', evidence.moon_sign],
-    ['Sun Sign', evidence.sun_sign],
-    ['Amatyakaraka (career soul planet)', `${evidence.amatyakaraka} — ${evidence.amatyakaraka_placement}`],
-    ['10th Lord', `${evidence.tenth_lord} — ${evidence.tenth_lord_placement}`],
-    ['D10 Lagna (Dasamsa)', evidence.d10_lagna],
-    ['D10 Job Score', evidence.d10_job_score],
-    ['D10 Business Score', evidence.d10_business_score],
-    ['Current Mahadasha', `${evidence.current_mahadasha} (until ${evidence.current_mahadasha_end})`],
-    ['Current Antardasha', evidence.current_antardasha],
+    [t('career_evidence_lagna'), sign(evidence.lagna)],
+    [t('career_evidence_moon_sign'), sign(evidence.moon_sign)],
+    [t('career_evidence_sun_sign'), sign(evidence.sun_sign)],
+    [t('career_evidence_amatyakaraka'), `${planetName(t, evidence.amatyakaraka)} — ${placement(evidence.amatyakaraka_placement)}`],
+    [t('career_evidence_tenth_lord'), `${planetName(t, evidence.tenth_lord)} — ${placement(evidence.tenth_lord_placement)}`],
+    [t('career_evidence_d10_lagna'), sign(evidence.d10_lagna)],
+    [t('career_evidence_d10_job'), evidence.d10_job_score],
+    [t('career_evidence_d10_business'), evidence.d10_business_score],
+    [t('career_evidence_mahadasha'), t('career_evidence_mahadasha_value', {
+      planet: planetName(t, evidence.current_mahadasha),
+      date: formatDate(evidence.current_mahadasha_end, { day: 'numeric', month: 'short', year: 'numeric' }),
+    })],
+    [t('career_evidence_antardasha'), planetName(t, evidence.current_antardasha)],
   ]
   return (
     <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">🔬</span>
-        <h3 className="font-bold text-primary text-base">The Astrology Behind This Report</h3>
+        <h3 className="font-bold text-primary text-base">{t('career_evidence_title')}</h3>
       </div>
       <div className="divide-y divide-line">
         {rows.map(([label, value]) => (
@@ -423,14 +440,14 @@ function AstrologicalEvidenceCard({ evidence }) {
         <div className="mt-3 pt-3 border-t border-line">
           <button onClick={() => setShowAllPlanets(o => !o)}
             className="text-xs font-semibold text-primary-dark hover:underline">
-            {showAllPlanets ? 'Hide' : 'See'} all planets {showAllPlanets ? '▲' : '▼'}
+            {t(showAllPlanets ? 'career_evidence_hide_planets' : 'career_evidence_show_planets')}
           </button>
           {showAllPlanets && (
             <div className="divide-y divide-line mt-2">
               {evidence.all_planets.map(p => (
                 <div key={p.name} className="flex justify-between items-center gap-4 py-1.5 text-xs">
-                  <span className="text-ink-muted">{p.name}{p.retrograde ? ' (R)' : ''}</span>
-                  <span className="text-ink font-medium text-right">{p.sign} · H{p.house} · {p.dignity}</span>
+                  <span className="text-ink-muted">{planetName(t, p.name)}{p.retrograde ? t('career_retrograde_mark') : ''}</span>
+                  <span className="text-ink font-medium text-right">{sign(p.sign)} · {t('career_house_abbr', { n: p.house })} · {t(`career_dignity_${p.dignity}`, { defaultValue: p.dignity })}</span>
                 </div>
               ))}
             </div>
@@ -441,19 +458,24 @@ function AstrologicalEvidenceCard({ evidence }) {
   )
 }
 
+// The backend's label is a stable English id; its explanation text comes
+// from the server.
+const ALIGNMENT = {
+  'Strong Alignment':        { key: 'strong',        cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  'Partial Alignment':       { key: 'partial',       cls: 'bg-primary-light text-primary-dark border-primary/30' },
+  'Underutilized Potential': { key: 'underutilized', cls: 'bg-mauve/10 text-mauve border-mauve/30' },
+}
+
 function CareerAlignmentBadge({ alignment }) {
+  const { t } = useTranslation()
   if (!alignment) return null
-  const COLOR = {
-    'Strong Alignment':        'bg-emerald-50 text-emerald-700 border-emerald-200',
-    'Partial Alignment':       'bg-primary-light text-primary-dark border-primary/30',
-    'Underutilized Potential': 'bg-mauve/10 text-mauve border-mauve/30',
-  }
-  const cls = COLOR[alignment.label] || COLOR['Partial Alignment']
+  const match = ALIGNMENT[alignment.label] || ALIGNMENT['Partial Alignment']
+  const cls = match.cls
   return (
     <div className={`rounded-xl p-4 border ${cls}`}>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg">🧭</span>
-        <span className="font-bold text-sm">{alignment.label}</span>
+        <span className="font-bold text-sm">{ALIGNMENT[alignment.label] ? t(`career_alignment_${match.key}`) : alignment.label}</span>
       </div>
       <p className="text-sm leading-relaxed opacity-90">{alignment.explanation}</p>
     </div>
@@ -461,12 +483,13 @@ function CareerAlignmentBadge({ alignment }) {
 }
 
 function CareerRoadmapCard({ roadmap, onAskQuestion }) {
+  const { t } = useTranslation()
   if (!roadmap) return null
   const horizons = [
-    ['Now', roadmap.now],
-    ['Next 12 Months', roadmap.next_12_months],
-    ['1–3 Years', roadmap.years_1_to_3],
-    ['3–5 Years', roadmap.years_3_to_5],
+    [t('career_roadmap_now'), roadmap.now],
+    [t('career_roadmap_12m'), roadmap.next_12_months],
+    [t('career_roadmap_1_3y'), roadmap.years_1_to_3],
+    [t('career_roadmap_3_5y'), roadmap.years_3_to_5],
   ].filter(([, text]) => text)
 
   return (
@@ -474,7 +497,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
       {horizons.length > 0 && (
         <div className="bg-parchment-card rounded-xl border border-line shadow-sm overflow-hidden">
           <div className="bg-night px-5 py-3">
-            <h3 className="font-bold text-primary-light text-base">🗺️ Your Career Roadmap</h3>
+            <h3 className="font-bold text-primary-light text-base">{t('career_roadmap_title')}</h3>
           </div>
           <div className="divide-y divide-line">
             {horizons.map(([label, text]) => (
@@ -490,7 +513,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {roadmap.top_actions?.length > 0 && (
             <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">Top Actions</p>
+              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">{t('career_roadmap_actions')}</p>
               <ul className="space-y-1.5">
                 {roadmap.top_actions.map((a, i) => (
                   <li key={i} className="text-sm text-ink flex gap-2">
@@ -502,7 +525,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
           )}
           {roadmap.top_avoid?.length > 0 && (
             <div className="bg-primary-light rounded-xl p-4 border border-primary/30">
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-2">Keep In Mind</p>
+              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-2">{t('career_roadmap_avoid')}</p>
               <ul className="space-y-1.5">
                 {roadmap.top_avoid.map((a, i) => (
                   <li key={i} className="text-sm text-ink flex gap-2">
@@ -517,7 +540,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
       {roadmap.next_question && (
         <button onClick={() => onAskQuestion(roadmap.next_question)}
           className="w-full text-left bg-parchment-card rounded-xl p-4 border border-line hover:border-primary/50 transition">
-          <p className="text-xs text-ink-faint mb-1">Suggested next question</p>
+          <p className="text-xs text-ink-faint mb-1">{t('career_roadmap_next_question')}</p>
           <p className="text-sm font-medium text-primary-dark">"{roadmap.next_question}" →</p>
         </button>
       )}
@@ -526,6 +549,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
 }
 
 function ScenarioAnalysisBox({ onSubmit }) {
+  const { t } = useTranslation()
   const [text, setText] = useState('')
   function submit() {
     if (!text.trim()) return
@@ -535,34 +559,33 @@ function ScenarioAnalysisBox({ onSubmit }) {
   return (
     <div className="bg-parchment-card rounded-xl p-4 border border-mauve/30 space-y-3">
       <div>
-        <p className="font-bold text-ink text-sm mb-1">🔍 Compare a Decision</p>
+        <p className="font-bold text-ink text-sm mb-1">{t('career_scenario_title')}</p>
         <p className="text-xs text-ink-muted">
-          Describe a real decision you're weighing — two job offers, a relocation, switching industries.
-          Submitting starts a fresh, focused conversation below.
+          {t('career_scenario_desc')}
         </p>
       </div>
       <textarea
         value={text}
         onChange={e => setText(e.target.value)}
-        placeholder="e.g. I have two offers: a startup in Bangalore vs. a stable corporate role in Delhi..."
+        placeholder={t('career_scenario_placeholder')}
         rows={3}
         className="w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
       />
       <button onClick={submit} disabled={!text.trim()}
         className="px-5 py-2 bg-primary hover:bg-primary-dark disabled:bg-night/10 disabled:text-ink-faint text-night font-semibold rounded-full text-sm transition">
-        Compare →
+        {t('career_scenario_compare')}
       </button>
     </div>
   )
 }
 
-function buildAskSeedQuestion(careerContext) {
+function buildAskSeedQuestion(careerContext, t) {
   const concern = careerContext?.career_concerns?.[0]
-  return concern || 'What should I focus on in my career right now?'
+  return concern ? concernLabel(t, concern) : t('career_ask_default')
 }
 
 export default function CareerReportTab({ input, onOpenRajyogas }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
   const [report, setReport] = useState(null)
@@ -596,11 +619,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
   }
 
   function handleScenarioSubmit(scenarioText) {
-    askQuestion(
-      `I'm weighing a career decision: ${scenarioText}. Based on my chart, timing, and career profile, ` +
-      `compare the options and give me astrological guidance (not a guaranteed prediction) — what does my ` +
-      `chart favor and why, and what timing considerations matter?`
-    )
+    askQuestion(t('career_scenario_prompt', { text: scenarioText }))
   }
 
   // Auto-reveal for signed-in visitors — see the matching effect and its
@@ -633,7 +652,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     generate(resolved)
   }
 
-  const lang = i18n.language?.startsWith('hi') ? 'hi' : 'en'
+  const lang = currentLanguage()
   const beginRequest = useLatestRequest()
 
   // A finished report follows the language toggle (the other language is
@@ -652,13 +671,9 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     return (
       <PaywallCard
         icon="💼"
-        title="Your Full Career Report"
-        body="Your exact career field, whether your chart favors a job or business, your peak career window, and the precise activation protocol for every Raj Yoga in your chart — gemstone, mantra, timing, and ritual, calibrated to you."
-        bullets={[
-          'Your best career options, ranked for your specific chart',
-          'Activation protocol for every Raj Yoga you carry',
-          'Delivered as a report you can keep and revisit',
-        ]}
+        title={t('career_paywall_title')}
+        body={t('career_paywall_body')}
+        bullets={[t('career_paywall_bullet_1'), t('career_paywall_bullet_2'), t('career_paywall_bullet_3')]}
       />
     )
   }
@@ -697,18 +712,17 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
   if (status === 'idle' && !isAuthenticated) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">💼</div>
-      <h2 className="text-xl font-bold text-ink mb-2">Vedic Career Report</h2>
+      <h2 className="text-xl font-bold text-ink mb-2">{t('career_idle_heading')}</h2>
       <p className="text-ink-muted text-sm mb-6 max-w-sm">
-        Personalized career destiny reading using D1 + D10 charts, Amatyakaraka, career yogas,
-        future dasha timing, and your top career paths — powered by your Vedic astrology skill files.
+        {t('career_idle_body')}
       </p>
       <button
         onClick={() => (showContextForm ? setWantsReport(true) : generate())}
         className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"
       >
-        Generate Career Report
+        {t('career_generate_btn')}
       </button>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')} · takes ~20 seconds</p>
+      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
     </div>
   )
 
@@ -717,8 +731,8 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4 animate-spin">⏳</div>
-      <p className="text-primary-dark font-semibold">Reading your career destiny…</p>
-      <p className="text-xs text-ink-faint mt-1">D1 + D10 · Amatyakaraka · Yogas · Future Dashas · Career Paths</p>
+      <p className="text-primary-dark font-semibold">{t('career_loading_text')}</p>
+      <p className="text-xs text-ink-faint mt-1">{t('career_loading_sub')}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
       </div>
@@ -733,7 +747,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
         onClick={() => generate()}
         className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
       >
-        Try Again
+        {t('topic_report_try_again')}
       </button>
     </div>
   )
@@ -752,13 +766,13 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
 
   const depthToggle = (
     <div className="flex gap-1 bg-night/5 rounded-full p-1">
-      {[['quick', 'Quick', 'Quick View'], ['full', 'Full', 'Full Report'], ['deep', 'Deep', 'Deep Analysis']].map(([key, short, full]) => (
+      {['quick', 'full', 'deep'].map(key => (
         <button key={key} onClick={() => setDepth(key)}
           className={`flex-1 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap ${
             depth === key ? 'bg-primary text-night' : 'text-ink-muted hover:text-ink'
           }`}>
-          <span className="sm:hidden">{short}</span>
-          <span className="hidden sm:inline">{full}</span>
+          <span className="sm:hidden">{t(`career_depth_${key}_short`)}</span>
+          <span className="hidden sm:inline">{t(`career_depth_${key}_long`)}</span>
         </button>
       ))}
     </div>
@@ -771,13 +785,13 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
           onClick={() => generate(undefined, { force: true })}
           className="text-sm text-primary hover:text-primary-dark transition font-medium"
         >
-          ↺ Regenerate Report
+          {t('career_regenerate')}
         </button>
         <button
           onClick={() => setShowContextForm(true)}
           className="text-sm text-ink-muted hover:text-ink transition"
         >
-          Edit your career context
+          {t('career_edit_context')}
         </button>
       </div>
 
@@ -803,20 +817,20 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {report.current_phase?.content && (
           <div className="bg-parchment-card rounded-xl p-4 border border-line">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">Current Phase</p>
+            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{t('career_quick_current_phase')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.current_phase.content}</p>
           </div>
         )}
         {report.peak_career_window?.content && (
           <div className="bg-parchment-card rounded-xl p-4 border border-line">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">Peak Window</p>
+            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{t('career_quick_peak_window')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.peak_career_window.content}</p>
           </div>
         )}
       </div>
       <button onClick={() => setDepth('full')}
         className="w-full py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
-        See Full Report →
+        {t('career_see_full')}
       </button>
       {footer}
     </div>
@@ -828,16 +842,16 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">👑</span>
         <h3 className="font-bold text-primary text-base">
-          You have {report.active_yogas.length} active Raj Yoga{report.active_yogas.length > 1 ? 's' : ''}
+          {t('reading_yogas_title', { count: report.active_yogas.length })}
         </h3>
       </div>
       <p className="text-ink text-sm leading-relaxed mb-3">
-        Including {report.active_yogas.slice(0, 2).map(y => y.name).join(' and ')}
-        {report.active_yogas.length > 2 ? ', and more' : ''} — see the full breakdown of what each one means for you.
+        {t(report.active_yogas.length > 2 ? 'reading_yogas_body_more' : 'reading_yogas_body',
+          { names: report.active_yogas.slice(0, 2).map(y => y.name).join(t('reading_list_and')) })}
       </p>
       <button onClick={onOpenRajyogas}
         className="text-sm font-semibold text-primary-dark hover:underline">
-        See my Raj Yogas →
+        {t('reading_see_yogas')}
       </button>
     </div>
   )
@@ -846,8 +860,8 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     <div className="bg-parchment-card rounded-xl border border-line shadow-sm p-5">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xl">🎯</span>
-        <h3 className="font-bold text-ink text-base">Your Best Career Options</h3>
-        <span className="text-xs text-ink-faint ml-1">· tap to expand</span>
+        <h3 className="font-bold text-ink text-base">{t('career_options_heading')}</h3>
+        <span className="text-xs text-ink-faint ml-1">· {t('topic_report_tap_to_expand')}</span>
       </div>
       <div className="space-y-2">
         {report.career_options.map(opt => (
@@ -871,12 +885,12 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
     'career-ask-ai':     () => (
       <>
         {depth === 'deep' && <ScenarioAnalysisBox onSubmit={handleScenarioSubmit} />}
-        <AskChart key={askNonce} input={input} initialQuestion={askSeed || buildAskSeedQuestion(careerContext)} />
+        <AskChart key={askNonce} input={input} initialQuestion={askSeed || buildAskSeedQuestion(careerContext, t)} />
       </>
     ),
   }
 
-  const orderedSections = reorderSections(careerContext)
+  const orderedSections = reorderSections(careerContext, t)
 
   return (
     <div className="max-w-2xl mx-auto py-2 space-y-4">

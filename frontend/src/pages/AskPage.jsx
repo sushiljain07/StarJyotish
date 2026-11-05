@@ -2,6 +2,7 @@
 // Standalone page for asking free-form questions about the birth chart.
 import { lazy, Suspense } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState } from '../services/lastChart'
 import Seo from '../components/Seo'
@@ -15,6 +16,7 @@ function TabLoader() {
 }
 
 export default function AskPage() {
+  const { t } = useTranslation()
   const location = useLocation()
   const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
@@ -33,12 +35,12 @@ export default function AskPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <Seo title="Ask Your Chart" description="Ask any question about your Vedic birth chart." path="/ask" noindex />
+      <Seo title={t('ask_page_title')} description={t('ask_page_seo_description')} path="/ask" noindex />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4 py-2">
           <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
-            Ask Your Chart
+            {t('ask_page_title')}
           </p>
         </div>
       </div>

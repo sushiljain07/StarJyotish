@@ -1,6 +1,8 @@
 from datetime import date as _date
 from typing import Optional
 
+from services.i18n import VALUES_LANGUAGE_RULE, text
+
 from services.astro_utils import (
     SIGNS, get_planet_dignity, calculate_amatyakaraka,
     planet_by_name, house_sign, house_lord, house_occupants,
@@ -309,12 +311,7 @@ def _build_relationship_prompt(
   },
 '''
 
-    _lang_rule = (
-        "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' and every 'content' string) "
-        "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown."
-    ) if language == "hi" else (
-        "LANGUAGE RULE: Write all 'title' and 'content' values in English."
-    )
+    _lang_rule = text(VALUES_LANGUAGE_RULE, language, "rule")
 
     prompt = f"""You are a compassionate Vedic relationship astrologer writing a warm, empowering relationship report.
 
@@ -403,10 +400,14 @@ Return ONLY a valid JSON object, sections in this exact order:
 _MINOR_AGE_CEILING = 18
 
 
+_MINOR_SAFE_LANG_RULE = {
+    "en": {"rule": "Write the 'title' and 'content' values in English."},
+    "hi": {"rule": "Write the 'title' and 'content' values in Hindi (Devanagari script)."},
+}
+
+
 def _build_minor_safe_prompt(language: str = "en") -> str:
-    _lang_rule = (
-        "Write the 'title' and 'content' values in Hindi (Devanagari script)."
-    ) if language == "hi" else "Write the 'title' and 'content' values in English."
+    _lang_rule = text(_MINOR_SAFE_LANG_RULE, language, "rule")
     return f"""Return ONLY this JSON object, nothing else. {_lang_rule}
 {{
   "relationship_destiny_brief": {{

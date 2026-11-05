@@ -22,6 +22,8 @@ import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
 import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
+import { LANGUAGES, currentLanguage, localeFor } from '../i18n/languages'
+import { markLanguageChosenByUser } from '../i18n'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -155,7 +157,10 @@ export default function Profile() {
         timezone: form.timezone || null,
       }
       const updated = await updateMyProfile(payload)
-      if (updated.preferred_language !== i18n.language) i18n.changeLanguage(updated.preferred_language)
+      if (updated.preferred_language !== i18n.language) {
+        i18n.changeLanguage(updated.preferred_language)
+        markLanguageChosenByUser()
+      }
       setSavedAt(Date.now())
     } catch (err) {
       setError(err.message)
@@ -165,7 +170,7 @@ export default function Profile() {
   }
 
   const memberSince = user?.created_at
-    ? new Date(user.created_at).toLocaleDateString(i18n.language.startsWith('hi') ? 'hi-IN' : 'en-IN', {
+    ? new Date(user.created_at).toLocaleDateString(localeFor(currentLanguage()), {
         year: 'numeric', month: 'long', day: 'numeric',
       })
     : null
@@ -228,8 +233,7 @@ export default function Profile() {
             <div>
               <label className={labelCls}>{t('profile_preferred_language')}</label>
               <select value={form.preferred_language} onChange={e => setField('preferred_language', e.target.value)} className={inputCls}>
-                <option value="en">English</option>
-                <option value="hi">हिन्दी</option>
+                {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.nativeName}</option>)}
               </select>
             </div>
             <div>

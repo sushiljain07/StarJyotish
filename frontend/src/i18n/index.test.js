@@ -34,12 +34,13 @@ describe('i18n language persistence', () => {
   })
 
   it('reads the registry at call time, so a runtime-registered language is honoured', async () => {
+    // Import ./index FIRST: a list frozen at import time would not know 'xx'.
+    const { readSavedLang } = await import('./index')
     const { LANGUAGES, registerLanguage } = await import('./languages')
     const before = [...LANGUAGES]
     try {
       registerLanguage({ code: 'xx', label: 'XX', nativeName: 'Xxish', locale: 'xx', script: 'latn' })
       localStorage.setItem('kundli_lang', 'xx')
-      const { readSavedLang } = await import('./index')
       expect(readSavedLang()).toBe('xx')
     } finally {
       LANGUAGES.splice(0, LANGUAGES.length, ...before)

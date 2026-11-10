@@ -6,7 +6,7 @@ from services.i18n import text
 from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
 from services.report_utils import call_llm as _report_call_llm
 from services.report_utils import filter_report_language as _filter_report_language
-from services.yoga_text import YOGA_TEXT, planet_name, render_yoga  # noqa: F401  (YOGA_TEXT re-exported)
+from services.yoga_text import YOGA_TEXT, planet_name, render_yoga  # noqa: F401  (YOGA_TEXT re-exported; test_yoga_i18n imports it from here)
 
 # ── Vedic Astrology Constants ─────────────────────────────────────────────────
 # Generic constants (SIGNS, SIGN_LORDS, dignity tables, dasha order) now live
@@ -1213,7 +1213,7 @@ def generate_career_report(
 
     ak_data      = calculate_amatyakaraka(planets)
     jvb          = determine_job_vs_business(planets, lagna_idx, d10_chart=d10_chart)
-    # Full 19-yoga set (not just the 12 from check_special_combinations) so
+    # Full 20-yoga set (not just the 12 from check_special_combinations) so
     # this report agrees with the Rajyogas tab and the free Reading tab,
     # which both already use check_all_yogas().
     combinations = check_all_yogas(planets, lagna_idx)  # English: feeds the LLM prompt and the teaser list

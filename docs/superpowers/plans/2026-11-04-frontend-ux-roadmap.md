@@ -81,6 +81,15 @@ Goal: a Hindi user sees no English on the main journey.
 
 **3B leftovers:** the "owner to confirm" rows in `docs/i18n-glossary.md` (Owner to confirm section: legend words, short forms, Sarvatobhadra corners, अमात्यकारक, तालमेल, रोडमैप, backend ordinal 2वें/3वें, Panchang yoga and masa spellings, the two Rajyoga phrasings, the career alignment text, राशिफल) stay open until the owner reviews the table; Tiro Devanagari bold is still synthesized (visually acceptable); KnowledgeCapsule teasers stay English (content phase).
 
+More 3B leftovers, each with a target:
+- `<Seo>` titles and descriptions stay English, so Hindi users see English tab titles (Phase 5e).
+- 11 `components/knowledge/*` strings stay in the hardcoded-English baseline (content phase).
+- The three Disclaimer plain-language bullets are English under a Hindi label "सरल भाषा में" (owner decision: legal pages; cheap to translate if the owner wants).
+- `patrika_rarity` stays dormant until the backend has Hindi rarity labels.
+- The PaywallCard `alert` stays English (Phase 4).
+- The spec bullet "assert that loading states show loading copy" was narrowed in the plan to "expectNoEnglish rejects empty or skeleton-only containers" (owner to confirm whether that is enough).
+- "SMS"/"OTP" in Hindi strings: should they join the allowed-Latin list or be translated? Owner policy call.
+
 Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language registry, switcher, typography, name and date helpers, and Hindi for the Kundli page, AI reports, Rajyogas (backend), forms, home, Panchang and site pages. What's left:
 
 1. **Guardrails** (Phase 3 plan, Task 8):

@@ -8,7 +8,7 @@ that into text. YOGA_TEXT is keyed like i18n.text() tables:
 A language with no entry falls back to English (i18n.text). To add a language,
 add a YOGA_TEXT/PLANET_NAMES/SIGN_NAMES/DIGNITY_NAMES entry; nothing else changes.
 """
-from services.i18n import ordinal, text
+from services.i18n import DEFAULT_LANGUAGE, ordinal, text
 
 PLANET_NAMES = {
     "en": {n: n for n in ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu")},
@@ -70,11 +70,11 @@ _MAHAPURUSHA_TEXT = {
 
 def _mahapurusha(language: str) -> dict:
     # Unknown languages fall back to English, as services.i18n.text does.
-    lang = language if language in _MAHAPURUSHA_TEXT else "en"
+    lang = language if language in _MAHAPURUSHA_TEXT else DEFAULT_LANGUAGE
     tpl = _MAHAPURUSHA_TEXT[lang]
     out = {}
     for yid, rows in _MAHAPURUSHA.items():
-        name, quality = rows.get(lang) or rows["en"]
+        name, quality = rows.get(lang) or rows[DEFAULT_LANGUAGE]
         out[f"{yid}.present.name"] = f"{name} ({tpl['suffix']})"
         out[f"{yid}.absent.name"] = name
         out[f"{yid}.missing.name"] = name

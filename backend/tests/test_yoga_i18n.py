@@ -26,12 +26,20 @@ def test_default_language_is_english():
     assert check_all_yogas(case["planets"], case["lagna"]) == check_all_yogas(case["planets"], case["lagna"], language="en")
 
 
-def test_hindi_is_devanagari_without_latin_words():
-    for case in _FIXTURE:
-        for y in check_all_yogas(case["planets"], case["lagna"], language="hi"):
-            for field in ("yoga", "description"):
-                assert _DEVANAGARI.search(y[field]), y
-                assert not _LATIN_WORD.search(y[field]), y
+_SCRIPT_RE = {"Devanagari": _DEVANAGARI}
+
+
+def test_scripted_languages_use_their_script_without_latin_words():
+    for code, meta in i18n.SUPPORTED_LANGUAGES.items():
+        script = meta.get("script")
+        if not script:
+            continue
+        assert script in _SCRIPT_RE, f"add a regex for {script} ({code})"
+        for case in _FIXTURE:
+            for y in check_all_yogas(case["planets"], case["lagna"], language=code):
+                for field in ("yoga", "description"):
+                    assert _SCRIPT_RE[script].search(y[field]), y
+                    assert not _LATIN_WORD.search(y[field]), y
 
 
 def test_ids_unique_and_every_id_templated_in_every_language():

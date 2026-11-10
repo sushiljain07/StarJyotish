@@ -42,18 +42,11 @@ function houseSignIndex(ascSignIndex, houseNumber) {
   return (ascSignIndex + houseNumber - 1) % 12
 }
 
-function ordinalSuffix(n) {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return s[(v - 20) % 10] || s[v] || s[0]
-}
-
-// House ordinal for t() interpolations. Pass oblique when the template puts
-// a postposition after the house ("{{house}} भाव में"): Hindi then needs the
-// oblique form (4थे, not 4था). English is the same either way.
-function houseStr(n, t, { oblique = false } = {}) {
-  const key = oblique ? 'house_ordinal_oblique' : 'house_ordinal'
-  return t ? t(key, { count: n, ordinal: true }) : `${n}${ordinalSuffix(n)}`
+// House ordinal for t() interpolations. Always the oblique form: every
+// template puts a postposition after the house ("{{house}} भाव में"), and
+// Hindi then needs 4थे, not 4था. English is the same either way.
+function houseStr(n, t) {
+  return t('house_ordinal_oblique', { count: n, ordinal: true })
 }
 
 export function computeDayScore(chart, transitPlanets, t) {
@@ -109,7 +102,7 @@ export function computeDoAvoid(chart, transitPlanets, panchang, t) {
     const moonHouse = ((transitMoon.sign_index - ascSignIndex + 12) % 12) + 1
     doItems.push(t('insight_moon_do', {
       action: t(`house_do_${moonHouse}`),
-      house: houseStr(moonHouse, t, { oblique: true }),
+      house: houseStr(moonHouse, t),
       theme: t(`house_name_${moonHouse}`),
     }))
     avoidItems.push(t('insight_moon_avoid', {
@@ -186,9 +179,9 @@ export function computeLifeAreas(chart, transitPlanets, t) {
     const lordHouse = natalLord ? natalLord.house_number : null
     const nugget = natalLord && lordHouse && t
       ? t('insight_nugget', {
-          houseN: houseStr(area.house, t, { oblique: true }),
+          houseN: houseStr(area.house, t),
           lord: t(`planet_${lord}`, lord),
-          lordHouseN: houseStr(lordHouse, t, { oblique: true }),
+          lordHouseN: houseStr(lordHouse, t),
           theme: t(`house_name_${lordHouse}`),
         })
       : null
@@ -268,7 +261,7 @@ export function computeSpotlight(chart, transitPlanets, t) {
       house,
       sign: transitMoon.sign,
       text: t('insight_moon_transit_text', {
-        house: houseStr(house, t, { oblique: true }),
+        house: houseStr(house, t),
         theme: t(`house_name_${house}`),
         action: t(`house_do_${house}`),
       }),

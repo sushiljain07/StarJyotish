@@ -43,35 +43,44 @@ ITEM_SEPARATOR = {
 }
 
 _MAHAPURUSHA = {
-    # id: (English name, English quality, Hindi name, Hindi quality)
-    "hamsa": ("Hamsa Yoga", "wisdom, nobility, and elevated status", "हंस योग", "ज्ञान, कुलीनता और उच्च प्रतिष्ठा"),
-    "malavya": ("Malavya Yoga", "charm, artistry, and material prosperity", "मालव्य योग", "आकर्षण, कलात्मकता और भौतिक समृद्धि"),
-    "sasa": ("Sasa Yoga", "discipline and leadership in large institutions", "शश योग", "अनुशासन और बड़ी संस्थाओं में नेतृत्व"),
-    "bhadra": ("Bhadra Yoga", "intellectual brilliance and analytical career", "भद्र योग", "बौद्धिक प्रतिभा और विश्लेषणात्मक करियर"),
-    "ruchaka": ("Ruchaka Yoga", "courage, executive authority, and leadership", "रुचक योग", "साहस, प्रशासनिक अधिकार और नेतृत्व"),
+    # id: {language: (name, quality)}
+    "hamsa": {"en": ("Hamsa Yoga", "wisdom, nobility, and elevated status"), "hi": ("हंस योग", "ज्ञान, कुलीनता और उच्च प्रतिष्ठा")},
+    "malavya": {"en": ("Malavya Yoga", "charm, artistry, and material prosperity"), "hi": ("मालव्य योग", "आकर्षण, कलात्मकता और भौतिक समृद्धि")},
+    "sasa": {"en": ("Sasa Yoga", "discipline and leadership in large institutions"), "hi": ("शश योग", "अनुशासन और बड़ी संस्थाओं में नेतृत्व")},
+    "bhadra": {"en": ("Bhadra Yoga", "intellectual brilliance and analytical career"), "hi": ("भद्र योग", "बौद्धिक प्रतिभा और विश्लेषणात्मक करियर")},
+    "ruchaka": {"en": ("Ruchaka Yoga", "courage, executive authority, and leadership"), "hi": ("रुचक योग", "साहस, प्रशासनिक अधिकार और नेतृत्व")},
+}
+
+# Per-language sentence templates; {quality} is filled from _MAHAPURUSHA.
+_MAHAPURUSHA_TEXT = {
+    "en": {
+        "suffix": "Pancha Mahapurusha",
+        "present": "{{planet}} in {{sign}} (H{{house}}, {{dignity}}) — {quality}.",
+        "absent": "{planet} in H{house} ({dignity}) — yoga not formed.",
+        "missing": "{planet} not found in chart.",
+    },
+    "hi": {
+        "suffix": "पंच महापुरुष",
+        "present": "{{planet}} {{sign}} में ({{house_ord}} भाव, {{dignity}}) — {quality}।",
+        "absent": "{planet} {house_ord} भाव में ({dignity}) — योग नहीं बना।",
+        "missing": "{planet} कुंडली में नहीं मिला।",
+    },
 }
 
 
-_MAHAPURUSHA_SUFFIX = {"en": "Pancha Mahapurusha", "hi": "पंच महापुरुष"}
-
-
-def _mahapurusha(index: int, language: str) -> dict:
+def _mahapurusha(language: str) -> dict:
+    # Unknown languages fall back to English, as services.i18n.text does.
+    lang = language if language in _MAHAPURUSHA_TEXT else "en"
+    tpl = _MAHAPURUSHA_TEXT[lang]
     out = {}
-    for yid, row in _MAHAPURUSHA.items():
-        name, quality = row[index], row[index + 1]
-        out[f"{yid}.present.name"] = (
-            f"{name} ({_MAHAPURUSHA_SUFFIX[language]})"
-        )
+    for yid, rows in _MAHAPURUSHA.items():
+        name, quality = rows.get(lang) or rows["en"]
+        out[f"{yid}.present.name"] = f"{name} ({tpl['suffix']})"
         out[f"{yid}.absent.name"] = name
         out[f"{yid}.missing.name"] = name
-        if index == 0:
-            out[f"{yid}.present"] = "{planet} in {sign} (H{house}, {dignity}) — " + quality + "."
-            out[f"{yid}.absent"] = "{planet} in H{house} ({dignity}) — yoga not formed."
-            out[f"{yid}.missing"] = "{planet} not found in chart."
-        else:
-            out[f"{yid}.present"] = "{planet} {sign} में ({house_ord} भाव, {dignity}) — " + quality + "।"
-            out[f"{yid}.absent"] = "{planet} {house_ord} भाव में ({dignity}) — योग नहीं बना।"
-            out[f"{yid}.missing"] = "{planet} कुंडली में नहीं मिला।"
+        out[f"{yid}.present"] = tpl["present"].format(quality=quality)
+        out[f"{yid}.absent"] = tpl["absent"]
+        out[f"{yid}.missing"] = tpl["missing"]
     return out
 
 
@@ -99,7 +108,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "Gaja-Kesari Yoga",
         "gaja_kesari.missing": "Moon or Jupiter not found in chart.",
 
-        **_mahapurusha(0, "en"),
+        **_mahapurusha("en"),
 
         "amala.present.name": "Amala Yoga",
         "amala.present": "{planets} in 10th house — pure and untarnished career reputation.",
@@ -200,7 +209,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "गजकेसरी योग",
         "gaja_kesari.missing": "चंद्र या गुरु कुंडली में नहीं मिला।",
 
-        **_mahapurusha(2, "hi"),
+        **_mahapurusha("hi"),
 
         "amala.present.name": "अमल योग",
         "amala.present": "{planets} 10वें भाव में हैं — निर्मल और बेदाग करियर प्रतिष्ठा।",

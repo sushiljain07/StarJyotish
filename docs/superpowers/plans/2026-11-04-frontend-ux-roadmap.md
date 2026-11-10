@@ -146,6 +146,8 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 
 ## Phase 4: Mobile and navigation polish (1–2 days)
 
+**Status (10 Nov 2026): done, PR pending whole-branch review.** Real-browser check at 390, 700 and 1440px (and 320px for /kundli) in English and Hindi: no horizontal scroll, 44px tap targets in the touch layouts, ScrollToTop clear of footer links, one tab row at 700px, safe-area edge delta 0px. Phase 4 leftovers: see PR.
+
 1. **Safe areas** (N-H3): add `viewport-fit=cover` to `index.html`, and set the raised NavBar to `bottom: calc(60px + env(safe-area-inset-bottom))`. Check on an iPhone-sized emulator with a home indicator.
 2. **Fixed chrome on /kundli** (N-M1): collapse the summary chips when the user scrolls down; switch the top and bottom tab rows at the same breakpoint (`md`).
 3. **Overlaps seen in the screenshots:**
@@ -225,5 +227,5 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 | 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
 | 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — PR open |
 | 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — PR pending; glossary rows open as 3B leftovers |
-| 4 | `fix/phase4-mobile-nav` | to write | — |
+| 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — PR pending; Phase 4 leftovers: see PR |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

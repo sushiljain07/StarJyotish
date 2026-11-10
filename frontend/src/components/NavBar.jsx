@@ -6,6 +6,7 @@
 // just 3 buttons. Desktop's tab bar is handled separately by Result.jsx.
 import { useTranslation } from 'react-i18next'
 import TabIcon from './TabIcon'
+import { useChromeRegistration } from './layout/useBottomChrome'
 
 // `raised` — set when the app shell's BottomNav occupies the true bottom
 // edge (authenticated mobile): this bar then stacks directly above it
@@ -13,6 +14,7 @@ import TabIcon from './TabIcon'
 // screen bottom, so it's skipped when raised.
 export default function NavBar({ tabs, activeTab, onTabChange, raised = false }) {
   const { t } = useTranslation()
+  useChromeRegistration(raised ? ['subNav', 'raisedSubNav'] : 'subNav')
   return (
     <nav
       className={`md:hidden fixed left-0 right-0 z-50 border-t min-h-[var(--sub-nav-h)] ${raised ? '' : 'bottom-0'}`}

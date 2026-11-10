@@ -20,7 +20,7 @@ import JyotiAvatar from './JyotiAvatar'
 import { localDateStr } from '../../utils/localDate'
 import { errorMessage } from '../../api/errors'
 import { currentLanguage } from '../../i18n/languages'
-import { useBottomChrome } from '../layout/useBottomChrome'
+import { useBottomChrome, useChromeRegistration } from '../layout/useBottomChrome'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -55,6 +55,7 @@ function saveQuota(userId, count) {
 export default function AskPersonaPanel({ userId, input }) {
   const { t } = useTranslation()
   const { spacerHeight } = useBottomChrome()
+  useChromeRegistration('fab')
   const { user, authedRequest } = useAuth()
   const personaName = t('ask_persona_name')
   const [open, setOpen] = useState(false)

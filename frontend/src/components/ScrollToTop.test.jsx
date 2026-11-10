@@ -1,25 +1,29 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import '../i18n'
 
-let mockAuthed = true
-vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: mockAuthed, user: mockAuthed ? { id: 1 } : null }),
-}))
 import ScrollToTop from './ScrollToTop'
+import { useChromeRegistration } from './layout/useBottomChrome'
 
-function renderAt(path, authed) {
-  mockAuthed = authed
-  render(<MemoryRouter initialEntries={[path]}><ScrollToTop visible /></MemoryRouter>)
+function Bars({ names }) {
+  useChromeRegistration(names)
+  return null
+}
+
+function renderWith(names) {
+  render(<MemoryRouter><Bars names={names} /><ScrollToTop visible /></MemoryRouter>)
   return screen.getByRole('button').getAttribute('style')
 }
 
 describe('ScrollToTop', () => {
-  it('floats above the bottom nav when signed in', () => {
-    expect(renderAt('/learn', true)).toContain('--bottom-nav-h')
+  it('floats above the bottom nav when one is mounted', () => {
+    expect(renderWith(['bottomNav'])).toContain('--bottom-nav-h')
   })
-  it('floats above the FAB on /home', () => {
-    expect(renderAt('/home', true)).toContain('--fab-h')
+  it('does not reserve nav height when no BottomNav is mounted', () => {
+    expect(renderWith([])).not.toContain('--bottom-nav-h')
+  })
+  it('floats above the FAB when one is mounted', () => {
+    expect(renderWith(['bottomNav', 'fab'])).toContain('var(--fab-h) + 0.75rem')
   })
 })

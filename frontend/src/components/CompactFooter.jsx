@@ -41,12 +41,12 @@ export default function CompactFooter() {
   return (
     <footer className="border-t border-white/10 bg-night">
       <div className="max-w-4xl mx-auto px-4 py-5">
-        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0">
           {LINKS.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap"
+              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center min-h-11"
             >
               {t(link.key, link.fallback)}
             </Link>

@@ -87,10 +87,10 @@ export default function AnimatedTabRow({
           aria-current={active === tab.id ? 'true' : undefined}
           className={
             isUnderline
-              ? `relative z-10 whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
+              ? `relative z-10 whitespace-nowrap px-4 min-h-11 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
                   active === tab.id ? 'text-primary-dark' : 'text-ink-muted hover:text-ink'
                 }`
-              : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-lg border transition-colors duration-200 ${
+              : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 min-h-11 inline-flex items-center rounded-lg border transition-colors duration-200 ${
                   active === tab.id
                     ? `${PILL_ACCENT_TEXT[accent]} font-medium border-transparent`
                     : 'text-ink-muted hover:text-ink border-line hover:border-primary/50'

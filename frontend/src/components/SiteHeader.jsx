@@ -110,7 +110,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           {!isAuthenticated && (
             <button
               onClick={signIn}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
+              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 min-h-11 rounded-full transition"
             >
               {t('nav_sign_in')}
             </button>
@@ -118,7 +118,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           {onCtaClick && (
             <button
               onClick={onCtaClick}
-              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 py-1.5 rounded-full transition whitespace-nowrap"
+              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 min-h-11 rounded-full transition whitespace-nowrap"
             >
               <span className="md:hidden">{t('nav_cta_mobile')}</span>
               <span className="hidden md:inline">{t('nav_cta_compact')}</span>
@@ -132,7 +132,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
               onClick={() => setMenuOpen(o => !o)}
               aria-expanded={menuOpen}
               aria-label={t('nav_menu', 'Menu')}
-              className="md:hidden p-2 -mr-1 text-primary-light/70 hover:text-primary-light transition-colors"
+              className="md:hidden min-w-11 min-h-11 inline-flex items-center justify-center -mr-1 text-primary-light/70 hover:text-primary-light transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 {menuOpen ? (

@@ -38,7 +38,7 @@ export default function NavBar({ tabs, activeTab, onTabChange, raised = false })
               type="button"
               onClick={() => onTabChange(tab.id)}
               aria-current={active ? 'page' : undefined}
-              className="relative flex flex-col items-center gap-0.5 px-4 py-1.5 min-w-0"
+              className="relative flex flex-col items-center gap-0.5 px-4 min-h-11 justify-center min-w-0"
             >
               {/* Active top-bar indicator */}
               {active && (

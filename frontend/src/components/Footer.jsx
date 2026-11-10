@@ -28,7 +28,7 @@ function FooterLink({ to, state, children }) {
       <Link
         to={to}
         state={state}
-        className="text-ink-onnight/80 hover:text-primary text-sm transition flex items-center gap-1.5"
+        className="text-ink-onnight/80 hover:text-primary text-sm transition flex items-center gap-1.5 min-h-11"
       >
         <span className="text-primary/50 text-xs">›</span>{children}
       </Link>
@@ -80,7 +80,7 @@ export default function Footer() {
 
         {/* Learn — only real, live destinations */}
         <FooterColumn heading={t('footer_learn_heading')} isMobile={isMobile}>
-          <ul className="space-y-2.5">
+          <ul>
             <FooterLink to="/panchang">{t('footer_link_panchang', 'Panchang')}</FooterLink>
             <FooterLink to="/learn">{t('footer_link_knowledge_center', 'Knowledge Center')}</FooterLink>
             <FooterLink to="/faq">{t('footer_link_faq')}</FooterLink>
@@ -90,7 +90,7 @@ export default function Footer() {
 
         {/* Company — about + contact + pricing; email folded in */}
         <FooterColumn heading={t('footer_company_heading')} isMobile={isMobile}>
-          <ul className="space-y-2.5">
+          <ul>
             <FooterLink to="/about">{t('footer_link_about')}</FooterLink>
             <FooterLink to="/pricing">{t('nav_early_access')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
@@ -167,11 +167,11 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-ink-onnight/60">
-          <Link to="/privacy" className="hover:text-primary transition">{t('footer_bottom_privacy')}</Link>
-          <Link to="/terms" className="hover:text-primary transition">{t('footer_bottom_terms')}</Link>
-          <Link to="/refund-policy" className="hover:text-primary transition">{t('footer_bottom_refund')}</Link>
-          <Link to="/disclaimer" className="hover:text-primary transition">{t('footer_bottom_disclaimer')}</Link>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 text-ink-onnight/60">
+          <Link to="/privacy" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_privacy')}</Link>
+          <Link to="/terms" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_terms')}</Link>
+          <Link to="/refund-policy" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_refund')}</Link>
+          <Link to="/disclaimer" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_disclaimer')}</Link>
         </div>
         <p className="text-ink-onnight/50 text-center">
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}

@@ -157,11 +157,11 @@ export default function PhoneOtpForm({ onSuccess }) {
       <div className="flex items-center justify-between text-sm">
         <button type="button"
           onClick={() => { setStep('input'); setCode(''); setError('') }}
-          className="text-ink-muted hover:text-ink transition">
+          className="min-h-11 text-ink-muted hover:text-ink transition">
           {t('login_change_number')}
         </button>
         <button type="button" onClick={handleResend} disabled={cooldown > 0}
-          className="text-primary-dark hover:underline disabled:text-ink-faint disabled:no-underline transition">
+          className="min-h-11 text-primary-dark hover:underline disabled:text-ink-faint disabled:no-underline transition">
           {cooldown > 0 ? t('login_resend_in', { seconds: cooldown }) : t('login_resend_code')}
         </button>
       </div>

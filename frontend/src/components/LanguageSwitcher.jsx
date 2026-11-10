@@ -47,7 +47,7 @@ export default function LanguageSwitcher({ size = 'md', tone = 'night' }) {
         value={active}
         onChange={e => choose(e.target.value)}
         aria-label={t('lang_toggle_label')}
-        className={`min-h-[32px] rounded-full font-semibold ${pad} ${idle}`}
+        className={`min-w-11 min-h-11 rounded-full font-semibold ${pad} ${idle}`}
       >
         {LANGUAGES.map(({ code, nativeName }) => (
           <option key={code} value={code} lang={code}>{nativeName}</option>
@@ -66,7 +66,7 @@ export default function LanguageSwitcher({ size = 'md', tone = 'night' }) {
           title={nativeName}
           aria-pressed={active === code}
           onClick={() => choose(code)}
-          className={`min-w-[32px] min-h-[32px] rounded-full font-semibold transition ${pad} ${
+          className={`min-w-11 min-h-11 rounded-full font-semibold transition ${pad} ${
             active === code ? 'bg-primary text-night' : idle
           }`}
         >

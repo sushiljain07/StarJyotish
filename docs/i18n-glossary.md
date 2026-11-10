@@ -42,7 +42,7 @@ Every other English word, acronyms included, is written in Devanagari
 | career scenario prompt | मुझे एक करियर निर्णय लेना है: {{text}}। … | Owner decision 3. Gender-neutral; replaces "मैं … विचार कर रहा हूँ". | settled |
 | Insight, Insights (the product feature) | इनसाइट (feminine; plural इनसाइट्स) | Not अंतर्दृष्टि. The one exception is `rajyoga_ref_hamsa_c2` ("दार्शनिक अंतर्दृष्टि"), a human quality rather than the feature. Loanword rule. *(test)* | settled |
 | page (web page), homepage | पेज (masculine), होमपेज | Not पृष्ठ or मुखपृष्ठ. Three keys are left for the owner (rows below): `home_edition_chip`, `home_closing_title`, `knowledge_breadcrumb_aria`. Loanword rule. *(test)* | settled |
-| user | यूज़र (plural oblique: यूज़र्स) | Not उपयोगकर्ता. Loanword rule. *(test)* | settled |
+| user | यूज़र (plural: यूज़र्स, colloquial; see the owner-to-confirm row) | Not उपयोगकर्ता. Loanword rule. *(test)* | settled |
 | preview | प्रीव्यू | Not पूर्वावलोकन. Loanword rule. *(test)* | settled |
 | Overview (career report section) | ओवरव्यू | Not अवलोकन; matches `landing_career_preview_subhead`. `career_jump_overview` uses सारांश (row below). Loanword rule. *(test)* | settled |
 | CA, IT (career fields) | सीए, आईटी | Not लेखाकर्म or सूचना प्रौद्योगिकी (`rajyoga_ref_bhadra_b1`). Loanword rule. *(test)* | settled |
@@ -65,7 +65,7 @@ Every other English word, acronyms included, is written in Devanagari
 | Sarvatobhadra vowels and letters | अ,आ,इ,ई,उ,ऊ,ए,ऐ,ओ,औ,अं,अः,क,ख,ग,घ,ङ,च,छ,ज,झ | keep | Native letters; the English UI shows a transliteration. | owner to confirm |
 | Amatyakaraka | अमात्यकारक | keep | Glossed once as "अमात्यकारक (करियर का मुख्य कारक ग्रह)" in `career_evidence_amatyakaraka`. | owner to confirm |
 | Alignment (career) | तालमेल: मज़बूत तालमेल, आंशिक तालमेल; अप्रयुक्त क्षमता | keep | The alternative is सामंजस्य, which is more formal. | owner to confirm |
-| Roadmap | रोडमैप | keep, or करियर योजना | A loan word. It is used in `career_jump_roadmap`, `career_roadmap_title` and `career_preview_sec_roadmap`. | owner to confirm |
+| Roadmap | रोडमैप | — | A loanword, kept under the loanword rule. Used in `career_jump_roadmap`, `career_roadmap_title` and `career_preview_sec_roadmap`. | settled |
 | backend ordinal for 1, 2, 3, 4 and 6 | `ordinal()`: 1वें, 2वें, 3वें, 4वें, 6वें | The frontend `house_ordinal_oblique` gives 1ले, 2रे, 3रे, 4थे, 6ठे; match it, or use पहले/दूसरे/तीसरे/चौथे/छठे | The rest of the backend oblique form is settled (see the house ordinal row above). | owner to confirm |
 | Panchang yoga names | विष्कम्भ, अतिगण्ड, गण्ड (half-nasal) | keep | Elsewhere the UI uses the anusvara (कुंभ, चंद्र). The half-nasal form is the traditional panchang spelling. | owner to confirm |
 | Masa names | चैत्र, वैशाख, ज्येष्ठ, आषाढ़, श्रावण, भाद्रपद, आश्विन, कार्तिक, मार्गशीर्ष, पौष, माघ, फाल्गुन; badge "{{masa}} मास" | keep | सावन and भादों are colloquial alternatives. | owner to confirm |
@@ -77,7 +77,7 @@ Every other English word, acronyms included, is written in Devanagari
 | testimonial | प्रशंसापत्र (`testimonials_*`); प्रतिक्रियाएँ in `testimonials_aria` and `testimonials_read_all` | one word for both: अनुभव, रिव्यू or टेस्टिमोनियल | प्रशंसापत्र reads like a certificate of praise; the two forms are inconsistent. Loanword rule. | owner to confirm |
 | page, in the newspaper image (`home_edition_chip`, `home_closing_title`) | पृष्ठ पलटता है | keep, or पन्ना पलटता है | "This page turns at sunrise" is a newspaper metaphor, where पृष्ठ / पन्ना is natural. Allow-listed in the test. | owner to confirm |
 | Breadcrumb (`knowledge_breadcrumb_aria`, screen readers only) | पृष्ठ पथ | पेज पथ, or नेविगेशन पथ | A coinage either way; no everyday word exists. Allow-listed in the test. | owner to confirm |
-| guide (`blog_*`, `learn_*`, `go_deeper_guide_*`, `home_*_guide`, `kp_guide_title`, `ask_persona_tagline`, `capsule_read_guide`) | मार्गदर्शिका (14 keys) | गाइड, or keep | Real Hindi but formal. Separately, `blog_seo_desc` and `blog_subhead` say "के व्यावहारिक मार्गदर्शिका"; मार्गदर्शिका is feminine, so it should be "की". | owner to confirm |
+| guide (`blog_*`, `learn_*`, `go_deeper_guide_*`, `home_*_guide`, `kp_guide_title`, `ask_persona_tagline`, `capsule_read_guide`) | मार्गदर्शिका (14 keys) | गाइड, or keep | Real Hindi but formal. `blog_seo_desc` and `blog_subhead` were fixed to the feminine plural (की … मार्गदर्शिकाएँ). If गाइड is chosen, treat it as feminine and change all 14 keys together. | owner to confirm |
 | Disclaimer | अस्वीकरण | डिस्क्लेमर, or keep | The standard legal term, but rarely said. The footer already mixes प्राइवेसी पॉलिसी and रिफंड पॉलिसी with अस्वीकरण. | owner to confirm |
 | Privacy Policy, Refund & Cancellation Policy | गोपनीयता नीति (`profile_privacy_link`, `about_p_more`) and प्राइवेसी पॉलिसी (footer, FAQ); रिफंड और रद्दीकरण नीति (`legal_refund_title`) and रिफंड व कैंसिलेशन पॉलिसी (`faq_page_a9`) | pick one form each | Both forms are understood; only the inconsistency needs a decision. | owner to confirm |
 | Edit | संपादित करें (`profile_edit_heading`, `onboarding_review_edit`, `profile_astro_edit`) | बदलें (as in `home_hero_edit_profile`), or एडिट करें | Formal UI Hindi. | owner to confirm |
@@ -86,7 +86,11 @@ Every other English word, acronyms included, is written in Devanagari
 | Blocked (`panchang_blocked`, `panchang_blocked_search`) | अवरुद्ध | ब्लॉक है | Bookish. | owner to confirm |
 | can't be undone (`profile_astro_delete_confirm`) | पूर्ववत नहीं किया जा सकता | वापस नहीं लिया जा सकता | Bookish. | owner to confirm |
 | Time Zone (`profile_timezone`, `panchang_timezone`) | समय क्षेत्र | टाइम ज़ोन, or keep | | owner to confirm |
-| Quick View, holistic view (`career_depth_quick_long`, `kundli_div_D27_governs`, `kundli_div_D45_governs`) | दृश्य ("संक्षिप्त दृश्य", "समग्र दृश्य") | झलक, नज़रिया | दृश्य means "scene" or "visible". Also, "constitutional" in `kundli_div_D27_governs` and `kundli_div_D6_governs` is rendered संवैधानिक (legal sense); शारीरिक / प्रकृतिगत is meant. | owner to confirm |
+| Quick View, holistic view (`career_depth_quick_long`, `kundli_div_D27_governs`, `kundli_div_D45_governs`) | दृश्य ("संक्षिप्त दृश्य", "समग्र दृश्य") | झलक, नज़रिया | दृश्य means "scene" or "visible". "Constitutional" in D6/D27 (previously संवैधानिक, which means legal/constitution) is now जन्मजात. | owner to confirm |
+| Journal entry (`home_journal_aria`) | डायरी प्रविष्टि | डायरी एंट्री | प्रविष्टि is formal. | owner to confirm |
+| Timeline (`timeline_heading`, `home_coming_soon_transit-timeline`, `early_access_item_kundli`) | समयरेखा | टाइमलाइन | An established word, but bookish. | owner to confirm |
+| Energetic capacity (`kundli_div_D27_governs`) | ऊर्जात्मक क्षमता | ऊर्जा-क्षमता | A semi-coinage. | owner to confirm |
+| Users, plural (`testimonials_aria`) | यूज़र्स | यूज़रों (grammatical oblique plural) | यूज़र्स is the colloquial English plural, common in Indian web copy. | owner to confirm |
 | Overview (`career_jump_overview`) | सारांश | ओवरव्यू (to match `career_preview_sec_overview`), or keep | सारांश is natural Hindi. | owner to confirm |
 | paid plan (`profile_membership_body`, `early_access_faq_q2`) | सशुल्क प्लान and पेड प्लान | पेड प्लान | Inconsistent. | owner to confirm |
 | Latin brand names and formats (`login_*` Google; `faq_page_a10` Anthropic Claude, Groq, OpenStreetMap; `profile_photo_hint` JPG, PNG) | Latin | keep Latin, or Devanagari (गूगल …) | Not on the Latin allow-list. Brand names are usually left in Latin. | owner to confirm |

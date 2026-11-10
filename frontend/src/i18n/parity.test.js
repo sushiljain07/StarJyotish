@@ -95,7 +95,7 @@ describe('hi glossary', () => {
     expect(keysWith(/मुखपृष्ठ/)).toEqual([])
     // Owner to confirm: the newspaper "page turns" image and the breadcrumb label.
     const ALLOWED = ['home_edition_chip', 'home_closing_title', 'knowledge_breadcrumb_aria']
-    expect(keysWith(/पृष्ठ/).filter(k => !ALLOWED.includes(k))).toEqual([])
+    expect(keysWith(/पृष्ठ(?!भूमि)/).filter(k => !ALLOWED.includes(k))).toEqual([])
   })
   it('uses यूज़र, not उपयोगकर्ता', () => expect(keysWith(/उपयोगकर्ता/)).toEqual([]))
   it('uses प्रीव्यू and ओवरव्यू, not पूर्वावलोकन or अवलोकन', () =>

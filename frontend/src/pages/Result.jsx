@@ -40,7 +40,9 @@ function SummaryChips({ data, collapsed }) {
     <div
       data-testid="summary-chips"
       className={`flex flex-wrap gap-1.5 motion-safe:transition-all motion-safe:duration-200 ${
-        collapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-none md:opacity-100 md:overflow-visible md:py-2' : 'py-2'
+        collapsed
+          ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-16 md:opacity-100 md:overflow-visible md:py-2'
+          : 'max-h-16 opacity-100 py-2'
       }`}
     >
       <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
@@ -221,7 +223,7 @@ export default function Result() {
       <Seo title={t('kundli_seo_title')} description={t('kundli_seo_description')} path="/kundli" noindex />
 
       {/* ── Sticky context bar ──────────────────────────────────────────── */}
-      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
+      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30 [overflow-anchor:none]">
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}

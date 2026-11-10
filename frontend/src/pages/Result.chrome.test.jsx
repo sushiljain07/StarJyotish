@@ -40,8 +40,14 @@ function scrollTo(y) {
   })
 }
 
-beforeEach(() => { window.scrollY = 0 })
-afterEach(() => { window.scrollY = 0; sessionStorage.clear() })
+let now
+beforeEach(() => {
+  window.scrollY = 0
+  now = 1000
+  vi.spyOn(performance, 'now').mockImplementation(() => now)
+  Object.defineProperty(document.documentElement, 'scrollHeight', { configurable: true, value: 5000 })
+})
+afterEach(() => { vi.restoreAllMocks(); delete document.documentElement.scrollHeight; window.scrollY = 0; sessionStorage.clear() })
 
 describe('Kundli sticky chrome', () => {
   it('shows the main-tab row from md up only', () => {
@@ -49,6 +55,11 @@ describe('Kundli sticky chrome', () => {
     const row = screen.getAllByRole('button', { name: /Birth Chart/ })[0].parentElement
     expect(row.className).toContain('md:flex')
     expect(row.className).not.toContain('sm:flex')
+  })
+
+  it('stops the sticky header from scroll anchoring', () => {
+    renderPage()
+    expect(screen.getByTestId('summary-chips').closest('.sticky').className).toContain('[overflow-anchor:none]')
   })
 
   it('collapses the chips while scrolling down and restores them on scroll up', () => {
@@ -59,6 +70,7 @@ describe('Kundli sticky chrome', () => {
     scrollTo(400)
     expect(chips.className).toContain('max-h-0')
     expect(chips.className).toContain('motion-safe:transition-all')
+    now += 300
     scrollTo(380)
     expect(chips.className).not.toContain('max-h-0')
   })

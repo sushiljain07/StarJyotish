@@ -126,7 +126,7 @@ export default function AccountMenu() {
               {t('account_my_dashboard')}
             </Link>
           )}
-          <div role="menuitem" className="flex items-center justify-between gap-2 px-3.5 py-2 border-t border-line">
+          <div role="group" aria-label={t('lang_toggle_label')} className="flex items-center justify-between gap-2 px-3.5 py-2 border-t border-line">
             <span className="text-sm text-ink">{t('lang_toggle_label')}</span>
             <LanguageSwitcher size="sm" tone="light" />
           </div>

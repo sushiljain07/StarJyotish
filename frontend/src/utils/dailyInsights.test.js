@@ -2,7 +2,7 @@
 // ("4थे भाव में"); English output is unchanged.
 import { afterEach, describe, expect, it } from 'vitest'
 import i18n from '../i18n'
-import { computeDoAvoid, computeLifeAreas, computeSpotlight } from './dailyInsights'
+import { buildComingUpEvents, computeDoAvoid, computeLifeAreas, computeSpotlight } from './dailyInsights'
 
 // Aries lagna; transit Moon in Cancer = 4th house. Saturn (lord of the
 // 10th, Capricorn) sits in the 2nd house.
@@ -35,5 +35,17 @@ describe('dailyInsights house ordinals', () => {
     expect(computeSpotlight(chart, transit, t).moonSpotlight.text).toContain('4थे भाव में')
     expect(computeDoAvoid(chart, transit, null, t).doItems[0]).toContain('4थे भाव में')
     expect(careerNugget()).toMatch(/^आपके 10वें भाव के स्वामी .+ आपके 2रे भाव में/)
+  })
+})
+
+describe('coming-up sign change dates', () => {
+  afterEach(() => i18n.changeLanguage('en'))
+  it('localizes the backend date and week count in hi', async () => {
+    await i18n.changeLanguage('hi')
+    const outlook = { upcoming_sign_changes: { Saturn: { days_away: 14, date: '12 Nov 2026', to_sign: 'Aries' } } }
+    const [event] = buildComingUpEvents(chart, outlook, null, t)
+    expect(event.when).toContain('नव॰')
+    expect(event.when).toContain('सप्ताह')
+    expect(event.when).not.toMatch(/Nov/)
   })
 })

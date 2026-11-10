@@ -59,4 +59,20 @@ describe('LanguageSwitcher', () => {
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
     expect(auth.updateMyProfile).not.toHaveBeenCalled()
   })
+
+  it('still switches when updateMyProfile throws synchronously', async () => {
+    auth.user = { id: 'u' }
+    auth.updateMyProfile.mockImplementationOnce(() => { throw new Error('boom') })
+    render(<LanguageSwitcher />)
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
+    expect(currentLanguage()).toBe('hi')
+  })
+
+  it('still switches when updateMyProfile rejects', async () => {
+    auth.user = { id: 'u' }
+    auth.updateMyProfile.mockImplementationOnce(() => Promise.reject(new Error('nope')))
+    render(<LanguageSwitcher />)
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
+    expect(currentLanguage()).toBe('hi')
+  })
 })

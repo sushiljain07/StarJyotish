@@ -43,4 +43,20 @@ describe('language registry', () => {
     }
     expect(LANGUAGES.some(l => l.code === 'xx')).toBe(false)
   })
+
+  it('falls back to the default locale and script for an unknown code', () => {
+    expect(localeFor('zz')).toBe('en-IN')
+    expect(scriptFor('zz')).toBe('latn')
+  })
+
+  it('replaces an entry registered twice with the second one', () => {
+    const before = [...LANGUAGES]
+    try {
+      registerLanguage({ code: 'hi', label: 'H2', nativeName: 'Hindi2', locale: 'hi-IN', script: 'deva' })
+      expect(LANGUAGES.filter(l => l.code === 'hi')).toHaveLength(1)
+      expect(languageEntry('hi').label).toBe('H2')
+    } finally {
+      LANGUAGES.splice(0, LANGUAGES.length, ...before)
+    }
+  })
 })

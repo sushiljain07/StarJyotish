@@ -27,7 +27,12 @@ export default function LanguageSwitcher({ size = 'md', tone = 'night' }) {
     i18n.changeLanguage(lng)
     markLanguageChosenByUser()
     if (auth?.user && auth.updateMyProfile) {
-      Promise.resolve(auth.updateMyProfile({ preferred_language: lng })).catch(() => {})
+      // Best effort: neither a throw nor a rejection may undo the switch.
+      try {
+        Promise.resolve(auth.updateMyProfile({ preferred_language: lng })).catch(() => {})
+      } catch {
+        // Profile save failed synchronously; the language still changed.
+      }
     }
   }
 

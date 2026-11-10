@@ -32,4 +32,23 @@ describe('i18n language persistence', () => {
     expect(i18n.language).toBe('en')
     await expect(i18n.changeLanguage('hi')).resolves.toBeDefined()
   })
+
+  it('reads the registry at call time, so a runtime-registered language is honoured', async () => {
+    const { LANGUAGES, registerLanguage } = await import('./languages')
+    const before = [...LANGUAGES]
+    try {
+      registerLanguage({ code: 'xx', label: 'XX', nativeName: 'Xxish', locale: 'xx', script: 'latn' })
+      localStorage.setItem('kundli_lang', 'xx')
+      const { readSavedLang } = await import('./index')
+      expect(readSavedLang()).toBe('xx')
+    } finally {
+      LANGUAGES.splice(0, LANGUAGES.length, ...before)
+    }
+  })
+
+  it('reports no saved choice when storage throws', async () => {
+    const { savedLanguageChoice } = await import('./index')
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked') })
+    expect(savedLanguageChoice()).toEqual({ code: null, source: null })
+  })
 })

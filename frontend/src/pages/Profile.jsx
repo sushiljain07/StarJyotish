@@ -233,7 +233,7 @@ export default function Profile() {
             <div>
               <label className={labelCls}>{t('profile_preferred_language')}</label>
               <select value={form.preferred_language} onChange={e => setField('preferred_language', e.target.value)} className={inputCls}>
-                {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.nativeName}</option>)}
+                {LANGUAGES.map(l => <option key={l.code} value={l.code} lang={l.code}>{l.nativeName}</option>)}
               </select>
             </div>
             <div>

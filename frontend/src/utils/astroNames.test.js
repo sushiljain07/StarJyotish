@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import astroCalcSrc from '../../../backend/services/astro_calc.py?raw'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import i18n from '../i18n'
 import en from '../i18n/en.json'
 import hi from '../i18n/hi.json'
@@ -35,14 +36,25 @@ describe('astroNames in en', () => {
 })
 
 describe('nakshatra parity with backend', () => {
-  it('uses exactly the backend NAKSHATRAS spellings', () => {
-    const src = astroCalcSrc
+  // The backend source is outside the frontend tree; skip where it is absent.
+  // eslint-disable-next-line no-undef
+  const backendPath = resolve(process.cwd(), '../backend/services/astro_calc.py')
+  it.skipIf(!existsSync(backendPath))('uses exactly the backend NAKSHATRAS spellings', () => {
+    const src = readFileSync(backendPath, 'utf8')
     const block = src.match(/NAKSHATRAS\s*=\s*\[([\s\S]*?)\]/)[1]
     const names = [...block.matchAll(/"([^"]+)"/g)].map(m => m[1])
     expect(names).toHaveLength(27)
-    expect(Object.keys(en.nakshatras)).toEqual(names)
-    expect(Object.keys(hi.nakshatras)).toEqual(names)
+    // Abhijit is the Sarvatobhadra chakra's 28th cell, not a backend nakshatra.
+    expect(Object.keys(en.nakshatras)).toEqual([...names, 'Abhijit'])
+    expect(Object.keys(hi.nakshatras)).toEqual([...names, 'Abhijit'])
     expect(Object.keys(en.planet_abbr)).toHaveLength(13)
     expect(Object.keys(hi.planet_abbr)).toHaveLength(13)
+  })
+})
+
+describe('Abhijit', () => {
+  it('has a Hindi name', async () => {
+    await i18n.changeLanguage('hi')
+    expect(nakshatraName(i18n.t.bind(i18n), 'Abhijit')).toBe('अभिजित')
   })
 })

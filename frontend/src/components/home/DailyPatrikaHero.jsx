@@ -86,7 +86,7 @@ function buildWhy(card, t) {
   if (ev.house) {
     return t('patrika_why_house', {
       planet: planetName(t, ev.planet),
-      house: t('house_ordinal', { count: ev.house, ordinal: true }),
+      house: t('house_ordinal_oblique', { count: ev.house, ordinal: true }),
     })
   }
   return t('patrika_why_planet', { planet: planetName(t, ev.planet) })

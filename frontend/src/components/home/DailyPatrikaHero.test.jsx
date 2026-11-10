@@ -1,25 +1,33 @@
-// The "Why" line names the house with a real ordinal (1st, not 1th) in
-// every language, via the shared house_ordinal key.
-import { render, screen } from '@testing-library/react'
+// The "Why" line names the house with a real ordinal (1st, not 1th). Hindi
+// uses the oblique ordinal because the house is followed by a postposition
+// ("1ले भाव को").
+import { render, screen, cleanup } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import i18n from '../../i18n'
 import DailyPatrikaHero from './DailyPatrikaHero'
 
 const edition = house => ({ headline: 'x', headline_event: { planet: 'Sun', house } })
+const whyLine = house => {
+  render(<DailyPatrikaHero firstName="A" edition={edition(house)} />)
+  const text = screen.getByText(/^(Why|क्यों):/).textContent
+  cleanup()
+  return text
+}
 
 afterEach(async () => { await i18n.changeLanguage('en') })
 
 describe('DailyPatrikaHero why line', () => {
-  it('uses a real English ordinal', async () => {
+  it('uses real English ordinals', async () => {
     await i18n.changeLanguage('en')
-    render(<DailyPatrikaHero firstName="A" edition={edition(1)} />)
-    expect(screen.getByText(/your 1st house/)).toBeTruthy()
-    expect(screen.queryByText(/1th/)).toBeNull()
+    expect(whyLine(1)).toBe('Why: transit Sun activates your 1st house today.')
+    expect(whyLine(3)).toContain('your 3rd house')
+    expect(whyLine(11)).toContain('your 11th house')
   })
 
-  it('uses the Hindi ordinal', async () => {
+  it('uses the Hindi oblique ordinal before the postposition', async () => {
     await i18n.changeLanguage('hi')
-    render(<DailyPatrikaHero firstName="A" edition={edition(1)} />)
-    expect(screen.getByText(/1ला भाव/)).toBeTruthy()
+    expect(whyLine(1)).toContain('आपके 1ले भाव को')
+    expect(whyLine(3)).toContain('आपके 3रे भाव को')
+    expect(whyLine(11)).toContain('आपके 11वें भाव को')
   })
 })

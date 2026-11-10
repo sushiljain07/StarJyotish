@@ -48,12 +48,12 @@ function ordinalSuffix(n) {
   return s[(v - 20) % 10] || s[v] || s[0]
 }
 
-// Ordinal as a simple number string — used in t() interpolations where
-// the full English ordinal suffix ("1st", "4th") would read oddly in Hindi.
-// Hindi uses bare ordinals ("पहला", "चौथा") but for brevity the key just
-// passes the number and the translation handles the phrasing.
-function houseStr(n, t) {
-  return t ? t('house_ordinal', { count: n, ordinal: true }) : `${n}${ordinalSuffix(n)}`
+// House ordinal for t() interpolations. Pass oblique when the template puts
+// a postposition after the house ("{{house}} भाव में"): Hindi then needs the
+// oblique form (4थे, not 4था). English is the same either way.
+function houseStr(n, t, { oblique = false } = {}) {
+  const key = oblique ? 'house_ordinal_oblique' : 'house_ordinal'
+  return t ? t(key, { count: n, ordinal: true }) : `${n}${ordinalSuffix(n)}`
 }
 
 export function computeDayScore(chart, transitPlanets, t) {
@@ -109,7 +109,7 @@ export function computeDoAvoid(chart, transitPlanets, panchang, t) {
     const moonHouse = ((transitMoon.sign_index - ascSignIndex + 12) % 12) + 1
     doItems.push(t('insight_moon_do', {
       action: t(`house_do_${moonHouse}`),
-      house: houseStr(moonHouse, t),
+      house: houseStr(moonHouse, t, { oblique: true }),
       theme: t(`house_name_${moonHouse}`),
     }))
     avoidItems.push(t('insight_moon_avoid', {
@@ -186,9 +186,9 @@ export function computeLifeAreas(chart, transitPlanets, t) {
     const lordHouse = natalLord ? natalLord.house_number : null
     const nugget = natalLord && lordHouse && t
       ? t('insight_nugget', {
-          houseN: houseStr(area.house, t),
+          houseN: houseStr(area.house, t, { oblique: true }),
           lord: t(`planet_${lord}`, lord),
-          lordHouseN: houseStr(lordHouse, t),
+          lordHouseN: houseStr(lordHouse, t, { oblique: true }),
           theme: t(`house_name_${lordHouse}`),
         })
       : null
@@ -268,7 +268,7 @@ export function computeSpotlight(chart, transitPlanets, t) {
       house,
       sign: transitMoon.sign,
       text: t('insight_moon_transit_text', {
-        house: houseStr(house, t),
+        house: houseStr(house, t, { oblique: true }),
         theme: t(`house_name_${house}`),
         action: t(`house_do_${house}`),
       }),

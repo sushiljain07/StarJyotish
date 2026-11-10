@@ -8,6 +8,6 @@ export default function CareerReportRedirect() {
   const { isAuthenticated, loading } = useAuth()
   // Wait for sign-in to resolve, or a signed-in user lands on /generate.
   if (loading) return null
-  const to = isAuthenticated ? '/insights?topic=career&sub=career' : '/generate?topic=career'
+  const to = isAuthenticated ? '/insights?sub=reports&topic=career&view=report' : '/generate?topic=career'
   return <Navigate to={to} replace />
 }

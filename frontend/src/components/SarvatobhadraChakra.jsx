@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 import { planetName, nakshatraName } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
+import ScrollHint from './ui/ScrollHint'
 
 const NAKSHATRAS_27 = [
   'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra',
@@ -154,7 +155,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
         </p>
       </div>
 
-      <div className="flex justify-center overflow-x-auto">
+      <ScrollHint className="flex justify-center">
         {/* Was width={W} height={H} with a hardcoded minWidth, which forced
             this chart to never shrink below 416px — every phone in the
             320–414px range would overflow horizontally. Every other chart
@@ -267,7 +268,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
             })
           )}
         </svg>
-      </div>
+      </ScrollHint>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-xs text-ink-muted px-1">
@@ -291,7 +292,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
           <div className="px-4 py-3 bg-night/[0.03] border-b">
             <h3 className="font-semibold text-ink text-sm">{t('chart_sarvato_positions')}</h3>
           </div>
-          <div className="overflow-x-auto">
+          <ScrollHint fadeFrom="from-parchment-card">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-night/[0.03]">
@@ -318,7 +319,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 })}
               </tbody>
             </table>
-          </div>
+          </ScrollHint>
         </div>
       )}
     </div>

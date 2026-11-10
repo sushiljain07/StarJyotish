@@ -38,10 +38,11 @@ export default function Pricing() {
   ]
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo title={t('early_access_heading')} description={t('early_access_subhead')} path="/pricing" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <div className="relative overflow-hidden bg-night px-6 pt-24 pb-12 text-center">
         <Reveal>
           <p className="text-primary text-xs font-bold tracking-widest uppercase mb-3">{t('early_access_eyebrow')}</p>
@@ -78,6 +79,8 @@ export default function Pricing() {
           <Reveal delay={80}><FAQAccordion items={faqItems} /></Reveal>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </div>

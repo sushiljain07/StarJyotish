@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, planetShort } from '../utils/astroNames'
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS } from '../config/planetColors'
+import ScrollHint from './ui/ScrollHint'
 
 const SIGN_KEYS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
@@ -76,8 +77,9 @@ export default function AshtakavargaTable({ input }) {
         <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {t(error)}</div>
       )}
       {loading && (
-        <div className="flex justify-center py-12">
-          <div className="text-3xl animate-spin">🪐</div>
+        <div role="status" className="flex justify-center py-12">
+          <span className="sr-only">{t('state_loading_label')}</span>
+          <div aria-hidden="true" className="text-3xl motion-safe:animate-spin">🪐</div>
         </div>
       )}
 
@@ -114,8 +116,9 @@ export default function AshtakavargaTable({ input }) {
                   {t('ashtakavarga_sarva_title')}
                 </h3>
               </div>
-              <div className="overflow-x-auto p-3">
-                <table className="w-full text-sm">
+              <div className="p-3">
+                <ScrollHint fadeFrom="from-parchment-card">
+                <table className="w-full text-sm whitespace-nowrap">
                   <thead>
                     <tr className="bg-night/[0.03]">
                       {SIGN_ABBR.map(s => (
@@ -131,6 +134,7 @@ export default function AshtakavargaTable({ input }) {
                     </tr>
                   </tbody>
                 </table>
+                </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
                   <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_strong')}</span>
                   <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_average')}</span>
@@ -150,8 +154,9 @@ export default function AshtakavargaTable({ input }) {
                   {t('ashtakavarga_bhinna_title', { planet: planetName(t, activeTab) })}
                 </h3>
               </div>
-              <div className="overflow-x-auto p-3">
-                <table className="w-full text-sm">
+              <div className="p-3">
+                <ScrollHint fadeFrom="from-parchment-card">
+                <table className="w-full text-sm whitespace-nowrap">
                   <thead>
                     <tr className="bg-night/[0.03]">
                       {SIGN_ABBR.map(s => (
@@ -167,6 +172,7 @@ export default function AshtakavargaTable({ input }) {
                     </tr>
                   </tbody>
                 </table>
+                </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
                   <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_strong')}</span>
                   <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_average')}</span>
@@ -183,11 +189,11 @@ export default function AshtakavargaTable({ input }) {
               <div className="px-4 py-3 bg-night/[0.03] border-b">
                 <h3 className="font-semibold text-ink text-sm">{t('ashtakavarga_overview')}</h3>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+              <ScrollHint fadeFrom="from-parchment-card">
+                <table className="w-full text-xs whitespace-nowrap">
                   <thead>
                     <tr className="bg-night/[0.03]">
-                      <th className="p-2 text-left border border-line">{t('col_planet')}</th>
+                      <th className="p-2 text-left border border-line sticky left-0 z-10 bg-[#F8F6F2]">{t('col_planet')}</th>
                       {SIGN_ABBR.map(s => (
                         <th key={s} className="p-1 text-center border border-line">{s}</th>
                       ))}
@@ -201,7 +207,7 @@ export default function AshtakavargaTable({ input }) {
                       const total = row.reduce((s, c) => s + c.points, 0)
                       return (
                         <tr key={planet} className={pi % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
-                          <td className="p-2 border border-line font-bold"
+                          <td className={`p-2 border border-line font-bold sticky left-0 z-10 ${pi % 2 === 0 ? 'bg-parchment-card' : 'bg-[#F8F6F2]'}`}
                               style={{ color: PLANET_COLORS[planet] ?? '#333' }}>
                             {planetShort(t, planet)}
                           </td>
@@ -226,7 +232,7 @@ export default function AshtakavargaTable({ input }) {
                     </tr>
                   </tbody>
                 </table>
-              </div>
+              </ScrollHint>
             </div>
           )}
         </>

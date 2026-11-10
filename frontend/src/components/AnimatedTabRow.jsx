@@ -26,7 +26,7 @@ const PILL_ACCENT_TEXT = {
 
 export default function AnimatedTabRow({
   tabs, active, onChange, renderIcon,
-  variant = 'underline', accent = 'primary', className = ''
+  variant = 'underline', accent = 'primary', className = '', label, semantics = 'tabs'
 }) {
   const containerRef = useRef(null)
   const buttonRefs  = useRef({})
@@ -61,17 +61,39 @@ export default function AnimatedTabRow({
   }, [active, tabs, variant])
 
   const isUnderline = variant === 'underline'
+  // 'nav': plain in-page navigation (e.g. scroll-spy jump row) — a <nav> of
+  // buttons with aria-current, natural tab order, no arrow handling.
+  const isNav = semantics === 'nav'
+  const Container = isNav ? 'nav' : 'div'
+
+  // Roving-tabindex keyboard model: arrows move focus AND select (the
+  // panels are cheap to switch), Home/End jump to the ends.
+  function handleKeyDown(e, index) {
+    let next
+    if (e.key === 'ArrowRight') next = (index + 1) % tabs.length
+    else if (e.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = tabs.length - 1
+    else return
+    e.preventDefault()
+    const target = tabs[next]
+    onChange(target.id)
+    buttonRefs.current[target.id]?.focus()
+  }
 
   return (
-    <div
+    <Container
       ref={containerRef}
+      role={isNav ? undefined : 'tablist'}
+      aria-label={label}
       className={`relative flex gap-1 ${
         isUnderline
-          ? 'flex-wrap hidden sm:flex mt-1'
+          ? 'flex-wrap hidden md:flex mt-1'
           : 'flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       } ${className}`}
     >
       <div
+        aria-hidden="true"
         className={`absolute top-0 left-0 transition-all duration-300 ease-out ${
           isUnderline
             ? 'bg-parchment border-t border-x border-line rounded-t-lg'
@@ -79,18 +101,26 @@ export default function AnimatedTabRow({
         }`}
         style={{ ...indicatorStyle, transitionProperty: 'transform, width, height' }}
       />
-      {tabs.map(tab => (
+      {tabs.map((tab, index) => (
         <button
           key={tab.id}
           ref={el => { buttonRefs.current[tab.id] = el }}
+          type="button"
+          {...(isNav
+            ? { 'aria-current': active === tab.id ? 'true' : undefined }
+            : {
+                role: 'tab',
+                'aria-selected': active === tab.id,
+                tabIndex: active === tab.id ? 0 : -1,
+                onKeyDown: e => handleKeyDown(e, index),
+              })}
           onClick={() => onChange(tab.id)}
-          aria-current={active === tab.id ? 'true' : undefined}
           className={
             isUnderline
-              ? `relative z-10 whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
+              ? `relative z-10 whitespace-nowrap px-4 min-h-11 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
                   active === tab.id ? 'text-primary-dark' : 'text-ink-muted hover:text-ink'
                 }`
-              : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-lg border transition-colors duration-200 ${
+              : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border transition-colors duration-200 ${
                   active === tab.id
                     ? `${PILL_ACCENT_TEXT[accent]} font-medium border-transparent`
                     : 'text-ink-muted hover:text-ink border-line hover:border-primary/50'
@@ -101,6 +131,6 @@ export default function AnimatedTabRow({
           {tab.label}
         </button>
       ))}
-    </div>
+    </Container>
   )
 }

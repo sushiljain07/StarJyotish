@@ -130,7 +130,7 @@ function YogaCard({ yoga, defaultOpen }) {
   )
 }
 
-export default function RajyogasTab({ input }) {
+export default function RajyogasTab({ input, active = true }) {
   const { t } = useTranslation()
   const lang = currentLanguage()
   const [status, setStatus]     = useState('idle')
@@ -149,11 +149,13 @@ export default function RajyogasTab({ input }) {
   // A loaded (or loading) result follows the language toggle.
   const shownLangRef = useRef(lang)
   useEffect(() => {
-    if (shownLangRef.current === lang) return
+    // Hidden (kept-mounted) panels in /insights wait: the ref keeps the
+    // language last shown, so the switch happens once, on becoming active.
+    if (!active || shownLangRef.current === lang) return
     shownLangRef.current = lang
     if (hasPremiumAccess() && (status === 'done' || status === 'loading')) load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang])
+  }, [lang, active])
 
   if (!hasPremiumAccess()) {
     return (
@@ -190,7 +192,7 @@ export default function RajyogasTab({ input }) {
         <div className="flex gap-1.5">
           {[0, 1, 2].map(i => (
             <span key={i}
-              className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce"
+              className="w-2.5 h-2.5 rounded-full bg-primary motion-safe:animate-bounce"
               style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>

@@ -6,20 +6,22 @@
 // desktop untranslated, mobile translated).
 //
 // isNavActive() is prefix-based with aliases, so sub-destinations keep
-// their parent tab lit: /week-ahead is part of the Home story, /ask is
-// part of AI Guidance. Before this, /week-ahead showed
-// NO active tab at all.
+// their parent tab lit: /week-ahead is part of the Home story. Before this,
+// /week-ahead showed NO active tab at all. (/ask now redirects to
+// /insights?sub=ask, so it needs no alias.)
 
 export const NAV_ITEMS = [
   { id: 'home',     key: 'nav_home_tab',    fallback: 'Home',        to: '/home' },
   { id: 'charts',   key: 'nav_my_charts',   fallback: 'My Charts',   to: '/kundli',   needsChart: true, activeTab: 'birth_chart', activeSubtab: 'chart' },
-  { id: 'guidance', key: 'nav_ai_guidance', fallback: 'AI Guidance', to: '/insights', needsChart: true },
+  { id: 'guidance', key: 'nav_ai_guidance', fallback: 'AI Insights', to: '/insights', needsChart: true },
   { id: 'explore',  key: 'nav_explore',     fallback: 'Explore',     to: '/learn' },
   { id: 'panchang', key: 'nav_panchang_tab', fallback: 'Panchang',   to: '/panchang' },
 ]
 
-// Signed-out header nav + mobile menu.
+// Signed-out header nav + mobile menu. The desktop header shows the first
+// three; the mobile menu shows them all.
 export const PUBLIC_NAV_ITEMS = [
+  { id: 'generate', key: 'nav_cta_compact',  fallback: 'Generate Kundli', to: '/generate' },
   { id: 'panchang', key: 'nav_panchang_tab', fallback: 'Panchang', to: '/panchang' },
   { id: 'explore',  key: 'nav_explore',      fallback: 'Explore',  to: '/learn' },
   { id: 'pricing',  key: 'nav_early_access', fallback: 'Free Access', to: '/pricing' },
@@ -29,7 +31,6 @@ export const PUBLIC_NAV_ITEMS = [
 // Routes that belong to a tab's "story" without living under its path.
 const TAB_ALIASES = {
   '/week-ahead':    '/home',
-  '/ask':           '/insights',
 }
 
 function matches(pathname, base) {

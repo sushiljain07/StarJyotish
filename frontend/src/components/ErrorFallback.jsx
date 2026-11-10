@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next'
 export default function ErrorFallback({ resetError }) {
   const { t } = useTranslation()
   return (
-    <div className="min-h-screen bg-parchment flex items-center justify-center px-4">
+    <div className="min-h-dvh bg-parchment flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-2">
           {t('error_fallback_eyebrow')}

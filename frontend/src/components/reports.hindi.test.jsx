@@ -26,7 +26,6 @@ import ErrorFallback from './ErrorFallback'
 import PaywallCard from './PaywallCard'
 import AskPersonaPanel from './home/AskPersonaPanel'
 import Insights from '../pages/Insights'
-import AskPage from '../pages/AskPage'
 
 const INPUT = { date: '1990-08-16', time: '19:05', place: 'New Delhi, India' }
 const json = (status, body) => ({
@@ -307,13 +306,13 @@ describe('Ask surfaces', () => {
     expectNoEnglish(container, ['Gemini'])
   })
   it('AskPersonaPanel: closed button and open panel', () => {
-    const { container } = render(<AskPersonaPanel userId={1} input={INPUT} />)
+    const { container } = render(<MemoryRouter><AskPersonaPanel userId={1} input={INPUT} /></MemoryRouter>)
     expectNoEnglish(container)
   })
-  it('AskPage', async () => {
+  it('Insights › Ask', async () => {
     const { container } = render(
-      <MemoryRouter initialEntries={[{ pathname: '/ask', state: { input: INPUT } }]}>
-        <Routes><Route path="/ask" element={<AskPage />} /></Routes>
+      <MemoryRouter initialEntries={[{ pathname: '/insights', search: '?sub=ask', state: { input: INPUT } }]}>
+        <Routes><Route path="/insights" element={<Insights />} /></Routes>
       </MemoryRouter>,
     )
     await screen.findByPlaceholderText(/.+/)
@@ -361,9 +360,9 @@ describe('Insights page', () => {
     return view
   }
   for (const topic of ['career', 'health', 'relationship', 'finance']) {
-    it(`sub-tabs and header (${topic})`, async () => {
+    it(`sub-tabs, header and topic picker (${topic})`, async () => {
       route({ '/api/': () => pending() })
-      const { container } = await renderInsights(`?topic=${topic}`)
+      const { container } = await renderInsights(`?sub=reports&topic=${topic}`)
       expectNoEnglish(container)
     })
   }
@@ -371,7 +370,7 @@ describe('Insights page', () => {
     signIn()
     route({ '/api/career-report': () => json(200, CAREER), '/api/rajyogas': () => json(200, rajyogas), '/kundli/reading': () => json(200, READING) })
     localStorage.setItem('starjyotish_career_context', '{}')
-    const { container } = await renderInsights('?topic=career&sub=career')
+    const { container } = await renderInsights('?sub=reports&topic=career&view=report')
     await waitFor(() => expect(container.textContent).toContain('आपका करियर भाग्य'))
     expectNoEnglish(container, ['Gemini'])
   })

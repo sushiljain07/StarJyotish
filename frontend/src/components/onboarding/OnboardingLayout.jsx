@@ -38,14 +38,14 @@ export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-6">
+      <div className="flex-1 flex items-center justify-center px-4 py-6">
         <div className="relative w-full max-w-md">
           <div className="absolute -inset-6 -z-10 overflow-hidden rounded-3xl">
             <CelestialBackdrop className="text-primary/[0.12]" />
           </div>
           {children}
         </div>
-      </main>
+      </div>
     </div>
   )
 }

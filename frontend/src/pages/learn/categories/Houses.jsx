@@ -61,7 +61,7 @@ export default function HousesGuide() {
   const nextGuide = getNextGuide('houses')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="The 12 Houses (Bhavas) in Vedic Astrology — A Complete Guide"
         description="Understand the 12 houses of the Vedic birth chart — what each house governs, how to identify house strength, and why the houses are where astrology gets personal."
@@ -69,6 +69,7 @@ export default function HousesGuide() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow="Knowledge Center"
         breadcrumbItems={[
@@ -199,6 +200,7 @@ export default function HousesGuide() {
         variant="full"
       />
 
+      </main>
       <Footer />
       <BottomNav />
     </div>

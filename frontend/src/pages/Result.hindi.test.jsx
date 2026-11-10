@@ -59,7 +59,7 @@ const PANES = [
 // Lazy panes show a skeleton first; wait until it is gone.
 async function settle(container) {
   await waitFor(() => {
-    if (container.querySelector('.animate-pulse, [aria-busy="true"]')) throw new Error('still loading')
+    if (container.querySelector('[class*="animate-pulse"], [aria-busy="true"]')) throw new Error('still loading')
   }, { timeout: 4000 })
   await act(async () => { await new Promise(r => setTimeout(r, 50)) })
 }
@@ -127,7 +127,8 @@ describe('Kundli page in Hindi', () => {
 
   it('labels the Chart sub-tab कुंडली (glossary wording, never चार्ट)', () => {
     renderAt('?tab=birth_chart&sub=chart')
-    expect(screen.getAllByRole('button', { name: 'कुंडली' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('tab', { name: 'कुंडली' }).length).toBeGreaterThan(0)
+    expect(screen.queryAllByRole('tab', { name: 'चार्ट' })).toHaveLength(0)
     expect(screen.queryAllByRole('button', { name: 'चार्ट' })).toHaveLength(0)
   })
 })

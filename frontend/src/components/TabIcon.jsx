@@ -3,9 +3,7 @@
 // Replaces the emoji used for the Advanced/Insights/Ask main tabs (🔬 📖 💬)
 // in mainTabs() (Result.jsx) — these render in both the desktop tab bar and
 // the bottom NavBar, making them the single most-repeated visual element in
-// the app. The in-app Kundli tab keeps using the actual /starjyotish.svg logo
-// (kept here only for the landing page's "what's inside" grid, which has no
-// equivalent logo slot of its own).
+// the app.
 const ICONS = {
   kundli: (
     <>
@@ -31,6 +29,14 @@ const ICONS = {
     <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z" />
   ),
 }
+
+ICONS.download = (
+  <>
+    <path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4" />
+    <path d="M12 3v12" />
+    <polyline points="7 10.5 12 15.5 17 10.5" />
+  </>
+)
 
 export default function TabIcon({ id, className = 'w-4 h-4' }) {
   const path = ICONS[id]

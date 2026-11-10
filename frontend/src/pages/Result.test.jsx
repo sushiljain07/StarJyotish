@@ -52,7 +52,7 @@ describe('Kundli tabs in the URL', () => {
 
   it('writes the sub-tab to the URL when clicked', () => {
     renderAt({ pathname: '/kundli', state: CHART })
-    fireEvent.click(screen.getByRole('button', { name: 'Dasha' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Dasha' }))
     expect(lastSearch).toBe('?tab=birth_chart&sub=dasha')
     expect(shown('DASHA_TABLE')).toBe(true)
   })
@@ -71,5 +71,18 @@ describe('Kundli tabs in the URL', () => {
     renderAt({ pathname: '/kundli', search: '?tab=birth_chart&sub=dasha', state: CHART })
     fireEvent.click(screen.getAllByRole('button', { name: /Birth Chart/ })[0])
     expect(lastSearch).toBe('?tab=birth_chart&sub=dasha')
+  })
+})
+
+describe('Kundli main tab icons', () => {
+  it('uses TabIcon SVGs (no img) and the download icon for Download', () => {
+    const { container } = renderAt({ pathname: '/kundli', state: CHART })
+    const tabs = screen.getAllByRole('button', { name: /Download/ })
+    expect(tabs.length).toBeGreaterThan(0)
+    for (const btn of tabs) {
+      expect(btn.querySelector('img')).toBeNull()
+      expect(btn.querySelector('svg polyline[points="7 10.5 12 15.5 17 10.5"]')).not.toBeNull()
+    }
+    expect(container.querySelector('nav img')).toBeNull()
   })
 })

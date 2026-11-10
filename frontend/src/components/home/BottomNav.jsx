@@ -12,6 +12,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { getPrimaryProfile } from '../../services/astrologyProfiles'
+import { useChromeRegistration } from '../layout/useBottomChrome'
 import { NAV_ITEMS, isNavActive, navTarget } from '../../config/nav'
 
 // SVG icons inline — no external dependency
@@ -61,13 +62,14 @@ const ICONS = {
 
 // Self-gating: renders nothing for signed-out users and derives the primary
 // profile itself, so any page (workspace shell, Knowledge Center, guides)
-// can mount <BottomNav /> without auth plumbing. The spacer keeps the fixed
-// nav from covering the end of the page's own content/footer on mobile.
+// can mount <BottomNav /> without auth plumbing. It registers itself with
+// useBottomChrome while rendered, so BottomChromeSpacer knows to reserve room.
 export default function BottomNav({ profile = null }) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuth()
+  useChromeRegistration('bottomNav', !!isAuthenticated)
 
   if (!isAuthenticated) return null
   const navProfile = profile ?? getPrimaryProfile(user)
@@ -80,9 +82,9 @@ export default function BottomNav({ profile = null }) {
   }
 
   return (
-    <>
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl pb-safe min-h-[60px]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl box-border pb-safe pl-[var(--safe-left)] pr-[var(--safe-right)]"
+      style={{ height: 'calc(var(--bottom-nav-h) + var(--safe-bottom))' }}
       aria-label={t('nav_bottom_aria', 'Main navigation')}
     >
       {NAV_ITEMS.map(item => {
@@ -113,7 +115,5 @@ export default function BottomNav({ profile = null }) {
           : <Link key={item.id} to={item.to} {...commonProps}>{content}</Link>
       })}
     </nav>
-    </>
   )
-
 }

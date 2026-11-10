@@ -135,7 +135,7 @@ export default function BlogArticle() {
   if (notFound && !loading) return <Navigate to="/blog" replace />
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <ReadingProgressBar />
       <Seo
         title={article ? `${article.title} — Star Jyotish Blog` : 'Blog — Star Jyotish'}
@@ -144,9 +144,11 @@ export default function BlogArticle() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       {loading ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-3xl animate-spin">🪐</div>
+        <div role="status" className="flex items-center justify-center min-h-dvh">
+          <span className="sr-only">{t('state_loading_label')}</span>
+          <div aria-hidden="true" className="text-3xl motion-safe:animate-spin">🪐</div>
         </div>
       ) : article ? (
         <>
@@ -214,6 +216,7 @@ export default function BlogArticle() {
           )}
         </>
       ) : null}
+      </main>
 
       <Footer />
     </div>

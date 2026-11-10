@@ -42,7 +42,7 @@ const SECTION_CONFIG = [
   { key: 'relationships',  icon: '💫' },
 ]
 
-export default function ChartReading({ input, topic, onOpenRajyogas }) {
+export default function ChartReading({ input, topic, onOpenRajyogas, active = true }) {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
 
@@ -102,13 +102,15 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   // fetched once, then cached).
   const shownLangRef = useRef(lang)
   useEffect(() => {
-    if (shownLangRef.current === lang) return
+    // Hidden (kept-mounted) panels in /insights wait: the ref keeps the
+    // language last shown, so the switch happens once, on becoming active.
+    if (!active || shownLangRef.current === lang) return
     shownLangRef.current = lang
     // While loading, the new request makes the old one stale (its reply
     // is still cached).
     if (status === 'done' || status === 'loading') generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang])
+  }, [lang, active])
 
   // Auto-reveal for signed-in visitors — the "Reveal My Prediction" click
   // gate exists for the anonymous funnel (it's a deliberate curiosity/
@@ -149,11 +151,11 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   // this, that single frame would flash the "Reveal My Prediction" button
   // pointlessly before immediately replacing it with this same screen.
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-4xl mb-4 animate-spin">⏳</div>
+    <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full rounded-full animate-pulse"
+        <div className="h-full rounded-full motion-safe:animate-pulse"
              style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
       </div>
       <p className="text-xs text-ink-faint mt-3">{t('reading_loading_sub')}</p>
@@ -194,7 +196,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
             <div className="bg-parchment-card px-5 py-4">
-              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+              <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -209,7 +211,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
             <div className="bg-parchment-card px-5 py-4">
-              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+              <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -224,7 +226,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-primary text-base">{title}</h3>
             </div>
-            <p className="text-ink text-sm leading-relaxed"
+            <p className="text-ink text-sm leading-relaxed max-w-prose"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
           </div>
         )

@@ -91,7 +91,7 @@ export default function ZodiacGuide() {
   const nextGuide = getNextGuide('zodiac')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Understanding the 12 Zodiac Signs in Vedic Astrology"
         description="Discover the twelve Rashis of Vedic astrology, what they represent, and why your zodiac sign is only one chapter in your complete birth chart."
@@ -99,6 +99,7 @@ export default function ZodiacGuide() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow="Knowledge Center"
         breadcrumbItems={[{ label: 'Home', to: isAuthenticated ? '/home' : '/' }, { label: 'Learn', to: '/learn' }, { label: 'Zodiac Signs' }]}
@@ -270,6 +271,7 @@ export default function ZodiacGuide() {
         variant="full"
       />
 
+      </main>
       <Footer />
       <BottomNav />
     </div>

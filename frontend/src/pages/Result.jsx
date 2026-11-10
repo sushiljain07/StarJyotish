@@ -12,6 +12,7 @@ import PlanetTable     from '../components/PlanetTable'
 import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
+import { useScrollDirection } from '../hooks/useScrollDirection'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -26,17 +27,25 @@ const AshtakavargaTable   = lazy(() => import('../components/AshtakavargaTable')
 const SarvatobhadraChakra = lazy(() => import('../components/SarvatobhadraChakra'))
 
 // Lazy-tab fallback — shared skeleton StateBlock (was a bespoke spinning 🪐
-// with a fake progress bar, duplicated in AskPage with a different emoji).
+// with a fake progress bar, duplicated in the old Ask page — now the Ask
+// sub-tab of /insights — with a different emoji).
 function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
 
-function SummaryChips({ data }) {
+function SummaryChips({ data, collapsed }) {
   const { t } = useTranslation()
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
-    <div className="flex flex-wrap gap-1.5 py-2">
+    <div
+      data-testid="summary-chips"
+      className={`flex flex-wrap gap-1.5 motion-safe:transition-all motion-safe:duration-200 ${
+        collapsed
+          ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-16 md:opacity-100 md:overflow-visible md:py-2'
+          : 'max-h-16 opacity-100 py-2'
+      }`}
+    >
       <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </span>
@@ -53,10 +62,10 @@ function SummaryChips({ data }) {
 }
 
 const mainTabs = t => [
-  { id: 'birth_chart', label: t('tab_birth_chart'),        icon: '/starjyotish.svg' },
+  { id: 'birth_chart', label: t('tab_birth_chart'),        icon: 'kundli' },
   { id: 'divisional',  label: t('kundli_tab_life_areas'),  icon: 'insights' },
   { id: 'analysis',    label: t('kundli_tab_analysis'),    icon: 'advanced' },
-  { id: 'download',    label: t('nav_download'),           icon: 'ask' },
+  { id: 'download',    label: t('nav_download'),           icon: 'download' },
 ]
 
 const birthSubtabs = t => [
@@ -82,13 +91,15 @@ const chartStyles = t => [
 ]
 
 function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
-  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} />
+  const { t } = useTranslation()
+  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} label={t('kundli_subsections_aria')} />
 }
 
 export default function Result() {
   const { t } = useTranslation()
   const location  = useLocation()
   const navigate  = useNavigate()
+  const scrollDir = useScrollDirection()
   const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
   const state = resolveChartState(location.state, user)
@@ -174,11 +185,22 @@ export default function Result() {
     return null
   }
 
+  // Only the Ask entry carries a preset question, and only once: this
+  // /kundli history entry drops it first, so Back + Ask doesn't spend another
+  // free question on it. The other Insights links pass just the chart.
+  function openAsk() {
+    if (location.state?.presetQuestion) {
+      navigate({ pathname: location.pathname, search: location.search },
+        { replace: true, state: { ...location.state, presetQuestion: undefined } })
+    }
+    navigate('/insights?sub=ask', { state: { data, input, presetQuestion } })
+  }
+
   function InsightsAskEntry() {
     return (
       <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t pt-6" style={{ borderColor: '#EAE1CC' }}>
         <button
-          onClick={() => navigate('/insights', { state })}
+          onClick={() => navigate('/insights', { state: { data, input } })}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
           style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
@@ -192,7 +214,7 @@ export default function Result() {
           <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_open')}</span>
         </button>
         <button
-          onClick={() => navigate('/ask', { state: { ...state, presetQuestion } })}
+          onClick={openAsk}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
           style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
@@ -214,11 +236,11 @@ export default function Result() {
       <Seo title={t('kundli_seo_title')} description={t('kundli_seo_description')} path="/kundli" noindex />
 
       {/* ── Sticky context bar ──────────────────────────────────────────── */}
-      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
+      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30 [overflow-anchor:none]">
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}
-          <SummaryChips data={data} />
+          <SummaryChips data={data} collapsed={scrollDir === 'down'} />
 
           {/* Row 3 — main tabs */}
           <div className="border-t border-line/40 pt-1">
@@ -226,9 +248,8 @@ export default function Result() {
               tabs={MAIN_TABS}
               active={activeMain}
               onChange={selectMain}
-              renderIcon={tab => tab.icon.startsWith('/')
-                ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
-                : <TabIcon id={tab.icon} className="w-4 h-4" />}
+              label={t('nav_kundli_sections_aria')}
+              renderIcon={tab => <TabIcon id={tab.icon} className="w-4 h-4" />}
             />
           </div>
 
@@ -253,7 +274,7 @@ export default function Result() {
         <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
 
           <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
-            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state })} />
+            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input } })} />
             <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />

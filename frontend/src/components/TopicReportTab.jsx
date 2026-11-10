@@ -95,11 +95,11 @@ function SectionContent({ content }) {
     .map(l => l.replace(/^[-•]\s*/, '').trim())
     .filter(Boolean)
   if (bullets.length <= 1)
-    return <p className="text-sm leading-relaxed text-ink">{content}</p>
+    return <p className="text-sm leading-relaxed text-ink max-w-prose">{content}</p>
   return (
     <ul className="space-y-2">
       {bullets.map((b, i) => (
-        <li key={i} className="flex gap-2 text-sm leading-relaxed text-ink">
+        <li key={i} className="flex gap-2 max-w-prose text-sm leading-relaxed text-ink">
           <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50" />
           <span>{b}</span>
         </li>
@@ -213,7 +213,7 @@ function HighlightCard({ h }) {
   )
 }
 
-export default function TopicReportTab({ topic, input }) {
+export default function TopicReportTab({ topic, input, active = true }) {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
@@ -249,13 +249,15 @@ export default function TopicReportTab({ topic, input }) {
   // fetched once, then cached).
   const shownLangRef = useRef(lang)
   useEffect(() => {
-    if (shownLangRef.current === lang) return
+    // Hidden (kept-mounted) panels in /insights wait: the ref keeps the
+    // language last shown, so the switch happens once, on becoming active.
+    if (!active || shownLangRef.current === lang) return
     shownLangRef.current = lang
     // While loading, the new request makes the old one stale (its reply
     // is still cached).
     if (status === 'done' || status === 'loading') generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang])
+  }, [lang, active])
 
   if (!cfg) return null
 
@@ -320,12 +322,12 @@ export default function TopicReportTab({ topic, input }) {
   // doesn't need marital-status input first) is still technically 'idle'
   // before the auto-reveal effect above fires.
   if (status === 'loading' || (status === 'idle' && skipIdleScreen)) return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-4xl mb-4 animate-spin">⏳</div>
+    <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>
       <p className="text-xs text-ink-faint mt-1">{t(`topic_report_${topic}_loading_sub`)}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
+        <div className="h-full bg-primary rounded-full motion-safe:animate-pulse w-3/4" />
       </div>
     </div>
   )

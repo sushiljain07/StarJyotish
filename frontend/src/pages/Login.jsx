@@ -64,7 +64,7 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden"
+      className="min-h-dvh bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden"
       onClick={goBackOrHome}
     >
       <Seo title={t('login_title')} description={t('login_seo_description')} path="/login" noindex />
@@ -80,6 +80,7 @@ export default function Login() {
         ← {t('nav_back', 'Back')}
       </button>
 
+      <main id="main" tabIndex={-1} className="relative w-full max-w-sm">
       <div
         className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8"
         onClick={e => e.stopPropagation()}
@@ -102,6 +103,7 @@ export default function Login() {
 
         <p className="text-ink-faint text-xs text-center mt-6">{t('login_disclaimer')}</p>
       </div>
+      </main>
     </div>
   )
 }

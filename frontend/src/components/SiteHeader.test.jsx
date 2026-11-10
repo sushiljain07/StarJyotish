@@ -39,3 +39,42 @@ describe('SiteHeader sign in', () => {
     expect(loginState?.next).toBeUndefined()
   })
 })
+
+function PathProbe({ label }) { return <div>{label} {useLocation().pathname}</div> }
+
+describe('SiteHeader signed-out links', () => {
+  function renderHeader(props = {}) {
+    render(
+      <MemoryRouter initialEntries={['/panchang']}>
+        <Routes>
+          <Route path="/generate" element={<PathProbe label="AT" />} />
+          <Route path="*" element={<SiteHeader {...props} />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  }
+
+  it('the menu has Generate Kundli first, going to /generate', async () => {
+    renderHeader()
+    fireEvent.click(screen.getByRole('button', { name: /menu/i }))
+    const menu = screen.getAllByRole('navigation').at(-1)
+    const first = menu.querySelector('button')
+    expect(first.textContent).toBe(en.nav_cta_compact)
+    fireEvent.click(first)
+    expect(await screen.findByText('AT /generate')).toBeInTheDocument()
+  })
+
+  it('the desktop header shows Generate Kundli, Panchang and Explore', () => {
+    renderHeader()
+    const desktop = screen.getAllByRole('navigation')[0]
+    expect([...desktop.querySelectorAll('button')].map(b => b.textContent))
+      .toEqual([en.nav_cta_compact, en.nav_panchang_tab, en.nav_explore])
+  })
+
+  it('the desktop header drops its Generate Kundli link when the page has the CTA pill', () => {
+    renderHeader({ onCtaClick: vi.fn() })
+    const desktop = screen.getAllByRole('navigation')[0]
+    expect([...desktop.querySelectorAll('button')].map(b => b.textContent))
+      .toEqual([en.nav_panchang_tab, en.nav_explore])
+  })
+})

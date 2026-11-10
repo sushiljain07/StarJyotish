@@ -8,7 +8,7 @@ import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import LegalLanguageNote from '../components/LegalLanguageNote'
 
-const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2 scroll-mt-20'
+const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2'
 const ul = 'list-disc pl-5 space-y-1.5'
 
 export default function TermsOfUse() {

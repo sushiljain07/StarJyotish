@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import SocialButtons from '../components/SocialButtons'
+import InlineNotice from '../components/ui/InlineNotice'
+import useTimedNotice from '../components/ui/useTimedNotice'
 import { API_BASE } from '../api/config'
 
 const CONTACT_EMAIL = 'contact@starjyotish.com'
@@ -21,6 +23,7 @@ export default function ContactUs() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const [errorMsg, setErrorMsg] = useState('')
+  const waNotice = useTimedNotice()
 
   function update(field) {
     return e => setForm(f => ({ ...f, [field]: e.target.value }))
@@ -67,12 +70,15 @@ export default function ContactUs() {
           </div>
           <button
             type="button"
-            onClick={() => alert(t('contact_whatsapp_alert'))}
+            onClick={waNotice.show}
             className="bg-sage-light text-sage border border-sage/30 text-xs font-semibold px-3.5 py-2 rounded-full transition hover:bg-sage/20 shrink-0 self-start sm:self-auto"
           >
             {t('contact_whatsapp_cta')}
           </button>
         </div>
+        {waNotice.visible && (
+          <InlineNotice onDismiss={waNotice.hide}>{t('contact_whatsapp_alert')}</InlineNotice>
+        )}
 
         {status === 'sent' ? (
           <div className="bg-sage-light border border-sage/30 rounded-2xl p-6 text-center">

@@ -71,7 +71,7 @@ function ArticleCard({ article, featured = false, onClick }) {
 
 function Skeleton() {
   return (
-    <div className="bg-parchment-card rounded-xl border border-line p-5 animate-pulse">
+    <div className="bg-parchment-card rounded-xl border border-line p-5 motion-safe:animate-pulse">
       <div className="h-3 w-16 bg-line rounded mb-3" />
       <div className="h-4 w-full bg-line rounded mb-2" />
       <div className="h-4 w-3/4 bg-line rounded mb-4" />
@@ -125,10 +125,11 @@ export default function Blog() {
   const rest = featured ? visible.filter(a => !a.featured) : visible
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo title={t('blog_seo_title')} description={t('blog_seo_desc')} path="/blog" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <div className="bg-night px-6 pt-24 pb-10">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
@@ -152,7 +153,7 @@ export default function Blog() {
 
         {loading ? (
           <div>
-            <div className="h-40 bg-night/10 rounded-2xl animate-pulse mb-6" />
+            <div className="h-40 bg-night/10 rounded-2xl motion-safe:animate-pulse mb-6" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1,2,3].map(i => <Skeleton key={i} />)}
             </div>
@@ -224,6 +225,7 @@ export default function Blog() {
           </div>
         </Reveal>
       </div>
+      </main>
       <Footer />
     </div>
   )

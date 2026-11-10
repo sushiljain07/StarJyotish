@@ -63,7 +63,7 @@ export default function DashasGuide() {
   const nextGuide = getNextGuide('dashas')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Dashas — Vedic Astrology's Planetary Timing System Explained"
         description="Understand the Vimshottari Dasha system — how planetary time periods work, what each Mahadasha governs, and how Dashas answer the 'when' question in Vedic astrology."
@@ -71,6 +71,7 @@ export default function DashasGuide() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow="Knowledge Center"
         breadcrumbItems={[
@@ -221,6 +222,7 @@ export default function DashasGuide() {
         variant="full"
       />
 
+      </main>
       <Footer />
       <BottomNav />
     </div>

@@ -8,14 +8,22 @@
 // versions duplicated inline in PlanetTable.jsx and ShodashvargaPanel.jsx —
 // which is what produced the Birth Chart vs Planets inconsistency. One
 // shared component now backs all three call sites.
-export default function SegmentedToggle({ label, options, active, onChange, className = '' }) {
+//
+// `ariaLabel` names the button group for screen readers when there is no
+// visible `label`; each button reports its state with aria-pressed.
+import { useId } from 'react'
+
+export default function SegmentedToggle({ label, ariaLabel, options, active, onChange, className = '' }) {
+  const labelId = useId()
   return (
     <div className={`flex items-center gap-2 flex-wrap ${className}`}>
-      {label && <span className="text-xs text-ink-muted">{label}</span>}
-      <div className="flex gap-1">
+      {label && <span id={labelId} className="text-xs text-ink-muted">{label}</span>}
+      <div className="flex gap-1 flex-wrap" role="group"
+           aria-labelledby={label ? labelId : undefined}
+           aria-label={label ? undefined : ariaLabel}>
         {options.map(o => (
-          <button key={o.id} onClick={() => onChange(o.id)}
-                  className={`text-xs px-3 py-1 rounded-lg border transition ${
+          <button key={o.id} type="button" onClick={() => onChange(o.id)} aria-pressed={active === o.id}
+                  className={`text-xs px-3 min-h-11 rounded-lg border transition ${
                     active === o.id
                       ? 'bg-primary border-primary text-night'
                       : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'

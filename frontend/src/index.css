@@ -4,10 +4,16 @@
 
 @layer base {
   html {
+    /* Hash targets clear the 60px sticky header. */
+    scroll-padding-top: 72px;
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
   body {
     @apply bg-parchment text-ink;
+    /* viewport-fit=cover (index.html) lets the page run under a landscape
+       notch; inset the content so text clears it. Fixed bars pad themselves. */
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
   }
 
   /* Global focus-visible ring — keyboard users need a clearly visible
@@ -38,9 +44,18 @@
   }
 }
 
+:root {
+  --bottom-nav-h: 60px;
+  /* NavBar: py-2 + a min-h-11 row + 1px top border = 61px (box-border). */
+  --sub-nav-h: 61px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
 @layer utilities {
   .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: var(--safe-bottom);
   }
 }
 

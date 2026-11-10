@@ -142,9 +142,11 @@ export default function PersonalHome() {
 
   function openReport(topicId) {
     if (!profile) return
-    // Career, finance, relationship, health → /insights with topic set,
-    // which builds the Reading/Rajyogas/Report subtabs (buildSubtabs in Insights.jsx).
-    navigate('/insights', {
+    // Career, finance, relationship, health → that topic's report under
+    // Insights › Reports (career opens the career report itself).
+    const search = new URLSearchParams({ sub: 'reports', topic: topicId })
+    if (topicId === 'career') search.set('view', 'report')
+    navigate(`/insights?${search}`, {
       state: {
         data: profile.chart,
         input: {

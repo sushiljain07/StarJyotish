@@ -62,8 +62,8 @@ export default function KPChart({ input }) {
       )}
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="text-center">
-            <img src="/starjyotish.svg" alt="" className="w-8 h-8 mx-auto animate-spin mb-2" />
+          <div role="status" className="text-center">
+            <img src="/starjyotish.svg" alt="" aria-hidden="true" className="w-8 h-8 mx-auto motion-safe:animate-spin mb-2" />
             <p className="text-ink-muted text-sm">{t('kp_calculating')}</p>
           </div>
         </div>

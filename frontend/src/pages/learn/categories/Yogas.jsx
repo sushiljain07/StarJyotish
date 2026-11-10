@@ -76,7 +76,7 @@ export default function YogasGuide() {
   const learningPathSteps = getLearningPathSteps('yogas')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Yogas in Vedic Astrology — Planetary Combinations Explained"
         description="What Vedic astrology Yogas are, how to identify Raj Yoga, Gaja Kesari, Dhana Yoga, and other key combinations in your birth chart — and what they actually mean."
@@ -84,6 +84,7 @@ export default function YogasGuide() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow="Knowledge Center"
         breadcrumbItems={[
@@ -196,6 +197,7 @@ export default function YogasGuide() {
         variant="full"
       />
 
+      </main>
       <Footer />
       <BottomNav />
     </div>

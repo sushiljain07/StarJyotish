@@ -1,5 +1,6 @@
 // The chart the user is looking at, kept for the browser tab's session.
-// /kundli, /insights and /ask used to get their chart only from router
+// /kundli and /insights (which now also hosts Ask; /ask redirects there)
+// used to get their chart only from router
 // state, so a refresh, a shared link or a sign-in round-trip bounced the
 // user to /home. resolveChartState() rebuilds it instead.
 import { getPrimaryProfile } from './astrologyProfiles'

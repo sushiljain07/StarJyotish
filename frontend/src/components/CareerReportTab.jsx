@@ -253,11 +253,11 @@ function SectionContent({ content, light = false }) {
     .filter(Boolean)
   const cls = light ? 'text-primary-light' : 'text-ink'
   if (bullets.length <= 1)
-    return <p className={`text-sm leading-relaxed ${cls}`}>{content}</p>
+    return <p className={`text-sm leading-relaxed max-w-prose ${cls}`}>{content}</p>
   return (
     <ul className="space-y-2">
       {bullets.map((b, i) => (
-        <li key={i} className={`flex gap-2 text-sm leading-relaxed ${cls}`}>
+        <li key={i} className={`flex gap-2 max-w-prose text-sm leading-relaxed ${cls}`}>
           <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50" />
           <span>{b}</span>
         </li>
@@ -503,7 +503,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
             {horizons.map(([label, text]) => (
               <div key={label} className="px-5 py-3">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{label}</p>
-                <p className="text-sm text-ink leading-relaxed">{text}</p>
+                <p className="text-sm text-ink leading-relaxed max-w-prose">{text}</p>
               </div>
             ))}
           </div>
@@ -584,7 +584,7 @@ function buildAskSeedQuestion(careerContext, t) {
   return concern ? concernLabel(t, concern) : t('career_ask_default')
 }
 
-export default function CareerReportTab({ input, onOpenRajyogas }) {
+export default function CareerReportTab({ input, onOpenRajyogas, active = true }) {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
@@ -659,13 +659,15 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
   // fetched once, then cached).
   const shownLangRef = useRef(lang)
   useEffect(() => {
-    if (shownLangRef.current === lang) return
+    // Hidden (kept-mounted) panels in /insights wait: the ref keeps the
+    // language last shown, so the switch happens once, on becoming active.
+    if (!active || shownLangRef.current === lang) return
     shownLangRef.current = lang
     // While loading, the new request makes the old one stale (its reply
     // is still cached).
     if (status === 'done' || status === 'loading') generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang])
+  }, [lang, active])
 
   if (!hasPremiumAccess()) {
     return (
@@ -729,12 +731,12 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
   // Also covers the one render where an authenticated visitor is still
   // technically 'idle' before the auto-reveal effect above fires.
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-4xl mb-4 animate-spin">⏳</div>
+    <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">{t('career_loading_text')}</p>
       <p className="text-xs text-ink-faint mt-1">{t('career_loading_sub')}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
+        <div className="h-full bg-primary rounded-full motion-safe:animate-pulse w-3/4" />
       </div>
     </div>
   )

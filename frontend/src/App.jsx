@@ -16,6 +16,7 @@ import GlobalScrollToTop from './components/GlobalScrollToTop'
 import OnboardingGate from './components/OnboardingGate'
 import ProtectedRoute from './components/ProtectedRoute'
 import RoleRoute from './components/RoleRoute'
+import SkipLink from './components/layout/SkipLink'
 import WorkspaceLayout, { RouteSkeleton } from './components/layout/WorkspaceLayout'
 
 const Landing = lazy(() => import('./pages/Landing'))
@@ -32,7 +33,7 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AstrologerDashboard = lazy(() => import('./pages/AstrologerDashboard'))
 const Disclaimer = lazy(() => import('./pages/Disclaimer'))
 const Insights = lazy(() => import('./pages/Insights'))
-const AskPage = lazy(() => import('./pages/AskPage'))
+const AskRedirect = lazy(() => import('./pages/AskRedirect'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'))
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'))
@@ -91,12 +92,13 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SkipLink />
         <ScrollManager />
         <GlobalScrollToTop />
         {/* Fallback for pages outside the workspace shell (marketing/legal);
             workspace pages get their fallback inside WorkspaceLayout so the
             header and nav stay put while a chunk loads. */}
-        <Suspense fallback={<div className="min-h-screen bg-parchment pt-[60px]"><RouteSkeleton /></div>}>
+        <Suspense fallback={<div className="min-h-dvh bg-parchment pt-[60px]"><RouteSkeleton /></div>}>
           <Routes>
             {/* ── Workspace (persistent app shell) ─────────────────── */}
             <Route element={<WorkspaceLayout />}>
@@ -107,7 +109,7 @@ export default function App() {
               <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
               <Route path="/kundli" element={<Result />} />
               <Route path="/insights" element={<Insights />} />
-              <Route path="/ask" element={<AskPage />} />
+              <Route path="/ask" element={<AskRedirect />} />
               <Route path="/career-report" element={<CareerReportRedirect />} />
               <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />

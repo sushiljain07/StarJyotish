@@ -17,6 +17,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
+import BottomChromeSpacer from './layout/BottomChromeSpacer'
 
 // Link set mirrors Footer.jsx's bottom bar + key destinations, and the
 // EN/हि toggle matches Footer.jsx, so the two footers never disagree on
@@ -39,15 +40,13 @@ export default function CompactFooter() {
 
   return (
     <footer className="border-t border-white/10 bg-night">
-      <div className="max-w-4xl mx-auto px-4 py-5 pb-safe-offset-5 md:pb-5"
-        style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
-      >
-        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+      <div className="max-w-5xl mx-auto px-4 py-5">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0">
           {LINKS.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap"
+              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center justify-center min-h-11 min-w-11"
             >
               {t(link.key, link.fallback)}
             </Link>
@@ -60,6 +59,7 @@ export default function CompactFooter() {
           <LanguageSwitcher size="sm" />
         </div>
       </div>
+      <BottomChromeSpacer />
     </footer>
   )
 }

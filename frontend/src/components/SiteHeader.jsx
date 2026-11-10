@@ -18,6 +18,11 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
 
+// The 16px gutter, widened to the landscape notch inset when there is one
+// (index.html sets viewport-fit=cover). The header itself is fixed, so the
+// body's safe-area padding doesn't reach it.
+const SAFE_GUTTER = 'pl-[max(1rem,var(--safe-left))] pr-[max(1rem,var(--safe-right))]'
+
 function NavButton({ item, active, onClick }) {
   const { t } = useTranslation()
   return (
@@ -39,7 +44,7 @@ function NavButton({ item, active, onClick }) {
   )
 }
 
-export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
+export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6xl' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -68,7 +73,11 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
     navigate(to, state ? { state } : undefined)
   }
 
-  const items = isAuthenticated ? NAV_ITEMS : PUBLIC_NAV_ITEMS.slice(0, 2)
+  // Signed out: Generate Kundli, Panchang, Explore — minus Generate Kundli
+  // when the page already shows it as the CTA pill.
+  const items = isAuthenticated
+    ? NAV_ITEMS
+    : PUBLIC_NAV_ITEMS.slice(0, 3).filter(item => !(onCtaClick && item.id === 'generate'))
 
   return (
     <header
@@ -79,11 +88,11 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
         borderColor: `rgba(255, 255, 255, ${borderAlpha})`,
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-0 flex items-center justify-between gap-4 h-[60px]">
+      <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto ${SAFE_GUTTER} py-0 flex items-center justify-between gap-4 h-[60px]`}>
         {/* Logo */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-2 shrink-0 min-h-11"
           aria-label={t('app_title')}
         >
           <img src="/starjyotish.svg" alt="" className="w-7 h-7" />
@@ -110,7 +119,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           {!isAuthenticated && (
             <button
               onClick={signIn}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 py-1.5 rounded-full transition"
+              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 min-h-11 rounded-full transition"
             >
               {t('nav_sign_in')}
             </button>
@@ -118,7 +127,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           {onCtaClick && (
             <button
               onClick={onCtaClick}
-              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 py-1.5 rounded-full transition whitespace-nowrap"
+              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 min-h-11 rounded-full transition whitespace-nowrap"
             >
               <span className="md:hidden">{t('nav_cta_mobile')}</span>
               <span className="hidden md:inline">{t('nav_cta_compact')}</span>
@@ -132,7 +141,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
               onClick={() => setMenuOpen(o => !o)}
               aria-expanded={menuOpen}
               aria-label={t('nav_menu', 'Menu')}
-              className="md:hidden p-2 -mr-1 text-primary-light/70 hover:text-primary-light transition-colors"
+              className="md:hidden min-w-11 min-h-11 inline-flex items-center justify-center -mr-1 text-primary-light/70 hover:text-primary-light transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 {menuOpen ? (
@@ -152,7 +161,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           className="md:hidden border-t border-white/10 bg-night animate-fade-in-fast motion-reduce:animate-none"
           aria-label={t('nav_bottom_aria', 'Main navigation')}
         >
-          <div className="max-w-6xl mx-auto px-4 py-2">
+          <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto ${SAFE_GUTTER} py-2`}>
             {PUBLIC_NAV_ITEMS.map(item => {
               const active = isNavActive(location.pathname, item.to)
               return (

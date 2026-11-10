@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { formatDate } from '../utils/format'
 import { planetName } from '../utils/astroNames'
+import ScrollHint from './ui/ScrollHint'
 
 
 function pct(start, end) {
@@ -43,7 +44,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
     return <p className="text-sm text-ink-faint italic">{t('dasha_no_data')}</p>
 
   return (
-    <div className="overflow-x-auto">
+    <ScrollHint fadeFrom="from-parchment-card">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className={`${color.light} ${color.text}`}>
@@ -80,7 +81,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
           })}
         </tbody>
       </table>
-    </div>
+    </ScrollHint>
   )
 }
 

@@ -40,11 +40,12 @@ export default function KnowledgeLayout({
   const scrollProgress = useScrollProgress(80)
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <ReadingProgress />
       <Seo title={seoTitle} description={seoDescription} path={path} />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} breadcrumbItems={breadcrumbItems} meta={meta} align="left" />
 
       {sidebar ? (
@@ -60,6 +61,7 @@ export default function KnowledgeLayout({
 
       {/* Full-width CTA band, outside the reading column */}
       {cta}
+      </main>
 
       <Footer />
       <BottomNav />

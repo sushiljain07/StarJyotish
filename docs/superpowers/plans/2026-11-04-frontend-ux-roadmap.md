@@ -146,6 +146,20 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 
 ## Phase 4: Mobile and navigation polish (1–2 days)
 
+**Status (10 Nov 2026): done, PR pending whole-branch review.** Real-browser check at 390, 700 and 1440px (and 320px for /kundli) in English and Hindi: no horizontal scroll, 44px tap targets on the controls Phase 4 covered (header, BottomNav, NavBar, tab pills, compact-footer links; not every control, see below), ScrollToTop clear of footer links, one tab row at 700px, safe-area edge delta 0px at the bottom and the header, BottomNav and NavBar inset past a 47px landscape notch.
+
+Phase 4 leftovers:
+- desktop header nav links are 36px tall;
+- marketing Footer social icons are 32×32;
+- the always-on 56px footer-coloured strip under footers on mobile (ScrollToTop clearance);
+- the skip link is reliably the first Tab stop only right after page load;
+- /panchang autofocuses its city search when no location is saved;
+- no `role="tabpanel"` / `aria-controls` on the tab rows;
+- InlineNotice live-region timing;
+- Hindi aria-label wording (कुंडली सेक्शन vs कुंडली के अनुभाग);
+- the CareerReportTab sticky sub-bar `top-[100px]` sits under the taller Insights header;
+- Reading and Reports share `?topic`.
+
 1. **Safe areas** (N-H3): add `viewport-fit=cover` to `index.html`, and set the raised NavBar to `bottom: calc(60px + env(safe-area-inset-bottom))`. Check on an iPhone-sized emulator with a home indicator.
 2. **Fixed chrome on /kundli** (N-M1): collapse the summary chips when the user scrolls down; switch the top and bottom tab rows at the same breakpoint (`md`).
 3. **Overlaps seen in the screenshots:**
@@ -225,5 +239,5 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 | 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
 | 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — PR open |
 | 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — PR pending; glossary rows open as 3B leftovers |
-| 4 | `fix/phase4-mobile-nav` | to write | — |
+| 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — PR pending; leftovers listed in the Phase 4 section |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

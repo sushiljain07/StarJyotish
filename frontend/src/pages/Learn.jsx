@@ -36,7 +36,7 @@ export default function Learn() {
   const { t } = useTranslation()
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Knowledge Center"
         description="A calm, practical guide to Vedic astrology — Zodiac signs, Nakshatras, planets, houses, dashas, yogas, and doshas, explained clearly."
@@ -44,6 +44,7 @@ export default function Learn() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow={t('footer_link_knowledge_center')}
         title={t('learn_title')}
@@ -187,6 +188,8 @@ export default function Learn() {
         to="/generate"
         variant="full"
       />
+
+      </main>
 
       <CompactFooter />
       <BottomNav />

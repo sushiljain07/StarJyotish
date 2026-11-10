@@ -57,8 +57,9 @@ export default function AccountMenu() {
         onClick={() => setOpen(o => !o)}
         aria-label={t('nav_account_menu')}
         aria-expanded={open}
-        className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-primary/40 transition shrink-0"
+        className="group min-w-11 min-h-11 inline-flex items-center justify-center shrink-0"
       >
+        <span className="w-8 h-8 rounded-full overflow-hidden group-hover:ring-2 group-hover:ring-primary/40 transition">
         {user?.avatar_url && !avatarError ? (
           <img
             src={user.avatar_url}
@@ -71,6 +72,7 @@ export default function AccountMenu() {
             {initialFor(user)}
           </span>
         )}
+        </span>
       </button>
 
       {open && (
@@ -83,10 +85,10 @@ export default function AccountMenu() {
             {secondaryLine && <p className="text-ink-faint text-xs truncate mt-0.5">{secondaryLine}</p>}
           </div>
           <Link
-            to="/"
+            to="/about"
             onClick={() => setOpen(false)}
             role="menuitem"
-            className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+            className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"
           >
             {t('nav_about_product', 'About Star Jyotish')}
           </Link>
@@ -94,7 +96,7 @@ export default function AccountMenu() {
             to="/home"
             onClick={() => setOpen(false)}
             role="menuitem"
-            className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+            className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"
           >
             {t('nav_my_home')}
           </Link>
@@ -102,7 +104,7 @@ export default function AccountMenu() {
             to="/account"
             onClick={() => setOpen(false)}
             role="menuitem"
-            className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+            className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"
           >
             {t('nav_my_profile')}
           </Link>
@@ -111,7 +113,7 @@ export default function AccountMenu() {
               to="/admin"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+              className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"
             >
               {t('account_admin_dashboard')}
             </Link>
@@ -121,7 +123,7 @@ export default function AccountMenu() {
               to="/astrologer"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
+              className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"
             >
               {t('account_my_dashboard')}
             </Link>
@@ -133,7 +135,7 @@ export default function AccountMenu() {
           <button
             onClick={() => { setOpen(false); logout(); navigate('/') }}
             role="menuitem"
-            className="w-full text-left px-3.5 py-2 text-sm text-vermillion hover:bg-vermillion-light/60 transition"
+            className="w-full text-left min-h-11 px-3.5 text-sm text-vermillion hover:bg-vermillion-light/60 transition"
           >
             {t('nav_logout')}
           </button>

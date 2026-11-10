@@ -29,18 +29,8 @@ import { Skeleton } from '../ui'
 
 const DARK_ROUTES = ['/home', '/week-ahead']
 
-// Pages that render their own page-level tab bar stacked above the shared
-// BottomNav (Result.jsx's <NavBar raised /> for Birth Chart/Life Areas/
-// Analysis/Download) — these need extra trailing clearance below the
-// footer so that second bar doesn't hide it too.
-const EXTRA_BOTTOM_NAV_ROUTES = ['/kundli']
-
 function isDark(pathname) {
   return DARK_ROUTES.some(p => pathname === p || pathname.startsWith(p + '/'))
-}
-
-function hasExtraBottomNav(pathname) {
-  return EXTRA_BOTTOM_NAV_ROUTES.some(p => pathname === p || pathname.startsWith(p + '/'))
 }
 
 // Route-level loading fallback — skeleton-shaped, matching the destination
@@ -65,7 +55,6 @@ export function RouteSkeleton({ dark = false }) {
 export default function WorkspaceLayout() {
   const { pathname } = useLocation()
   const dark = isDark(pathname)
-  const extraNav = hasExtraBottomNav(pathname)
 
   return (
     <div className={`min-h-screen flex flex-col ${dark ? 'bg-night-deep' : 'bg-parchment'}`}>
@@ -80,20 +69,6 @@ export default function WorkspaceLayout() {
         </Suspense>
       </main>
       <CompactFooter />
-      {/* Mobile-only trailing clearance below the footer. BottomNav is
-          `position: fixed` (~60-90px incl. safe-area), so it always overlays
-          whatever content is at the true bottom of the page once fully
-          scrolled — a spacer *before* the footer doesn't help with that,
-          only one *after* it does. /kundli additionally stacks its own
-          raised NavBar above BottomNav, so it needs a bit more. Sized to
-          just clear those nav bars, not the taller (and only occasionally
-          visible) ScrollToTop FAB — that one's fine overlapping the very
-          last sliver of footer while scrolling past, same as any FAB. */}
-      <div
-        className="md:hidden"
-        style={{ height: `calc(${extraNav ? '8rem' : '6rem'} + env(safe-area-inset-bottom, 0px))` }}
-        aria-hidden="true"
-      />
       <BottomNav />
     </div>
   )

@@ -80,9 +80,8 @@ export default function BottomNav({ profile = null }) {
   }
 
   return (
-    <>
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl pb-safe min-h-[60px]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl pb-safe min-h-[var(--bottom-nav-h)]"
       aria-label={t('nav_bottom_aria', 'Main navigation')}
     >
       {NAV_ITEMS.map(item => {
@@ -113,7 +112,5 @@ export default function BottomNav({ profile = null }) {
           : <Link key={item.id} to={item.to} {...commonProps}>{content}</Link>
       })}
     </nav>
-    </>
   )
-
 }

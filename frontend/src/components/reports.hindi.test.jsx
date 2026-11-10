@@ -307,7 +307,7 @@ describe('Ask surfaces', () => {
     expectNoEnglish(container, ['Gemini'])
   })
   it('AskPersonaPanel: closed button and open panel', () => {
-    const { container } = render(<AskPersonaPanel userId={1} input={INPUT} />)
+    const { container } = render(<MemoryRouter><AskPersonaPanel userId={1} input={INPUT} /></MemoryRouter>)
     expectNoEnglish(container)
   })
   it('AskPage', async () => {

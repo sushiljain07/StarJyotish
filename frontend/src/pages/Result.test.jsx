@@ -73,3 +73,16 @@ describe('Kundli tabs in the URL', () => {
     expect(lastSearch).toBe('?tab=birth_chart&sub=dasha')
   })
 })
+
+describe('Kundli main tab icons', () => {
+  it('uses TabIcon SVGs (no img) and the download icon for Download', () => {
+    const { container } = renderAt({ pathname: '/kundli', state: CHART })
+    const tabs = screen.getAllByRole('button', { name: /Download/ })
+    expect(tabs.length).toBeGreaterThan(0)
+    for (const btn of tabs) {
+      expect(btn.querySelector('img')).toBeNull()
+      expect(btn.querySelector('svg polyline[points="7 10.5 12 15.5 17 10.5"]')).not.toBeNull()
+    }
+    expect(container.querySelector('nav img')).toBeNull()
+  })
+})

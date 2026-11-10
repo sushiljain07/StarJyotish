@@ -20,6 +20,7 @@ import JyotiAvatar from './JyotiAvatar'
 import { localDateStr } from '../../utils/localDate'
 import { errorMessage } from '../../api/errors'
 import { currentLanguage } from '../../i18n/languages'
+import { useBottomChrome } from '../layout/useBottomChrome'
 
 const MAX_QUESTIONS = 5
 const MAX_CHARS = 500
@@ -53,6 +54,7 @@ function saveQuota(userId, count) {
 
 export default function AskPersonaPanel({ userId, input }) {
   const { t } = useTranslation()
+  const { spacerHeight } = useBottomChrome()
   const { user, authedRequest } = useAuth()
   const personaName = t('ask_persona_name')
   const [open, setOpen] = useState(false)
@@ -126,7 +128,8 @@ export default function AskPersonaPanel({ userId, input }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 md:bottom-28 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        style={{ '--fab-bottom': `calc(${spacerHeight} + 0.75rem)` }}
+        className="fixed bottom-[var(--fab-bottom)] md:bottom-28 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
         <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />

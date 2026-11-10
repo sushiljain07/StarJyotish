@@ -53,10 +53,10 @@ function SummaryChips({ data }) {
 }
 
 const mainTabs = t => [
-  { id: 'birth_chart', label: t('tab_birth_chart'),        icon: '/starjyotish.svg' },
+  { id: 'birth_chart', label: t('tab_birth_chart'),        icon: 'kundli' },
   { id: 'divisional',  label: t('kundli_tab_life_areas'),  icon: 'insights' },
   { id: 'analysis',    label: t('kundli_tab_analysis'),    icon: 'advanced' },
-  { id: 'download',    label: t('nav_download'),           icon: 'ask' },
+  { id: 'download',    label: t('nav_download'),           icon: 'download' },
 ]
 
 const birthSubtabs = t => [
@@ -226,9 +226,7 @@ export default function Result() {
               tabs={MAIN_TABS}
               active={activeMain}
               onChange={selectMain}
-              renderIcon={tab => tab.icon.startsWith('/')
-                ? <img src={tab.icon} alt="" className="w-4 h-4 object-contain" />
-                : <TabIcon id={tab.icon} className="w-4 h-4" />}
+              renderIcon={tab => <TabIcon id={tab.icon} className="w-4 h-4" />}
             />
           </div>
 

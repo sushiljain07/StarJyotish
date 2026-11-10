@@ -18,6 +18,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 import { subscribeNewsletter } from '../api/newsletter'
 import LanguageSwitcher from './LanguageSwitcher'
+import BottomChromeSpacer from './layout/BottomChromeSpacer'
 
 const FOOTER_YEAR = new Date().getFullYear()
 
@@ -177,6 +178,7 @@ export default function Footer() {
         </p>
         <LanguageSwitcher size="sm" />
       </div>
+      <BottomChromeSpacer />
     </footer>
   )
 }

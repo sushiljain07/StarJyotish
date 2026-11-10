@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { HelmetProvider } from 'react-helmet-async'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import '../../i18n'
 import SkipLink from './SkipLink'
@@ -27,6 +27,24 @@ describe('SkipLink and landmarks', () => {
     const link = screen.getByRole('link', { name: 'Skip to content' })
     expect(link).toHaveAttribute('href', '#main')
     expect(document.body.querySelector('a, button')).toBe(link)
+  })
+
+  it('moves focus to main#main without a router navigation', () => {
+    let loc
+    function Probe() { loc = useLocation(); return null }
+    render(
+      <MemoryRouter initialEntries={['/kundli?tab=chart']}>
+        <SkipLink /><Probe /><main id="main" tabIndex={-1}>x</main>
+      </MemoryRouter>,
+    )
+    const main = document.getElementById('main')
+    main.scrollIntoView = vi.fn()
+    const link = screen.getByRole('link', { name: 'Skip to content' })
+    const ev = fireEvent.click(link)
+    expect(ev).toBe(false) // default prevented: the browser doesn't follow #main
+    expect(document.activeElement).toBe(main)
+    expect(main.scrollIntoView).toHaveBeenCalled()
+    expect(loc.pathname + loc.search + loc.hash).toBe('/kundli?tab=chart')
   })
 
   it('StaticPageLayout renders exactly one main#main', () => {

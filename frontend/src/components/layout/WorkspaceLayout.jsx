@@ -1,7 +1,8 @@
 // components/layout/WorkspaceLayout.jsx
 //
-// The persistent app shell for every workspace page (/home, /kundli, /ask,
-// /insights, /week-ahead, /account, /panchang, /generate, dashboards).
+// The persistent app shell for every workspace page (/home, /kundli,
+// /insights, /week-ahead, /account, /panchang, /generate, dashboards; /ask
+// only redirects to /insights?sub=ask).
 // Before this existed there was no shell at all: each page hand-assembled
 // its own SiteHeader/footer/BottomNav, which is how the mobile BottomNav
 // ended up on only 2 of 10 workspace pages, /panchang wore the heavy

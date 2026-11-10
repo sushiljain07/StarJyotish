@@ -8,6 +8,7 @@ describe('viewport height', () => {
       .filter(([p]) => !p.endsWith('noViewportHeight.test.js'))
       .filter(([, src]) => src.includes('min-h-screen'))
       .map(([p]) => p)
+    expect(Object.keys(files).length).toBeGreaterThan(50)
     expect(offenders).toEqual([])
   })
 })

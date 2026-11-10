@@ -42,18 +42,11 @@ function houseSignIndex(ascSignIndex, houseNumber) {
   return (ascSignIndex + houseNumber - 1) % 12
 }
 
-function ordinalSuffix(n) {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return s[(v - 20) % 10] || s[v] || s[0]
-}
-
-// Ordinal as a simple number string — used in t() interpolations where
-// the full English ordinal suffix ("1st", "4th") would read oddly in Hindi.
-// Hindi uses bare ordinals ("पहला", "चौथा") but for brevity the key just
-// passes the number and the translation handles the phrasing.
+// House ordinal for t() interpolations. Always the oblique form: every
+// template puts a postposition after the house ("{{house}} भाव में"), and
+// Hindi then needs 4थे, not 4था. English is the same either way.
 function houseStr(n, t) {
-  return t ? t('house_ordinal', { count: n, ordinal: true }) : `${n}${ordinalSuffix(n)}`
+  return t('house_ordinal_oblique', { count: n, ordinal: true })
 }
 
 export function computeDayScore(chart, transitPlanets, t) {
@@ -324,7 +317,7 @@ export function buildComingUpEvents(chart, outlook, formatDate, t) {
     if (!change || !t) continue
     const weeks = Math.max(1, Math.round(change.days_away / 7))
     events.push({
-      when: t('coming_in_weeks', { weeks, s: weeks === 1 ? '' : 's', date: localizeBackendDate(t, change.date) }),
+      when: t('coming_in_weeks', { count: weeks, date: localizeBackendDate(t, change.date) }),
       title: t('coming_enters_sign', { planet: t(`planet_${planet}`, planet), sign: signName(t, change.to_sign) }),
       description: t(`coming_sign_change_${planet.toLowerCase()}`),
     })

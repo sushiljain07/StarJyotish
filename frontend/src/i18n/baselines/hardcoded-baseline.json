@@ -1,0 +1,13 @@
+{
+  "components/home/QuickAccess.jsx": 1,
+  "components/knowledge/ConceptLink.jsx": 1,
+  "components/knowledge/LearningMetadata.jsx": 2,
+  "components/knowledge/LearningPath.jsx": 1,
+  "components/knowledge/RelatedArticles.jsx": 4,
+  "components/knowledge/SignNav.jsx": 4,
+  "components/knowledge/ZodiacCard.jsx": 1,
+  "pages/Disclaimer.jsx": 14,
+  "pages/PrivacyPolicy.jsx": 87,
+  "pages/RefundPolicy.jsx": 56,
+  "pages/TermsOfUse.jsx": 88
+}

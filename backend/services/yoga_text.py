@@ -8,7 +8,7 @@ that into text. YOGA_TEXT is keyed like i18n.text() tables:
 A language with no entry falls back to English (i18n.text). To add a language,
 add a YOGA_TEXT/PLANET_NAMES/SIGN_NAMES/DIGNITY_NAMES entry; nothing else changes.
 """
-from services.i18n import ordinal, text
+from services.i18n import DEFAULT_LANGUAGE, ordinal, text
 
 PLANET_NAMES = {
     "en": {n: n for n in ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu")},
@@ -43,32 +43,44 @@ ITEM_SEPARATOR = {
 }
 
 _MAHAPURUSHA = {
-    # id: (English name, English quality, Hindi name, Hindi quality)
-    "hamsa": ("Hamsa Yoga", "wisdom, nobility, and elevated status", "हंस योग", "ज्ञान, कुलीनता और उच्च प्रतिष्ठा"),
-    "malavya": ("Malavya Yoga", "charm, artistry, and material prosperity", "मालव्य योग", "आकर्षण, कलात्मकता और भौतिक समृद्धि"),
-    "sasa": ("Sasa Yoga", "discipline and leadership in large institutions", "शश योग", "अनुशासन और बड़ी संस्थाओं में नेतृत्व"),
-    "bhadra": ("Bhadra Yoga", "intellectual brilliance and analytical career", "भद्र योग", "बौद्धिक प्रतिभा और विश्लेषणात्मक करियर"),
-    "ruchaka": ("Ruchaka Yoga", "courage, executive authority, and leadership", "रुचक योग", "साहस, प्रशासनिक अधिकार और नेतृत्व"),
+    # id: {language: (name, quality)}
+    "hamsa": {"en": ("Hamsa Yoga", "wisdom, nobility, and elevated status"), "hi": ("हंस योग", "ज्ञान, कुलीनता और उच्च प्रतिष्ठा")},
+    "malavya": {"en": ("Malavya Yoga", "charm, artistry, and material prosperity"), "hi": ("मालव्य योग", "आकर्षण, कलात्मकता और भौतिक समृद्धि")},
+    "sasa": {"en": ("Sasa Yoga", "discipline and leadership in large institutions"), "hi": ("शश योग", "अनुशासन और बड़ी संस्थाओं में नेतृत्व")},
+    "bhadra": {"en": ("Bhadra Yoga", "intellectual brilliance and analytical career"), "hi": ("भद्र योग", "बौद्धिक प्रतिभा और विश्लेषणात्मक करियर")},
+    "ruchaka": {"en": ("Ruchaka Yoga", "courage, executive authority, and leadership"), "hi": ("रुचक योग", "साहस, प्रशासनिक अधिकार और नेतृत्व")},
+}
+
+# Per-language sentence templates; {quality} is filled from _MAHAPURUSHA.
+_MAHAPURUSHA_TEXT = {
+    "en": {
+        "suffix": "Pancha Mahapurusha",
+        "present": "{{planet}} in {{sign}} (H{{house}}, {{dignity}}) — {quality}.",
+        "absent": "{planet} in H{house} ({dignity}) — yoga not formed.",
+        "missing": "{planet} not found in chart.",
+    },
+    "hi": {
+        "suffix": "पंच महापुरुष",
+        "present": "{{planet}} {{sign}} में ({{house_ord}} भाव, {{dignity}}) — {quality}।",
+        "absent": "{planet} {house_ord} भाव में ({dignity}) — योग नहीं बना।",
+        "missing": "{planet} कुंडली में नहीं मिला।",
+    },
 }
 
 
-def _mahapurusha(index: int) -> dict:
+def _mahapurusha(language: str) -> dict:
+    # Unknown languages fall back to English, as services.i18n.text does.
+    lang = language if language in _MAHAPURUSHA_TEXT else DEFAULT_LANGUAGE
+    tpl = _MAHAPURUSHA_TEXT[lang]
     out = {}
-    for yid, row in _MAHAPURUSHA.items():
-        name, quality = row[index], row[index + 1]
-        out[f"{yid}.present.name"] = (
-            f"{name} (Pancha Mahapurusha)" if index == 0 else f"{name} (पंच महापुरुष)"
-        )
+    for yid, rows in _MAHAPURUSHA.items():
+        name, quality = rows.get(lang) or rows[DEFAULT_LANGUAGE]
+        out[f"{yid}.present.name"] = f"{name} ({tpl['suffix']})"
         out[f"{yid}.absent.name"] = name
         out[f"{yid}.missing.name"] = name
-        if index == 0:
-            out[f"{yid}.present"] = "{planet} in {sign} (H{house}, {dignity}) — " + quality + "."
-            out[f"{yid}.absent"] = "{planet} in H{house} ({dignity}) — yoga not formed."
-            out[f"{yid}.missing"] = "{planet} not found in chart."
-        else:
-            out[f"{yid}.present"] = "{planet} {sign} में ({house_ord} भाव, {dignity}) — " + quality + "।"
-            out[f"{yid}.absent"] = "{planet} {house_ord} भाव में ({dignity}) — योग नहीं बना।"
-            out[f"{yid}.missing"] = "{planet} कुंडली में नहीं मिला।"
+        out[f"{yid}.present"] = tpl["present"].format(quality=quality)
+        out[f"{yid}.absent"] = tpl["absent"]
+        out[f"{yid}.missing"] = tpl["missing"]
     return out
 
 
@@ -96,7 +108,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "Gaja-Kesari Yoga",
         "gaja_kesari.missing": "Moon or Jupiter not found in chart.",
 
-        **_mahapurusha(0),
+        **_mahapurusha("en"),
 
         "amala.present.name": "Amala Yoga",
         "amala.present": "{planets} in 10th house — pure and untarnished career reputation.",
@@ -175,9 +187,9 @@ YOGA_TEXT = {
         "chamara.missing": "Jupiter or lagna lord not found in chart.",
     },
     "hi": {
-        "raja_yoga.present.name": "राज योग",
+        "raja_yoga.present.name": "राजयोग",
         "raja_yoga.present": "9वें भाव के स्वामी ({lord_9}) और 10वें भाव के स्वामी ({lord_10}) {house_ord} भाव में एक साथ हैं — प्रबल प्रतिष्ठा और करियर में उन्नति।",
-        "raja_yoga.absent.name": "राज योग",
+        "raja_yoga.absent.name": "राजयोग",
         "raja_yoga.absent": "9वें भाव के स्वामी ({lord_9}) और 10वें भाव के स्वामी ({lord_10}) एक साथ नहीं हैं।",
 
         "dharma_karma.present.name": "धर्म-कर्माधिपति योग",
@@ -197,7 +209,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "गजकेसरी योग",
         "gaja_kesari.missing": "चंद्र या गुरु कुंडली में नहीं मिला।",
 
-        **_mahapurusha(2),
+        **_mahapurusha("hi"),
 
         "amala.present.name": "अमल योग",
         "amala.present": "{planets} 10वें भाव में हैं — निर्मल और बेदाग करियर प्रतिष्ठा।",
@@ -288,6 +300,11 @@ def _lookup(table: dict, language: str, value):
         return value
 
 
+def planet_name(value, language: str = "en"):
+    """Localized planet name; anything that is not a planet (e.g. "?") is returned as is."""
+    return _lookup(PLANET_NAMES, language, value)
+
+
 def _house_ord(value, language: str) -> str:
     return ordinal(value, language) if isinstance(value, int) else str(value)
 
@@ -309,7 +326,7 @@ def _localize(params: dict, language: str) -> dict:
 
 
 def render_yoga(entry: dict, language: str = "en") -> dict:
-    """Fill entry's "yoga" and "description" from YOGA_TEXT for language.
+    """Return a copy of entry with "yoga" and "description" filled from YOGA_TEXT for language.
 
     entry needs id, state and params. A params value that is a list of strings
     is a list of planet names (joined with ", "); a list of dicts is a list of
@@ -329,6 +346,8 @@ def render_yoga(entry: dict, language: str = "en") -> dict:
             params[key] = ", ".join(_lookup(PLANET_NAMES, language, v) for v in value)
         else:
             params.update(_localize({key: value}, language))
-    entry["yoga"] = text(YOGA_TEXT, language, f"{yoga_id}.{state}.name")
-    entry["description"] = text(YOGA_TEXT, language, f"{yoga_id}.{state}", **params)
-    return entry
+    return {
+        **entry,
+        "yoga": text(YOGA_TEXT, language, f"{yoga_id}.{state}.name"),
+        "description": text(YOGA_TEXT, language, f"{yoga_id}.{state}", **params),
+    }

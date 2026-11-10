@@ -20,6 +20,7 @@
 // dark, the rest parchment) while making the split explicit.
 
 import { Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Outlet, useLocation } from 'react-router-dom'
 import SiteHeader from '../SiteHeader'
 import CompactFooter from '../CompactFooter'
@@ -45,9 +46,10 @@ function hasExtraBottomNav(pathname) {
 // Route-level loading fallback — skeleton-shaped, matching the destination
 // surface, so a lazy page loads as "content coming" rather than a spinner.
 export function RouteSkeleton({ dark = false }) {
+  const { t } = useTranslation()
   const surface = dark ? 'night' : 'light'
   return (
-    <div role="status" aria-label="Loading page" className="max-w-5xl mx-auto w-full px-4 pt-8 space-y-4">
+    <div role="status" aria-label={t('route_loading_page_label')} className="max-w-5xl mx-auto w-full px-4 pt-8 space-y-4">
       <Skeleton surface={surface} className="h-8 w-1/3" />
       <Skeleton surface={surface} className="h-4 w-2/3" />
       <div className="grid sm:grid-cols-2 gap-4 pt-4">

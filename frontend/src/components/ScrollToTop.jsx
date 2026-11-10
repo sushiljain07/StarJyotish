@@ -4,11 +4,14 @@
 // the AskPersonaPanel FAB (bottom-24, ~148px tall including its two-line
 // label) with a visible gap instead of touching it, and stays above the
 // BottomNav (bottom-0).
+import { useTranslation } from 'react-i18next'
+
 export default function ScrollToTop({ visible }) {
+  const { t } = useTranslation()
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      aria-label="Scroll to top"
+      aria-label={t('scroll_to_top_label')}
       className={`fixed bottom-44 md:bottom-5 right-5 z-40 w-11 h-11 rounded-full bg-primary hover:bg-primary-dark text-night shadow-lg flex items-center justify-center transition-all duration-300 ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
       }`}

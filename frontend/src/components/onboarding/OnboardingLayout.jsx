@@ -6,9 +6,11 @@
 // and (while it's still allowed) a way out entirely. The wordmark that
 // used to sit between them is gone — the shell's header directly above
 // already shows it.
+import { useTranslation } from 'react-i18next'
 import CelestialBackdrop from '../CelestialBackdrop'
 
 export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }) {
+  const { t } = useTranslation()
   return (
     <div className="flex-1 flex flex-col">
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
@@ -16,7 +18,7 @@ export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }
           {onBack && (
             <button
               onClick={onBack}
-              aria-label="Back"
+              aria-label={t('nav_back')}
               className="text-ink-muted hover:text-ink -ml-2 p-2 rounded-full hover:bg-line/40 transition"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"

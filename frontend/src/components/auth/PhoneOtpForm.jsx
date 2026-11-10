@@ -114,12 +114,12 @@ export default function PhoneOtpForm({ onSuccess }) {
           {PHONE_LOGIN_ENABLED && identifier.trim().length > 3 && (
             <p className="text-xs text-ink-faint mt-1.5">
               {emailMode
-                ? 'We will email a code to this address'
-                : 'We will send a code via SMS'}
+                ? t('auth_email_code_hint')
+                : t('auth_sms_code_hint')}
             </p>
           )}
           {!PHONE_LOGIN_ENABLED && (
-            <p className="text-xs text-ink-faint mt-1.5">We will email a code to this address</p>
+            <p className="text-xs text-ink-faint mt-1.5">{t('auth_email_code_hint')}</p>
           )}
         </div>
         {error && <p className="text-vermillion text-sm">{error}</p>}

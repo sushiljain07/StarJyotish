@@ -33,9 +33,10 @@ describe('LanguageSwitcher', () => {
   })
 
   it('renders a third button for a newly registered language', () => {
+    const base = LANGUAGES.length
     registerLanguage({ code: 'xx', label: 'XX', nativeName: 'Xxish', locale: 'xx', script: 'latn' })
     render(<LanguageSwitcher />)
-    expect(screen.getAllByRole('button')).toHaveLength(3)
+    expect(screen.getAllByRole('button')).toHaveLength(base + 1)
   })
 
   it('renders a select with more than three languages', () => {
@@ -58,5 +59,21 @@ describe('LanguageSwitcher', () => {
     render(<LanguageSwitcher />)
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
     expect(auth.updateMyProfile).not.toHaveBeenCalled()
+  })
+
+  it('still switches when updateMyProfile throws synchronously', async () => {
+    auth.user = { id: 'u' }
+    auth.updateMyProfile.mockImplementationOnce(() => { throw new Error('boom') })
+    render(<LanguageSwitcher />)
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
+    expect(currentLanguage()).toBe('hi')
+  })
+
+  it('still switches when updateMyProfile rejects', async () => {
+    auth.user = { id: 'u' }
+    auth.updateMyProfile.mockImplementationOnce(() => Promise.reject(new Error('nope')))
+    render(<LanguageSwitcher />)
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'हि' })) })
+    expect(currentLanguage()).toBe('hi')
   })
 })

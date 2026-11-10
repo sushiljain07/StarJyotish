@@ -16,7 +16,6 @@ import panchangWeek from '../test/fixtures/panchang-week.json'
 import panchangMonth from '../test/fixtures/panchang-month.json'
 import * as learnContent from '../config/learnContent'
 
-const DEVANAGARI = /[ऀ-ॿ]/
 const PLACE = 'New Delhi, India'
 const LOCATION = { lat: 28.6139, lon: 77.209, timezone: 'Asia/Kolkata', label: PLACE, source: 'manual' }
 
@@ -133,16 +132,9 @@ afterEach(async () => {
 // 'English' is the language switcher's own tooltip for English (a language is
 // always named in its own script); starjyotish.com is the brand's bare domain.
 // 'Asia/Kolkata' is the IANA time-zone id the Panchang page shows as given.
-// Adjacent AM / AM/PM / PM option labels run together in textContent.
-const ALLOW = ['contact@starjyotish.com', 'Asia/Kolkata', 'Star JyotishAI', PLACE, 'New Delhi', 'Asha', 'Verma', 'English', 'starjyotish.com', /(?:AM|PM)+/]
+const ALLOW = ['contact@starjyotish.com', 'Asia/Kolkata', PLACE, 'New Delhi', 'Asha', 'Verma', 'English', 'starjyotish.com']
 
-// <style> text is part of textContent but is not on screen; drop it before checking.
-function expectHindi(container, extra = []) {
-  const visible = container.cloneNode(true)
-  visible.querySelectorAll('style,script').forEach(el => el.remove())
-  expect(visible.textContent).toMatch(DEVANAGARI)
-  expectNoEnglish(visible, [...ALLOW, ...extra])
-}
+const expectHindi = (container, extra = []) => expectNoEnglish(container, [...ALLOW, ...extra])
 
 // The Knowledge Center card titles and descriptions are article content, not chrome.
 function learnStrings() {

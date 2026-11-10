@@ -33,7 +33,7 @@ export const eclipseName = (t, eclipse) => {
 const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 export function localizeBackendDate(t, text) {
   const m = /^(\d{1,2}) ([A-Za-z]{3}) (\d{4})$/.exec(text ?? '')
-  const key = m ? MONTH_KEYS[['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2].toLowerCase())] : null
+  const key = m ? MONTH_KEYS[MONTH_KEYS.indexOf(m[2].toLowerCase())] : null
   if (!key) return text
   return `${m[1]} ${t(`month_short_${key}`)} ${m[3]}`
 }

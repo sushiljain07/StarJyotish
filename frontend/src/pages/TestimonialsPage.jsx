@@ -159,7 +159,7 @@ export default function TestimonialsPage() {
   useEffect(() => { loadMore(0) }, [])
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="User Testimonials — Star Jyotish"
         description="Read what people are discovering with Star Jyotish's AI-powered Vedic astrology. Share your own experience."

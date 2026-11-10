@@ -96,7 +96,7 @@ export default function App() {
         {/* Fallback for pages outside the workspace shell (marketing/legal);
             workspace pages get their fallback inside WorkspaceLayout so the
             header and nav stay put while a chunk loads. */}
-        <Suspense fallback={<div className="min-h-screen bg-parchment pt-[60px]"><RouteSkeleton /></div>}>
+        <Suspense fallback={<div className="min-h-dvh bg-parchment pt-[60px]"><RouteSkeleton /></div>}>
           <Routes>
             {/* ── Workspace (persistent app shell) ─────────────────── */}
             <Route element={<WorkspaceLayout />}>

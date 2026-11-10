@@ -118,7 +118,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-parchment overflow-x-hidden">
+    <div className="min-h-dvh bg-parchment overflow-x-hidden">
       <Seo
         title="Your Personal AI Vedic Astrologer"
         description="Your personal AI-powered Vedic astrologer. Free birth chart plus daily, personalized guidance on career, wealth, relationships & health. English and Hindi."
@@ -276,7 +276,7 @@ export default function Landing() {
           Not relevant to a signed-in visitor who's already onboarded. */}
       {!isAuthenticated && (
         <>
-          <section id="how-it-works" className="px-4 py-10 scroll-mt-16">
+          <section id="how-it-works" className="px-4 py-10">
             <div className="max-w-3xl mx-auto">
               <Reveal as="h2" className="text-center font-serif font-semibold text-2xl text-ink mb-8">
                 {t('landing_steps_heading')}

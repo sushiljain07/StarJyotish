@@ -36,7 +36,7 @@ export default function Learn() {
   const { t } = useTranslation()
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Knowledge Center"
         description="A calm, practical guide to Vedic astrology — Zodiac signs, Nakshatras, planets, houses, dashas, yogas, and doshas, explained clearly."

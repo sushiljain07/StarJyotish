@@ -40,7 +40,7 @@ export default function CompactFooter() {
 
   return (
     <footer className="border-t border-white/10 bg-night">
-      <div className="max-w-4xl mx-auto px-4 py-5">
+      <div className="max-w-5xl mx-auto px-4 py-5">
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0">
           {LINKS.map(link => (
             <Link

@@ -12,7 +12,7 @@ import Footer from './Footer'
 
 export default function StaticPageLayout({ title, eyebrow, maxWidth = 'max-w-2xl', children }) {
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
+    <div className="min-h-dvh bg-parchment flex flex-col">
       {/* These pages (About/FAQ/Contact/Disclaimer/Privacy/Terms/Refund)
           used to be reachable only via a "← Back to Home" text link — a
           real dead end, since there was no way from here to Learn,

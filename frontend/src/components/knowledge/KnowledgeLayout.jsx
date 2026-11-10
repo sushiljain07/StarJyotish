@@ -40,7 +40,7 @@ export default function KnowledgeLayout({
   const scrollProgress = useScrollProgress(80)
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <ReadingProgress />
       <Seo title={seoTitle} description={seoDescription} path={path} />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />

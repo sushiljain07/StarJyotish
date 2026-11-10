@@ -39,7 +39,7 @@ function NavButton({ item, active, onClick }) {
   )
 }
 
-export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
+export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6xl' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -83,7 +83,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
         borderColor: `rgba(255, 255, 255, ${borderAlpha})`,
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-0 flex items-center justify-between gap-4 h-[60px]">
+      <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto px-4 py-0 flex items-center justify-between gap-4 h-[60px]`}>
         {/* Logo */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
@@ -156,7 +156,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
           className="md:hidden border-t border-white/10 bg-night animate-fade-in-fast motion-reduce:animate-none"
           aria-label={t('nav_bottom_aria', 'Main navigation')}
         >
-          <div className="max-w-6xl mx-auto px-4 py-2">
+          <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto px-4 py-2`}>
             {PUBLIC_NAV_ITEMS.map(item => {
               const active = isNavActive(location.pathname, item.to)
               return (

@@ -253,11 +253,11 @@ function SectionContent({ content, light = false }) {
     .filter(Boolean)
   const cls = light ? 'text-primary-light' : 'text-ink'
   if (bullets.length <= 1)
-    return <p className={`text-sm leading-relaxed ${cls}`}>{content}</p>
+    return <p className={`text-sm leading-relaxed max-w-prose ${cls}`}>{content}</p>
   return (
     <ul className="space-y-2">
       {bullets.map((b, i) => (
-        <li key={i} className={`flex gap-2 text-sm leading-relaxed ${cls}`}>
+        <li key={i} className={`flex gap-2 max-w-prose text-sm leading-relaxed ${cls}`}>
           <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50" />
           <span>{b}</span>
         </li>
@@ -503,7 +503,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
             {horizons.map(([label, text]) => (
               <div key={label} className="px-5 py-3">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{label}</p>
-                <p className="text-sm text-ink leading-relaxed">{text}</p>
+                <p className="text-sm text-ink leading-relaxed max-w-prose">{text}</p>
               </div>
             ))}
           </div>

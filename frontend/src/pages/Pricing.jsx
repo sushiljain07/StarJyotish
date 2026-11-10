@@ -38,7 +38,7 @@ export default function Pricing() {
   ]
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo title={t('early_access_heading')} description={t('early_access_subhead')} path="/pricing" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 

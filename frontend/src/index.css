@@ -4,6 +4,8 @@
 
 @layer base {
   html {
+    /* Hash targets clear the 60px sticky header. */
+    scroll-padding-top: 72px;
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
   body {

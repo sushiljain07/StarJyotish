@@ -95,11 +95,11 @@ function SectionContent({ content }) {
     .map(l => l.replace(/^[-•]\s*/, '').trim())
     .filter(Boolean)
   if (bullets.length <= 1)
-    return <p className="text-sm leading-relaxed text-ink">{content}</p>
+    return <p className="text-sm leading-relaxed text-ink max-w-prose">{content}</p>
   return (
     <ul className="space-y-2">
       {bullets.map((b, i) => (
-        <li key={i} className="flex gap-2 text-sm leading-relaxed text-ink">
+        <li key={i} className="flex gap-2 max-w-prose text-sm leading-relaxed text-ink">
           <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-current opacity-50" />
           <span>{b}</span>
         </li>

@@ -77,7 +77,7 @@ export default function DoshasGuide() {
   const learningPathSteps = getLearningPathSteps('doshas')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Doshas in Vedic Astrology — Chart Afflictions Explained Clearly"
         description="What Mangal Dosha, Kaal Sarp Dosha, Sade Sati, and other chart afflictions actually mean — including what classical texts say, what cancellations exist, and what popular accounts get wrong."

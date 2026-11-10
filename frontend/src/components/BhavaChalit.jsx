@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS } from '../config/planetColors'
+import ScrollHint from './ui/ScrollHint'
 
 // Hand-written notes exist for these shifts; any other shift gets a generic line.
 const KNOWN_SHIFTS = new Set([
@@ -145,7 +146,7 @@ export default function BhavaChalit({ input }) {
                   {t('bhava_table_title')}
                 </p>
               </div>
-              <div className="overflow-x-auto">
+              <ScrollHint fadeFrom="from-parchment">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-night/5 text-ink-muted">
@@ -189,7 +190,7 @@ export default function BhavaChalit({ input }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </ScrollHint>
             </div>
           )}
         </>

@@ -125,7 +125,7 @@ export default function Blog() {
   const rest = featured ? visible.filter(a => !a.featured) : visible
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo title={t('blog_seo_title')} description={t('blog_seo_desc')} path="/blog" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 

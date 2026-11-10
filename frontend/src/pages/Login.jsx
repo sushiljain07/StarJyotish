@@ -64,7 +64,7 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden"
+      className="min-h-dvh bg-night flex items-center justify-center px-4 py-12 relative overflow-hidden"
       onClick={goBackOrHome}
     >
       <Seo title={t('login_title')} description={t('login_seo_description')} path="/login" noindex />

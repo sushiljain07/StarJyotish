@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SegmentedToggle from './SegmentedToggle'
+import ScrollHint from './ui/ScrollHint'
 import { planetName, signName, nakshatraName, planetShort } from '../utils/astroNames'
 import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
 
@@ -70,11 +71,11 @@ export default function PlanetTable({ planets = [], ascendant }) {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-line">
-        <table className="w-full text-sm border-collapse">
+      <ScrollHint className="rounded-xl border border-line" fadeFrom="from-parchment-card">
+        <table className="w-full text-sm border-collapse whitespace-nowrap">
           <thead>
             <tr className="bg-primary-light text-primary-dark">
-              <th className="p-2.5 border-b text-left">{t('col_planet')}</th>
+              <th className="p-2.5 border-b text-left sticky left-0 z-10 bg-primary-light">{t('col_planet')}</th>
               <th className="p-2.5 border-b text-left">{t('col_sign')}</th>
               <th className="p-2.5 border-b text-right">{t('col_degree')}</th>
               <th className="p-2.5 border-b text-center">{t('col_house')}</th>
@@ -107,7 +108,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
               const dignity = getDignity(t, p.name, p.sign_index)
               return (
                 <tr key={p.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
-                  <td className="p-2.5 border-b font-bold"
+                  <td className={`p-2.5 border-b font-bold sticky left-0 z-10 ${i % 2 === 0 ? 'bg-parchment-card' : 'bg-[#F8F6F2]'}`}
                       style={{ color: PLANET_COLORS[p.name] ?? '#333' }}>
                     {planetName(t, p.name)}
                   </td>
@@ -161,7 +162,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
             })}
           </tbody>
         </table>
-      </div>
+      </ScrollHint>
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-faint px-1">
         <span>{t('kundli_planets_legend_r')}</span>

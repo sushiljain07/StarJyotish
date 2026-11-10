@@ -194,7 +194,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
             <div className="bg-parchment-card px-5 py-4">
-              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+              <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -209,7 +209,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
             <div className="bg-parchment-card px-5 py-4">
-              <p className="text-ink text-sm leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
+              <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
           </div>
         )
@@ -224,7 +224,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-primary text-base">{title}</h3>
             </div>
-            <p className="text-ink text-sm leading-relaxed"
+            <p className="text-ink text-sm leading-relaxed max-w-prose"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
           </div>
         )

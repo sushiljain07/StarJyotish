@@ -67,7 +67,7 @@ export default function PlanetsGuideHub() {
   const nextGuide = getNextGuide('planets')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="The Nine Planets (Navagrahas) in Vedic Astrology"
         description="A complete guide to the nine grahas of Vedic astrology — Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, and Ketu — what they govern and how they operate in your chart."

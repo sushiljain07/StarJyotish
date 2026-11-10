@@ -91,7 +91,7 @@ export default function ZodiacGuide() {
   const nextGuide = getNextGuide('zodiac')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Understanding the 12 Zodiac Signs in Vedic Astrology"
         description="Discover the twelve Rashis of Vedic astrology, what they represent, and why your zodiac sign is only one chapter in your complete birth chart."

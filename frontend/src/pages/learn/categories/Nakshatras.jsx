@@ -86,7 +86,7 @@ export default function NakshatrasGuide() {
   const nextGuide = getNextGuide('nakshatra')
 
   return (
-    <div className="min-h-screen bg-parchment">
+    <div className="min-h-dvh bg-parchment">
       <Seo
         title="Nakshatras — The 27 Lunar Mansions in Vedic Astrology"
         description="Understand the 27 Nakshatras of Vedic astrology — their ruling planets, symbols, Ganas, and how your birth Nakshatra shapes your emotional nature and Dasha sequence."

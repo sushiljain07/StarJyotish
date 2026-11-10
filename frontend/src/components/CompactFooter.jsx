@@ -46,7 +46,7 @@ export default function CompactFooter() {
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center min-h-11"
+              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center justify-center min-h-11 min-w-11"
             >
               {t(link.key, link.fallback)}
             </Link>

@@ -87,7 +87,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
         {/* Logo */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-2 shrink-0 min-h-11"
           aria-label={t('app_title')}
         >
           <img src="/starjyotish.svg" alt="" className="w-7 h-7" />

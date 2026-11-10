@@ -50,28 +50,39 @@ describe('useBottomChrome', () => {
     mockAuthed = true
     expect(chrome([]).spacerHeight).toBe('0px')
   })
+  it('footer clearance adds the ScrollToTop reach (and the FAB) to the bars', () => {
+    expect(chrome([]).footerClearance).toBe('calc(3.5rem)')
+    expect(chrome(['bottomNav']).footerClearance).toContain('+ 3.5rem)')
+    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('4rem + 4.25rem')
+  })
 })
 
 describe('BottomChromeSpacer', () => {
-  it('signed in with no BottomNav on the page (Footer-only page): renders nothing', () => {
+  it('signed in with no BottomNav on the page (Footer-only page): reserves only the ScrollToTop reach', () => {
     mockAuthed = true
     const { container } = render(<MemoryRouter><BottomChromeSpacer /></MemoryRouter>)
-    expect(container.firstChild).toBeNull()
+    const spacer = container.firstChild
+    expect(spacer.getAttribute('style')).toContain('calc(3.5rem)')
+    expect(spacer.getAttribute('style')).not.toContain('--bottom-nav-h')
+    expect(spacer.className).toContain('xl:hidden')
   })
   it('signed in with a mounted BottomNav: reserves the nav height', () => {
     mockAuthed = true
     const { container } = render(
       <MemoryRouter initialEntries={['/home']}><BottomNav /><BottomChromeSpacer /></MemoryRouter>,
     )
-    const spacer = container.querySelector('div.md\\:hidden')
+    const spacer = container.querySelector('div[aria-hidden="true"]')
     expect(spacer.getAttribute('style')).toContain('--bottom-nav-h')
+    // ...plus the ScrollToTop button's reach above the bars, so it never covers footer links.
+    expect(spacer.getAttribute('style')).toContain('3.5rem')
   })
-  it('signed out: BottomNav renders nothing and no spacer is reserved', () => {
+  it('signed out: BottomNav renders nothing; the spacer keeps only the ScrollToTop reach', () => {
     mockAuthed = false
     const { container } = render(
       <MemoryRouter><BottomNav /><BottomChromeSpacer /></MemoryRouter>,
     )
-    expect(container.firstChild).toBeNull()
+    expect(container.querySelector('nav')).toBeNull()
+    expect(container.querySelector('div[aria-hidden="true"]').getAttribute('style')).not.toContain('--bottom-nav-h')
   })
 })
 

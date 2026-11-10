@@ -51,5 +51,12 @@ export function useBottomChrome() {
   } else if (subNav) {
     spacerHeight = 'calc(var(--sub-nav-h) + var(--safe-bottom))'
   }
-  return { bottomNav, subNav, raisedSubNav, hasFab, spacerHeight }
+  // Footer content must also end above the floating ScrollToTop button, which
+  // sits 0.75rem over the bars (plus the FAB and a gap when the FAB shows) and
+  // is 2.75rem tall. Keep in sync with ScrollToTop.jsx.
+  const sttReach = hasFab ? `${FAB_HEIGHT} + 4.25rem` : '3.5rem'
+  const footerClearance = spacerHeight === '0px'
+    ? `calc(${sttReach})`
+    : `calc(${spacerHeight} + ${sttReach})`
+  return { bottomNav, subNav, raisedSubNav, hasFab, spacerHeight, footerClearance }
 }

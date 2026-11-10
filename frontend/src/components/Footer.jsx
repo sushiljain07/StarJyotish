@@ -141,7 +141,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={newsletterStatus === 'sending'}
-                className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2 rounded-lg transition shrink-0"
+                className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2 min-h-11 rounded-lg transition shrink-0"
               >
                 {newsletterStatus === 'sending' ? '…' : t('footer_newsletter_cta')}
               </button>

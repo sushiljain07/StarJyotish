@@ -35,6 +35,8 @@ describe('44px tap targets', () => {
   it('AnimatedTabRow pill', () => {
     wrap(<AnimatedTabRow tabs={tabs} active="a" onChange={vi.fn()} variant="pill" />)
     expect(bad(screen.getAllByRole('tab'))).toEqual([])
+    // Short labels (Hindi "ग्रह", "पूछें") measured 39-41px wide in the browser check.
+    expect(screen.getAllByRole('tab').every(el => WIDE.test(el.className))).toBe(true)
   })
   it('AnimatedTabRow underline', () => {
     wrap(<AnimatedTabRow tabs={tabs} active="a" onChange={vi.fn()} variant="underline" />)
@@ -68,6 +70,16 @@ describe('44px tap targets', () => {
     wrap(<CompactFooter />)
     const links = screen.getAllByRole('link')
     expect(bad(links)).toEqual([])
+    // Short labels ("FAQs", Hindi "संपर्क करें") measured 30-41px wide in the browser check.
+    expect(links.every(el => WIDE.test(el.className))).toBe(true)
+  })
+  it('SiteHeader logo link and Footer newsletter button', () => {
+    mockAuth = { isAuthenticated: false, user: null }
+    const { unmount } = wrap(<SiteHeader onCtaClick={vi.fn()} />)
+    expect(tall(screen.getByRole('button', { name: en.app_title }))).toBe(true)
+    unmount()
+    wrap(<Footer />)
+    expect(tall(screen.getByRole('button', { name: en.footer_newsletter_cta }))).toBe(true)
   })
   it('Footer links', () => {
     mockAuth = { isAuthenticated: false, user: null }

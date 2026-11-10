@@ -59,7 +59,7 @@ const PANES = [
 // Lazy panes show a skeleton first; wait until it is gone.
 async function settle(container) {
   await waitFor(() => {
-    if (container.querySelector('.animate-pulse, [aria-busy="true"]')) throw new Error('still loading')
+    if (container.querySelector('[class*="animate-pulse"], [aria-busy="true"]')) throw new Error('still loading')
   }, { timeout: 4000 })
   await act(async () => { await new Promise(r => setTimeout(r, 50)) })
 }

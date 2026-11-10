@@ -187,9 +187,9 @@ YOGA_TEXT = {
         "chamara.missing": "Jupiter or lagna lord not found in chart.",
     },
     "hi": {
-        "raja_yoga.present.name": "राज योग",
+        "raja_yoga.present.name": "राजयोग",
         "raja_yoga.present": "9वें भाव के स्वामी ({lord_9}) और 10वें भाव के स्वामी ({lord_10}) {house_ord} भाव में एक साथ हैं — प्रबल प्रतिष्ठा और करियर में उन्नति।",
-        "raja_yoga.absent.name": "राज योग",
+        "raja_yoga.absent.name": "राजयोग",
         "raja_yoga.absent": "9वें भाव के स्वामी ({lord_9}) और 10वें भाव के स्वामी ({lord_10}) एक साथ नहीं हैं।",
 
         "dharma_karma.present.name": "धर्म-कर्माधिपति योग",

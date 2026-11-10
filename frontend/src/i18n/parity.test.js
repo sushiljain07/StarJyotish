@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import en from './en.json'
+import hi from './hi.json'
 import { LANGUAGES, DEFAULT_LANGUAGE, registerLanguage } from './languages'
 import { flatten, placeholders, pluralBase, scriptViolation, parityProblems } from './localeCheck'
 
@@ -51,5 +52,40 @@ describe('locale parity', () => {
     expect(pluralBase('x_other')).toBe('x')
     expect(scriptViolation('Hello', /[ऀ-ॿ]/)).toBe(true)
     expect(scriptViolation('{{n}} AI PDF', /[ऀ-ॿ]/)).toBe(false)
+  })
+})
+
+// Settled rows of the Hindi glossary (docs/i18n-glossary.md). Each check
+// lists the offending keys so a failure says exactly what to fix.
+describe('hi glossary', () => {
+  const flat = [...flatten(hi)]
+  const keysWith = re => flat.filter(([, v]) => re.test(v)).map(([k]) => k)
+
+  // चार्ट only where a key names a specific divisional chart (D-number or
+  // नवांश); a chart in general is कुंडली / जन्म कुंडली.
+  const CHART_ALLOWED = [
+    'testimonial_4_text', // नवांश (D9) chart, in a user quote
+    'home_this_week_subtext', // D10, D9, D2/D11 and D6 charts
+    'report_career_note', // D10 chart
+    'report_finance_note', // D2 and D11 charts
+    'report_relationship_note', // D9 and D7 charts
+    'report_health_note', // D6 chart
+  ]
+
+  it('uses कुंडली, not चार्ट, outside the allow-list', () => {
+    expect(keysWith(/चार्ट/).filter(k => !CHART_ALLOWED.includes(k))).toEqual([])
+  })
+  it('every allow-listed चार्ट key still exists and names a specific chart', () => {
+    const map = new Map(flat)
+    for (const k of CHART_ALLOWED) expect(map.get(k)).toMatch(/(D\d+|नवांश) चार्ट/)
+  })
+  it('uses चंद्र, not चंद्रमा', () => expect(keysWith(/चंद्रमा/)).toEqual([]))
+  it('uses गुरु, not बृहस्पति', () => expect(keysWith(/बृहस्पति/)).toEqual([]))
+  it('uses पुनः प्रयास करें', () => expect(keysWith(/फिर से प्रयास|फिर कोशिश/)).toEqual([]))
+  it('writes राजयोग as one word', () => expect(keysWith(/राज योग/)).toEqual([]))
+  it('patrika_rarity has a verb', () => expect(hi.patrika_rarity).toMatch(/होता/))
+  it('chart_sarvato_corner_Saturn repeats no word', () => {
+    const words = hi.chart_sarvato_corner_Saturn.split(/[\s()]+/).filter(Boolean)
+    expect(new Set(words).size).toBe(words.length)
   })
 })

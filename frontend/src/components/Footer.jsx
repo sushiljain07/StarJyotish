@@ -75,7 +75,7 @@ export default function Footer() {
           </div>
           <p className="text-sm text-ink-onnight/70 mt-3 leading-relaxed max-w-xs">{t('landing_subhead')}</p>
           <p className="text-xs font-semibold tracking-wide uppercase text-ink-onnight/50 mt-5 mb-2">{t('footer_follow_heading')}</p>
-          <SocialButtons dark />
+          <SocialButtons dark className="-ml-1.5" />
         </div>
 
         {/* Learn — only real, live destinations */}

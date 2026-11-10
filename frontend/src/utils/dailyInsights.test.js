@@ -1,5 +1,5 @@
 // House ordinals followed by a postposition use the oblique form in Hindi
-// ("4थे भाव में"); English output is unchanged.
+// ("चौथे भाव में"); English output is unchanged.
 import { afterEach, describe, expect, it } from 'vitest'
 import i18n from '../i18n'
 import { buildComingUpEvents, computeDoAvoid, computeLifeAreas, computeSpotlight } from './dailyInsights'
@@ -32,9 +32,9 @@ describe('dailyInsights house ordinals', () => {
 
   it('Hindi uses the oblique ordinal before a postposition', async () => {
     await i18n.changeLanguage('hi')
-    expect(computeSpotlight(chart, transit, t).moonSpotlight.text).toContain('4थे भाव में')
-    expect(computeDoAvoid(chart, transit, null, t).doItems[0]).toContain('4थे भाव में')
-    expect(careerNugget()).toMatch(/^आपके 10वें भाव के स्वामी .+ आपके 2रे भाव में/)
+    expect(computeSpotlight(chart, transit, t).moonSpotlight.text).toContain('चौथे भाव में')
+    expect(computeDoAvoid(chart, transit, null, t).doItems[0]).toContain('चौथे भाव में')
+    expect(careerNugget()).toMatch(/^आपके 10वें भाव के स्वामी .+ आपके दूसरे भाव में/)
   })
 })
 

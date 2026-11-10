@@ -6,6 +6,7 @@
 // that surface in the UI go through t().
 
 import { signName, localizeBackendDate } from './astroNames'
+import { houseOrdinal } from './format'
 
 const CHANDRA_BALA_FAVORABLE = new Set([3, 6, 7, 10, 11])
 
@@ -44,9 +45,9 @@ function houseSignIndex(ascSignIndex, houseNumber) {
 
 // House ordinal for t() interpolations. Always the oblique form: every
 // template puts a postposition after the house ("{{house}} भाव में"), and
-// Hindi then needs 4थे, not 4था. English is the same either way.
+// Hindi then needs चौथे, not चौथा. English is the same either way.
 function houseStr(n, t) {
-  return t('house_ordinal_oblique', { count: n, ordinal: true })
+  return houseOrdinal(t, n, { oblique: true })
 }
 
 export function computeDayScore(chart, transitPlanets, t) {

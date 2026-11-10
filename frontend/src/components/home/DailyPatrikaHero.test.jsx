@@ -1,6 +1,6 @@
 // The "Why" line names the house with a real ordinal (1st, not 1th). Hindi
 // uses the oblique ordinal because the house is followed by a postposition
-// ("1ले भाव को").
+// ("पहले भाव को"; houses 1–6 are words).
 import { render, screen, cleanup } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import i18n from '../../i18n'
@@ -26,8 +26,8 @@ describe('DailyPatrikaHero why line', () => {
 
   it('uses the Hindi oblique ordinal before the postposition', async () => {
     await i18n.changeLanguage('hi')
-    expect(whyLine(1)).toContain('आपके 1ले भाव को')
-    expect(whyLine(3)).toContain('आपके 3रे भाव को')
+    expect(whyLine(1)).toContain('आपके पहले भाव को')
+    expect(whyLine(3)).toContain('आपके तीसरे भाव को')
     expect(whyLine(11)).toContain('आपके 11वें भाव को')
   })
 })

@@ -2,7 +2,7 @@ from datetime import date as _date
 from typing import Optional
 
 from services.ashtakavarga import calculate_ashtakavarga
-from services.i18n import text
+from services.i18n import HINDI_WORDING_RULE, text
 from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
 from services.report_utils import call_llm as _report_call_llm
 from services.report_utils import filter_report_language as _filter_report_language
@@ -796,7 +796,7 @@ _CAREER_LANG_RULE = {
         "rule": (
             "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' string and every 'content' string) "
             "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown. "
-            "Every word inside the values must be in Hindi — no English words in the output values."
+            + HINDI_WORDING_RULE
         ),
     },
 }

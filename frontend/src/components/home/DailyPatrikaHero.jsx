@@ -22,7 +22,7 @@
 // strip — is unchanged; those weren't part of this reskin.
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatDate } from '../../utils/format'
+import { formatDate, houseOrdinal } from '../../utils/format'
 import { planetName } from '../../utils/astroNames'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
@@ -86,7 +86,7 @@ function buildWhy(card, t) {
   if (ev.house) {
     return t('patrika_why_house', {
       planet: planetName(t, ev.planet),
-      house: t('house_ordinal_oblique', { count: ev.house, ordinal: true }),
+      house: houseOrdinal(t, ev.house, { oblique: true }),
     })
   }
   return t('patrika_why_planet', { planet: planetName(t, ev.planet) })

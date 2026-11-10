@@ -193,8 +193,9 @@ function LocationPrompt({ onSetLocation }) {
       <h2 className="font-serif text-lg font-semibold text-ink mb-1">{t('panchang_where_are_you')}</h2>
       <p className="text-sm text-ink-muted mb-5">{t('panchang_location_specific')}</p>
       <div className="relative">
-        <input autoFocus value={query} onChange={e => setQuery(e.target.value)}
+        <input value={query} onChange={e => setQuery(e.target.value)}
           placeholder={t('panchang_search_city_short')}
+          aria-label={t('panchang_search_city_short')}
           className="w-full border border-line rounded-xl px-4 py-2.5 text-sm bg-parchment text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary" />
         {matches.length > 0 && (
           <ul className="absolute left-0 right-0 top-full mt-1 z-20 max-h-48 overflow-y-auto rounded-xl border border-line bg-parchment-card shadow-xl text-left">

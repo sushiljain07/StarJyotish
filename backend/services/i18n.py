@@ -14,12 +14,27 @@ SUPPORTED_LANGUAGES = {
 }
 
 # Per-language ordinal suffix rules. A language without an entry uses English.
+# Hindi house ordinals 1–6 are written as words (owner decision, 10 Nov 2026);
+# 7 and above stay as digits + वें. This is the oblique form (before भाव में/के).
+_HI_ORDINAL_WORDS = {1: "पहले", 2: "दूसरे", 3: "तीसरे", 4: "चौथे", 5: "पाँचवें", 6: "छठे"}
+
 _ORDINAL_SUFFIX = {
     "hi": lambda n: "वें",
     "en": lambda n: (
         "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
     ),
 }
+
+# How the LLM should write Hindi, shared by every Hindi language rule.
+# Mirrors the UI wording rule (owner decision, 10 Nov 2026): common English
+# loanwords in Devanagari are fine; coined Hindi and Latin script are not.
+HINDI_WORDING_RULE = (
+    "Use natural, everyday Hindi. Where no common Hindi word exists, use the familiar "
+    "English loanword written in Devanagari (for example करियर, रिपोर्ट, बिज़नेस, मीटिंग) — "
+    "never invent a literal or Sanskritized Hindi coinage. Keep Jyotish terms in Hindi "
+    "(कुंडली, दशा, भाव, राजयोग) and write yoga names in Hindi (गजकेसरी योग). "
+    "Do not use Latin (English) script anywhere in the output."
+)
 
 # "Write ALL values in <language>" rule shared by the JSON-report prompts
 # (health, wealth, relationship). Keyed like text() tables.
@@ -30,7 +45,8 @@ VALUES_LANGUAGE_RULE = {
     "hi": {
         "rule": (
             "LANGUAGE RULE — NON-NEGOTIABLE: Write ALL values (every 'title' and every 'content' string) "
-            "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown."
+            "in Hindi (Devanagari script) only. JSON keys must stay in English exactly as shown. "
+            + HINDI_WORDING_RULE
         ),
     },
 }
@@ -60,5 +76,7 @@ def text(table: dict, code: str, key: str, **params) -> str:
 
 
 def ordinal(n: int, code: str) -> str:
+    if normalize_language(code) == "hi" and n in _HI_ORDINAL_WORDS:
+        return _HI_ORDINAL_WORDS[n]
     suffix = _ORDINAL_SUFFIX.get(normalize_language(code), _ORDINAL_SUFFIX[DEFAULT_LANGUAGE])
     return f"{n}{suffix(n)}"

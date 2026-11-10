@@ -77,7 +77,7 @@ Goal: a Hindi user sees no English on the main journey.
 
 ## Phase 3B: Hindi follow-ups (moved out of Phase 3 by the owner on 4 Nov 2026)
 
-**Status (10 Nov 2026): done, PR pending whole-branch review.** Guardrails, glossary, Hindi career alignment and the real-browser check are in. The browser check (390px and 1440px, `kundli_lang=hi`) found 0 Latin words on /generate, every /kundli tab and sub-tab, /insights, /panchang and /pricing; /terms is English by design.
+**Status (10 Nov 2026): done, merged in PR #165.** Guardrails, glossary, Hindi career alignment and the real-browser check are in. The browser check (390px and 1440px, `kundli_lang=hi`) found 0 Latin words on /generate, every /kundli tab and sub-tab, /insights, /panchang and /pricing; /terms is English by design.
 
 **3B leftovers:** the "owner to confirm" rows in `docs/i18n-glossary.md` (Owner to confirm section: legend words, short forms, Sarvatobhadra corners, अमात्यकारक, तालमेल, रोडमैप, backend ordinal 2वें/3वें, Panchang yoga and masa spellings, the two Rajyoga phrasings, the career alignment text, राशिफल) stay open until the owner reviews the table; Tiro Devanagari bold is still synthesized (visually acceptable); KnowledgeCapsule teasers stay English (content phase).
 
@@ -146,14 +146,14 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 
 ## Phase 4: Mobile and navigation polish (1–2 days)
 
-**Status (10 Nov 2026): done, PR pending whole-branch review.** Real-browser check at 390, 700 and 1440px (and 320px for /kundli) in English and Hindi: no horizontal scroll, 44px tap targets on the controls Phase 4 covered (header, BottomNav, NavBar, tab pills, compact-footer links; not every control, see below), ScrollToTop clear of footer links, one tab row at 700px, safe-area edge delta 0px at the bottom and the header, BottomNav and NavBar inset past a 47px landscape notch.
+**Status (10 Nov 2026): done, merged in PR #165.** Real-browser check at 390, 700 and 1440px (and 320px for /kundli) in English and Hindi: no horizontal scroll, 44px tap targets on the controls Phase 4 covered (header, BottomNav, NavBar, tab pills, compact-footer links; not every control, see below), ScrollToTop clear of footer links, one tab row at 700px, safe-area edge delta 0px at the bottom and the header, BottomNav and NavBar inset past a 47px landscape notch.
 
 Phase 4 leftovers:
-- desktop header nav links are 36px tall;
-- marketing Footer social icons are 32×32;
+- ~~desktop header nav links are 36px tall~~ and ~~Footer social icons are 32×32~~: fixed on `feat/hindi-owner-decisions` (44px tap area, owner decision 10 Nov 2026);
 - the always-on 56px footer-coloured strip under footers on mobile (ScrollToTop clearance);
-- the skip link is reliably the first Tab stop only right after page load;
-- /panchang autofocuses its city search when no location is saved;
+- the skip link is reliably the first Tab stop only right after page load (moved to Phase 5);
+- ~~/panchang autofocuses its city search when no location is saved~~: removed on `feat/hindi-owner-decisions`;
+- on a notched phone in landscape, parchment shows in the notch strip beside full-bleed dark sections (moved to Phase 5);
 - no `role="tabpanel"` / `aria-controls` on the tab rows;
 - InlineNotice live-region timing;
 - Hindi aria-label wording (कुंडली सेक्शन vs कुंडली के अनुभाग);
@@ -235,9 +235,9 @@ Phase 4 leftovers:
 
 | Phase | Branch | Plan | Status |
 |---|---|---|---|
-| 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — PR open |
-| 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
-| 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — PR open |
-| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — PR pending; glossary rows open as 3B leftovers |
-| 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — PR pending; leftovers listed in the Phase 4 section |
+| 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — merged |
+| 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — merged |
+| 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — merged |
+| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — merged (#164); the glossary rows were settled by the owner on 10 Nov 2026 and applied on `feat/hindi-owner-decisions` |
+| 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — merged (#165); leftovers listed in the Phase 4 section |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

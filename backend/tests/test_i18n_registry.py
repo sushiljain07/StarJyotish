@@ -37,6 +37,8 @@ def test_text_falls_back_to_english_then_formats():
 
 def test_ordinal():
     assert ordinal(9, "hi") == "9वें"
+    assert [ordinal(n, "hi") for n in range(1, 8)] == [
+        "पहले", "दूसरे", "तीसरे", "चौथे", "पाँचवें", "छठे", "7वें"]
     assert [ordinal(n, "en") for n in (1, 2, 3, 4, 11, 12, 21, 22)] == [
         "1st", "2nd", "3rd", "4th", "11th", "12th", "21st", "22nd"]
     assert ordinal(9, "fr") == "9th"
@@ -57,3 +59,16 @@ def test_route_accepts_unknown_language():
     with patch("services.chart_context.geocode_place", return_value=geo):
         resp = client.post("/api/rajyogas", json={**BODY, "language": "fr"})
     assert resp.status_code == 200
+
+
+def test_hindi_llm_rules_allow_devanagari_loanwords():
+    # Owner decision (10 Nov 2026): the AI follows the UI loanword rule, so no
+    # Hindi prompt may forbid English words outright; all share one clause.
+    from services.ai import _READING_LANG_RULE
+    from services.career_analysis import _CAREER_LANG_RULE
+    from services.i18n import HINDI_WORDING_RULE, VALUES_LANGUAGE_RULE
+    for table in (_READING_LANG_RULE, _CAREER_LANG_RULE, VALUES_LANGUAGE_RULE):
+        rule = text(table, "hi", "rule")
+        assert HINDI_WORDING_RULE in rule
+        assert "no English words" not in rule and "EVERY SINGLE WORD" not in rule
+    assert "करियर" in HINDI_WORDING_RULE and "Latin" in HINDI_WORDING_RULE

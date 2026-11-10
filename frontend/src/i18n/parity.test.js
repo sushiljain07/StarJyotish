@@ -92,11 +92,21 @@ describe('hi glossary', () => {
     expect(hi.rajyoga_ref_hamsa_c2).toMatch(/दार्शनिक अंतर्दृष्टि/)
   })
   it('uses पेज and होमपेज, not पृष्ठ or मुखपृष्ठ, for a web page', () => {
-    expect(keysWith(/मुखपृष्ठ/)).toEqual([])
-    // Owner to confirm: the newspaper "page turns" image and the breadcrumb label.
-    const ALLOWED = ['home_edition_chip', 'home_closing_title', 'knowledge_breadcrumb_aria']
-    expect(keysWith(/पृष्ठ(?!भूमि)/).filter(k => !ALLOWED.includes(k))).toEqual([])
+    expect(keysWith(/मुखपृष्ठ|पृष्ठ(?!भूमि)/)).toEqual([])
   })
+  // Owner decisions on the "owner to confirm" glossary rows (10 Nov 2026).
+  it('uses the settled everyday words, not the bookish ones', () => {
+    for (const re of [/मार्गदर्शिका/, /प्रशंसापत्र/, /अस्वीकरण/, /गोपनीयता नीति/, /रद्दीकरण/,
+      /संपादित करें/, /सत्यापित करें/, /अवरुद्ध/, /पूर्ववत/, /समय क्षेत्र/, /समयरेखा/,
+      /प्रविष्टि/, /ऊर्जात्मक/, /सशुल्क/, /स्थानांतरण/, /बृह/, /नीचता भंग/]) {
+      expect(keysWith(re), String(re)).toEqual([])
+    }
+    expect(hi.chart_sarvato_corner_Jupiter).toBe('गुरु')
+    expect(hi.testimonials_aria).toMatch(/अनुभव/)
+    expect(hi.testimonials_read_all).toMatch(/अनुभव/)
+  })
+  it('writes houses 1–6 as words, not 1ले/2रे/4थे', () =>
+    expect(keysWith(/(?<![0-9])[1-6](ला|रा|था|ठा|ले|रे|थे|ठे|वें|वाँ)(?=[\s,/)।]|$)/)).toEqual([]))
   it('uses यूज़र, not उपयोगकर्ता', () => expect(keysWith(/उपयोगकर्ता/)).toEqual([]))
   it('uses प्रीव्यू and ओवरव्यू, not पूर्वावलोकन or अवलोकन', () =>
     expect(keysWith(/पूर्वावलोकन|अवलोकन/)).toEqual([]))

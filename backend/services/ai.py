@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import HTTPException
 
 from services.astro_utils import get_planet_dignity
-from services.i18n import language_name, text
+from services.i18n import HINDI_WORDING_RULE, language_name, text
 from services.llm import AI_UNAVAILABLE_MESSAGE, LLMUnavailable, complete as llm_complete
 
 _SKILLS_BASE = Path(__file__).parent.parent.parent / "astro-skills"
@@ -57,10 +57,10 @@ _READING_LANG_RULE = {
     },
     "hi": {
         "rule": (
-            "LANGUAGE RULE — NON-NEGOTIABLE: Write EVERY SINGLE WORD in Hindi (Devanagari script). "
-            "This includes all section content, yoga names (translate them to Hindi), "
-            "timeline descriptions, character descriptions, bullet points, and all closing messages. "
-            "Do NOT write any English words anywhere in your output — pure Hindi only."
+            "LANGUAGE RULE — NON-NEGOTIABLE: Write the whole output in Hindi (Devanagari script), "
+            "including all section content, yoga names, timeline descriptions, character descriptions, "
+            "bullet points, and all closing messages. "
+            + HINDI_WORDING_RULE
         ),
     },
 }

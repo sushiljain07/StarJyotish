@@ -60,7 +60,7 @@ describe('no browser alert() in src', () => {
         }
       }
     }
-    walk(path.resolve(process.cwd(), 'src'))
+    walk(path.resolve('src'))
     expect(hits).toEqual([])
   })
 })

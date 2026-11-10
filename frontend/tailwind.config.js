@@ -18,6 +18,9 @@ export default {
           // than light (which is nearly white). Promoted from the hardcoded
           // #F0CB80 the home page and nav active states were using.
           glow:    '#F0CB80',
+          // Gold for TEXT on parchment/white (Phase 5a). DEFAULT and dark fall
+          // below 4.5:1 there; this one passes AA for body text.
+          ink:     '#86621E',
         },
         // Deep indigo-night — used for hero/header dark bands (the "look up
         // at the stars" moments), not for buttons or links.
@@ -38,8 +41,10 @@ export default {
         // Ink text scale, replacing the old slate-800/500/400/200 text colors.
         ink: {
           DEFAULT: '#2A2724',
-          muted:   '#7A7264',
-          faint:   '#A39C8C',
+          // Darkened in Phase 5a so secondary text passes WCAG AA (4.5:1) on
+          // parchment; faint is for decoration/disabled text only (3:1).
+          muted:   '#6F6656',
+          faint:   '#857A6A',
           onnight: '#C9C2D6',
         },
         // Sparing secondary accent — privacy notes, focus highlights, and
@@ -60,6 +65,21 @@ export default {
         mauve: {
           DEFAULT: '#8C5B73',
           light:   '#F3E6EC',
+        },
+        // Semantic status colours (Phase 5a): text on parchment passes AA;
+        // `light` is the matching tinted background. Use these instead of
+        // ad-hoc green/amber/red for good / caution / bad meanings.
+        good: {
+          DEFAULT: '#3F6B45',
+          light:   '#E7EEE3',
+        },
+        caution: {
+          DEFAULT: '#8A5A12',
+          light:   '#FBF0DC',
+        },
+        bad: {
+          DEFAULT: '#A23B3B',
+          light:   '#F7E8E4',
         },
         // Standard hairline border/divider color on parchment surfaces.
         line: '#EAE1CC',

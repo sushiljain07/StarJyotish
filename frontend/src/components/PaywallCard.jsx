@@ -4,9 +4,12 @@
 // See src/config/entitlements.js for how the lock itself is controlled.
 
 import { useTranslation } from 'react-i18next'
+import InlineNotice from './ui/InlineNotice'
+import useTimedNotice from './ui/useTimedNotice'
 
 export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }) {
   const { t } = useTranslation()
+  const notice = useTimedNotice()
   return (
     <div className="max-w-md mx-auto py-10 px-6 text-center">
       <div className="text-4xl mb-3">{icon}</div>
@@ -25,11 +28,16 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
         // TODO: wire to the real checkout flow once Razorpay (Master Plan
         // Phase 4) exists. There's nowhere real to send someone yet — swap
         // in a payment link or a WhatsApp/contact link when ready.
-        onClick={() => alert('Checkout is coming soon — your full report will unlock right here.')}
+        onClick={notice.show}
         className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-6 py-2.5 rounded-full shadow transition"
       >
         {t('paywall_unlock_btn')}
       </button>
+      {notice.visible && (
+        <InlineNotice onDismiss={notice.hide} className="mt-4 text-left">
+          {t('paywall_checkout_soon')}
+        </InlineNotice>
+      )}
     </div>
   )
 }

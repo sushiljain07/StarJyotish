@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import '../i18n'
 import i18n from '../i18n'
 import PaywallCard from './PaywallCard'
@@ -61,7 +60,7 @@ describe('no browser alert() in src', () => {
         }
       }
     }
-    walk(fileURLToPath(new URL('..', import.meta.url)))
+    walk(path.resolve(process.cwd(), 'src'))
     expect(hits).toEqual([])
   })
 })

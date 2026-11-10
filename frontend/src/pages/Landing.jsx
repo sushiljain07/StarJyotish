@@ -128,6 +128,7 @@ export default function Landing() {
         scrollProgress={headerScrollProgress}
         onCtaClick={() => goToForm(null)}
       />
+      <main id="main">
 
       {/* ───────────────────── Hero ───────────────────── */}
       {/* pt-20/24: clears SiteHeader, which is now `fixed` and present
@@ -420,6 +421,8 @@ export default function Landing() {
           </Button>
         )}
       </Reveal>
+
+      </main>
 
       <Footer />
     </div>

@@ -220,13 +220,13 @@ export default function Onboarding() {
     return (
       <div className="flex-1 flex flex-col">
         <Seo title={t('onboarding_seo_title')} description={t('onboarding_seo_description')} path="/onboarding" noindex />
-        <main className="flex-1 flex items-center justify-center px-4 py-6">
+        <div className="flex-1 flex items-center justify-center px-4 py-6">
           <CompletionCelebration
             t={t}
             label={createdProfile?.label}
             onContinue={() => navigate('/home', { replace: true })}
           />
-        </main>
+        </div>
       </div>
     )
   }

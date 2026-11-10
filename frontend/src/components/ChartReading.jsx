@@ -149,8 +149,8 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
   // this, that single frame would flash the "Reveal My Prediction" button
   // pointlessly before immediately replacing it with this same screen.
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-4xl mb-4 animate-spin">⏳</div>
+    <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full animate-pulse"

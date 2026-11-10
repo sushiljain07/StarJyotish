@@ -129,6 +129,7 @@ export default function Blog() {
       <Seo title={t('blog_seo_title')} description={t('blog_seo_desc')} path="/blog" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main">
       <div className="bg-night px-6 pt-24 pb-10">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
@@ -224,6 +225,7 @@ export default function Blog() {
           </div>
         </Reveal>
       </div>
+      </main>
       <Footer />
     </div>
   )

@@ -52,7 +52,7 @@ describe('Kundli tabs in the URL', () => {
 
   it('writes the sub-tab to the URL when clicked', () => {
     renderAt({ pathname: '/kundli', state: CHART })
-    fireEvent.click(screen.getByRole('button', { name: 'Dasha' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Dasha' }))
     expect(lastSearch).toBe('?tab=birth_chart&sub=dasha')
     expect(shown('DASHA_TABLE')).toBe(true)
   })

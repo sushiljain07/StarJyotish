@@ -143,8 +143,8 @@ export default function ShodashvargaPanel({ input }) {
           <div className="w-full sm:w-[460px]">
             {loading ? (
               <div className="flex justify-center py-16">
-                <div className="text-center">
-                  <div className="text-3xl animate-spin mb-2">🪐</div>
+                <div role="status" className="text-center">
+                  <div aria-hidden="true" className="text-3xl motion-safe:animate-spin mb-2">🪐</div>
                   <p className="text-ink-muted text-sm">{t('kundli_shv_calculating', { code: selected?.name })}</p>
                 </div>
               </div>
@@ -158,8 +158,8 @@ export default function ShodashvargaPanel({ input }) {
             <div className="w-full sm:w-[460px]">
               {compareLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="text-center">
-                    <div className="text-3xl animate-spin mb-2">🪐</div>
+                  <div role="status" className="text-center">
+                    <div aria-hidden="true" className="text-3xl motion-safe:animate-spin mb-2">🪐</div>
                     <p className="text-ink-muted text-sm">{t('kundli_shv_calculating', { code: compared?.name })}</p>
                   </div>
                 </div>

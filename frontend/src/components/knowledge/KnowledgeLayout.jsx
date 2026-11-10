@@ -45,6 +45,7 @@ export default function KnowledgeLayout({
       <Seo title={seoTitle} description={seoDescription} path={path} />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main">
       <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} breadcrumbItems={breadcrumbItems} meta={meta} align="left" />
 
       {sidebar ? (
@@ -60,6 +61,7 @@ export default function KnowledgeLayout({
 
       {/* Full-width CTA band, outside the reading column */}
       {cta}
+      </main>
 
       <Footer />
       <BottomNav />

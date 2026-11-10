@@ -34,11 +34,11 @@ const tabs = [{ id: 'a', label: 'Alpha' }, { id: 'b', label: 'Beta' }]
 describe('44px tap targets', () => {
   it('AnimatedTabRow pill', () => {
     wrap(<AnimatedTabRow tabs={tabs} active="a" onChange={vi.fn()} variant="pill" />)
-    expect(bad(screen.getAllByRole('button'))).toEqual([])
+    expect(bad(screen.getAllByRole('tab'))).toEqual([])
   })
   it('AnimatedTabRow underline', () => {
     wrap(<AnimatedTabRow tabs={tabs} active="a" onChange={vi.fn()} variant="underline" />)
-    expect(bad(screen.getAllByRole('button'))).toEqual([])
+    expect(bad(screen.getAllByRole('tab'))).toEqual([])
   })
   it('SegmentedToggle', () => {
     wrap(<SegmentedToggle options={tabs} active="a" onChange={vi.fn()} />)

@@ -40,9 +40,10 @@ const LEGACY_SUBS = {
 }
 
 function TabLoader() {
+  const { t } = useTranslation()
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-      <div className="text-3xl mb-3 motion-safe:animate-spin">🪐</div>
+    <div role="status" aria-label={t('state_loading_label')} className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <div aria-hidden="true" className="text-3xl mb-3 motion-safe:animate-spin">🪐</div>
       <div className="w-40 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full motion-safe:animate-pulse bg-primary w-3/4" />
       </div>

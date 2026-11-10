@@ -167,6 +167,7 @@ export default function TestimonialsPage() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main">
       {/* Header */}
       <div className="bg-night px-6 pt-24 pb-12 text-center">
         <Reveal>
@@ -226,6 +227,8 @@ export default function TestimonialsPage() {
           <SubmitForm />
         </Reveal>
       </div>
+
+      </main>
 
       <Footer />
     </div>

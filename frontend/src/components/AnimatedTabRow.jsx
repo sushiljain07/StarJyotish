@@ -26,7 +26,7 @@ const PILL_ACCENT_TEXT = {
 
 export default function AnimatedTabRow({
   tabs, active, onChange, renderIcon,
-  variant = 'underline', accent = 'primary', className = ''
+  variant = 'underline', accent = 'primary', className = '', label
 }) {
   const containerRef = useRef(null)
   const buttonRefs  = useRef({})
@@ -62,9 +62,26 @@ export default function AnimatedTabRow({
 
   const isUnderline = variant === 'underline'
 
+  // Roving-tabindex keyboard model: arrows move focus AND select (the
+  // panels are cheap to switch), Home/End jump to the ends.
+  function handleKeyDown(e, index) {
+    let next
+    if (e.key === 'ArrowRight') next = (index + 1) % tabs.length
+    else if (e.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = tabs.length - 1
+    else return
+    e.preventDefault()
+    const target = tabs[next]
+    onChange(target.id)
+    buttonRefs.current[target.id]?.focus()
+  }
+
   return (
     <div
       ref={containerRef}
+      role="tablist"
+      aria-label={label}
       className={`relative flex gap-1 ${
         isUnderline
           ? 'flex-wrap hidden md:flex mt-1'
@@ -72,6 +89,7 @@ export default function AnimatedTabRow({
       } ${className}`}
     >
       <div
+        aria-hidden="true"
         className={`absolute top-0 left-0 transition-all duration-300 ease-out ${
           isUnderline
             ? 'bg-parchment border-t border-x border-line rounded-t-lg'
@@ -79,12 +97,16 @@ export default function AnimatedTabRow({
         }`}
         style={{ ...indicatorStyle, transitionProperty: 'transform, width, height' }}
       />
-      {tabs.map(tab => (
+      {tabs.map((tab, index) => (
         <button
           key={tab.id}
           ref={el => { buttonRefs.current[tab.id] = el }}
+          type="button"
+          role="tab"
+          aria-selected={active === tab.id}
+          tabIndex={active === tab.id ? 0 : -1}
           onClick={() => onChange(tab.id)}
-          aria-current={active === tab.id ? 'true' : undefined}
+          onKeyDown={e => handleKeyDown(e, index)}
           className={
             isUnderline
               ? `relative z-10 whitespace-nowrap px-4 min-h-11 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${

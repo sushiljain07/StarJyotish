@@ -16,6 +16,7 @@ import GlobalScrollToTop from './components/GlobalScrollToTop'
 import OnboardingGate from './components/OnboardingGate'
 import ProtectedRoute from './components/ProtectedRoute'
 import RoleRoute from './components/RoleRoute'
+import SkipLink from './components/layout/SkipLink'
 import WorkspaceLayout, { RouteSkeleton } from './components/layout/WorkspaceLayout'
 
 const Landing = lazy(() => import('./pages/Landing'))
@@ -91,6 +92,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SkipLink />
         <ScrollManager />
         <GlobalScrollToTop />
         {/* Fallback for pages outside the workspace shell (marketing/legal);

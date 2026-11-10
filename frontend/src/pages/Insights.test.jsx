@@ -63,7 +63,7 @@ describe('Insights sub-tabs', () => {
     renderInsights(undefined)
     await screen.findByText('READING')
     for (const label of [en.nav_reading, en.insights_subtab_ask, en.insights_subtab_reports]) {
-      expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: label })).toBeInTheDocument()
     }
   })
 
@@ -111,7 +111,7 @@ describe('Insights › Ask', () => {
     renderInsights(undefined)
     await screen.findByText('READING')
     expect(mounts.AskChart ?? 0).toBe(0)
-    fireEvent.click(screen.getByRole('button', { name: en.insights_subtab_ask }))
+    fireEvent.click(screen.getByRole('tab', { name: en.insights_subtab_ask }))
     expect(await screen.findByText('ASKCHART')).toBeInTheDocument()
     expect(params().get('sub')).toBe('ask')
   })
@@ -138,8 +138,8 @@ describe('Insights › Reports', () => {
     expect(await screen.findByText('CAREER')).toBeInTheDocument()
     expect(params().get('view')).toBe('report')
     await waitFor(() => expect(mounts.CareerReportTab).toBe(1))
-    fireEvent.click(screen.getByRole('button', { name: en.nav_reading }))
-    fireEvent.click(screen.getByRole('button', { name: en.insights_subtab_reports }))
+    fireEvent.click(screen.getByRole('tab', { name: en.nav_reading }))
+    fireEvent.click(screen.getByRole('tab', { name: en.insights_subtab_reports }))
     expect(screen.getByText('CAREER').closest('.hidden')).toBeNull()
     expect(mounts.CareerReportTab).toBe(1)
     expect(unmounts.CareerReportTab ?? 0).toBe(0)
@@ -204,7 +204,7 @@ describe('Insights in Hindi', () => {
     await screen.findByText('RAJYOGAS')
     expect(screen.getByText('AI इनसाइट्स')).toBeInTheDocument()
     for (const label of [hi.nav_reading, hi.insights_subtab_ask, hi.insights_subtab_reports]) {
-      expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: label })).toBeInTheDocument()
     }
     expectNoEnglish(container, ['RAJYOGAS'])
   })

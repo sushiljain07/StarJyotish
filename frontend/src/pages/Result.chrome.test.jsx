@@ -52,7 +52,7 @@ afterEach(() => { vi.restoreAllMocks(); delete document.documentElement.scrollHe
 describe('Kundli sticky chrome', () => {
   it('shows the main-tab row from md up only', () => {
     renderPage()
-    const row = screen.getAllByRole('button', { name: /Birth Chart/ })[0].parentElement
+    const row = screen.getAllByRole('tab', { name: /Birth Chart/ })[0].parentElement
     expect(row.className).toContain('md:flex')
     expect(row.className).not.toContain('sm:flex')
   })

@@ -55,8 +55,8 @@ export default function TransitPanel({ input, natalData }) {
 
       {loading && (
         <div className="flex justify-center py-16">
-          <div className="text-center">
-            <div className="text-3xl animate-spin mb-3">🌍</div>
+          <div role="status" className="text-center">
+            <div aria-hidden="true" className="text-3xl motion-safe:animate-spin mb-3">🌍</div>
             <p className="text-ink-muted text-sm">{t('transit_loading')}</p>
           </div>
         </div>

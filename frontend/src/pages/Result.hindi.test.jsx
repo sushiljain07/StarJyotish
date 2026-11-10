@@ -127,7 +127,8 @@ describe('Kundli page in Hindi', () => {
 
   it('labels the Chart sub-tab कुंडली (glossary wording, never चार्ट)', () => {
     renderAt('?tab=birth_chart&sub=chart')
-    expect(screen.getAllByRole('button', { name: 'कुंडली' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('tab', { name: 'कुंडली' }).length).toBeGreaterThan(0)
+    expect(screen.queryAllByRole('tab', { name: 'चार्ट' })).toHaveLength(0)
     expect(screen.queryAllByRole('button', { name: 'चार्ट' })).toHaveLength(0)
   })
 })

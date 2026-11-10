@@ -72,8 +72,8 @@ export default function BhavaChalit({ input }) {
       </div>
 
       {loading && (
-        <div className="flex flex-col items-center justify-center py-14">
-          <div className="text-3xl animate-spin mb-3">🏠</div>
+        <div role="status" aria-label={t('state_loading_label')} className="flex flex-col items-center justify-center py-14">
+          <div aria-hidden="true" className="text-3xl motion-safe:animate-spin mb-3">🏠</div>
           <div className="w-40 h-1.5 bg-line rounded-full overflow-hidden">
             <div className="h-full rounded-full animate-pulse bg-primary w-3/4" />
           </div>

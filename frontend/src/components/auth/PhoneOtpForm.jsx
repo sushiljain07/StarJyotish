@@ -9,7 +9,7 @@
 // otp_provider.py), so phone entry is hidden from the UI for now rather
 // than left available and silently failing. Flip this back to true once
 // that integration is live — no other code here needs to change.
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { sendOtp } from '../../api/auth'
 import { useAuth } from '../../contexts/AuthContext'
@@ -37,6 +37,9 @@ export default function PhoneOtpForm({ onSuccess }) {
   const [error,      setError]      = useState('')
   const [cooldown,   setCooldown]   = useState(0)
   const codeInputRef = useRef(null)
+  const idInputId = useId()
+  const codeInputId = useId()
+  const errorId = useId()
 
   // While phone login is disabled, treat the field as always-email —
   // isEmail(identifier) would say false for a half-typed address (no "."
@@ -99,10 +102,14 @@ export default function PhoneOtpForm({ onSuccess }) {
     return (
       <form onSubmit={handleSendCode} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-ink mb-1">
+          <label htmlFor={idInputId} className="block text-sm font-medium text-ink mb-1">
             {PHONE_LOGIN_ENABLED ? t('login_phone_label') : t('login_email_label', 'Email address')}
           </label>
           <input
+            id={idInputId}
+            name={emailMode ? 'email' : 'phone'}
+            autoComplete={emailMode ? 'email' : 'tel'}
+            aria-describedby={error ? errorId : undefined}
             type={PHONE_LOGIN_ENABLED ? 'text' : 'email'}
             inputMode={emailMode ? 'email' : 'tel'}
             required autoFocus
@@ -122,7 +129,7 @@ export default function PhoneOtpForm({ onSuccess }) {
             <p className="text-xs text-ink-faint mt-1.5">{t('auth_email_code_hint')}</p>
           )}
         </div>
-        {error && <p className="text-vermillion text-sm">{error}</p>}
+        {error && <p id={errorId} role="alert" className="text-vermillion text-sm">{error}</p>}
         <button type="submit" disabled={loading || identifier.trim().length < 4} className={buttonCls}>
           {loading ? t('login_sending') : t('login_send_code')}
         </button>
@@ -134,7 +141,7 @@ export default function PhoneOtpForm({ onSuccess }) {
   return (
     <form onSubmit={handleVerify} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-ink mb-1">
+        <label htmlFor={codeInputId} className="block text-sm font-medium text-ink mb-1">
           {t('login_code_label')}
         </label>
         <p className="text-xs text-ink-muted mb-2">
@@ -143,6 +150,10 @@ export default function PhoneOtpForm({ onSuccess }) {
         </p>
         <input
           ref={codeInputRef}
+          id={codeInputId}
+          name="otp"
+          autoComplete="one-time-code"
+          aria-describedby={error ? errorId : undefined}
           type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} required
           placeholder="••••••"
           value={code}
@@ -150,7 +161,7 @@ export default function PhoneOtpForm({ onSuccess }) {
           className={`${inputCls} tracking-[0.5em] text-center text-lg`}
         />
       </div>
-      {error && <p className="text-vermillion text-sm">{error}</p>}
+      {error && <p id={errorId} role="alert" className="text-vermillion text-sm">{error}</p>}
       <button type="submit" disabled={loading || code.length !== 6} className={buttonCls}>
         {loading ? t('login_verifying') : t('login_verify')}
       </button>

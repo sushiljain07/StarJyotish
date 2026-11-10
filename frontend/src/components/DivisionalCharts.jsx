@@ -204,8 +204,8 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       </div>
 
       {loading && (
-        <div className="flex flex-col items-center justify-center py-14">
-          <div className="text-3xl animate-spin mb-3">🪐</div>
+        <div role="status" className="flex flex-col items-center justify-center py-14">
+          <div aria-hidden="true" className="text-3xl motion-safe:animate-spin mb-3">🪐</div>
           <p className="text-sm font-medium text-ink-muted">{t('kundli_div_calculating', { code: selected.code })}</p>
           <div className="mt-3 w-40 h-1 rounded-full overflow-hidden bg-line">
             <div className="h-full rounded-full animate-pulse bg-primary w-3/4" />

@@ -119,9 +119,9 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
 
   // ── LOADING ───────────────────────────────────────────────────────────────
   if (status === 'loading') return (
-    <div className="mt-4 rounded-xl px-5 py-4 flex items-center gap-3"
+    <div role="status" className="mt-4 rounded-xl px-5 py-4 flex items-center gap-3"
          style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.25)' }}>
-      <div className="text-xl animate-spin shrink-0">⏳</div>
+      <div aria-hidden="true" className="text-xl motion-safe:animate-spin shrink-0">⏳</div>
       <div>
         <p className="text-sm font-medium" style={{ color: '#D4AF37' }}>
           {t('chart_highlight_loading', { label: meta.label })}

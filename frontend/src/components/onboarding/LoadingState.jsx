@@ -25,8 +25,8 @@ export default function LoadingState({ t }) {
   }, [])
 
   return (
-    <div className="text-center py-10">
-      <div className="w-14 h-14 mx-auto mb-6 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+    <div role="status" className="text-center py-10">
+      <div aria-hidden="true" className="w-14 h-14 mx-auto mb-6 rounded-full border-2 border-primary/30 border-t-primary motion-safe:animate-spin" />
       <p className="font-serif text-lg text-ink transition-opacity duration-300">{t(LINES[lineIndex])}</p>
     </div>
   )

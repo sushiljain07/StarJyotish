@@ -77,8 +77,8 @@ export default function AshtakavargaTable({ input }) {
         <div className="bg-vermillion-light border border-vermillion/30 rounded-lg p-4 text-vermillion text-sm">⚠️ {t(error)}</div>
       )}
       {loading && (
-        <div className="flex justify-center py-12">
-          <div className="text-3xl animate-spin">🪐</div>
+        <div role="status" aria-label={t('state_loading_label')} className="flex justify-center py-12">
+          <div aria-hidden="true" className="text-3xl motion-safe:animate-spin">🪐</div>
         </div>
       )}
 

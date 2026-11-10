@@ -320,8 +320,8 @@ export default function TopicReportTab({ topic, input }) {
   // doesn't need marital-status input first) is still technically 'idle'
   // before the auto-reveal effect above fires.
   if (status === 'loading' || (status === 'idle' && skipIdleScreen)) return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-4xl mb-4 animate-spin">⏳</div>
+    <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="text-primary-dark font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>
       <p className="text-xs text-ink-faint mt-1">{t(`topic_report_${topic}_loading_sub`)}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">

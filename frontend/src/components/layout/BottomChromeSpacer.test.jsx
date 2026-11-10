@@ -65,6 +65,8 @@ describe('BottomChromeSpacer', () => {
     expect(spacer.getAttribute('style')).toContain('calc(3.5rem)')
     expect(spacer.getAttribute('style')).not.toContain('--bottom-nav-h')
     expect(spacer.className).toContain('xl:hidden')
+    // Desktop ScrollToTop reaches md:bottom-5 (20px) + h-11 (44px) = 64px.
+    expect(spacer.className).toContain('md:h-16')
   })
   it('signed in with a mounted BottomNav: reserves the nav height', () => {
     mockAuthed = true

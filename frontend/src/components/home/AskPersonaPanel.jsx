@@ -130,7 +130,7 @@ export default function AskPersonaPanel({ userId, input }) {
       <button
         onClick={() => setOpen(true)}
         style={{ '--fab-bottom': `calc(${spacerHeight} + 0.75rem)` }}
-        className="fixed bottom-[var(--fab-bottom)] md:bottom-28 right-5 z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        className="fixed bottom-[var(--fab-bottom)] md:bottom-28 right-[max(1.25rem,var(--safe-right))] z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
       >
         <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />
@@ -180,9 +180,9 @@ export default function AskPersonaPanel({ userId, input }) {
           ))}
           {loading && (
             <div className="self-start bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           )}
           {error && <p className="text-xs text-vermillion text-center">{error}</p>}

@@ -83,7 +83,7 @@ export default function BottomNav({ profile = null }) {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl box-border pb-safe"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-night/[0.97] border-t border-white/[0.12] backdrop-blur-xl box-border pb-safe pl-[var(--safe-left)] pr-[var(--safe-right)]"
       style={{ height: 'calc(var(--bottom-nav-h) + var(--safe-bottom))' }}
       aria-label={t('nav_bottom_aria', 'Main navigation')}
     >

@@ -13,7 +13,7 @@ export default function BottomChromeSpacer() {
   const { footerClearance } = useBottomChrome()
   return (
     <div
-      className="h-[var(--chrome-clear)] md:h-14 xl:hidden"
+      className="h-[var(--chrome-clear)] md:h-16 xl:hidden"
       style={{ '--chrome-clear': footerClearance }}
       aria-hidden="true"
     />

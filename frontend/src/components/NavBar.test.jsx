@@ -14,6 +14,18 @@ describe('NavBar', () => {
     const bottom = screen.getByRole('navigation').style.bottom
     expect(bottom).toContain('var(--bottom-nav-h)')
     expect(bottom).toContain('var(--safe-bottom)')
+    // Raised: no safe-area padding, so exactly --sub-nav-h tall.
+    const nav = screen.getByRole('navigation')
+    expect(nav.style.height).toBe('var(--sub-nav-h)')
+    expect(nav.className).toContain('box-border')
+  })
+  it('at the screen bottom is --sub-nav-h plus the safe area, padded by it', () => {
+    render(<NavBar tabs={tabs} activeTab="a" onTabChange={vi.fn()} />)
+    const nav = screen.getByRole('navigation')
+    expect(nav.className).toContain('box-border')
+    expect(nav.className).not.toContain('min-h-[var(--sub-nav-h)]')
+    expect(nav.style.height).toBe('calc(var(--sub-nav-h) + var(--safe-bottom))')
+    expect(nav.style.paddingBottom).toBe('var(--safe-bottom)')
   })
   it('is labelled and marks the active tab', () => {
     render(<NavBar tabs={tabs} activeTab="a" onTabChange={vi.fn()} />)

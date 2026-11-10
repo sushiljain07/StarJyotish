@@ -12,7 +12,7 @@ import { currentLanguage } from '../i18n/languages'
 // way) other than having been set independently at different times.
 const MAX_QUESTIONS = 5
 
-export default function AskChart({ input, initialQuestion = null }) {
+export default function AskChart({ input, initialQuestion = null, onInitialQuestionSent }) {
   const { t } = useTranslation()
   const { user, authedRequest } = useAuth()
   const [messages, setMessages]     = useState([])
@@ -40,6 +40,9 @@ export default function AskChart({ input, initialQuestion = null }) {
     if (initialQuestion && !autoSentRef.current) {
       autoSentRef.current = true
       handleSend(initialQuestion)
+      // The owner drops it from history state, so a reload or a later
+      // remount doesn't send (and pay for) it again.
+      onInitialQuestionSent?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion])
@@ -140,9 +143,9 @@ export default function AskChart({ input, initialQuestion = null }) {
           <div className="flex justify-start">
             <div className="bg-night/[0.04] rounded-2xl rounded-bl-sm px-4 py-2.5">
               <div className="flex gap-1 items-center">
-                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'0ms'}}/>
-                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'150ms'}}/>
-                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full animate-bounce" style={{animationDelay:'300ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{animationDelay:'0ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{animationDelay:'150ms'}}/>
+                <span className="w-1.5 h-1.5 bg-ink-faint rounded-full motion-safe:animate-bounce" style={{animationDelay:'300ms'}}/>
               </div>
             </div>
           </div>

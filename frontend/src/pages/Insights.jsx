@@ -10,7 +10,7 @@
 // Old links (?sub=career|rajyogas|health|relationship|finance) are mapped
 // onto this scheme with a replace.
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState } from '../services/lastChart'
@@ -73,6 +73,7 @@ function resolveView(searchParams, inputTopic) {
 export default function Insights() {
   const { t } = useTranslation()
   const location = useLocation()
+  const navigate = useNavigate()
   const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
   const state = resolveChartState(location.state, user)
@@ -84,6 +85,8 @@ export default function Insights() {
   // Every panel starts its own request when it mounts (the reading, a
   // preset Ask question, the career and topic reports are LLM calls), so
   // a panel mounts only once it has been opened, then stays mounted.
+  // Hidden panels get active={false} so a language switch doesn't
+  // regenerate them unseen; each catches up when shown again.
   const [openedPanels, setOpenedPanels] = useState(() => new Set())
   useEffect(() => {
     if (!activePanel) return
@@ -131,6 +134,13 @@ export default function Insights() {
     setSearchParams(next, { replace: true, state: location.state })
   }
 
+  // Once AskChart has sent the preset question, drop it from this history
+  // entry so a reload (or Back to here) doesn't ask it again.
+  function clearPresetQuestion() {
+    navigate({ pathname: location.pathname, search: location.search },
+      { replace: true, state: { ...location.state, presetQuestion: undefined } })
+  }
+
   const selectSub = id => updateParams({ sub: id })
   const openRajyogas = () => updateParams({ sub: 'reports', topic: 'career', view: 'rajyogas' })
   const panelClass = id => (activePanel === id ? 'tab-fade' : 'hidden')
@@ -176,27 +186,27 @@ export default function Insights() {
         <Suspense fallback={<TabLoader />}>
           {isOpened('reading') && (
             <div className={panelClass('reading')}>
-              <ChartReading input={input} topic={readingTopic} onOpenRajyogas={openRajyogas} />
+              <ChartReading input={input} topic={readingTopic} onOpenRajyogas={openRajyogas} active={activePanel === 'reading'} />
             </div>
           )}
           {isOpened('ask') && (
             <div className={panelClass('ask')}>
-              <AskChart input={input} initialQuestion={presetQuestion} />
+              <AskChart input={input} initialQuestion={presetQuestion} onInitialQuestionSent={clearPresetQuestion} />
             </div>
           )}
           {isOpened('reports:career:report') && (
             <div className={panelClass('reports:career:report')}>
-              <CareerReportTab input={input} onOpenRajyogas={openRajyogas} />
+              <CareerReportTab input={input} onOpenRajyogas={openRajyogas} active={activePanel === 'reports:career:report'} />
             </div>
           )}
           {isOpened('reports:career:rajyogas') && (
             <div className={panelClass('reports:career:rajyogas')}>
-              <RajyogasTab input={input} />
+              <RajyogasTab input={input} active={activePanel === 'reports:career:rajyogas'} />
             </div>
           )}
           {OTHER_TOPICS.filter(id => isOpened(`reports:${id}`)).map(id => (
             <div key={id} className={panelClass(`reports:${id}`)}>
-              <TopicReportTab topic={id} input={input} />
+              <TopicReportTab topic={id} input={input} active={activePanel === `reports:${id}`} />
             </div>
           ))}
         </Suspense>

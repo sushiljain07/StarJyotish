@@ -160,6 +160,23 @@ describe('Insights › Reports', () => {
     expect(mounts['TopicReportTab:finance'] ?? 0).toBe(0)
   })
 
+  it('marks only the visible panel active (hidden ones defer a language switch)', async () => {
+    renderInsights(undefined)
+    await screen.findByText('READING')
+    expect(props.ChartReading.active).toBe(true)
+    fireEvent.click(screen.getByRole('tab', { name: en.insights_subtab_reports }))
+    await screen.findByText('RAJYOGAS')
+    fireEvent.click(screen.getByRole('button', { name: en.insights_career_view_report }))
+    await screen.findByText('CAREER')
+    await waitFor(() => expect(props.CareerReportTab.active).toBe(true))
+    expect(props.ChartReading.active).toBe(false)
+    expect(props.RajyogasTab.active).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: en.insights_subtab_health }))
+    await screen.findByText('TOPIC:health')
+    await waitFor(() => expect(props['TopicReportTab:health'].active).toBe(true))
+    expect(props.CareerReportTab.active).toBe(false)
+  })
+
   it("Reading's Rajyogas link opens Reports › Career › Rajyogas", async () => {
     renderInsights('career')
     await screen.findByText('READING')

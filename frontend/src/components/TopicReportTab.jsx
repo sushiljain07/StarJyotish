@@ -213,7 +213,7 @@ function HighlightCard({ h }) {
   )
 }
 
-export default function TopicReportTab({ topic, input }) {
+export default function TopicReportTab({ topic, input, active = true }) {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [status, setStatus] = useState('idle')
@@ -249,13 +249,15 @@ export default function TopicReportTab({ topic, input }) {
   // fetched once, then cached).
   const shownLangRef = useRef(lang)
   useEffect(() => {
-    if (shownLangRef.current === lang) return
+    // Hidden (kept-mounted) panels in /insights wait: the ref keeps the
+    // language last shown, so the switch happens once, on becoming active.
+    if (!active || shownLangRef.current === lang) return
     shownLangRef.current = lang
     // While loading, the new request makes the old one stale (its reply
     // is still cached).
     if (status === 'done' || status === 'loading') generate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang])
+  }, [lang, active])
 
   if (!cfg) return null
 

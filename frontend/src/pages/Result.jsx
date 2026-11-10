@@ -185,11 +185,22 @@ export default function Result() {
     return null
   }
 
+  // Only the Ask entry carries a preset question, and only once: this
+  // /kundli history entry drops it first, so Back + Ask doesn't spend another
+  // free question on it. The other Insights links pass just the chart.
+  function openAsk() {
+    if (location.state?.presetQuestion) {
+      navigate({ pathname: location.pathname, search: location.search },
+        { replace: true, state: { ...location.state, presetQuestion: undefined } })
+    }
+    navigate('/insights?sub=ask', { state: { data, input, presetQuestion } })
+  }
+
   function InsightsAskEntry() {
     return (
       <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t pt-6" style={{ borderColor: '#EAE1CC' }}>
         <button
-          onClick={() => navigate('/insights', { state })}
+          onClick={() => navigate('/insights', { state: { data, input } })}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
           style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
@@ -203,7 +214,7 @@ export default function Result() {
           <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_open')}</span>
         </button>
         <button
-          onClick={() => navigate('/insights?sub=ask', { state: { ...state, presetQuestion } })}
+          onClick={openAsk}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
           style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >
@@ -263,7 +274,7 @@ export default function Result() {
         <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
 
           <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
-            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state })} />
+            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input } })} />
             <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />

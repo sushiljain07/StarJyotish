@@ -29,7 +29,7 @@ function NavButton({ item, active, onClick }) {
     <button
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
-      className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+      className={`relative inline-flex items-center min-h-11 px-4 text-sm font-medium rounded-md transition-colors ${
         active ? 'text-primary-glow' : 'text-primary-light/60 hover:text-primary-light/90'
       }`}
     >

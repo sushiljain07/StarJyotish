@@ -88,6 +88,20 @@ describe('44px tap targets', () => {
     expect(links.length).toBeGreaterThan(5)
     expect(bad(links)).toEqual([])
   })
+  it('SiteHeader desktop nav links (owner decision, 10 Nov 2026)', () => {
+    mockAuth = { isAuthenticated: false, user: null }
+    const { container } = wrap(<SiteHeader />)
+    const navBtns = [...container.querySelectorAll('nav button')]
+    expect(navBtns.length).toBeGreaterThan(1)
+    expect(bad(navBtns)).toEqual([])
+  })
+  it('Footer social buttons (owner decision, 10 Nov 2026)', () => {
+    mockAuth = { isAuthenticated: false, user: null }
+    wrap(<Footer />)
+    const social = ['instagram', 'x', 'youtube'].map(id => screen.getByRole('button', { name: en[`social_${id}`] }))
+    expect(bad(social)).toEqual([])
+    expect(social.every(el => WIDE.test(el.className))).toBe(true)
+  })
   it('LanguageSwitcher both sizes', () => {
     for (const size of ['sm', 'md']) {
       const { unmount } = wrap(<LanguageSwitcher size={size} />)

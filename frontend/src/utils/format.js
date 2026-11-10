@@ -41,3 +41,13 @@ export function formatTime(timeStr) {
   else if (h > 12) h -= 12
   return `${h}:${min} ${ampm}`
 }
+
+// House ordinal for t() interpolations. Houses 1–6 use exact keys so Hindi
+// can write them as words (पहला/पहले … छठा/छठे; owner decision, 10 Nov 2026);
+// 7+ fall back to the plural-ordinal keys (7वाँ/7वें). `oblique` picks the
+// form used before a postposition ("दूसरे भाव में"); English is the same.
+export function houseOrdinal(t, n, { oblique = false } = {}) {
+  const base = oblique ? 'house_ordinal_oblique' : 'house_ordinal'
+  if (Number.isInteger(n) && n >= 1 && n <= 6) return t(`${base}_n${n}`)
+  return t(base, { count: n, ordinal: true })
+}

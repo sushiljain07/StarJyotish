@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { planetName, signName } from '../../utils/astroNames'
+import { houseOrdinal } from '../../utils/format'
 
 export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
   const { t } = useTranslation()
@@ -15,7 +16,7 @@ export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
           <div>
             <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_moon_title')}</h3>
             <p className="text-[11px] text-ink-onnight/45 mt-0.5">
-              {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ? signName(t, moonSpotlight.sign) : '—', house: house ? t('house_ordinal', { count: house, ordinal: true }) : '—' })}
+              {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ? signName(t, moonSpotlight.sign) : '—', house: house ? houseOrdinal(t, house) : '—' })}
             </p>
           </div>
         </div>

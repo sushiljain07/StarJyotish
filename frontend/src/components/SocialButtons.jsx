@@ -35,18 +35,24 @@ const SOCIAL_ICONS = {
 function SocialButton({ icon, dark }) {
   const { t } = useTranslation()
   return (
+    // 44px tap area (Phase 4 leftover, owner decision 10 Nov 2026) around
+    // the unchanged 32px circle.
     <button
       type="button"
       aria-label={t(`social_${icon}`)}
-      className={`w-8 h-8 rounded-full border flex items-center justify-center transition ${
-        dark
-          ? 'bg-white/5 border-white/10 text-ink-onnight hover:text-primary hover:border-primary/40'
-          : 'bg-parchment-card border-line text-ink-muted hover:text-primary-dark hover:border-primary/40'
-      }`}
+      className="group min-w-11 min-h-11 rounded-full flex items-center justify-center"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-        {SOCIAL_ICONS[icon]}
-      </svg>
+      <span
+        className={`w-8 h-8 rounded-full border flex items-center justify-center transition ${
+          dark
+            ? 'bg-white/5 border-white/10 text-ink-onnight group-hover:text-primary group-hover:border-primary/40'
+            : 'bg-parchment-card border-line text-ink-muted group-hover:text-primary-dark group-hover:border-primary/40'
+        }`}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+          {SOCIAL_ICONS[icon]}
+        </svg>
+      </span>
     </button>
   )
 }
@@ -56,7 +62,7 @@ function SocialButton({ icon, dark }) {
 // in this app already themes for (see Footer.jsx itself, or PaywallCard).
 export default function SocialButtons({ dark = true, className = '' }) {
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={`flex ${className}`}>
       {Object.keys(SOCIAL_ICONS).map(id => <SocialButton key={id} icon={id} dark={dark} />)}
     </div>
   )

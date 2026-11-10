@@ -1,7 +1,7 @@
 // frontend/src/components/layout/SkipLink.jsx
 //
 // First focusable element on every page: lets keyboard and screen-reader
-// users jump past the header/nav straight to <main id="main">.
+// users jump past the header/nav straight to <main id="main" tabIndex={-1}>.
 import { useTranslation } from 'react-i18next'
 
 export default function SkipLink() {

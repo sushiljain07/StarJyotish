@@ -67,7 +67,7 @@ export default function QuickPanchangStrip({ data, loading }) {
   const { t } = useTranslation()
 
   if (!data && loading) {
-    return <div className="rounded-2xl border border-primary/20 bg-night-light animate-pulse h-[72px]" />
+    return <div className="rounded-2xl border border-primary/20 bg-night-light motion-safe:animate-pulse h-[72px]" />
   }
   if (!data) return null
 

@@ -734,7 +734,7 @@ export default function CareerReportTab({ input, onOpenRajyogas }) {
       <p className="text-primary-dark font-semibold">{t('career_loading_text')}</p>
       <p className="text-xs text-ink-faint mt-1">{t('career_loading_sub')}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full animate-pulse w-3/4" />
+        <div className="h-full bg-primary rounded-full motion-safe:animate-pulse w-3/4" />
       </div>
     </div>
   )

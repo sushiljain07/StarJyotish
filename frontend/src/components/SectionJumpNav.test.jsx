@@ -54,3 +54,19 @@ describe('SectionJumpNav sheet accessibility', () => {
     expect(document.body.style.overflow).toBe('')
   })
 })
+
+describe('SectionJumpNav desktop row', () => {
+  it('is a navigation of buttons, not a tablist', () => {
+    const { container } = render(<SectionJumpNav sections={SECTIONS} />)
+    const nav = container.querySelector('nav')
+    expect(nav).not.toBeNull()
+    expect(nav).toHaveAttribute('aria-label', i18n.t('jump_nav_title'))
+    expect(container.querySelector('[role="tablist"]')).toBeNull()
+    expect(container.querySelector('[role="tab"]')).toBeNull()
+    const btns = [...nav.querySelectorAll('button')]
+    expect(btns).toHaveLength(2)
+    expect(btns.every(b => b.tabIndex === 0)).toBe(true)
+    expect(btns[0]).toHaveAttribute('aria-current', 'true')
+    expect(btns[1]).not.toHaveAttribute('aria-current')
+  })
+})

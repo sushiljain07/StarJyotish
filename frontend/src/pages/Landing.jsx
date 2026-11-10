@@ -128,7 +128,7 @@ export default function Landing() {
         scrollProgress={headerScrollProgress}
         onCtaClick={() => goToForm(null)}
       />
-      <main id="main">
+      <main id="main" tabIndex={-1}>
 
       {/* ───────────────────── Hero ───────────────────── */}
       {/* pt-20/24: clears SiteHeader, which is now `fixed` and present

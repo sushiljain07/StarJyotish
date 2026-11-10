@@ -80,7 +80,7 @@ export default function Login() {
         ← {t('nav_back', 'Back')}
       </button>
 
-      <main id="main" className="relative w-full max-w-sm">
+      <main id="main" tabIndex={-1} className="relative w-full max-w-sm">
       <div
         className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8"
         onClick={e => e.stopPropagation()}

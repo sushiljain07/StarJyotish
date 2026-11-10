@@ -99,6 +99,7 @@ export default function ZodiacGuide() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow="Knowledge Center"
         breadcrumbItems={[{ label: 'Home', to: isAuthenticated ? '/home' : '/' }, { label: 'Learn', to: '/learn' }, { label: 'Zodiac Signs' }]}
@@ -270,6 +271,7 @@ export default function ZodiacGuide() {
         variant="full"
       />
 
+      </main>
       <Footer />
       <BottomNav />
     </div>

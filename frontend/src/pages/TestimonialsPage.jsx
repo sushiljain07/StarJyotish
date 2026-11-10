@@ -167,7 +167,7 @@ export default function TestimonialsPage() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
-      <main id="main">
+      <main id="main" tabIndex={-1}>
       {/* Header */}
       <div className="bg-night px-6 pt-24 pb-12 text-center">
         <Reveal>
@@ -182,7 +182,7 @@ export default function TestimonialsPage() {
         {loading && items.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1,2,3,4].map(i => (
-              <div key={i} className="bg-parchment-card rounded-2xl border border-line p-6 animate-pulse">
+              <div key={i} className="bg-parchment-card rounded-2xl border border-line p-6 motion-safe:animate-pulse">
                 <div className="h-3 w-8 bg-line rounded mb-3" />
                 <div className="h-3 w-full bg-line rounded mb-2" />
                 <div className="h-3 w-full bg-line rounded mb-2" />

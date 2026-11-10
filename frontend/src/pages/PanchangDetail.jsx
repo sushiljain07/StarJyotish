@@ -301,7 +301,7 @@ function TodayTab({ location, date, onSetLocation }) {
 
   return (
     <div className="space-y-6">
-      {loading && <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 rounded-xl bg-line animate-pulse" />)}</div>}
+      {loading && <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 rounded-xl bg-line motion-safe:animate-pulse" />)}</div>}
       {error && <div className="rounded-xl border border-vermillion/30 bg-vermillion-light px-4 py-3 text-sm text-vermillion">{t('panchang_error_today')}</div>}
       {data && (
         <>
@@ -409,7 +409,7 @@ function WeekTab({ location, onSetLocation }) {
 
   return (
     <div className="space-y-4">
-      {loading && <div className="space-y-2">{[1,2,3,4,5,6,7].map(i => <div key={i} className="h-12 rounded-xl bg-line animate-pulse" />)}</div>}
+      {loading && <div className="space-y-2">{[1,2,3,4,5,6,7].map(i => <div key={i} className="h-12 rounded-xl bg-line motion-safe:animate-pulse" />)}</div>}
       {error && <div className="rounded-xl border border-vermillion/30 bg-vermillion-light px-4 py-3 text-sm text-vermillion">{t('panchang_week_error')}</div>}
       {days && <PanchangTable days={days} />}
       <PanchangTableLegend />
@@ -453,7 +453,7 @@ function HinduMonthTab({ location, onSetLocation }) {
         </div>
       )}
 
-      {loading && <div className="space-y-2">{Array.from({length:10}).map((_,i) => <div key={i} className="h-12 rounded-xl bg-line animate-pulse" />)}</div>}
+      {loading && <div className="space-y-2">{Array.from({length:10}).map((_,i) => <div key={i} className="h-12 rounded-xl bg-line motion-safe:animate-pulse" />)}</div>}
       {error && <div className="rounded-xl border border-vermillion/30 bg-vermillion-light px-4 py-3 text-sm text-vermillion">{t('panchang_month_error')}</div>}
       {result?.days && <PanchangTable days={result.days} />}
       <PanchangTableLegend />

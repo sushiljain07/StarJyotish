@@ -42,7 +42,7 @@ export default function Pricing() {
       <Seo title={t('early_access_heading')} description={t('early_access_subhead')} path="/pricing" />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
-      <main id="main">
+      <main id="main" tabIndex={-1}>
       <div className="relative overflow-hidden bg-night px-6 pt-24 pb-12 text-center">
         <Reveal>
           <p className="text-primary text-xs font-bold tracking-widest uppercase mb-3">{t('early_access_eyebrow')}</p>

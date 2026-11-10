@@ -28,7 +28,7 @@ export default function StaticPageLayout({ title, eyebrow, maxWidth = 'max-w-2xl
           rather than reworded, since the real fix is having exactly one
           such control per page. */}
       <SiteHeader />
-      <main id="main" className={`flex-1 px-4 sm:px-6 pt-20 sm:pt-24 pb-10 sm:pb-12 ${maxWidth} mx-auto w-full`}>
+      <main id="main" tabIndex={-1} className={`flex-1 px-4 sm:px-6 pt-20 sm:pt-24 pb-10 sm:pb-12 ${maxWidth} mx-auto w-full`}>
         {eyebrow && (
           <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-1">{eyebrow}</p>
         )}

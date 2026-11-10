@@ -110,6 +110,7 @@ export default function PhoneOtpForm({ onSuccess }) {
             name={emailMode ? 'email' : 'phone'}
             autoComplete={emailMode ? 'email' : 'tel'}
             aria-describedby={error ? errorId : undefined}
+            aria-invalid={!!error}
             type={PHONE_LOGIN_ENABLED ? 'text' : 'email'}
             inputMode={emailMode ? 'email' : 'tel'}
             required autoFocus
@@ -154,6 +155,7 @@ export default function PhoneOtpForm({ onSuccess }) {
           name="otp"
           autoComplete="one-time-code"
           aria-describedby={error ? errorId : undefined}
+            aria-invalid={!!error}
           type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} required
           placeholder="••••••"
           value={code}

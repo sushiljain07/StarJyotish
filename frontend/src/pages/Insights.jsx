@@ -42,7 +42,8 @@ const LEGACY_SUBS = {
 function TabLoader() {
   const { t } = useTranslation()
   return (
-    <div role="status" aria-label={t('state_loading_label')} className="flex flex-col items-center justify-center py-20 px-4 text-center">
+    <div role="status" className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <span className="sr-only">{t('state_loading_label')}</span>
       <div aria-hidden="true" className="text-3xl mb-3 motion-safe:animate-spin">🪐</div>
       <div className="w-40 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full motion-safe:animate-pulse bg-primary w-3/4" />
@@ -147,7 +148,7 @@ export default function Insights() {
           </div>
 
           <div className="border-t border-line/40 py-2">
-            <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={selectSub} variant="pill" accent="mauve" />
+            <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={selectSub} variant="pill" accent="mauve" label={t('insights_subtabs_aria')} />
           </div>
         </div>
       </div>

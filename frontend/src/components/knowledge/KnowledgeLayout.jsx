@@ -45,7 +45,7 @@ export default function KnowledgeLayout({
       <Seo title={seoTitle} description={seoDescription} path={path} />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
-      <main id="main">
+      <main id="main" tabIndex={-1}>
       <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} breadcrumbItems={breadcrumbItems} meta={meta} align="left" />
 
       {sidebar ? (

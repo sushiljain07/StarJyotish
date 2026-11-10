@@ -144,9 +144,10 @@ export default function BlogArticle() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
-      <main id="main">
+      <main id="main" tabIndex={-1}>
       {loading ? (
-        <div role="status" aria-label={t('state_loading_label')} className="flex items-center justify-center min-h-dvh">
+        <div role="status" className="flex items-center justify-center min-h-dvh">
+          <span className="sr-only">{t('state_loading_label')}</span>
           <div aria-hidden="true" className="text-3xl motion-safe:animate-spin">🪐</div>
         </div>
       ) : article ? (

@@ -153,7 +153,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas }) {
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
-        <div className="h-full rounded-full animate-pulse"
+        <div className="h-full rounded-full motion-safe:animate-pulse"
              style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
       </div>
       <p className="text-xs text-ink-faint mt-3">{t('reading_loading_sub')}</p>

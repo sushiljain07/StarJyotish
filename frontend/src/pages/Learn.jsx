@@ -44,7 +44,7 @@ export default function Learn() {
       />
       <SiteHeader scrollProgress={scrollProgress} onCtaClick={() => navigate('/generate')} />
 
-      <main id="main">
+      <main id="main" tabIndex={-1}>
       <Hero
         eyebrow={t('footer_link_knowledge_center')}
         title={t('learn_title')}

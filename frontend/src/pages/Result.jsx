@@ -91,7 +91,8 @@ const chartStyles = t => [
 ]
 
 function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
-  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} />
+  const { t } = useTranslation()
+  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} label={t('kundli_subsections_aria')} />
 }
 
 export default function Result() {
@@ -236,6 +237,7 @@ export default function Result() {
               tabs={MAIN_TABS}
               active={activeMain}
               onChange={selectMain}
+              label={t('nav_kundli_sections_aria')}
               renderIcon={tab => <TabIcon id={tab.icon} className="w-4 h-4" />}
             />
           </div>

@@ -26,7 +26,7 @@ const PILL_ACCENT_TEXT = {
 
 export default function AnimatedTabRow({
   tabs, active, onChange, renderIcon,
-  variant = 'underline', accent = 'primary', className = '', label
+  variant = 'underline', accent = 'primary', className = '', label, semantics = 'tabs'
 }) {
   const containerRef = useRef(null)
   const buttonRefs  = useRef({})
@@ -61,6 +61,10 @@ export default function AnimatedTabRow({
   }, [active, tabs, variant])
 
   const isUnderline = variant === 'underline'
+  // 'nav': plain in-page navigation (e.g. scroll-spy jump row) — a <nav> of
+  // buttons with aria-current, natural tab order, no arrow handling.
+  const isNav = semantics === 'nav'
+  const Container = isNav ? 'nav' : 'div'
 
   // Roving-tabindex keyboard model: arrows move focus AND select (the
   // panels are cheap to switch), Home/End jump to the ends.
@@ -78,9 +82,9 @@ export default function AnimatedTabRow({
   }
 
   return (
-    <div
+    <Container
       ref={containerRef}
-      role="tablist"
+      role={isNav ? undefined : 'tablist'}
       aria-label={label}
       className={`relative flex gap-1 ${
         isUnderline
@@ -102,11 +106,15 @@ export default function AnimatedTabRow({
           key={tab.id}
           ref={el => { buttonRefs.current[tab.id] = el }}
           type="button"
-          role="tab"
-          aria-selected={active === tab.id}
-          tabIndex={active === tab.id ? 0 : -1}
+          {...(isNav
+            ? { 'aria-current': active === tab.id ? 'true' : undefined }
+            : {
+                role: 'tab',
+                'aria-selected': active === tab.id,
+                tabIndex: active === tab.id ? 0 : -1,
+                onKeyDown: e => handleKeyDown(e, index),
+              })}
           onClick={() => onChange(tab.id)}
-          onKeyDown={e => handleKeyDown(e, index)}
           className={
             isUnderline
               ? `relative z-10 whitespace-nowrap px-4 min-h-11 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
@@ -123,6 +131,6 @@ export default function AnimatedTabRow({
           {tab.label}
         </button>
       ))}
-    </div>
+    </Container>
   )
 }

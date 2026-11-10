@@ -107,6 +107,7 @@ export default function SectionJumpNav({ sections, className = '' }) {
           variant="pill"
           accent="mauve"
           label={t('jump_nav_title')}
+          semantics="nav"
         />
       </div>
 

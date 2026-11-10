@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import '../../i18n'
 import SkipLink from './SkipLink'
 import StaticPageLayout from '../StaticPageLayout'
+import WorkspaceLayout from './WorkspaceLayout'
 import Landing from '../../pages/Landing'
 
 vi.mock('../../contexts/AuthContext', () => ({
@@ -38,5 +39,26 @@ describe('SkipLink and landmarks', () => {
     const { container } = render(wrap(<Landing />))
     expect(container.querySelectorAll('main')).toHaveLength(1)
     expect(container.querySelector('main#main')).not.toBeNull()
+  })
+
+  it('is first focusable in WorkspaceLayout and #main is focusable', () => {
+    const { container } = render(wrap(<><SkipLink /><WorkspaceLayout /></>))
+    const first = container.querySelector('a[href], button, input, [tabindex="0"]')
+    expect(first).toBe(screen.getByRole('link', { name: 'Skip to content' }))
+    expect(container.querySelector('main#main')).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('every page rendering SiteHeader directly provides main#main', () => {
+    const files = import.meta.glob('../../pages/**/*.jsx', { query: '?raw', import: 'default', eager: true })
+    const missing = Object.entries(files)
+      .filter(([f, src]) => !/\.test\./.test(f) && /<SiteHeader/.test(src) && !/<main id="main"/.test(src))
+      .map(([f]) => f)
+    expect(missing).toEqual([])
+  })
+
+  it('a Learn category page renders main#main', async () => {
+    const { default: Planets } = await import('../../pages/learn/categories/Planets')
+    const { container } = render(wrap(<Planets />))
+    expect(container.querySelectorAll('main#main')).toHaveLength(1)
   })
 })

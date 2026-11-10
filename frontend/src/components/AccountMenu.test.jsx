@@ -22,3 +22,11 @@ describe('AccountMenu language row', () => {
     }
   })
 })
+
+describe('AccountMenu About link', () => {
+  it('goes to /about, not the landing page', () => {
+    render(<MemoryRouter><AccountMenu /></MemoryRouter>)
+    fireEvent.click(screen.getAllByRole('button')[0])
+    expect(screen.getByRole('menuitem', { name: en.nav_about_product })).toHaveAttribute('href', '/about')
+  })
+})

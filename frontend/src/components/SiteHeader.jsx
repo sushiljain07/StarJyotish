@@ -68,7 +68,11 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
     navigate(to, state ? { state } : undefined)
   }
 
-  const items = isAuthenticated ? NAV_ITEMS : PUBLIC_NAV_ITEMS.slice(0, 2)
+  // Signed out: Generate Kundli, Panchang, Explore — minus Generate Kundli
+  // when the page already shows it as the CTA pill.
+  const items = isAuthenticated
+    ? NAV_ITEMS
+    : PUBLIC_NAV_ITEMS.slice(0, 3).filter(item => !(onCtaClick && item.id === 'generate'))
 
   return (
     <header

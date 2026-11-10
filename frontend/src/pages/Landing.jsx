@@ -97,7 +97,7 @@ export default function Landing() {
 
   function goToAsk(presetQuestion = null) {
     if (profile) {
-      navigate('/ask', { state: { input: profileInput(), presetQuestion } })
+      navigate('/insights?sub=ask', { state: { input: profileInput(), presetQuestion } })
       return
     }
     goToForm(null, presetQuestion ? { presetQuestion } : { landToAsk: true })

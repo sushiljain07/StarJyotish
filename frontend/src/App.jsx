@@ -32,7 +32,7 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AstrologerDashboard = lazy(() => import('./pages/AstrologerDashboard'))
 const Disclaimer = lazy(() => import('./pages/Disclaimer'))
 const Insights = lazy(() => import('./pages/Insights'))
-const AskPage = lazy(() => import('./pages/AskPage'))
+const AskRedirect = lazy(() => import('./pages/AskRedirect'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfUse = lazy(() => import('./pages/TermsOfUse'))
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'))
@@ -107,7 +107,7 @@ export default function App() {
               <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
               <Route path="/kundli" element={<Result />} />
               <Route path="/insights" element={<Insights />} />
-              <Route path="/ask" element={<AskPage />} />
+              <Route path="/ask" element={<AskRedirect />} />
               <Route path="/career-report" element={<CareerReportRedirect />} />
               <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />

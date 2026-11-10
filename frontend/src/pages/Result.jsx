@@ -201,7 +201,7 @@ export default function Result() {
           <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_open')}</span>
         </button>
         <button
-          onClick={() => navigate('/ask', { state: { ...state, presetQuestion } })}
+          onClick={() => navigate('/insights?sub=ask', { state: { ...state, presetQuestion } })}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
           style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
         >

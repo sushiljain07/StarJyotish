@@ -85,7 +85,7 @@ export default function AccountMenu() {
             {secondaryLine && <p className="text-ink-faint text-xs truncate mt-0.5">{secondaryLine}</p>}
           </div>
           <Link
-            to="/"
+            to="/about"
             onClick={() => setOpen(false)}
             role="menuitem"
             className="flex items-center min-h-11 px-3.5 text-sm text-ink hover:bg-primary-light/60 transition"

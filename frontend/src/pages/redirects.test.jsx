@@ -57,7 +57,6 @@ describe('state-less pages rebuild from the last chart', () => {
   it.each([
     ['/kundli', () => import('./Result'), /kundli_chip_lagna/],
     ['/insights', () => import('./Insights'), /insights_header/],
-    ['/ask', () => import('./AskPage'), /ask_page_title/],
   ])('%s with a saved last chart renders instead of redirecting', async (path, load, marker) => {
     const { saveLastChart } = await import('../services/lastChart')
     saveLastChart(LAST)
@@ -73,18 +72,23 @@ describe('state-less pages redirect home', () => {
   it.each([
     ['/kundli', () => import('./Result')],
     ['/insights', () => import('./Insights')],
-    ['/ask', () => import('./AskPage')],
   ])('%s without state → landing (signed out)', async (path, load) => {
     const { default: Page } = await load()
     renderAt(path, <Page />)
     expect(await screen.findByText('LANDING')).toBeInTheDocument()
   })
 
-  it('/ask without state → /home (signed in)', async () => {
+  it('/insights without state → /home (signed in)', async () => {
     auth.isAuthenticated = true
-    const { default: AskPage } = await import('./AskPage')
-    renderAt('/ask', <AskPage />)
+    const { default: Insights } = await import('./Insights')
+    renderAt('/insights', <Insights />)
     expect(await screen.findByText('HOME')).toBeInTheDocument()
+  })
+
+  it('/ask forwards to /insights?sub=ask', async () => {
+    const { default: AskRedirect } = await import('./AskRedirect')
+    renderAt('/ask', <AskRedirect />)
+    expect(await screen.findByText('INSIGHTS ?sub=ask')).toBeInTheDocument()
   })
 })
 
@@ -124,7 +128,7 @@ describe('/career-report (retired page)', () => {
     auth.isAuthenticated = true
     const { default: CareerReportRedirect } = await import('./CareerReportRedirect')
     renderAt('/career-report', <CareerReportRedirect />)
-    expect(await screen.findByText('INSIGHTS ?topic=career&sub=career')).toBeInTheDocument()
+    expect(await screen.findByText('INSIGHTS ?sub=reports&topic=career&view=report')).toBeInTheDocument()
   })
 })
 
@@ -144,7 +148,6 @@ describe('while sign-in is still resolving', () => {
   it.each([
     ['/kundli', () => import('./Result')],
     ['/insights', () => import('./Insights')],
-    ['/ask', () => import('./AskPage')],
     ['/career-report', () => import('./CareerReportRedirect')],
   ])('%s waits instead of redirecting', async (path, load) => {
     auth.loading = true

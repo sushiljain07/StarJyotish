@@ -324,7 +324,7 @@ export function buildComingUpEvents(chart, outlook, formatDate, t) {
     if (!change || !t) continue
     const weeks = Math.max(1, Math.round(change.days_away / 7))
     events.push({
-      when: t('coming_in_weeks', { weeks, s: weeks === 1 ? '' : 's', date: localizeBackendDate(t, change.date) }),
+      when: t('coming_in_weeks', { count: weeks, date: localizeBackendDate(t, change.date) }),
       title: t('coming_enters_sign', { planet: t(`planet_${planet}`, planet), sign: signName(t, change.to_sign) }),
       description: t(`coming_sign_change_${planet.toLowerCase()}`),
     })

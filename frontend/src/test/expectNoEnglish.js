@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 
 // Test-only guardrail: a Hindi-rendered container must hold no English words.
-const ALLOW = [
+export const ALLOWED_LATIN = [
   /https?:\/\/\S+/g,
   /\b[\w.+-]+@[\w-]+(\.[\w-]+)+\b/g,
   /\bwww\.\S+/g,
@@ -24,7 +24,7 @@ export function expectNoEnglish(container, extraAllow = []) {
       ? text.replace(new RegExp(extra.source, extra.flags.includes('g') ? extra.flags : extra.flags + 'g'), ' ')
       : text.split(extra).join(' ')
   }
-  for (const re of ALLOW) text = text.replace(re, ' ')
+  for (const re of ALLOWED_LATIN) text = text.replace(re, ' ')
   const offenders = [...new Set(text.match(/[A-Za-z]{3,}/g) ?? [])]
   expect(offenders, `English text found: ${offenders.join(', ')}`).toEqual([])
 }

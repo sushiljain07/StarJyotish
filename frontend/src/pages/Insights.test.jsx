@@ -85,6 +85,13 @@ describe('Insights sub-tabs', () => {
     expect(mounts.ChartReading ?? 0).toBe(0)
   })
 
+  it.each(['career', 'health', undefined])('landing on ?sub=reports never mounts the reading (topic %s)', async topic => {
+    renderInsights(topic, '?sub=reports')
+    await screen.findByText(topic === 'health' ? 'TOPIC:health' : 'RAJYOGAS')
+    await new Promise(r => setTimeout(r, 20))
+    expect(mounts.ChartReading ?? 0).toBe(0)
+  })
+
   it('falls back to Reading for an unknown sub-tab', async () => {
     renderInsights('career', '?sub=bogus')
     expect(await screen.findByText('READING')).toBeInTheDocument()
@@ -177,6 +184,7 @@ describe('Insights legacy ?sub= links', () => {
     expect(params().get('sub')).toBe(expected.sub)
     expect(params().get('topic')).toBe(expected.topic)
     expect(params().get('view')).toBe(expected.view)
+    expect(mounts.ChartReading ?? 0).toBe(0)
   })
 })
 

@@ -51,9 +51,11 @@ function TabLoader() {
 }
 
 // Which panel the URL points at: 'reading', 'ask', 'reports:career:report',
-// 'reports:career:rajyogas' or 'reports:<topic>'.
+// 'reports:career:rajyogas' or 'reports:<topic>'. null for a legacy ?sub=
+// that is about to be redirected, so nothing is opened (and mounted) first.
 function resolveView(searchParams, inputTopic) {
   const urlSub = searchParams.get('sub')
+  if (LEGACY_SUBS[urlSub]) return { sub: null, reportTopic: null, careerView: null, panel: null }
   const sub = SUB_IDS.includes(urlSub) ? urlSub : 'reading'
   const urlTopic = searchParams.get('topic')
   const reportTopic = TOPIC_IDS.includes(urlTopic) ? urlTopic
@@ -82,6 +84,7 @@ export default function Insights() {
   // a panel mounts only once it has been opened, then stays mounted.
   const [openedPanels, setOpenedPanels] = useState(() => new Set())
   useEffect(() => {
+    if (!activePanel) return
     setOpenedPanels(prev => (prev.has(activePanel) ? prev : new Set(prev).add(activePanel)))
   }, [activePanel])
   const isOpened = id => id === activePanel || openedPanels.has(id)

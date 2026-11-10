@@ -27,7 +27,8 @@ const AshtakavargaTable   = lazy(() => import('../components/AshtakavargaTable')
 const SarvatobhadraChakra = lazy(() => import('../components/SarvatobhadraChakra'))
 
 // Lazy-tab fallback — shared skeleton StateBlock (was a bespoke spinning 🪐
-// with a fake progress bar, duplicated in AskPage with a different emoji).
+// with a fake progress bar, duplicated in the old Ask page — now the Ask
+// sub-tab of /insights — with a different emoji).
 function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }

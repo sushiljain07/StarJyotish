@@ -1,7 +1,8 @@
 // components/ui/StateBlock.jsx
 //
 // The one loading / empty / error surface. Replaces the grab-bag this app
-// had grown: three different spinner emojis (🪐 in Result, 💬 in AskPage,
+// had grown: three different spinner emojis (🪐 in Result, 💬 in the old
+// Ask page, now /insights?sub=ask,
 // ⏳ in ChartReading), a TabLoader duplicated verbatim across two pages,
 // and fake animate-pulse progress bars. Loading is skeleton-shaped (calm,
 // no spinners); empty/error are icon + message + optional action.

@@ -12,6 +12,7 @@ import PlanetTable     from '../components/PlanetTable'
 import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
+import { useScrollDirection } from '../hooks/useScrollDirection'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -31,12 +32,17 @@ function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
 
-function SummaryChips({ data }) {
+function SummaryChips({ data, collapsed }) {
   const { t } = useTranslation()
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
-    <div className="flex flex-wrap gap-1.5 py-2">
+    <div
+      data-testid="summary-chips"
+      className={`flex flex-wrap gap-1.5 motion-safe:transition-all motion-safe:duration-200 ${
+        collapsed ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-none md:opacity-100 md:overflow-visible md:py-2' : 'py-2'
+      }`}
+    >
       <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </span>
@@ -89,6 +95,7 @@ export default function Result() {
   const { t } = useTranslation()
   const location  = useLocation()
   const navigate  = useNavigate()
+  const scrollDir = useScrollDirection()
   const { isAuthenticated, user, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile.
   const state = resolveChartState(location.state, user)
@@ -218,7 +225,7 @@ export default function Result() {
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}
-          <SummaryChips data={data} />
+          <SummaryChips data={data} collapsed={scrollDir === 'down'} />
 
           {/* Row 3 — main tabs */}
           <div className="border-t border-line/40 pt-1">

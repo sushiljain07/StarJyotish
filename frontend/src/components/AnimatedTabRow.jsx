@@ -67,7 +67,7 @@ export default function AnimatedTabRow({
       ref={containerRef}
       className={`relative flex gap-1 ${
         isUnderline
-          ? 'flex-wrap hidden sm:flex mt-1'
+          ? 'flex-wrap hidden md:flex mt-1'
           : 'flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       } ${className}`}
     >

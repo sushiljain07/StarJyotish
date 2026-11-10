@@ -300,6 +300,11 @@ def _lookup(table: dict, language: str, value):
         return value
 
 
+def planet_name(value, language: str = "en"):
+    """Localized planet name; anything that is not a planet (e.g. "?") is returned as is."""
+    return _lookup(PLANET_NAMES, language, value)
+
+
 def _house_ord(value, language: str) -> str:
     return ordinal(value, language) if isinstance(value, int) else str(value)
 
@@ -321,7 +326,7 @@ def _localize(params: dict, language: str) -> dict:
 
 
 def render_yoga(entry: dict, language: str = "en") -> dict:
-    """Fill entry's "yoga" and "description" from YOGA_TEXT for language.
+    """Return a copy of entry with "yoga" and "description" filled from YOGA_TEXT for language.
 
     entry needs id, state and params. A params value that is a list of strings
     is a list of planet names (joined with ", "); a list of dicts is a list of
@@ -341,6 +346,8 @@ def render_yoga(entry: dict, language: str = "en") -> dict:
             params[key] = ", ".join(_lookup(PLANET_NAMES, language, v) for v in value)
         else:
             params.update(_localize({key: value}, language))
-    entry["yoga"] = text(YOGA_TEXT, language, f"{yoga_id}.{state}.name")
-    entry["description"] = text(YOGA_TEXT, language, f"{yoga_id}.{state}", **params)
-    return entry
+    return {
+        **entry,
+        "yoga": text(YOGA_TEXT, language, f"{yoga_id}.{state}.name"),
+        "description": text(YOGA_TEXT, language, f"{yoga_id}.{state}", **params),
+    }

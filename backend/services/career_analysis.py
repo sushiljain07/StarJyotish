@@ -2,7 +2,11 @@ from datetime import date as _date
 from typing import Optional
 
 from services.ashtakavarga import calculate_ashtakavarga
-from services.yoga_text import YOGA_TEXT, render_yoga  # noqa: F401  (YOGA_TEXT re-exported)
+from services.i18n import text
+from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
+from services.report_utils import call_llm as _report_call_llm
+from services.report_utils import filter_report_language as _filter_report_language
+from services.yoga_text import YOGA_TEXT, planet_name, render_yoga  # noqa: F401  (YOGA_TEXT re-exported)
 
 # ── Vedic Astrology Constants ─────────────────────────────────────────────────
 # Generic constants (SIGNS, SIGN_LORDS, dignity tables, dasha order) now live
@@ -76,7 +80,45 @@ PROFESSION_KEYWORDS = {
 }
 
 
-def compute_career_alignment(current_profession, ak_data, planets, lagna_idx):
+CAREER_ALIGNMENT_TEXT = {
+    "en": {
+        "underutilized": (
+            "Your stated profession doesn't obviously map to a classical career domain, but your "
+            "chart's strongest career signal (Amatyakaraka: {amk}) points toward real, "
+            "specific strengths — this report explores what that potential looks like."
+        ),
+        "strong": (
+            "Your stated profession matches keywords ({keywords}) tied to {planet} — "
+            "which is also your chart's Amatyakaraka, its strongest career signal. Your current path draws "
+            "directly on your chart's core strength."
+        ),
+        "partial": (
+            "Your stated profession matches keywords ({keywords}) tied to {planet}, "
+            "but your chart's strongest career signal (Amatyakaraka) is {amk}. Your current "
+            "path draws on real strengths — this report also explores the potential your {amk} "
+            "energy points toward."
+        ),
+    },
+    "hi": {
+        "underutilized": (
+            "आपका बताया गया पेशा किसी पारंपरिक करियर क्षेत्र से सीधे नहीं जुड़ता, लेकिन आपकी कुंडली का सबसे मज़बूत "
+            "करियर संकेत (अमात्यकारक: {amk}) ठोस, विशिष्ट क्षमताओं की ओर इशारा करता है। यह रिपोर्ट बताती है कि वह "
+            "क्षमता कैसी दिखती है।"
+        ),
+        "strong": (
+            "आपका बताया गया पेशा {planet} से जुड़े शब्दों ({keywords}) से मेल खाता है, और {planet} ही आपकी कुंडली का "
+            "अमात्यकारक है, यानी सबसे मज़बूत करियर संकेत। आपका वर्तमान मार्ग सीधे आपकी कुंडली की मूल शक्ति पर आधारित है।"
+        ),
+        "partial": (
+            "आपका बताया गया पेशा {planet} से जुड़े शब्दों ({keywords}) से मेल खाता है, लेकिन आपकी कुंडली का सबसे "
+            "मज़बूत करियर संकेत (अमात्यकारक) {amk} है। आपका वर्तमान मार्ग वास्तविक क्षमताओं पर आधारित है; यह रिपोर्ट "
+            "यह भी बताती है कि आपकी {amk} ऊर्जा किस संभावना की ओर इशारा करती है।"
+        ),
+    },
+}
+
+
+def compute_career_alignment(current_profession, ak_data, planets, lagna_idx, language="en"):
     """
     Deterministic (not LLM) alignment label between a free-text current
     profession and the chart's Amatyakaraka — keyword-matching only, so the
@@ -89,7 +131,7 @@ def compute_career_alignment(current_profession, ak_data, planets, lagna_idx):
     if not current_profession or not current_profession.strip():
         return None
 
-    text = current_profession.lower()
+    profession = current_profession.lower()
     amk_planet = (ak_data.get("amatyakaraka") or {}).get("name")
 
     # Collect every planet's match count, then break ties in favor of the
@@ -98,7 +140,7 @@ def compute_career_alignment(current_profession, ak_data, planets, lagna_idx):
     # style keywords equally; if the chart's AMK is Mercury, that's the
     # more meaningful read than an arbitrary dict-order tiebreak.
     counts = {
-        planet: [kw for kw in keywords if kw in text]
+        planet: [kw for kw in keywords if kw in profession]
         for planet, keywords in PROFESSION_KEYWORDS.items()
     }
     max_count = max((len(v) for v in counts.values()), default=0)
@@ -109,39 +151,25 @@ def compute_career_alignment(current_profession, ak_data, planets, lagna_idx):
         best_planet = amk_planet if amk_planet in tied else tied[0]
         best_keywords = counts[best_planet]
 
-    if best_planet is None:
-        return {
-            "label": "Underutilized Potential",
-            "amk_planet": amk_planet or "?",
-            "matched_keywords": [],
-            "explanation": (
-                f"Your stated profession doesn't obviously map to a classical career domain, but your "
-                f"chart's strongest career signal (Amatyakaraka: {amk_planet or '?'}) points toward real, "
-                f"specific strengths — this report explores what that potential looks like."
-            ),
-        }
+    amk_label = amk_planet or "?"
+    params = {
+        "amk": planet_name(amk_label, language),
+        "planet": planet_name(best_planet, language) if best_planet else "",
+        "keywords": ", ".join(best_keywords),
+    }
 
-    if best_planet == amk_planet:
-        label = "Strong Alignment"
-        explanation = (
-            f"Your stated profession matches keywords ({', '.join(best_keywords)}) tied to {best_planet} — "
-            f"which is also your chart's Amatyakaraka, its strongest career signal. Your current path draws "
-            f"directly on your chart's core strength."
-        )
+    if best_planet is None:
+        label, key = "Underutilized Potential", "underutilized"
+    elif best_planet == amk_planet:
+        label, key = "Strong Alignment", "strong"
     else:
-        label = "Partial Alignment"
-        explanation = (
-            f"Your stated profession matches keywords ({', '.join(best_keywords)}) tied to {best_planet}, "
-            f"but your chart's strongest career signal (Amatyakaraka) is {amk_planet or '?'}. Your current "
-            f"path draws on real strengths — this report also explores the potential your {amk_planet or '?'} "
-            f"energy points toward."
-        )
+        label, key = "Partial Alignment", "partial"
 
     return {
         "label": label,
-        "amk_planet": amk_planet or "?",
+        "amk_planet": amk_label,
         "matched_keywords": best_keywords,
-        "explanation": explanation,
+        "explanation": text(CAREER_ALIGNMENT_TEXT, language, key, **params),
     }
 
 
@@ -749,10 +777,6 @@ def identify_career_fields(
 # The provider chain lives in services/llm.py and the JSON handling in
 # report_utils.call_llm (shared with relationship/health/wealth); the thin
 # wrapper below just supplies career's Groq prompt and log prefix.
-from services.i18n import text
-from services.report_utils import GEMSTONE_GROQ_HEADER, add_gemstone_context, compute_age
-from services.report_utils import call_llm as _report_call_llm
-
 
 def _call_llm(prompt: str, system: str = "", groq_extra: str = "") -> tuple[dict, str]:
     from services.skill_loader import GROQ_SYSTEM_PROMPT
@@ -1157,7 +1181,6 @@ Sections must appear in this EXACT order.
 
 # _filter_report_language moved to report_utils.py verbatim (shared with
 # relationship/health/wealth — the forbidden-word list is topic-agnostic).
-from services.report_utils import filter_report_language as _filter_report_language
 
 
 # ── Main Entry Point ──────────────────────────────────────────────────────────
@@ -1193,7 +1216,7 @@ def generate_career_report(
     # Full 19-yoga set (not just the 12 from check_special_combinations) so
     # this report agrees with the Rajyogas tab and the free Reading tab,
     # which both already use check_all_yogas().
-    combinations = check_all_yogas(planets, lagna_idx)
+    combinations = check_all_yogas(planets, lagna_idx)  # English: feeds the LLM prompt and the teaser list
     d10_data     = analyze_d10(d10_chart)
     d2_data      = analyze_d2(d2_chart) if d2_chart else None
     fields       = identify_career_fields(planets, lagna_idx, ak_data)
@@ -1306,8 +1329,8 @@ def generate_career_report(
     # since all three now read from the same check_all_yogas() call.
     # The prompt above used the English list; the response is localized.
     report["active_yogas"] = [
-        {"name": y["yoga"], "description": y["description"]}
-        for y in check_all_yogas(planets, lagna_idx, language=language) if y["present"]
+        {"name": r["yoga"], "description": r["description"]}
+        for r in (render_yoga(y, language) for y in combinations if y["present"])
     ]
 
     # ── Astrological Evidence — purely surfacing data already computed
@@ -1350,7 +1373,7 @@ def generate_career_report(
 
     # Deterministic — not LLM. See compute_career_alignment()'s docstring.
     report["career_alignment"] = compute_career_alignment(
-        current_profession, ak_data, planets, lagna_idx
+        current_profession, ak_data, planets, lagna_idx, language=language
     )
 
     return report

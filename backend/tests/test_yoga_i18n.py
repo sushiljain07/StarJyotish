@@ -35,12 +35,11 @@ def test_hindi_is_devanagari_without_latin_words():
 
 
 def test_ids_unique_and_every_id_templated_in_every_language():
-    ids = []
-    for case in _FIXTURE[:12]:
+    all_ids = {k.split(".")[0] for k in YOGA_TEXT["en"]}
+    for case in _FIXTURE:
         ids = [y["id"] for y in check_all_yogas(case["planets"], case["lagna"])]
         assert len(ids) == len(set(ids))
-    all_ids = {k.split(".")[0] for k in YOGA_TEXT["en"]}
-    assert set(ids) <= all_ids
+        assert set(ids) <= all_ids
     for code in i18n.SUPPORTED_LANGUAGES:
         for yoga_id in all_ids:
             for state in ("present", "absent"):

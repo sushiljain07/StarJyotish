@@ -22,7 +22,7 @@ import { usePlaceSuggestions } from '../hooks/usePlaceSuggestions'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
 import { requestBrowserLocation } from '../services/currentLocation'
 import { fetchReverseGeocode } from '../api/astro'
-import { LANGUAGES, currentLanguage, localeFor } from '../i18n/languages'
+import { LANGUAGES, DEFAULT_LANGUAGE, currentLanguage, localeFor } from '../i18n/languages'
 import { markLanguageChosenByUser } from '../i18n'
 
 const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
@@ -136,7 +136,7 @@ export default function Profile() {
   const [form, setForm] = useState({
     name: user?.name || '',
     avatar_url: user?.avatar_url || '',
-    preferred_language: user?.preferred_language || 'en',
+    preferred_language: user?.preferred_language || DEFAULT_LANGUAGE,
     timezone: user?.timezone || '',
   })
 

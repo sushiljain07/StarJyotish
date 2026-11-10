@@ -52,12 +52,15 @@ _MAHAPURUSHA = {
 }
 
 
-def _mahapurusha(index: int) -> dict:
+_MAHAPURUSHA_SUFFIX = {"en": "Pancha Mahapurusha", "hi": "पंच महापुरुष"}
+
+
+def _mahapurusha(index: int, language: str) -> dict:
     out = {}
     for yid, row in _MAHAPURUSHA.items():
         name, quality = row[index], row[index + 1]
         out[f"{yid}.present.name"] = (
-            f"{name} (Pancha Mahapurusha)" if index == 0 else f"{name} (पंच महापुरुष)"
+            f"{name} ({_MAHAPURUSHA_SUFFIX[language]})"
         )
         out[f"{yid}.absent.name"] = name
         out[f"{yid}.missing.name"] = name
@@ -96,7 +99,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "Gaja-Kesari Yoga",
         "gaja_kesari.missing": "Moon or Jupiter not found in chart.",
 
-        **_mahapurusha(0),
+        **_mahapurusha(0, "en"),
 
         "amala.present.name": "Amala Yoga",
         "amala.present": "{planets} in 10th house — pure and untarnished career reputation.",
@@ -197,7 +200,7 @@ YOGA_TEXT = {
         "gaja_kesari.missing.name": "गजकेसरी योग",
         "gaja_kesari.missing": "चंद्र या गुरु कुंडली में नहीं मिला।",
 
-        **_mahapurusha(2),
+        **_mahapurusha(2, "hi"),
 
         "amala.present.name": "अमल योग",
         "amala.present": "{planets} 10वें भाव में हैं — निर्मल और बेदाग करियर प्रतिष्ठा।",

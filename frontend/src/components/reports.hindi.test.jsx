@@ -201,7 +201,7 @@ describe('CareerReportTab', () => {
     await settle()
     expectNoEnglish(container, ['Gemini'])
   })
-  it('context form with a stage and concern picked', async () => {
+  it('context form, signed in, nothing picked yet', async () => {
     signIn()
     const { container } = render(<CareerReportTab input={INPUT} />)
     await screen.findByPlaceholderText(/.+/)

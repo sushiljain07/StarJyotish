@@ -19,8 +19,7 @@ import Result from './Result'
 import ShodashvargaPanel from '../components/ShodashvargaPanel'
 
 const INPUT = { name: 'Asha', date: '1990-08-16', time: '19:05', place: 'New Delhi, India' }
-// Adjacent "KP" labels (the style toggle, then the KP chart title) run together in textContent.
-const ALLOW = [INPUT.place, INPUT.name, /(?:KP){2,}/]
+const ALLOW = [INPUT.place, INPUT.name]
 const STATE = { data: kundli, input: INPUT }
 
 function stubFetch() {

@@ -77,6 +77,10 @@ Goal: a Hindi user sees no English on the main journey.
 
 ## Phase 3B: Hindi follow-ups (moved out of Phase 3 by the owner on 4 Nov 2026)
 
+**Status (10 Nov 2026): done, PR pending whole-branch review.** Guardrails, glossary, Hindi career alignment and the real-browser check are in. The browser check (390px and 1440px, `kundli_lang=hi`) found 0 Latin words on /generate, every /kundli tab and sub-tab, /insights, /panchang and /pricing; /terms is English by design.
+
+**3B leftovers:** the "owner to confirm" rows in `docs/i18n-glossary.md` (Owner to confirm section: legend words, short forms, Sarvatobhadra corners, अमात्यकारक, तालमेल, रोडमैप, backend ordinal 2वें/3वें, Panchang yoga and masa spellings, the two Rajyoga phrasings, the career alignment text, राशिफल) stay open until the owner reviews the table; Tiro Devanagari bold is still synthesized (visually acceptable); KnowledgeCapsule teasers stay English (content phase).
+
 Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language registry, switcher, typography, name and date helpers, and Hindi for the Kundli page, AI reports, Rajyogas (backend), forms, home, Panchang and site pages. What's left:
 
 1. **Guardrails** (Phase 3 plan, Task 8):
@@ -211,6 +215,6 @@ Phase 3 shipped Tasks 0–7 of `2026-11-04-phase3-hindi.md`: the language regist
 | 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — PR open |
 | 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — PR open |
 | 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — PR open |
-| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | — |
+| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — PR pending; glossary rows open as 3B leftovers |
 | 4 | `fix/phase4-mobile-nav` | to write | — |
 | 5a–g | `feat/phase5-*` | to write per slice | — |

@@ -20,4 +20,10 @@ describe('PlanetTable sticky first column', () => {
       expect(td.className).toMatch(/\bbg-/)
     }
   })
+  it('zebra rows: the sticky cell is the opaque twin of the row tint (night 3% over parchment = #F1ECE1)', () => {
+    const { container } = render(<PlanetTable planets={planets} />)
+    const second = container.querySelectorAll('tbody tr')[1]
+    expect(second.className).toContain('bg-night/[0.03]')
+    expect(second.querySelector('td').className).toContain('bg-[#F1ECE1]')
+  })
 })

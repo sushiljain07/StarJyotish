@@ -108,7 +108,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
               const dignity = getDignity(t, p.name, p.sign_index)
               return (
                 <tr key={p.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
-                  <td className={`p-2.5 border-b font-bold sticky left-0 z-10 ${i % 2 === 0 ? 'bg-parchment-card' : 'bg-[#F8F6F2]'}`}
+                  <td className={`p-2.5 border-b font-bold sticky left-0 z-10 ${i % 2 === 0 ? 'bg-parchment-card' : 'bg-[#F1ECE1]'}`}
                       style={{ color: PLANET_COLORS[p.name] ?? '#333' }}>
                     {planetName(t, p.name)}
                   </td>

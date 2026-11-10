@@ -83,6 +83,30 @@ describe('hi glossary', () => {
   it('uses गुरु, not बृहस्पति', () => expect(keysWith(/बृहस्पति/)).toEqual([]))
   it('uses पुनः प्रयास करें', () => expect(keysWith(/फिर से प्रयास|फिर कोशिश/)).toEqual([]))
   it('writes राजयोग as one word', () => expect(keysWith(/राज योग/)).toEqual([]))
+  // Loanword rule (owner, 10 Nov 2026): where Hindi has no clear everyday
+  // word, the UI uses the English word in Devanagari, not a coinage.
+  it('uses इनसाइट, not अंतर्दृष्टि, for the product "Insights"', () => {
+    // Allowed: a human quality ("philosophical insight"), not the product.
+    const ALLOWED = ['rajyoga_ref_hamsa_c2']
+    expect(keysWith(/अंतर्दृष्टि/).filter(k => !ALLOWED.includes(k))).toEqual([])
+    expect(hi.rajyoga_ref_hamsa_c2).toMatch(/दार्शनिक अंतर्दृष्टि/)
+  })
+  it('uses पेज and होमपेज, not पृष्ठ or मुखपृष्ठ, for a web page', () => {
+    expect(keysWith(/मुखपृष्ठ/)).toEqual([])
+    // Owner to confirm: the newspaper "page turns" image and the breadcrumb label.
+    const ALLOWED = ['home_edition_chip', 'home_closing_title', 'knowledge_breadcrumb_aria']
+    expect(keysWith(/पृष्ठ/).filter(k => !ALLOWED.includes(k))).toEqual([])
+  })
+  it('uses यूज़र, not उपयोगकर्ता', () => expect(keysWith(/उपयोगकर्ता/)).toEqual([]))
+  it('uses प्रीव्यू and ओवरव्यू, not पूर्वावलोकन or अवलोकन', () =>
+    expect(keysWith(/पूर्वावलोकन|अवलोकन/)).toEqual([]))
+  it('uses सीए and आईटी, not लेखाकर्म or सूचना प्रौद्योगिकी', () =>
+    expect(keysWith(/लेखाकर्म|प्रौद्योगिकी/)).toEqual([]))
+  it('writes एसएमएस and ओटीपी in Devanagari', () => {
+    expect(keysWith(/SMS|OTP/)).toEqual([])
+    expect(hi.auth_sms_code_hint).toMatch(/एसएमएस/)
+    expect(hi.login_send_code).toMatch(/ओटीपी/)
+  })
   it('patrika_rarity has a verb', () => expect(hi.patrika_rarity).toMatch(/होता/))
   it('chart_sarvato_corner_Saturn repeats no word', () => {
     const words = hi.chart_sarvato_corner_Saturn.split(/[\s()]+/).filter(Boolean)

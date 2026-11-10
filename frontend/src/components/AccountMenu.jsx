@@ -113,7 +113,7 @@ export default function AccountMenu() {
               role="menuitem"
               className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
             >
-              Admin Dashboard
+              {t('account_admin_dashboard')}
             </Link>
           )}
           {user?.role === 'astrologer' && (
@@ -123,7 +123,7 @@ export default function AccountMenu() {
               role="menuitem"
               className="block px-3.5 py-2 text-sm text-ink hover:bg-primary-light/60 transition"
             >
-              My Dashboard
+              {t('account_my_dashboard')}
             </Link>
           )}
           <div role="menuitem" className="flex items-center justify-between gap-2 px-3.5 py-2 border-t border-line">

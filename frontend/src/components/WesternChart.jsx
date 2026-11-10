@@ -1,6 +1,7 @@
 // Western-style circular astrological chart
 // Ascendant on left (9-o'clock); houses/signs go counter-clockwise
 
+import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
 
 const CX = 260
@@ -51,6 +52,7 @@ export default function WesternChart({
   title = 'Western Chart',
   transitPlanets = null,
 }) {
+  const { t } = useTranslation()
   const ascIdx = ascendant?.sign_index ?? 0
   const ascDeg = ascendant?.degree ?? 0
   const ascLon = ascIdx * 30 + ascDeg  // absolute sidereal longitude of ASC
@@ -199,7 +201,7 @@ export default function WesternChart({
         </svg>
 
         <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-faint">
-          <span>AC = Ascendant · DC = Descendant · MC = Midheaven · IC = Imum Coeli</span>
+          <span>{t('western_chart_legend')}</span>
         </div>
       </div>
     </div>

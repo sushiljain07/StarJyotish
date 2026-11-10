@@ -146,7 +146,7 @@ export default function TodayWindow({ panchang }) {
         </p>
       ) : (
         <p className="text-sm text-ink-onnight/60 mt-3">
-          Abhijit Muhurta falls within Rahu Kaal today — consider waiting for tomorrow's window.
+          {t('window_abhijit_in_rahu_note')}
         </p>
       )}
 

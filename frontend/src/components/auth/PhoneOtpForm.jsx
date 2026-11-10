@@ -119,7 +119,7 @@ export default function PhoneOtpForm({ onSuccess }) {
             </p>
           )}
           {!PHONE_LOGIN_ENABLED && (
-            <p className="text-xs text-ink-faint mt-1.5">We will email a code to this address</p>
+            <p className="text-xs text-ink-faint mt-1.5">{t('auth_email_code_hint')}</p>
           )}
         </div>
         {error && <p className="text-vermillion text-sm">{error}</p>}

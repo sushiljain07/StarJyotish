@@ -7,10 +7,13 @@
 // pill nav) rather than a raster screenshot, so this won't go stale again
 // the next time that UI changes, and stays visually consistent with the
 // rest of this page (which otherwise has zero images).
-const PREVIEW_SECTIONS = ['Overview', 'Growth', 'Money', 'Timing', 'Roadmap', 'Ask AI']
-const ROADMAP_HORIZONS = ['Now', 'Next 12 Months', '1–3 Years', '3–5 Years']
+import { useTranslation } from 'react-i18next'
+
+const PREVIEW_SECTIONS = ['overview', 'growth', 'money', 'timing', 'roadmap', 'ask_ai'].map(k => `career_preview_sec_${k}`)
+const ROADMAP_HORIZONS = ['now', 'next_12', '1_3', '3_5'].map(k => `career_preview_hz_${k}`)
 
 export default function CareerReportPreview() {
+  const { t } = useTranslation()
   return (
     <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl border border-line shadow-md overflow-hidden" aria-hidden="true">
       {/* Mini pill nav — mirrors SectionJumpNav's real pill row */}
@@ -22,7 +25,7 @@ export default function CareerReportPreview() {
               i === 0 ? 'bg-mauve text-white' : 'text-ink-muted border border-line'
             }`}
           >
-            {label}
+            {t(label)}
           </span>
         ))}
       </div>
@@ -32,11 +35,11 @@ export default function CareerReportPreview() {
         <div className="rounded-xl overflow-hidden border border-primary/30">
           <div className="bg-gradient-to-r from-primary to-primary-dark px-4 py-2.5 flex items-center gap-2">
             <span className="text-lg">✨</span>
-            <span className="font-extrabold text-night text-sm">Your Career Destiny in Brief</span>
+            <span className="font-extrabold text-night text-sm">{t('career_preview_destiny_title')}</span>
           </div>
           <div className="px-4 py-3 bg-parchment-card">
             <p className="text-xs text-ink-muted leading-relaxed">
-              A personalized read of your chart's career strengths, current phase, and what's ahead — grounded in real planetary positions, not generic horoscope text.
+              {t('career_preview_destiny_body')}
             </p>
           </div>
         </div>
@@ -44,12 +47,12 @@ export default function CareerReportPreview() {
         {/* Roadmap sample card */}
         <div className="rounded-xl border border-line overflow-hidden">
           <div className="bg-night px-4 py-2.5">
-            <span className="font-bold text-primary-light text-sm">🗺️ Your Career Roadmap</span>
+            <span className="font-bold text-primary-light text-sm">{t('career_preview_roadmap_title')}</span>
           </div>
           <div className="px-4 py-3 grid grid-cols-2 gap-2">
             {ROADMAP_HORIZONS.map(label => (
               <p key={label} className="text-2xs font-semibold text-primary uppercase tracking-wide">
-                {label}
+                {t(label)}
               </p>
             ))}
           </div>
@@ -59,8 +62,8 @@ export default function CareerReportPreview() {
         <div className="rounded-xl border border-mauve/30 bg-mauve/5 px-4 py-3 flex items-center gap-2">
           <span className="text-lg">💬</span>
           <div>
-            <p className="font-semibold text-ink text-xs">Ask Career AI</p>
-            <p className="text-2xs text-ink-muted">"Should I ask for a promotion this year?"</p>
+            <p className="font-semibold text-ink text-xs">{t('career_preview_ask_title')}</p>
+            <p className="text-2xs text-ink-muted">{t('career_preview_ask_example')}</p>
           </div>
         </div>
       </div>

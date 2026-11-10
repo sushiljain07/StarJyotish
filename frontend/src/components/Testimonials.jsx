@@ -63,7 +63,7 @@ export default function Testimonials() {
   }, [])
 
   return (
-    <section className="px-4 py-12 sm:py-16" aria-label="User testimonials">
+    <section className="px-4 py-12 sm:py-16" aria-label={t('testimonials_aria')}>
       <div className="max-w-4xl mx-auto">
         <Reveal className="text-center mb-10">
           <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{t('testimonials_subhead')}</p>
@@ -81,7 +81,7 @@ export default function Testimonials() {
         <Reveal delay={200} className="text-center mt-10">
           <Link to="/testimonials"
             className="inline-flex items-center gap-2 text-sm text-primary-dark hover:underline font-medium">
-            Read all testimonials →
+            {t('testimonials_read_all')}
           </Link>
           <p className="text-ink-faint text-xs mt-2">{t('landing_footer_note')}</p>
         </Reveal>

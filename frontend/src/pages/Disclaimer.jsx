@@ -132,7 +132,7 @@ export default function Disclaimer() {
         <LegalLanguageNote />
         {/* Plain-language summary */}
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-6 not-prose">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">{t('disclaimer_plain_label')}</p>
           <ul className="space-y-1.5 text-sm text-ink">
             <li>✦ Readings are for guidance and self-reflection — not medical, legal, or financial advice.</li>
             <li>✦ Astrology is a cultural and philosophical tradition, not a verified science.</li>

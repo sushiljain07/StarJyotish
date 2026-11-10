@@ -29,7 +29,7 @@ export default function FAQ() {
         description="Answers to common questions about Star Jyotish — pricing, accuracy, AI vs. human astrologers, data privacy, and how the platform works."
         path="/faq"
       />
-      <StaticPageLayout title="Frequently Asked Questions" maxWidth="max-w-2xl">
+      <StaticPageLayout title={t('faq_page_heading')} maxWidth="max-w-2xl">
         <FAQAccordion items={items} />
       </StaticPageLayout>
       <FaqSchema items={items} />

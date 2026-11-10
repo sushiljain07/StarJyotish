@@ -22,12 +22,17 @@ export function scanJsx(source, file = '') {
   const add = (node, text) => {
     if (hasEnglish(text)) found.push({ line: node.loc.start.line, text: text.trim().replace(/\s+/g, ' ') })
   }
-  const strOf = n => {
-    if (!n) return null
-    if (n.type === 'StringLiteral') return n.value
-    if (n.type === 'TemplateLiteral' && n.expressions.length === 0) return n.quasis.map(q => q.value.cooked).join('')
-    return null
+  // Collect every string literal an expression can evaluate to (branches of ?:, operands of && || ??).
+  const strsOf = n => {
+    if (!n) return []
+    if (n.type === 'StringLiteral') return [n]
+    if (n.type === 'TemplateLiteral' && n.expressions.length === 0) return [n]
+    if (n.type === 'ConditionalExpression') return [...strsOf(n.consequent), ...strsOf(n.alternate)]
+    if (n.type === 'LogicalExpression') return [...strsOf(n.left), ...strsOf(n.right)]
+    if (n.type === 'ParenthesizedExpression') return strsOf(n.expression)
+    return []
   }
+  const textOf = n => (n.type === 'StringLiteral' ? n.value : n.quasis.map(q => q.value.cooked).join(''))
   const visit = (node, parent) => {
     if (!node || typeof node.type !== 'string') return
     // CSS inside <style>{`...`}</style> is not user-visible text.
@@ -40,12 +45,10 @@ export function scanJsx(source, file = '') {
     if (node.type === 'JSXText') {
       add(node, node.value)
     } else if (node.type === 'JSXExpressionContainer' && parent && (parent.type === 'JSXElement' || parent.type === 'JSXFragment')) {
-      const s = strOf(node.expression)
-      if (s !== null) add(node, s)
+      strsOf(node.expression).forEach(n => add(n, textOf(n)))
     } else if (node.type === 'JSXAttribute' && node.name.type === 'JSXIdentifier' && ATTRS.has(node.name.name)) {
       const v = node.value
-      const s = v && v.type === 'JSXExpressionContainer' ? strOf(v.expression) : strOf(v)
-      if (s !== null) add(node, s)
+      strsOf(v && v.type === 'JSXExpressionContainer' ? v.expression : v).forEach(n => add(n, textOf(n)))
     }
     for (const key of Object.keys(node)) {
       if (key === 'loc' || key === 'leadingComments' || key === 'trailingComments') continue

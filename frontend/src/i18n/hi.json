@@ -2031,5 +2031,6 @@
   "career_preview_roadmap_title": "🗺️ आपका करियर रोडमैप",
   "career_preview_ask_title": "करियर AI से पूछें",
   "career_preview_ask_example": "\"क्या मुझे इस वर्ष पदोन्नति माँगनी चाहिए?\"",
-  "western_chart_legend": "AC = लग्न · DC = सप्तम भाव · MC = दशम भाव · IC = चतुर्थ भाव"
+  "western_chart_legend": "AC = लग्न · DC = सप्तम भाव · MC = दशम भाव · IC = चतुर्थ भाव",
+  "auth_sms_code_hint": "हम SMS से एक कोड भेजेंगे"
 }

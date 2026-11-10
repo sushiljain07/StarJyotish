@@ -2031,5 +2031,6 @@
   "career_preview_roadmap_title": "🗺️ Your Career Roadmap",
   "career_preview_ask_title": "Ask Career AI",
   "career_preview_ask_example": "\"Should I ask for a promotion this year?\"",
-  "western_chart_legend": "AC = Ascendant · DC = Descendant · MC = Midheaven · IC = Imum Coeli"
+  "western_chart_legend": "AC = Ascendant · DC = Descendant · MC = Midheaven · IC = Imum Coeli",
+  "auth_sms_code_hint": "We will send a code via SMS"
 }

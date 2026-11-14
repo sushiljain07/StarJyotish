@@ -56,9 +56,9 @@ const REPORTS = [
 // saturated per-report blocks.
 const ACCENT = {
   primary:    { bgFrom: 'from-primary/20',    text: 'text-primary-glow', bar: 'bg-primary',    chip: 'text-primary' },
-  sage:       { bgFrom: 'from-sage/20',       text: 'text-sage',         bar: 'bg-sage',       chip: 'text-sage' },
-  mauve:      { bgFrom: 'from-mauve/20',      text: 'text-mauve',        bar: 'bg-mauve',      chip: 'text-mauve' },
-  vermillion: { bgFrom: 'from-vermillion/20', text: 'text-vermillion',   bar: 'bg-vermillion', chip: 'text-vermillion' },
+  sage:       { bgFrom: 'from-sage/20',       text: 'text-sage-onnight',   bar: 'bg-sage-onnight',   chip: 'text-sage-onnight' },
+  mauve:      { bgFrom: 'from-mauve/20',      text: 'text-mauve-onnight',  bar: 'bg-mauve-onnight',  chip: 'text-mauve-onnight' },
+  vermillion: { bgFrom: 'from-vermillion/20', text: 'text-bad-onnight',    bar: 'bg-bad-onnight',    chip: 'text-bad-onnight' },
 }
 
 const TREND_LABEL = { up: '▲ Up', down: '▼ Down', flat: '— Steady' }
@@ -66,7 +66,7 @@ const TREND_LABEL = { up: '▲ Up', down: '▼ Down', flat: '— Steady' }
 function TrendChip({ trend, accent, t }) {
   if (!trend) return null
   return (
-    <span className={`text-3xs font-bold ${accent.chip}`}>
+    <span className={`text-2xs font-bold ${accent.chip}`}>
       {t(`life_trend_${trend}`, TREND_LABEL[trend] ?? TREND_LABEL.flat)}
     </span>
   )
@@ -95,7 +95,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
           </span>
           <div className="flex items-center gap-2.5">
             <TrendChip trend={area?.trend} accent={accent} t={t} />
-            <span className="text-3xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/[0.1] text-ink-onnight/70">
+            <span className="text-2xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/[0.1] text-ink-onnight">
               {t('report_full_tag')}
             </span>
           </div>
@@ -103,7 +103,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
         <h4 className="font-serif font-semibold text-lg text-primary-light mb-1 leading-snug group-hover:opacity-90">
           {t(report.labelKey)}
         </h4>
-        <p className="text-2xs mb-1 text-ink-onnight/55">
+        <p className="text-2xs mb-1 text-ink-onnightMuted">
           {t(report.noteKey)}
         </p>
         <ScoreBar pct={area?.pct} accent={accent} />
@@ -132,16 +132,16 @@ function SmallReport({ report, area, onOpen, t }) {
     >
       <div className="px-2.5 py-3 sm:px-3.5 sm:py-3.5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-1 mb-2">
-          <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-serif font-semibold text-3xs sm:text-2xs bg-white/10 ${accent.text} shrink-0`}>
+          <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-serif font-semibold text-2xs bg-white/10 ${accent.text} shrink-0`}>
             {report.houseGlyph}
           </span>
           <TrendChip trend={area?.trend} accent={accent} t={t} />
         </div>
-        <h4 className={`font-serif font-semibold text-[11px] sm:text-[13px] text-primary-light mb-0.5 leading-snug group-hover:opacity-90 line-clamp-2`}>
+        <h4 className={`font-serif font-semibold text-2xs sm:text-[13px] text-primary-light mb-0.5 leading-snug group-hover:opacity-90 line-clamp-2`}>
           {t(report.labelKey)}
         </h4>
         <ScoreBar pct={area?.pct} accent={accent} />
-        <p className={`text-3xs sm:text-2xs mt-auto pt-2 font-semibold ${accent.text}`}>
+        <p className={`text-2xs mt-auto pt-2 font-semibold ${accent.text}`}>
           {t('report_open')} →
         </p>
       </div>

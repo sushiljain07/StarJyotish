@@ -138,7 +138,7 @@ export default function AskPersonaPanel({ userId, input }) {
         </span>
         <span className="hidden sm:block text-left">
           <span className="block text-xs font-bold text-parchment">{t('ask_persona_button', { name: personaName })}</span>
-          <span className="block text-[10px] text-sage">{t('ask_persona_status')}</span>
+          <span className="block text-2xs text-sage-onnight">{t('ask_persona_status')}</span>
         </span>
       </button>
 
@@ -156,9 +156,9 @@ export default function AskPersonaPanel({ userId, input }) {
           </span>
           <div>
             <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{personaName}</h3>
-            <p className="text-[11px] text-ink-onnight/50">{t('ask_persona_tagline')}</p>
+            <p className="text-2xs text-ink-onnightMuted">{t('ask_persona_tagline')}</p>
           </div>
-          <button onClick={() => setOpen(false)} aria-label={t('jump_nav_close')} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
+          <button onClick={() => setOpen(false)} aria-label={t('jump_nav_close')} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnightMuted hover:text-ink-onnight text-lg">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
@@ -215,7 +215,7 @@ export default function AskPersonaPanel({ userId, input }) {
               ↑
             </button>
           </div>
-          <p className="text-[10px] text-ink-muted text-right mt-1">{value.length} / {MAX_CHARS}</p>
+          <p className="text-2xs text-ink-muted text-right mt-1">{value.length} / {MAX_CHARS}</p>
         </div>
       </div>
     </>

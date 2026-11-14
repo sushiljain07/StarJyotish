@@ -11,7 +11,7 @@ export default function LocationPrompt({ status, onRetryGeolocation, onSetManual
   const { t } = useTranslation()
   if (status === 'idle' || status === 'requesting') {
     return (
-      <p role="status" className="text-sm text-ink-onnight/75 py-6">
+      <p role="status" className="text-sm text-ink-onnight py-6">
         {t('location_finding')}
       </p>
     )

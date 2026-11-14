@@ -24,6 +24,9 @@ import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDate, houseOrdinal } from '../../utils/format'
 import { planetName } from '../../utils/astroNames'
+import { colors } from '../../theme/tokens'
+import { withAlpha } from '../../theme/chartPalette'
+import { dayScoreBand } from './dayScoreBand'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
 const ICON_BY_TYPE = {
@@ -37,9 +40,9 @@ const PLANET_GLYPHS = {
 }
 
 const RING_COLORS = {
-  opportunity: { track: 'rgba(240,203,128,0.12)', fill: '#D9A441', glyph: 'rgba(240,203,128,0.9)' },
-  steady:      { track: 'rgba(91,122,94,0.18)',   fill: '#9FC7A2', glyph: 'rgba(159,199,162,0.9)' },
-  caution:     { track: 'rgba(162,59,59,0.18)',   fill: '#E09090', glyph: 'rgba(224,144,144,0.9)' },
+  opportunity: { track: withAlpha(colors.primary.glow, 0.12), fill: colors.primary.DEFAULT, glyph: withAlpha(colors.primary.glow, 0.9) },
+  steady:      { track: withAlpha(colors.good.onnight, 0.18),  fill: colors.good.onnight,    glyph: withAlpha(colors.good.onnight, 0.9) },
+  caution:     { track: withAlpha(colors.bad.onnight, 0.18),   fill: colors.bad.onnight,     glyph: withAlpha(colors.bad.onnight, 0.9) },
 }
 
 // ── Cosmic Ring — unchanged from v3 ─────────────────────────────────────────
@@ -47,31 +50,31 @@ function CosmicRing({ score, tone, mdPlanet, label, pulse }) {
   const R = 44, cx = 50, cy = 50, lw = 6
   const circ = 2 * Math.PI * R
   const filled = score != null ? (score / 10) * circ : 0
-  const colors = RING_COLORS[tone] || RING_COLORS.steady
+  const ring = RING_COLORS[tone] || RING_COLORS.steady
   const glyph = PLANET_GLYPHS[mdPlanet] || "✦"
 
   return (
     <div className="sj-ring-wrap">
-      <svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx={cx} cy={cy} r={R} fill="none" stroke={colors.track} strokeWidth={lw}/>
+      <svg width="120" height="120" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke={ring.track} strokeWidth={lw}/>
         {score != null && (
           <circle cx={cx} cy={cy} r={R} fill="none"
-                  stroke={colors.fill} strokeWidth={lw} strokeLinecap="round"
+                  stroke={ring.fill} strokeWidth={lw} strokeLinecap="round"
                   strokeDasharray={`${filled} ${circ - filled}`}
                   strokeDashoffset={circ / 4}
                   className={`sj-ring-arc${pulse ? " sj-ring-pulse" : ""}`}/>
         )}
         <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="middle"
-              fontSize="18" fontWeight="700" fill="rgba(248,242,228,0.95)" fontFamily="Georgia,serif">
+              fontSize="18" fontWeight="700" fill={colors.parchment.DEFAULT} fontFamily="Georgia,serif">
           {score ?? "—"}
         </text>
         <text x={cx} y={cy + 12} textAnchor="middle"
-              fontSize="7.5" fontWeight="600" fill="rgba(248,242,228,0.42)"
-              fontFamily="system-ui,sans-serif" letterSpacing="0.8">
+              fontSize="9.2" fontWeight="600" fill={colors.ink.onnightMuted}
+              fontFamily="system-ui,sans-serif" letterSpacing="0.4">
           {label?.toUpperCase() ?? ""}
         </text>
         <text x={cx} y={cy + R - 5} textAnchor="middle"
-              fontSize="9" fill={colors.glyph} fontFamily="Georgia,serif">
+              fontSize="9" fill={ring.glyph} fontFamily="Georgia,serif">
           {glyph}
         </text>
       </svg>
@@ -109,7 +112,7 @@ function ReactionRow({ cardType, event, reacted, onReaction, t }) {
             className={`min-h-11 md:min-h-0 text-xs rounded-full px-3.5 py-1.5 border transition ${
               reacted === opt.id
                 ? 'bg-primary/15 border-primary text-primary-glow'
-                : 'border-white/[0.16] text-ink-onnight/75 hover:border-primary/50 hover:text-primary-glow'
+                : 'border-white/[0.16] text-ink-onnight hover:border-primary/50 hover:text-primary-glow'
             }`}
           >
             {opt.label}
@@ -117,7 +120,7 @@ function ReactionRow({ cardType, event, reacted, onReaction, t }) {
         ))}
       </div>
       {reacted && (
-        <p className="text-2xs text-sage mt-2.5">
+        <p className="text-2xs text-good-onnight mt-2.5">
           {reacted === 'tellmore'
             ? t('patrika_note_tellmore')
             : t('patrika_note_default')}
@@ -181,7 +184,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
               />
             ))}
           </div>
-          <span className="text-3xs tracking-wide text-ink-onnight/40">{t('patrika_tap_next')}</span>
+          <span className="text-2xs tracking-wide text-ink-onnightMuted">{t('patrika_tap_next')}</span>
         </div>
       </div>
 
@@ -196,7 +199,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
       {onRefresh && (
         <button
           onClick={onRefresh}
-          className="block mx-auto mt-3 min-h-11 md:min-h-0 text-3xs font-semibold text-ink-onnight/40 border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight/70 hover:border-white/[0.2] transition"
+          className="block mx-auto mt-3 min-h-11 md:min-h-0 text-2xs font-semibold text-ink-onnightMuted border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight hover:border-white/[0.2] transition"
         >
           {t('patrika_refresh')}
         </button>
@@ -245,9 +248,9 @@ function OneAction({ action }) {
   const { t } = useTranslation()
   if (!action) return null
   const ts = {
-    opportunity: { bg: "rgba(91,122,94,0.22)", border: "rgba(91,122,94,0.45)", ac: "#9FC7A2" },
-    steady:      { bg: "rgba(217,164,65,0.12)", border: "rgba(217,164,65,0.30)", ac: "#F0CB80" },
-    caution:     { bg: "rgba(184,64,64,0.16)",  border: "rgba(184,64,64,0.35)",  ac: "#E09090" },
+    opportunity: { bg: withAlpha(colors.sage.DEFAULT, 0.22),   border: withAlpha(colors.sage.DEFAULT, 0.45),   ac: colors.good.onnight },
+    steady:      { bg: withAlpha(colors.primary.DEFAULT, 0.12), border: withAlpha(colors.primary.DEFAULT, 0.30), ac: colors.primary.glow },
+    caution:     { bg: withAlpha(colors.bad.DEFAULT, 0.16),    border: withAlpha(colors.bad.DEFAULT, 0.35),    ac: colors.bad.onnight },
   }[action.tone] || {}
 
   function openJyoti() {
@@ -293,7 +296,8 @@ export default function DailyPatrikaHero({
 
   const chapter = edition?.chapter
   const score = dayScore?.score
-  const tone = score >= 7 ? "opportunity" : score >= 4.5 ? "steady" : "caution"
+  // One band drives both the ring tone and its label (C5).
+  const { tone, labelKey } = dayScoreBand(score)
   const pulse = score >= 8
 
   const cards = edition?.cards?.length
@@ -328,7 +332,7 @@ export default function DailyPatrikaHero({
               Mobile: ring centered above, deck below (flex-col)
               sm+:    ring left, deck right (flex-row) */}
           <div className="sj-body">
-            <CosmicRing score={score} tone={tone} mdPlanet={chapter?.md} label={dayScore?.label} pulse={pulse}/>
+            <CosmicRing score={score} tone={tone} mdPlanet={chapter?.md} label={labelKey ? t(labelKey) : dayScore?.label} pulse={pulse}/>
             <div className="sj-body-right">
               {cards.length > 0 ? (
                 <PatrikaDeck
@@ -354,124 +358,6 @@ export default function DailyPatrikaHero({
 
       {/* Countdown strip */}
       <CountdownStrip countdowns={edition?.countdowns} chapterLabelFn={chapterLabelFn}/>
-
-      <style>{`
-        /* ── Root ── */
-        .sj-hero-root { font-family: inherit; }
-
-        /* ── Night card ── */
-        .sj-night-card {
-          position:relative; overflow:hidden; border-radius:20px;
-          border:1px solid rgba(217,164,65,0.18);
-          background:linear-gradient(135deg,#1e2247 0%,#171B33 60%,#0F1226 100%);
-        }
-        .sj-night-inner { position:relative; padding:22px 18px 20px; }
-        @media(min-width:640px){ .sj-night-inner{ padding:30px 28px 26px; } }
-
-        .sj-glow{
-          position:absolute;top:-70px;right:-50px;
-          width:220px;height:220px;border-radius:50%;
-          background:radial-gradient(circle,rgba(217,164,65,0.08),transparent 70%);
-          pointer-events:none;
-        }
-
-        /* ── Top row ── */
-        .sj-top-row{
-          display:flex;align-items:flex-start;
-          justify-content:space-between;margin-bottom:18px;gap:8px;
-        }
-        .sj-greet{
-          font-family:Fraunces,Georgia,serif;font-size:15px;
-          color:rgba(248,242,228,0.48);line-height:1.2;
-        }
-        .sj-name{
-          font-family:Fraunces,Georgia,serif;font-weight:600;
-          font-size:clamp(20px,5vw,26px);
-          color:rgba(248,242,228,0.95);line-height:1.1;
-        }
-        .sj-datebox{ text-align:right;flex-shrink:0;min-width:0; }
-        .sj-eyebrow-gold{
-          font-size:10px;font-weight:700;letter-spacing:.12em;
-          text-transform:uppercase;color:#D9A441;
-        }
-        .sj-datestr{ font-size:11px;color:rgba(248,242,228,0.32);margin-top:2px; }
-        .sj-chapday{ font-size:10px;color:rgba(248,242,228,0.2);margin-top:2px; }
-
-        /* ── Body: mobile = col, sm+ = row ── */
-        .sj-body{
-          display:flex;flex-direction:column;align-items:center;
-          gap:14px;margin-bottom:2px;
-        }
-        @media(min-width:480px){
-          .sj-body{ flex-direction:row;align-items:flex-start;gap:18px; }
-        }
-        .sj-ring-wrap{ flex-shrink:0; }
-        .sj-body-right{ flex:1;min-width:0;width:100%; }
-
-        /* ── One action ── */
-        .sj-action{ margin-top:14px; }
-        .sj-action-eyebrow{
-          font-size:10px;text-transform:uppercase;letter-spacing:.12em;
-          font-weight:700;margin-bottom:7px;color:rgba(248,242,228,0.38);
-        }
-        .sj-action-card{
-          border-radius:14px;padding:12px 14px;
-        }
-        .sj-action-text{
-          font-family:Fraunces,Georgia,serif;font-weight:600;
-          font-size:clamp(13px,3.6vw,15px);line-height:1.35;
-          color:rgba(248,242,228,0.95);margin:0 0 4px;
-        }
-        .sj-action-why{
-          font-size:11px;color:rgba(248,242,228,0.4);margin:0 0 8px;
-        }
-        .sj-why-btn{
-          background:rgba(248,242,228,0.07);border-radius:99px;
-          padding:5px 12px;font-size:11px;font-weight:700;
-          cursor:pointer;transition:all 150ms;
-          -webkit-tap-highlight-color:transparent;
-        }
-
-        /* ── Chapter bar ── */
-        .sj-chap{ margin-top:14px; }
-        .sj-chap-row{
-          display:flex;justify-content:space-between;
-          font-size:10px;color:rgba(248,242,228,0.28);margin-bottom:4px;
-        }
-        .sj-chap-track{
-          height:2px;border-radius:99px;
-          background:rgba(248,242,228,0.07);overflow:hidden;
-        }
-        .sj-chap-fill{
-          height:100%;border-radius:99px;background:rgba(217,164,65,0.48);
-        }
-
-        /* ── Countdown strip — 1 col mobile, 3 col md+ ── */
-        .sj-cd-strip{
-          display:grid;
-          grid-template-columns:1fr;
-          gap:7px;margin-top:8px;
-        }
-        @media(min-width:600px){
-          .sj-cd-strip{ grid-template-columns:repeat(3,1fr); }
-        }
-        .sj-cd-chip{
-          display:flex;align-items:flex-start;gap:10px;
-          border-radius:14px;padding:12px 13px;
-          background:rgba(23,27,51,0.72);
-          border:1px solid rgba(248,242,228,0.07);
-          animation:sj-fade-up 220ms both;
-        }
-        .sj-cd-glyph{ font-size:17px;color:#D9A441;margin-top:1px;flex-shrink:0; }
-        .sj-cd-in{
-          font-size:10px;font-weight:700;letter-spacing:.1em;
-          text-transform:uppercase;color:#D9A441;margin:0 0 2px;
-        }
-        .sj-cd-name{
-          font-size:12px;font-weight:600;color:rgba(248,242,228,0.78);margin:0 0 1px;
-        }
-        .sj-cd-theme{ font-size:10px;color:rgba(248,242,228,0.32);margin:0; }
-      `}</style>
     </div>
   )
 }

@@ -8,10 +8,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaceMatches } from '../../hooks/usePlaceMatches'
+import { colors } from '../../theme/tokens'
+import { withAlpha } from '../../theme/chartPalette'
 
 // Simple Indian city SVG silhouette placeholder
 function CitySilhouette({ dark = false }) {
-  const fill = dark ? 'rgba(248,242,228,0.12)' : 'rgba(42,39,36,0.08)'
+  const fill = dark ? withAlpha(colors.parchment.DEFAULT, 0.12) : withAlpha(colors.ink.DEFAULT, 0.08)
   return (
     <svg width="100%" height="60" viewBox="0 0 300 60" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
       {/* Simple skyline shapes */}
@@ -60,7 +62,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
       <div className="sj-loc-card">
         <div className="sj-loc-card-body">
           <p className="sj-loc-eyebrow">
-            <span style={{color:'#A23B3B',marginRight:4}}>📍</span>
+            <span style={{color:colors.bad.onnight,marginRight:4}} aria-hidden="true">📍</span>
             {t('location_currently_in')}
           </p>
           <p className="sj-loc-city">{currentLabel ?? t('location_set_your_city')}</p>
@@ -100,7 +102,7 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         <div className="sj-loc-card">
           <div className="sj-loc-card-body">
             <p className="sj-loc-eyebrow">
-              <span style={{color:'#D9A441',marginRight:4}} aria-hidden="true">🪔</span>
+              <span style={{color:colors.primary.DEFAULT,marginRight:4}} aria-hidden="true">🪔</span>
               {t('location_chart_cast_for')}
             </p>
             <p className="sj-loc-city sj-loc-birth">{birthPlace}</p>
@@ -117,87 +119,6 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
           </div>
         </div>
       )}
-
-      <style>{`
-        .sj-loc-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-        @media(max-width:479px){
-          .sj-loc-grid { grid-template-columns: 1fr; }
-        }
-        .sj-loc-card {
-          background: #171B33;
-          border: 1px solid rgba(217,164,65,0.12);
-          border-radius: 14px;
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          min-height: 130px;
-        }
-        .sj-loc-card-body { padding: 16px 16px 8px; }
-        .sj-loc-eyebrow {
-          font-size: 12px;
-          color: rgba(201,194,214,0.75);
-          margin: 0 0 6px;
-          font-weight: 500;
-        }
-        .sj-loc-city {
-          font-size: clamp(14px,2.5vw,18px);
-          font-weight: 700;
-          color: #F8F3E7;
-          margin: 0 0 6px;
-          line-height: 1.25;
-        }
-        .sj-loc-birth { color: #C9C2D6; }
-        .sj-loc-sub {
-          font-size: 12px;
-          color: rgba(201,194,214,0.75);
-          margin: 0 0 8px;
-        }
-        .sj-loc-update-btn {
-          display: inline-block;
-          font-size: 11px;
-          font-weight: 600;
-          color: #D9A441;
-          border: 1px solid rgba(217,164,65,0.4);
-          border-radius: 99px;
-          padding: 5px 16px;
-          min-height: 44px;
-          background: none;
-          cursor: pointer;
-          transition: all 150ms;
-        }
-        .sj-loc-update-btn:hover {
-          background: rgba(217,164,65,0.08);
-        }
-        .sj-loc-illustration {
-          padding: 0 0 0;
-          opacity: 0.6;
-        }
-        .sj-loc-input {
-          width:100%;border:1px solid rgba(217,164,65,0.2);border-radius:10px;
-          padding:6px 10px;min-height:44px;font-size:16px;color:#F8F3E7;
-          background:#0F1226;outline:none;
-        }
-        .sj-loc-input:focus { border-color:#D9A441; }
-        .sj-loc-dropdown {
-          position:absolute;top:calc(100% + 4px);left:0;right:0;
-          background:#171B33;border:1px solid rgba(217,164,65,0.15);border-radius:10px;
-          box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:50;
-          max-height:160px;overflow-y:auto;
-        }
-        .sj-loc-match {
-          display:block;width:100%;text-align:left;
-          padding:8px 12px;min-height:44px;font-size:12px;color:#C9C2D6;
-          background:none;border:none;cursor:pointer;
-          border-bottom:1px solid rgba(217,164,65,0.08);
-        }
-        .sj-loc-match:last-child { border-bottom:none; }
-        .sj-loc-match:hover { background:rgba(217,164,65,0.06); }
-      `}</style>
     </div>
   )
 }

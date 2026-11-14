@@ -15,24 +15,24 @@ export default function ChartSpotlight({ moonSpotlight, dashaSpotlight }) {
           <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-serif font-semibold text-night text-sm">☾</span>
           <div>
             <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_moon_title')}</h3>
-            <p className="text-[11px] text-ink-onnight/45 mt-0.5">
+            <p className="text-2xs text-ink-onnightMuted mt-0.5">
               {t('spotlight_moon_subtitle', { sign: moonSpotlight?.sign ? signName(t, moonSpotlight.sign) : '—', house: house ? houseOrdinal(t, house) : '—' })}
             </p>
           </div>
         </div>
-        <p className="text-[13.5px] text-ink-onnight/75 leading-relaxed">{moonSpotlight?.text}</p>
+        <p className="text-[13.5px] text-ink-onnight leading-relaxed">{moonSpotlight?.text}</p>
       </div>
       <div className="bg-white/[0.045] border border-white/[0.09] rounded-2xl p-5 sm:p-6">
         <div className="flex items-center gap-2.5 mb-2.5">
           <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-serif font-semibold text-night text-sm">♀</span>
           <div>
             <h3 className="font-serif font-semibold text-[15px] text-primary-light">{t('spotlight_dasha_title')}</h3>
-            <p className="text-[11px] text-ink-onnight/45 mt-0.5">
+            <p className="text-2xs text-ink-onnightMuted mt-0.5">
               {t('spotlight_dasha_subtitle', { mahadasha: dashaSpotlight?.mahadasha ? planetName(t, dashaSpotlight.mahadasha) : '—', antardasha: antardashaStr })}
             </p>
           </div>
         </div>
-        <p className="text-[13.5px] text-ink-onnight/75 leading-relaxed">{dashaSpotlight?.text}</p>
+        <p className="text-[13.5px] text-ink-onnight leading-relaxed">{dashaSpotlight?.text}</p>
       </div>
     </div>
   )

@@ -46,8 +46,8 @@ function GrahaAccordion({ grahas }) {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="font-semibold text-ink text-sm">{g.name}</span>
-                  <span className="text-ink-faint text-xs">{g.skt}</span>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-dark">{g.keyword}</span>
+                  <span className="text-ink-muted text-xs">{g.skt}</span>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">{g.keyword}</span>
                 </div>
                 <p className="text-ink-muted text-xs mt-0.5 truncate">{g.governs}</p>
               </div>
@@ -62,9 +62,9 @@ function GrahaAccordion({ grahas }) {
               <div className="px-5 pb-5 border-t border-line pt-4">
                 <p className="text-ink text-sm leading-relaxed mb-4">{g.body}</p>
                 <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                  <div><dt className="inline text-ink-faint">Owns: </dt><dd className="inline text-ink">{g.owns}</dd></div>
-                  <div><dt className="inline text-ink-faint">Exalted: </dt><dd className="inline text-ink">{g.exalted}</dd></div>
-                  <div><dt className="inline text-ink-faint">Debilitated: </dt><dd className="inline text-ink">{g.debilitated}</dd></div>
+                  <div><dt className="inline text-ink-muted">Owns: </dt><dd className="inline text-ink">{g.owns}</dd></div>
+                  <div><dt className="inline text-ink-muted">Exalted: </dt><dd className="inline text-ink">{g.exalted}</dd></div>
+                  <div><dt className="inline text-ink-muted">Debilitated: </dt><dd className="inline text-ink">{g.debilitated}</dd></div>
                 </dl>
               </div>
             )}
@@ -98,7 +98,7 @@ export default function PlanetsGuide() {
       {/* ── Grahas: forces, not rocks ───────────────────────────────────── */}
       <section className="mt-10" aria-labelledby="intro-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{GRAHAS_INTRO.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{GRAHAS_INTRO.eyebrow}</p>
           <h2 id="intro-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {GRAHAS_INTRO.title}
           </h2>
@@ -112,7 +112,7 @@ export default function PlanetsGuide() {
       {/* ── The nine grahas (accordion) ─────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="grahas-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">The Navagrahas</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">The Navagrahas</p>
           <h2 id="grahas-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-3">
             The nine grahas
           </h2>
@@ -124,7 +124,7 @@ export default function PlanetsGuide() {
       {/* ── Planetary strength ──────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="strength-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{PLANETARY_STRENGTH.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{PLANETARY_STRENGTH.eyebrow}</p>
           <h2 id="strength-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-4">
             {PLANETARY_STRENGTH.title}
           </h2>
@@ -146,7 +146,7 @@ export default function PlanetsGuide() {
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

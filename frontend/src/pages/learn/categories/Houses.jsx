@@ -35,15 +35,15 @@ function HouseCard({ house }) {
   return (
     <div className="bg-parchment-card border border-line rounded-2xl p-5 hover:border-primary/40 transition-colors">
       <div className="flex items-center gap-3 mb-3">
-        <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary-dark font-bold text-sm shrink-0">
+        <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary-ink font-bold text-sm shrink-0">
           {house.number}
         </span>
         <div>
           <p className="font-semibold text-sm text-ink leading-tight">{house.name}</p>
-          <p className="text-xs text-ink-faint">{house.sanskrit}</p>
+          <p className="text-xs text-ink-muted">{house.sanskrit}</p>
         </div>
       </div>
-      <p className="text-[11px] font-semibold text-primary-dark tracking-wide uppercase mb-2">{house.keywords}</p>
+      <p className="text-[11px] font-semibold text-primary-ink tracking-wide uppercase mb-2">{house.keywords}</p>
       <p className="text-sm text-ink-muted leading-relaxed">{house.description}</p>
     </div>
   )
@@ -103,7 +103,7 @@ export default function HousesGuide() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
+            <p className="text-sm text-primary-ink leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
           </div>
         </div>
       )}

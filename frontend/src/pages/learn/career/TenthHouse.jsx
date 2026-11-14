@@ -36,7 +36,7 @@ export default function TenthHouseGuide() {
 
       <section className="mt-10" aria-labelledby="tenth-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{WHAT_THE_TENTH_IS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{WHAT_THE_TENTH_IS.eyebrow}</p>
           <h2 id="tenth-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">{WHAT_THE_TENTH_IS.title}</h2>
           <ArticleParagraphs paragraphs={WHAT_THE_TENTH_IS.paragraphs} />
         </Reveal>
@@ -44,7 +44,7 @@ export default function TenthHouseGuide() {
 
       <section className="mt-14" aria-labelledby="read-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{HOW_TO_READ.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{HOW_TO_READ.eyebrow}</p>
           <h2 id="read-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">{HOW_TO_READ.title}</h2>
         </Reveal>
         <dl className="space-y-6 mt-2">
@@ -61,7 +61,7 @@ export default function TenthHouseGuide() {
 
       <section className="mt-14" aria-labelledby="signs-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{SIGNS_IN_TENTH.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{SIGNS_IN_TENTH.eyebrow}</p>
           <h2 id="signs-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-4">{SIGNS_IN_TENTH.title}</h2>
           <p className="text-ink-muted text-sm leading-relaxed mb-6">{SIGNS_IN_TENTH.description}</p>
         </Reveal>
@@ -69,7 +69,7 @@ export default function TenthHouseGuide() {
           <dl>
             {SIGNS_IN_TENTH.items.map((item, i) => (
               <div key={i} className={`flex items-start gap-4 px-5 py-3.5 ${i < SIGNS_IN_TENTH.items.length - 1 ? 'border-b border-line' : ''}`}>
-                <dt className="shrink-0 w-44 text-sm font-semibold text-ink">{item.sign} <span className="text-ink-faint font-normal text-xs">({item.lord})</span></dt>
+                <dt className="shrink-0 w-44 text-sm font-semibold text-ink">{item.sign} <span className="text-ink-muted font-normal text-xs">({item.lord})</span></dt>
                 <dd className="text-sm text-ink-muted leading-relaxed">{item.tendency}</dd>
               </div>
             ))}
@@ -79,7 +79,7 @@ export default function TenthHouseGuide() {
 
       <section className="mt-14" aria-labelledby="beyond-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{BEYOND_PLACEMENT.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{BEYOND_PLACEMENT.eyebrow}</p>
           <h2 id="beyond-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">{BEYOND_PLACEMENT.title}</h2>
           <ArticleParagraphs paragraphs={BEYOND_PLACEMENT.paragraphs} />
         </Reveal>
@@ -87,7 +87,7 @@ export default function TenthHouseGuide() {
 
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">Frequently asked questions</h2>
         </Reveal>
         <FAQ items={FAQS} title={null} />

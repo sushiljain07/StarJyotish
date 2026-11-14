@@ -33,16 +33,16 @@ function PathStep({ step }) {
   const isAvailable = Boolean(step.href) && !step.comingSoon
   const inner = (
     <div className="flex gap-5 items-start">
-      <div className="shrink-0 w-9 h-9 rounded-xl bg-primary-light flex items-center justify-center text-primary-dark font-bold text-sm font-serif mt-0.5">
+      <div className="shrink-0 w-9 h-9 rounded-xl bg-primary-light flex items-center justify-center text-primary-ink font-bold text-sm font-serif mt-0.5">
         {step.num}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-1.5">
-          <h3 className={`font-semibold text-sm text-ink leading-snug ${isAvailable ? 'group-hover:text-primary-dark transition' : ''}`}>
+          <h3 className={`font-semibold text-sm text-ink leading-snug ${isAvailable ? 'group-hover:text-primary-ink transition' : ''}`}>
             {step.title}
           </h3>
           {step.comingSoon && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-faint border border-line">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
               Coming soon
             </span>
           )}
@@ -53,9 +53,9 @@ function PathStep({ step }) {
           )}
         </div>
         <p className="text-ink-muted text-sm leading-relaxed mb-2">{step.teaser}</p>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-faint">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
           <span>{step.readTime} min read</span>
-          {step.outcome && <span className="text-primary-dark font-medium">→ {step.outcome}</span>}
+          {step.outcome && <span className="text-primary-ink font-medium">→ {step.outcome}</span>}
         </div>
       </div>
     </div>
@@ -115,7 +115,7 @@ export default function MarriagePath() {
       {/* ── What Vedic astrology says about marriage ──────────────────── */}
       <section className="mt-2" aria-labelledby="intro-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{MARRIAGE_PATH_INTRO.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{MARRIAGE_PATH_INTRO.eyebrow}</p>
           <h2 id="intro-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {MARRIAGE_PATH_INTRO.title}
           </h2>
@@ -129,7 +129,7 @@ export default function MarriagePath() {
       {/* ── The 7 steps ───────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="steps-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">The path</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">The path</p>
           <h2 id="steps-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Seven guides, in order
           </h2>
@@ -146,7 +146,7 @@ export default function MarriagePath() {
       {/* ── After this path ───────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="after-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{MARRIAGE_PATH_AFTER.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{MARRIAGE_PATH_AFTER.eyebrow}</p>
           <h2 id="after-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {MARRIAGE_PATH_AFTER.title}
           </h2>
@@ -157,7 +157,7 @@ export default function MarriagePath() {
       {/* ── FAQ ───────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

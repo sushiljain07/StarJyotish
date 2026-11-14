@@ -142,135 +142,15 @@
     "goldText": 1
   },
   "pages/learn/Zodiac.jsx": {
-    "goldText": 3,
-    "faintText": 3
-  },
-  "pages/learn/basics/LagnaGuide.jsx": {
-    "goldText": 6,
-    "faintText": 2
-  },
-  "pages/learn/basics/MoonSignGuide.jsx": {
-    "goldText": 7,
-    "faintText": 2
+    "goldText": 1
   },
   "pages/learn/basics/PlanetsGuide.jsx": {
-    "goldText": 5,
-    "faintText": 5
-  },
-  "pages/learn/basics/WhatIsKundli.jsx": {
-    "goldText": 7
-  },
-  "pages/learn/career/D10Dashamsha.jsx": {
-    "goldText": 3
-  },
-  "pages/learn/career/DashasTiming.jsx": {
-    "goldText": 3
-  },
-  "pages/learn/career/Rajyogas.jsx": {
-    "goldText": 3,
     "faintText": 1
-  },
-  "pages/learn/career/SaturnAndSun.jsx": {
-    "goldText": 4
-  },
-  "pages/learn/career/TenthHouse.jsx": {
-    "goldText": 5,
-    "faintText": 1
-  },
-  "pages/learn/career/TenthLord.jsx": {
-    "goldText": 5
-  },
-  "pages/learn/categories/Dashas.jsx": {
-    "goldText": 4,
-    "faintText": 1
-  },
-  "pages/learn/categories/Doshas.jsx": {
-    "goldText": 3,
-    "faintText": 4
   },
   "pages/learn/categories/Houses.jsx": {
-    "goldText": 4,
-    "faintText": 1
+    "goldText": 1
   },
   "pages/learn/categories/Nakshatras.jsx": {
-    "goldText": 6,
-    "faintText": 3
-  },
-  "pages/learn/categories/Planets.jsx": {
-    "goldText": 2,
-    "faintText": 3
-  },
-  "pages/learn/categories/Yogas.jsx": {
-    "goldText": 1,
-    "faintText": 4
-  },
-  "pages/learn/marriage/D9Navamsa.jsx": {
     "goldText": 2
-  },
-  "pages/learn/marriage/GunaMilan.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/marriage/MangalDosha.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/marriage/MarriageTiming.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/marriage/SeventhHouse.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/marriage/Synastry.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/marriage/VenusJupiter.jsx": {
-    "goldText": 2
-  },
-  "pages/learn/paths/CareerPath.jsx": {
-    "goldText": 7,
-    "faintText": 2
-  },
-  "pages/learn/paths/MarriagePath.jsx": {
-    "goldText": 7,
-    "faintText": 2
-  },
-  "pages/learn/paths/NewToVedic.jsx": {
-    "goldText": 7,
-    "faintText": 2
-  },
-  "pages/learn/zodiac/Aquarius.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Aries.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Cancer.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Capricorn.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Gemini.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Leo.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Libra.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Pisces.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Sagittarius.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Scorpio.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Taurus.jsx": {
-    "goldText": 12
-  },
-  "pages/learn/zodiac/Virgo.jsx": {
-    "goldText": 12
   }
 }

@@ -45,19 +45,19 @@ function YogaCard({ yoga }) {
       </div>
       <dl className="space-y-4">
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Formation</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{yoga.formation}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Effect</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Effect</dt>
           <dd className="text-sm text-ink leading-relaxed">{yoga.effect}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Example</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Example</dt>
           <dd className="text-sm text-ink-muted leading-relaxed italic">{yoga.example}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Important note</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Important note</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{yoga.notes}</dd>
         </div>
       </dl>
@@ -118,7 +118,7 @@ export default function YogasGuide() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
+            <p className="text-sm text-primary-ink leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
           </div>
         </div>
       )}

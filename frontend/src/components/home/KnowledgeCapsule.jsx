@@ -114,7 +114,7 @@ export default function KnowledgeCapsule({ edition }) {
           <p className="font-serif font-medium text-[15px] text-primary-light leading-snug mb-1">
             {capsule.title}
           </p>
-          <p className="text-xs text-ink-onnight/50 leading-relaxed line-clamp-2 mb-2">
+          <p className="text-xs text-ink-onnightMuted leading-relaxed line-clamp-2 mb-2">
             {capsule.body}
           </p>
           <Link

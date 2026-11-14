@@ -109,6 +109,7 @@ export default function Footer() {
             <p className="text-xs text-ink-onnightMuted mt-1 max-w-sm">{t('footer_newsletter_body')}</p>
           </div>
           {newsletterStatus === 'sent' ? (
+            // light-surface: sage text on its own sage-light pill (AA)
             <div className="flex items-center gap-2 bg-sage-light border border-sage/30 rounded-lg px-4 py-2.5 text-sage text-sm font-medium">
               ✓ {t('footer_newsletter_success', "You're on the list — we'll be in touch!")}
             </div>
@@ -176,7 +177,7 @@ export default function Footer() {
         <p className="text-ink-onnightMuted text-center">
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}
         </p>
-        <LanguageSwitcher size="sm" />
+        <LanguageSwitcher />
       </div>
       <BottomChromeSpacer />
     </footer>

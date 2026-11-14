@@ -23,8 +23,8 @@
 //     brief)
 //  5. Beat: This week — WeekStrip, now a constellation → /week-ahead
 //  6. Beat: Your charts — ChartsStrip → /kundli divisional tab
-//  7. Beat: Your reports — ReportsStrip, now carrying the life-area trend
-//     signal that used to be LifeAreaGrid's own beat
+//  7. Beat: Your reports — ReportsStrip, which also carries the weekly
+//     life-area trend signal (computeLifeAreas)
 //  8. Beat: Coming up — ComingUpStrip, reduced to the 2 nearest events
 //  9. Beat: The sky remembers — a slim Ask-Jyoti entry point + SkyRemembers
 //     (yesterday's-reaction memory line + free-text journal)
@@ -33,10 +33,9 @@
 //  12. DisclaimerBlock
 //  13. AskPersonaPanel FAB
 //
-// LifeAreaGrid.jsx, ReflectionLoop.jsx and JournalPrompt.jsx are no longer
-// wired in here (their roles are folded into ReportsStrip and
-// SkyRemembers respectively) but remain on disk, unmodified and still
-// importable elsewhere — nothing was deleted.
+// The life-area signal lives in ReportsStrip, and the reflection/journal
+// roles live in SkyRemembers. ReflectionLoop.jsx and JournalPrompt.jsx are
+// still on disk but are not rendered on this page.
 //
 // Header/footer/BottomNav/background are the app shell's job — see
 // components/layout/WorkspaceLayout.jsx. This page renders content only.
@@ -278,7 +277,7 @@ export default function PersonalHome() {
             <Beat title={t('home_coming_up_label')}>
               {comingUpEvents.length > 0
                 ? <ComingUpStrip events={comingUpEvents} />
-                : <p className="text-sm text-ink-onnight/55">{t('home_coming_up_loading')}</p>
+                : <p className="text-sm text-ink-onnightMuted">{t('home_coming_up_loading')}</p>
               }
             </Beat>
 
@@ -293,7 +292,7 @@ export default function PersonalHome() {
               >
                 <div>
                   <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
-                  <p className="text-sm text-ink-onnight/75">{t('home_ask_jyoti_body')}</p>
+                  <p className="text-sm text-ink-onnight">{t('home_ask_jyoti_body')}</p>
                 </div>
                 <span className="text-primary-light text-lg shrink-0">↗</span>
               </Card>

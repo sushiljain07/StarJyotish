@@ -22,7 +22,7 @@ export default function GoDeeperCta({ onOpenFullReading, guideHref, guideLabel }
       >
         <div>
           <h4 className="font-serif font-semibold text-[17px] text-primary-light mb-1.5">{guideLabel}</h4>
-          <p className="text-[13px] text-ink-onnight/60">{t('go_deeper_guide_body')}</p>
+          <p className="text-[13px] text-ink-onnightMuted">{t('go_deeper_guide_body')}</p>
         </div>
         <span className="self-start mt-3.5 text-xs font-bold px-4 py-2 rounded-full bg-night text-primary-light">
           {t('go_deeper_guide_btn')}

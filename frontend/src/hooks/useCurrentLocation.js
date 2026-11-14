@@ -57,7 +57,7 @@ export function useCurrentLocation() {
       return
     }
     // Stale or missing — ask the browser once automatically. If that fails,
-    // status becomes 'denied' and LocationBar shows the manual picker.
+    // status becomes 'denied' and the home page's location UI offers the manual picker.
     tryGeolocation()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile?.current_lat, profile?.current_lon])

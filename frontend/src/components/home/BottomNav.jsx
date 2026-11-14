@@ -108,7 +108,7 @@ export default function BottomNav({ profile = null }) {
               />
             )}
             <span className="flex justify-center">{ICONS[item.id]}</span>
-            <span className="text-3xs font-semibold tracking-[0.3px] leading-none text-center">
+            <span className="text-2xs font-semibold tracking-[0.3px] leading-none text-center">
               {t(item.key, item.fallback)}
             </span>
           </>

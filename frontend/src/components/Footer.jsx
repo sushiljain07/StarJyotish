@@ -28,7 +28,7 @@ function FooterLink({ to, state, children }) {
       <Link
         to={to}
         state={state}
-        className="text-ink-onnight/80 hover:text-primary text-sm transition flex items-center gap-1.5 min-h-11"
+        className="text-ink-onnightMuted hover:text-primary text-sm transition flex items-center gap-1.5 min-h-11"
       >
         <span className="text-primary/50 text-xs">›</span>{children}
       </Link>
@@ -73,8 +73,8 @@ export default function Footer() {
             <img src="/starjyotish.svg" alt="" className="w-8 h-8" />
             <span className="font-serif font-semibold text-lg text-primary-light">{t('app_title')}</span>
           </div>
-          <p className="text-sm text-ink-onnight/70 mt-3 leading-relaxed max-w-xs">{t('landing_subhead')}</p>
-          <p className="text-xs font-semibold tracking-wide uppercase text-ink-onnight/50 mt-5 mb-2">{t('footer_follow_heading')}</p>
+          <p className="text-sm text-ink-onnightMuted mt-3 leading-relaxed max-w-xs">{t('landing_subhead')}</p>
+          <p className="text-xs font-semibold tracking-wide uppercase text-ink-onnightMuted mt-5 mb-2">{t('footer_follow_heading')}</p>
           <SocialButtons dark className="-ml-1.5" />
         </div>
 
@@ -95,7 +95,7 @@ export default function Footer() {
             <FooterLink to="/pricing">{t('nav_early_access')}</FooterLink>
             <FooterLink to="/contact">{t('footer_link_contact')}</FooterLink>
           </ul>
-          <p className="flex items-center gap-1.5 text-sm text-ink-onnight/80 mt-4">
+          <p className="flex items-center gap-1.5 text-sm text-ink-onnightMuted mt-4">
             ✉️ contact@starjyotish.com
           </p>
         </FooterColumn>
@@ -106,7 +106,7 @@ export default function Footer() {
         <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="font-serif font-semibold text-base text-primary-light">{t('footer_newsletter_heading')}</p>
-            <p className="text-xs text-ink-onnight/70 mt-1 max-w-sm">{t('footer_newsletter_body')}</p>
+            <p className="text-xs text-ink-onnightMuted mt-1 max-w-sm">{t('footer_newsletter_body')}</p>
           </div>
           {newsletterStatus === 'sent' ? (
             <div className="flex items-center gap-2 bg-sage-light border border-sage/30 rounded-lg px-4 py-2.5 text-sage text-sm font-medium">
@@ -149,11 +149,11 @@ export default function Footer() {
           )}
         </div>
         {newsletterStatus === 'error' && (
-          <p role="alert" className="max-w-6xl mx-auto px-6 pb-2 text-sm text-vermillion md:text-right">
+          <p role="alert" className="max-w-6xl mx-auto px-6 pb-2 text-sm text-bad-onnight md:text-right">
             {t('footer_newsletter_error')}
           </p>
         )}
-        <p className="max-w-6xl mx-auto px-6 pb-4 text-[11px] text-ink-onnight/50 md:text-right">🔒 {t('footer_newsletter_note')}</p>
+        <p className="max-w-6xl mx-auto px-6 pb-4 text-xs text-ink-onnightMuted md:text-right">🔒 {t('footer_newsletter_note')}</p>
       </div>
 
       {/* ── Trust badges ── */}
@@ -167,13 +167,13 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 text-ink-onnight/60">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 text-ink-onnightMuted">
           <Link to="/privacy" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_privacy')}</Link>
           <Link to="/terms" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_terms')}</Link>
           <Link to="/refund-policy" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_refund')}</Link>
           <Link to="/disclaimer" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_disclaimer')}</Link>
         </div>
-        <p className="text-ink-onnight/50 text-center">
+        <p className="text-ink-onnightMuted text-center">
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}
         </p>
         <LanguageSwitcher size="sm" />

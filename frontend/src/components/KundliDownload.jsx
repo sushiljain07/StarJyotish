@@ -165,21 +165,21 @@ export default function KundliDownload({ data, input }) {
             </div>
             {ad && (
               <div className="bg-mauve-light border border-mauve/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-mauve/70 uppercase font-medium">{t('dasha_antardasha')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_antardasha')}</div>
                 <div className="text-sm font-bold text-mauve">{planetName(t, ad.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(ad.start)} – {fmtDate(ad.end)}</div>
               </div>
             )}
             {dasha.current_pratyantar && (
               <div className="bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-vermillion/70 uppercase font-medium">{t('dasha_pratyantar')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_pratyantar')}</div>
                 <div className="text-sm font-bold text-vermillion">{planetName(t, dasha.current_pratyantar.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_pratyantar.start)} – {fmtDate(dasha.current_pratyantar.end)}</div>
               </div>
             )}
             {dasha.current_sookshma && (
               <div className="bg-sage-light border border-sage/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-sage/70 uppercase font-medium">{t('dasha_sookshma')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_sookshma')}</div>
                 <div className="text-sm font-bold text-sage">{planetName(t, dasha.current_sookshma.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_sookshma.start)} – {fmtDate(dasha.current_sookshma.end)}</div>
               </div>

@@ -112,6 +112,9 @@ export function AuthProvider({ children }) {
       // Best-effort — even if the network call fails, drop the local
       // session state so the UI reflects "logged out" immediately.
     }
+    // A refresh that started while the logout call was in flight still
+    // carries the old generation: bump it again so it can't sign back in.
+    markLoggedOut()
     setAccessToken(null)
     setUser(null)
     setSessionError(null)

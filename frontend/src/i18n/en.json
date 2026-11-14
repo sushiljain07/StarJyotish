@@ -902,6 +902,7 @@
   "kundli_chip_lagna": "Lagna: {{sign}}",
   "kundli_chip_rashi": "Rashi: {{sign}}",
   "kundli_chip_mahadasha": "Mahadasha: {{planet}}",
+  "kundli_chips_toggle_aria": "Chart summary",
   "kundli_tab_life_areas": "Life Areas",
   "kundli_tab_analysis": "Analysis",
   "kundli_sub_chart": "Chart",

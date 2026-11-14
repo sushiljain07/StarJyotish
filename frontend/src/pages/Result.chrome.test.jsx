@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
@@ -75,6 +75,65 @@ describe('Kundli sticky chrome', () => {
     expect(mainRow.className).toContain('md:block')
     const subRow = screen.getByRole('tab', { name: 'Dasha' }).closest('[data-testid="kundli-sub-tabs"]')
     expect(subRow.className).not.toMatch(/(^|\s)hidden(\s|$)/)
+  })
+
+  function phone() {
+    vi.spyOn(window, 'matchMedia').mockImplementation(q => ({
+      matches: q === '(max-width: 767px)', media: q,
+      addEventListener: () => {}, removeEventListener: () => {},
+    }))
+  }
+
+  it('on phones the collapsed chips are hidden from screen readers', () => {
+    phone()
+    renderPage()
+    const chips = screen.getByTestId('summary-chips')
+    expect(chips.getAttribute('aria-hidden')).toBe('true')
+    expect(chips.hasAttribute('inert')).toBe(true)
+    const toggle = screen.getByRole('button', { name: 'Chart summary' })
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(toggle.getAttribute('aria-controls')).toBe(chips.id)
+    expect(toggle.className).toContain('min-h-11')
+    expect(toggle.className).toContain('min-w-11')
+    // Inline at the end of the sub-tab row, not a row of its own.
+    expect(toggle.closest('[data-testid="kundli-sub-tabs"]')).not.toBeNull()
+  })
+
+  it('on phones tapping the toggle reveals the chips until tapped again', () => {
+    phone()
+    renderPage()
+    const chips = screen.getByTestId('summary-chips')
+    const toggle = screen.getByRole('button', { name: 'Chart summary' })
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(chips.hasAttribute('aria-hidden')).toBe(false)
+    expect(chips.hasAttribute('inert')).toBe(false)
+    expect(chips.className).not.toContain('max-h-0')
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(chips.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('on phones revealed chips close again on scroll down', () => {
+    phone()
+    renderPage()
+    scrollTo(300)
+    const chips = screen.getByTestId('summary-chips')
+    const toggle = screen.getByRole('button', { name: 'Chart summary' })
+    fireEvent.click(toggle)
+    now += 400
+    scrollTo(290)          // up: stays open
+    expect(chips.hasAttribute('aria-hidden')).toBe(false)
+    scrollTo(340)          // down: closes
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(chips.className).toContain('max-h-0')
+  })
+
+  it('on laptops there is no chips toggle and the chips are announced', () => {
+    renderPage()
+    expect(screen.queryByRole('button', { name: 'Chart summary' })).toBeNull()
+    expect(screen.getByTestId('summary-chips').hasAttribute('aria-hidden')).toBe(false)
+    expect(screen.getByTestId('summary-chips').hasAttribute('inert')).toBe(false)
   })
 
   it('on laptops the chips start expanded', () => {

@@ -37,13 +37,18 @@ function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
 
-function SummaryChips({ data, collapsed }) {
+// `hidden` is true only when the collapsed chips are really invisible (phones):
+// they are then kept out of the accessibility tree and the tab order.
+function SummaryChips({ data, collapsed, hidden, id }) {
   const { t } = useTranslation()
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
     <div
+      id={id}
       data-testid="summary-chips"
+      aria-hidden={hidden ? 'true' : undefined}
+      inert={hidden ? '' : undefined}
       className={`flex flex-wrap gap-1.5 motion-safe:transition-all motion-safe:duration-200 ${
         collapsed
           ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-16 md:opacity-100 md:overflow-visible md:py-2'
@@ -62,6 +67,51 @@ function SummaryChips({ data, collapsed }) {
         {t('kundli_chip_mahadasha', { planet: planetName(t, md.planet) })}
       </span>
     </div>
+  )
+}
+
+// Phones: the chips start collapsed and open on tap. They stay open until
+// the next tap or a scroll down. Scroll changes in the first moment after
+// opening are ignored, since the band growing can nudge scrollY by itself.
+const REVEAL_SETTLE_MS = 300
+const REVEAL_SCROLL_PX = 8
+function useTapToReveal() {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return undefined
+    const openedAt = performance.now()
+    let baseY = window.scrollY
+    function onScroll() {
+      const y = window.scrollY
+      if (performance.now() - openedAt < REVEAL_SETTLE_MS || y < baseY) {
+        baseY = y
+        return
+      }
+      if (y - baseY > REVEAL_SCROLL_PX) setOpen(false)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [open])
+  return [open, () => setOpen(o => !o)]
+}
+
+function ChipsToggle({ open, onToggle, controls }) {
+  const { t } = useTranslation()
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      aria-controls={controls}
+      aria-label={t('kundli_chips_toggle_aria')}
+      className="shrink-0 min-h-11 min-w-11 -mr-2 flex items-center justify-center rounded-full text-ink-muted hover:text-ink"
+    >
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+           aria-hidden="true"
+           className={`w-5 h-5 motion-safe:transition-transform motion-safe:duration-200 ${open ? 'rotate-180' : ''}`}>
+        <path d="M5 8l5 5 5-5" />
+      </svg>
+    </button>
   )
 }
 
@@ -105,6 +155,7 @@ export default function Result() {
   const navigate  = useNavigate()
   const scrollDir = useScrollDirection()
   const belowMd   = useBelowMd()
+  const [chipsOpen, toggleChips] = useTapToReveal()
   const { isAuthenticated, user, accessToken, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile
   // (local cache), else — on a cold device or a shared link — the profile
@@ -289,8 +340,14 @@ export default function Result() {
 
           {/* chips */}
           {/* Phones start collapsed: the band must leave ≥75% of the
-              screen to content (owner decision, 14 Nov). */}
-          <SummaryChips data={data} collapsed={belowMd || scrollDir === 'down'} />
+              screen to content (owner decision, 14 Nov). A toggle at the
+              end of the sub-tab row reveals them. */}
+          <SummaryChips
+            id="kundli-summary-chips"
+            data={data}
+            collapsed={belowMd ? !chipsOpen : scrollDir === 'down'}
+            hidden={belowMd && !chipsOpen}
+          />
 
           {/* Row 3 — main tabs. Laptops only: on phones the main tabs live
               in the bottom NavBar and this band shows just the sub-tabs. */}
@@ -306,13 +363,16 @@ export default function Result() {
 
           {/* Row 4 — sub-tabs (only when the active main tab has them) */}
           {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
-            <div data-testid="kundli-sub-tabs" className="md:border-t border-line/40 py-2">
-              {activeMain === 'birth_chart' && (
-                <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
-              )}
-              {activeMain === 'analysis' && (
-                <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
-              )}
+            <div data-testid="kundli-sub-tabs" className="md:border-t border-line/40 py-2 flex items-center gap-1">
+              <div className="flex-1 min-w-0">
+                {activeMain === 'birth_chart' && (
+                  <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
+                )}
+                {activeMain === 'analysis' && (
+                  <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
+                )}
+              </div>
+              {belowMd && <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />}
             </div>
           )}
         </div>

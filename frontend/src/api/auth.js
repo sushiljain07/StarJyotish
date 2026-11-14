@@ -88,12 +88,23 @@ async function refreshAttempt() {
   }
 }
 
+// A 409 that is still there after every retry is a stale tab replaying a
+// closed token (e.g. after sign-out elsewhere), not a race it can win: it
+// rejects as a 401 so the app goes to /login, not the reconnect screen.
 async function refreshOnce() {
   for (let i = 0; ; i++) {
     try {
       return await refreshAttempt()
     } catch (err) {
-      if (isAuthRejection(err) || i >= REFRESH_RETRY_DELAYS_MS.length) throw err
+      if (isAuthRejection(err)) throw err
+      if (i >= REFRESH_RETRY_DELAYS_MS.length) {
+        if (err.status === 409) {
+          const signedOut = new Error('Session expired. Please log in again.')
+          signedOut.status = 401
+          throw signedOut
+        }
+        throw err
+      }
       await wait(REFRESH_RETRY_DELAYS_MS[i])
     }
   }

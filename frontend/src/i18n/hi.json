@@ -902,6 +902,7 @@
   "kundli_chip_lagna": "लग्न: {{sign}}",
   "kundli_chip_rashi": "राशि: {{sign}}",
   "kundli_chip_mahadasha": "महादशा: {{planet}}",
+  "kundli_chips_toggle_aria": "कुंडली का सारांश",
   "kundli_tab_life_areas": "जीवन क्षेत्र",
   "kundli_tab_analysis": "विश्लेषण",
   "kundli_sub_chart": "कुंडली",

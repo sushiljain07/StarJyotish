@@ -357,3 +357,86 @@ def test_refresh_limit_is_per_cookie_not_per_ip(client):
         assert client.post("/api/auth/refresh", cookies={"sj_refresh": "same"}).status_code == 429
     finally:
         limiter.reset()
+
+
+# ---- refresh reuse interval: accept-once, and never undo a sign-out ----
+
+def _login(client):
+    client.cookies.clear()
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+
+def _refresh(client, cookie):
+    client.cookies.clear()
+    resp = client.post("/api/auth/refresh", cookies={"sj_refresh": cookie})
+    return resp, client.cookies.get("sj_refresh")
+
+
+def _db_edit(raw_cookie, **fields):
+    from db.repositories.session_repository import hash_token
+    from db.models.session import UserSession
+    from db.models.user import User
+    import db.session as dbs
+    from sqlalchemy import select
+    from datetime import datetime, timedelta, timezone
+    with dbs.SessionLocal() as db:
+        row = db.scalars(select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_cookie))).first()
+        if "age_seconds" in fields:
+            row.revoked_at = datetime.now(timezone.utc) - timedelta(seconds=fields["age_seconds"])
+        if "revoked_reason" in fields:
+            row.revoked_reason = fields["revoked_reason"]
+        if fields.get("disable_user"):
+            db.get(User, row.user_id).is_active = False
+        db.commit()
+
+
+def test_refresh_reuse_is_accepted_only_once(client):
+    _, t1 = _login(client)
+    assert _refresh(client, t1)[0].status_code == 200
+    second, _ = _refresh(client, t1)
+    assert second.status_code == 200
+    third, _ = _refresh(client, t1)
+    assert third.status_code == 401
+
+
+def test_replay_after_logout_cannot_resurrect_session(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    client.cookies.clear()
+    assert client.post("/api/auth/logout", cookies={"sj_refresh": t2}).status_code == 200
+    assert _refresh(client, t1)[0].status_code == 401
+
+
+def test_replay_after_device_revoke_cannot_resurrect_session(client):
+    access, t1 = _login(client)
+    resp, t2 = _refresh(client, t1)
+    access2 = resp.json()["access_token"]
+    sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {access2}"}).json()
+    assert client.delete(f"/api/auth/sessions/{sessions[0]['id']}", headers={"Authorization": f"Bearer {access2}"}).status_code == 200
+    assert _refresh(client, t1)[0].status_code == 401
+
+
+def test_replay_after_theft_revoke_all_is_rejected(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t2)
+    _db_edit(t1, age_seconds=1000)  # t1 is old: replaying it is theft
+    assert _refresh(client, t1)[0].status_code == 401
+    assert _refresh(client, t2)[0].status_code == 401  # recent rotation was closed
+    assert _refresh(client, t3)[0].status_code == 401
+
+
+def test_refresh_reuse_of_user_revoked_token_is_rejected(client):
+    _, t1 = _login(client)
+    _db_edit(t1, age_seconds=1, revoked_reason="user")
+    assert _refresh(client, t1)[0].status_code == 401
+
+
+def test_refresh_reuse_by_disabled_user_is_rejected(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, disable_user=True)
+    assert _refresh(client, t1)[0].status_code == 401

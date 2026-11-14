@@ -20,16 +20,22 @@ raw token leaked (e.g. it was copied off a stolen device, then both the
 thief and the legitimate device tried to use their respective copies),
 and every session for that user is revoked as a precaution.
 
-Exception — the reuse interval: a rotated token is accepted once more
+Exception — the reuse interval: a rotated token is accepted ONCE more
 for REFRESH_REUSE_GRACE_SECONDS after it was revoked. This covers a
 refresh whose response never reached the browser (page reload or
 navigation mid-request, a dropped mobile connection) and two tabs that
-refresh at the same moment with the same cookie. A "rotated" token
-presented inside the window gets a NEW session (new cookie, new access
-token); nothing else is revoked, so each racing tab simply ends up with
-its own valid session. Outside the window, or for a token revoked for any
-other reason, the replay is treated as theft: every session for the user
-is revoked and the response is 401.
+refresh at the same moment with the same cookie. The stale row is
+looked up under a row lock; a "rotated" token inside the window gets a
+NEW session (new cookie, new access token) and the row is re-marked
+"rotated-reused" in the same transaction, so a second replay is treated
+as theft. Nothing else is revoked on acceptance.
+
+The interval must never undo a sign-out: logout, revoking a device and the
+theft response also re-mark the user's tokens rotated within the window as
+"rotated-closed" (SessionRepository.close_recent_rotations), so they can't
+be replayed. Outside the window, or for a token revoked for any other
+reason, a replay is theft: every session for the user is revoked and the
+response is 401.
 """
 import os
 import uuid
@@ -191,7 +197,7 @@ def refresh_session(
         # Distinguish "never existed / already expired" (normal) from
         # "exists but was already revoked" (possible token-theft replay —
         # see module docstring) before giving up.
-        stale = session_repo.get_by_raw_token_any_state(sj_refresh)
+        stale = session_repo.get_by_raw_token_any_state(sj_refresh, for_update=True)
         if stale is not None and stale.revoked_at is not None:
             revoked_ago = (datetime.now(timezone.utc) - stale.revoked_at).total_seconds()
             if stale.revoked_reason == "rotated" and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
@@ -199,9 +205,15 @@ def refresh_session(
                 # carried the replacement token was lost, or another tab
                 # raced us. Hand out a fresh session; revoke nothing.
                 user = UserRepository(db).get(stale.user_id)
-                if user is not None and user.is_active:
-                    return _issue_session_and_response(db, response, user, request)
+                if user is None or not user.is_active:
+                    session_repo.revoke_all_for_user(stale.user_id, reason="disabled")
+                    db.commit()
+                    _clear_refresh_cookie(response)
+                    raise HTTPException(status_code=401, detail="Account not found or disabled")
+                stale.revoked_reason = "rotated-reused"  # accepted once; a replay is now theft
+                return _issue_session_and_response(db, response, user, request)
             session_repo.revoke_all_for_user(stale.user_id, reason="reuse")
+            session_repo.close_recent_rotations(stale.user_id, REFRESH_REUSE_GRACE_SECONDS)
             # Commit now, not just flush: this branch always ends in an
             # HTTPException below, and get_db rolls back the transaction
             # for any exception that escapes the route — without this,
@@ -228,6 +240,7 @@ def logout(response: Response, sj_refresh: str | None = Cookie(default=None), db
         session = SessionRepository(db).get_active_by_raw_token(sj_refresh)
         if session is not None:
             SessionRepository(db).revoke(session, reason="logout")
+            SessionRepository(db).close_recent_rotations(session.user_id, REFRESH_REUSE_GRACE_SECONDS)
     _clear_refresh_cookie(response)
     return {"logged_out": True}
 
@@ -260,4 +273,5 @@ def revoke_session(session_id: uuid.UUID, user: User = Depends(get_current_user)
     if target is None or target.user_id != user.id:
         raise HTTPException(status_code=404, detail="Session not found")
     session_repo.revoke(target, reason="user")
+    session_repo.close_recent_rotations(user.id, REFRESH_REUSE_GRACE_SECONDS)
     return {"revoked": True}

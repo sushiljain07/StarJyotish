@@ -11,9 +11,9 @@
 import { Link } from 'react-router-dom'
 
 const SIZES = {
-  sm: 'px-3.5 py-1.5 text-xs',
-  md: 'px-5 py-2.5 text-sm',
-  lg: 'px-7 py-3 text-base',
+  sm: 'px-3.5 py-1.5 text-xs min-h-11 md:min-h-0',
+  md: 'px-5 py-2.5 text-sm min-h-11',
+  lg: 'px-7 py-3 text-base min-h-11',
 }
 
 const VARIANTS = {

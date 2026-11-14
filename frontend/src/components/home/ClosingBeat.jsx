@@ -52,7 +52,7 @@ export default function ClosingBeat({ headline, comingUpEvents }) {
       )}
       <button
         onClick={handleShare}
-        className="mt-5 inline-flex items-center gap-2 border border-primary text-primary-glow rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-primary/10 transition"
+        className="mt-5 inline-flex items-center gap-2 border border-primary text-primary-glow rounded-full px-5 py-2.5 min-h-11 text-sm font-semibold hover:bg-primary/10 transition"
       >
         <span aria-hidden="true">✦</span>
         {shareState === 'shared'

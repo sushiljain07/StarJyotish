@@ -9,16 +9,21 @@
 // GlobalScrollToTop.jsx, mounted once in App.jsx.
 import { useEffect, useState } from 'react'
 
+// thresholdPx: a number, or a function returning one (read on every scroll).
 export function useWindowScrolledPast(thresholdPx = 480) {
   const [scrolledPast, setScrolledPast] = useState(false)
 
   useEffect(() => {
     function onScroll() {
-      setScrolledPast(window.scrollY > thresholdPx)
+      setScrolledPast(window.scrollY > (typeof thresholdPx === 'function' ? thresholdPx() : thresholdPx))
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
   }, [thresholdPx])
 
   return scrolledPast

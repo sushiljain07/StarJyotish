@@ -4,7 +4,8 @@
 // mount), leaving a blank page.
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 const auth = { isAuthenticated: false, user: null }
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => auth }))
@@ -42,6 +43,17 @@ function StateProbe({ label }) {
   return <div>{label} {JSON.stringify(useLocation().state)}</div>
 }
 
+// Every page here is imported inside its test; on a cold module graph that
+// transform (plus /kundli's lazy panes) is the slow part. Do it once, up front.
+vi.setConfig({ testTimeout: 15000 })
+beforeAll(async () => {
+  await Promise.all([
+    preloadKundliChunks(),
+    import('./Result'), import('./Insights'), import('./AskRedirect'), import('./Login'),
+    import('./CareerReportRedirect'), import('./Home'), import('../services/lastChart'),
+  ])
+}, PRELOAD_TIMEOUT_MS)
+
 beforeEach(() => {
   auth.isAuthenticated = false
   auth.user = null
@@ -62,7 +74,7 @@ describe('state-less pages rebuild from the last chart', () => {
     saveLastChart(LAST)
     const { default: Page } = await load()
     renderAt(path, <Page />)
-    expect(await screen.findByText(marker)).toBeInTheDocument()
+    expect(await screen.findByText(marker, {}, { timeout: 4000 })).toBeInTheDocument()
     expect(screen.queryByText('LANDING')).toBeNull()
     sessionStorage.clear()
   })
@@ -75,7 +87,7 @@ describe('state-less pages redirect home', () => {
   ])('%s without state → landing (signed out)', async (path, load) => {
     const { default: Page } = await load()
     renderAt(path, <Page />)
-    expect(await screen.findByText('LANDING')).toBeInTheDocument()
+    expect(await screen.findByText('LANDING', {}, { timeout: 4000 })).toBeInTheDocument()
   })
 
   it('/insights without state → /home (signed in)', async () => {

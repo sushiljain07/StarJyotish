@@ -902,6 +902,7 @@
   "kundli_chip_lagna": "Lagna: {{sign}}",
   "kundli_chip_rashi": "Rashi: {{sign}}",
   "kundli_chip_mahadasha": "Mahadasha: {{planet}}",
+  "kundli_chips_toggle_aria": "Chart summary",
   "kundli_tab_life_areas": "Life Areas",
   "kundli_tab_analysis": "Analysis",
   "kundli_sub_chart": "Chart",
@@ -2058,5 +2059,8 @@
   "auth_sms_code_hint": "We will send a code via SMS",
   "skip_to_content": "Skip to content",
   "kundli_subsections_aria": "Kundli views",
-  "insights_subtabs_aria": "AI Insights sections"
+  "insights_subtabs_aria": "AI Insights sections",
+  "session_reconnect_title": "Can't reach Star Jyotish right now",
+  "session_reconnect_body": "Your connection or our server hiccuped, so we couldn't confirm your sign-in. You are not signed out. Please try again.",
+  "session_reconnect_retry": "Try again"
 }

@@ -74,7 +74,7 @@ export default function Login() {
           obvious without breaking the focused card layout. */}
       <button
         onClick={e => { e.stopPropagation(); goBackOrHome() }}
-        className="absolute top-4 left-4 text-ink-onnight/60 hover:text-primary text-xs font-medium flex items-center gap-1 transition z-10"
+        className="absolute top-4 left-4 min-h-11 min-w-11 px-2 text-ink-onnight/60 hover:text-primary text-xs font-medium flex items-center gap-1 transition z-10"
         aria-label={t('nav_back', '← Back')}
       >
         ← {t('nav_back', 'Back')}

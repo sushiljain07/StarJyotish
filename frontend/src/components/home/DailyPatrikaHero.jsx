@@ -106,7 +106,7 @@ function ReactionRow({ cardType, event, reacted, onReaction, t }) {
           <button
             key={opt.id}
             onClick={() => onReaction?.(cardType, opt.id, event)}
-            className={`text-xs rounded-full px-3.5 py-1.5 border transition ${
+            className={`min-h-11 md:min-h-0 text-xs rounded-full px-3.5 py-1.5 border transition ${
               reacted === opt.id
                 ? 'bg-primary/15 border-primary text-primary-glow'
                 : 'border-white/[0.16] text-ink-onnight/75 hover:border-primary/50 hover:text-primary-glow'
@@ -196,7 +196,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
       {onRefresh && (
         <button
           onClick={onRefresh}
-          className="block mx-auto mt-3 text-3xs font-semibold text-ink-onnight/40 border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight/70 hover:border-white/[0.2] transition"
+          className="block mx-auto mt-3 min-h-11 md:min-h-0 text-3xs font-semibold text-ink-onnight/40 border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight/70 hover:border-white/[0.2] transition"
         >
           {t('patrika_refresh')}
         </button>
@@ -264,7 +264,7 @@ function OneAction({ action }) {
           <span style={{ color: ts.ac }}>{action.verb}</span>{" "}{action.context}
         </p>
         <p className="sj-action-why">{action.why}</p>
-        <button className="sj-why-btn" onClick={openJyoti}
+        <button className="sj-why-btn inline-flex items-center min-h-11 md:min-h-0" onClick={openJyoti}
                 style={{ color: ts.ac, border: `1px solid ${ts.border}` }}>
           {t('patrika_why_btn')}
         </button>

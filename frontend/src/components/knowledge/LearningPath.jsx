@@ -43,6 +43,7 @@ export default function LearningPath({ title = 'Your learning path', steps }) {
           const isLast = i === steps.length - 1
           const tone = STEP_CLASSES[step.status] ?? STEP_CLASSES.locked
           const classes = `flex items-center gap-1.5 text-xs px-3.5 py-2 rounded-full whitespace-nowrap ${tone}`
+          const linkClasses = `${classes} min-h-11 md:min-h-0`
           const canLink = step.href && (step.status === 'available' || step.status === 'completed')
 
           const content = (
@@ -56,7 +57,7 @@ export default function LearningPath({ title = 'Your learning path', steps }) {
           return (
             <li key={step.id} className="flex items-center gap-1.5">
               {canLink ? (
-                <Link to={step.href} className={classes}>{content}</Link>
+                <Link to={step.href} className={linkClasses}>{content}</Link>
               ) : (
                 <span className={classes} aria-current={step.status === 'current' ? 'step' : undefined}>
                   {content}

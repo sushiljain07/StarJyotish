@@ -129,13 +129,14 @@ export default function AskPersonaPanel({ userId, input }) {
     <>
       <button
         onClick={() => setOpen(true)}
+        aria-label={t('ask_persona_button', { name: personaName })}
         style={{ '--fab-bottom': `calc(${spacerHeight} + 0.75rem)` }}
-        className="fixed bottom-[var(--fab-bottom)] md:bottom-28 right-[max(1.25rem,var(--safe-right))] z-40 flex items-center gap-2.5 bg-night-light border border-primary/35 rounded-full pl-2 pr-4 py-2 shadow-xl hover:-translate-y-0.5 transition"
+        className="fixed bottom-[var(--fab-bottom)] md:bottom-6 right-[max(1.25rem,var(--safe-right))] z-40 flex items-center justify-center gap-2.5 bg-night-light border border-primary/35 rounded-full w-12 h-12 sm:w-auto sm:h-auto sm:justify-start sm:pl-2 sm:pr-4 sm:py-2 shadow-xl motion-safe:hover:-translate-y-0.5 transition"
       >
-        <span className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
+        <span aria-hidden="true" className="w-10 h-10 sm:w-9 sm:h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />
         </span>
-        <span className="text-left">
+        <span className="hidden sm:block text-left">
           <span className="block text-xs font-bold text-parchment">{t('ask_persona_button', { name: personaName })}</span>
           <span className="block text-[10px] text-sage">{t('ask_persona_status')}</span>
         </span>
@@ -157,7 +158,7 @@ export default function AskPersonaPanel({ userId, input }) {
             <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{personaName}</h3>
             <p className="text-[11px] text-ink-onnight/50">{t('ask_persona_tagline')}</p>
           </div>
-          <button onClick={() => setOpen(false)} className="ml-auto text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
+          <button onClick={() => setOpen(false)} aria-label={t('jump_nav_close')} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
@@ -204,7 +205,7 @@ export default function AskPersonaPanel({ userId, input }) {
               maxLength={MAX_CHARS}
               rows={1}
               placeholder={t('ask_placeholder')}
-              className="flex-1 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 min-h-11 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}

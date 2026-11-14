@@ -42,19 +42,39 @@ export function peekReport(endpoint, body) {
   }
 }
 
-export async function fetchReport(endpoint, body, { signal, force = false, fallback = 'Server error' } = {}) {
-  if (!force) {
+const RETRY_DELAY_MS = 1500
+
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const abort = () => { clearTimeout(id); reject(new DOMException('Aborted', 'AbortError')) }
+    const id = setTimeout(() => { signal?.removeEventListener('abort', abort); resolve() }, ms)
+    if (signal?.aborted) return abort()
+    signal?.addEventListener('abort', abort, { once: true })
+  })
+}
+
+// cache:false skips both the read and the write (for data that depends on
+// the current moment). retryOn429: the compute endpoints are rate limited (30/min). One retry
+// after a short pause rides out a burst before the caller shows an error.
+export async function fetchReport(endpoint, body, { signal, force = false, fallback = 'Server error', retryOn429 = false, cache = true } = {}) {
+  if (cache && !force) {
     const cached = peekReport(endpoint, body)
     if (cached) return cached
   }
-  const resp = await fetch(`${API_BASE}${endpoint}`, {
+  const send = () => fetch(`${API_BASE}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
     signal,
   })
+  let resp = await send()
+  if (resp.status === 429 && retryOn429) {
+    await sleep(RETRY_DELAY_MS, signal)
+    resp = await send()
+  }
   if (!resp.ok) throw await errorFromResponse(resp, fallback)
   const data = await resp.json()
+  if (!cache) return data
   try {
     sessionStorage.setItem(cacheKey(endpoint, body), JSON.stringify(data))
   } catch {

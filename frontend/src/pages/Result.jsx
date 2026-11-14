@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName } from '../utils/astroNames'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState, saveLastChart } from '../services/lastChart'
+import { loadProfiles } from '../services/astrologyProfiles'
+import { chartStateFromProfile } from '../config/nav'
+import { chartBody } from '../api/reportCache'
 
 import { StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
@@ -13,6 +16,7 @@ import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { useScrollDirection } from '../hooks/useScrollDirection'
+import { useBelowMd } from '../hooks/useHideOnScroll'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -33,13 +37,18 @@ function TabLoader() {
   return <StateBlock loading lines={5} className="max-w-lg mx-auto" />
 }
 
-function SummaryChips({ data, collapsed }) {
+// `hidden` is true only when the collapsed chips are really invisible (phones):
+// they are then kept out of the accessibility tree and the tab order.
+function SummaryChips({ data, collapsed, hidden, id }) {
   const { t } = useTranslation()
   const moon = data.planets.find(p => p.name === 'Moon')
   const md   = data.dasha.current_mahadasha
   return (
     <div
+      id={id}
       data-testid="summary-chips"
+      aria-hidden={hidden ? 'true' : undefined}
+      inert={hidden ? '' : undefined}
       className={`flex flex-wrap gap-1.5 motion-safe:transition-all motion-safe:duration-200 ${
         collapsed
           ? 'max-h-0 opacity-0 overflow-hidden py-0 md:max-h-16 md:opacity-100 md:overflow-visible md:py-2'
@@ -58,6 +67,51 @@ function SummaryChips({ data, collapsed }) {
         {t('kundli_chip_mahadasha', { planet: planetName(t, md.planet) })}
       </span>
     </div>
+  )
+}
+
+// Phones: the chips start collapsed and open on tap. They stay open until
+// the next tap or a scroll down. Scroll changes in the first moment after
+// opening are ignored, since the band growing can nudge scrollY by itself.
+const REVEAL_SETTLE_MS = 300
+const REVEAL_SCROLL_PX = 8
+function useTapToReveal() {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return undefined
+    const openedAt = performance.now()
+    let baseY = window.scrollY
+    function onScroll() {
+      const y = window.scrollY
+      if (performance.now() - openedAt < REVEAL_SETTLE_MS || y < baseY) {
+        baseY = y
+        return
+      }
+      if (y - baseY > REVEAL_SCROLL_PX) setOpen(false)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [open])
+  return [open, () => setOpen(o => !o)]
+}
+
+function ChipsToggle({ open, onToggle, controls }) {
+  const { t } = useTranslation()
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      aria-controls={controls}
+      aria-label={t('kundli_chips_toggle_aria')}
+      className="shrink-0 min-h-11 min-w-11 -mr-2 flex items-center justify-center rounded-full text-ink-muted hover:text-ink"
+    >
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+           aria-hidden="true"
+           className={`w-5 h-5 motion-safe:transition-transform motion-safe:duration-200 ${open ? 'rotate-180' : ''}`}>
+        <path d="M5 8l5 5 5-5" />
+      </svg>
+    </button>
   )
 }
 
@@ -100,9 +154,28 @@ export default function Result() {
   const location  = useLocation()
   const navigate  = useNavigate()
   const scrollDir = useScrollDirection()
-  const { isAuthenticated, user, loading: authLoading } = useAuth()
-  // Router state, else the last chart in this tab, else the saved profile.
-  const state = resolveChartState(location.state, user)
+  const belowMd   = useBelowMd()
+  const [chipsOpen, toggleChips] = useTapToReveal()
+  const { isAuthenticated, user, accessToken, loading: authLoading } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile
+  // (local cache), else — on a cold device or a shared link — the profile
+  // fetched from the API below.
+  const cachedState = resolveChartState(location.state, user)
+  const [fetched, setFetched] = useState({ done: false, state: null })
+  const needsFetch = !cachedState?.data && isAuthenticated && !authLoading
+  useEffect(() => {
+    if (!needsFetch) return undefined
+    let cancelled = false
+    loadProfiles(user, accessToken)
+      .catch(() => [])
+      .then(profiles => {
+        if (cancelled) return
+        const primary = profiles.find(p => p.is_primary) ?? profiles[0] ?? null
+        setFetched({ done: true, state: chartStateFromProfile(primary) })
+      })
+    return () => { cancelled = true }
+  }, [needsFetch, user, accessToken])
+  const state = cachedState?.data ? cachedState : (fetched.state ?? cachedState)
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
@@ -139,6 +212,26 @@ export default function Result() {
     setSearchParams({ tab: activeMain, sub: id }, { replace: true, state: location.state })
   }
 
+  // Data panels mount the first time their tab is opened, then stay mounted
+  // (hidden), so tab switches don't refetch and a first /kundli load doesn't
+  // fire every compute endpoint at once (30/min rate limit). The set is tied
+  // to the chart: a different chart starts with nothing visited.
+  const chartKey = state?.input ? JSON.stringify(chartBody(state.input)) : ''
+  const openPanel = activeMain === 'analysis' ? activeAnalysisSub
+    : activeMain === 'divisional' ? 'divisional'
+    : activeMain === 'birth_chart' && activeBirthSub === 'transit' ? 'transit'
+    : null
+  const [visitedState, setVisitedState] = useState(() => ({ key: chartKey, ids: new Set([openPanel]) }))
+  const visited = visitedState.key === chartKey ? visitedState.ids : new Set()
+  useEffect(() => {
+    if (!openPanel) return
+    setVisitedState(prev => {
+      const ids = prev.key === chartKey ? prev.ids : new Set()
+      return ids.has(openPanel) ? prev : { key: chartKey, ids: new Set(ids).add(openPanel) }
+    })
+  }, [openPanel, chartKey])
+  const mounted = id => visited.has(id) || openPanel === id
+
   const [chartStyle, setChartStyle]               = useState('north')
   const MAIN_TABS = mainTabs(t)
 
@@ -151,6 +244,10 @@ export default function Result() {
   // On a hard page load the saved profile is only known once sign-in
   // has resolved; redirecting before then would bounce a signed-in user.
   if (!state?.data && authLoading) return null
+
+  // Signed in but nothing cached on this device: wait for the profile
+  // fetch; only a person with no profile goes to /home.
+  if (!state?.data && isAuthenticated && !fetched.done) return <TabLoader />
 
   // <Navigate>, not navigate(): navigate() during render is ignored by
   // React Router, which left a blank page for bookmarked/refreshed URLs.
@@ -236,14 +333,25 @@ export default function Result() {
       <Seo title={t('kundli_seo_title')} description={t('kundli_seo_description')} path="/kundli" noindex />
 
       {/* ── Sticky context bar ──────────────────────────────────────────── */}
-      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30 [overflow-anchor:none]">
+      {/* top follows SiteHeader: it drops to 0 while the header is slid
+          away on mobile (--header-offset, index.css). */}
+      <div className="bg-parchment-card border-b border-line sticky top-[var(--header-offset)] motion-safe:transition-[top] motion-safe:duration-150 motion-safe:ease-out z-30 [overflow-anchor:none]">
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}
-          <SummaryChips data={data} collapsed={scrollDir === 'down'} />
+          {/* Phones start collapsed: the band must leave ≥75% of the
+              screen to content (owner decision, 14 Nov). A toggle at the
+              end of the sub-tab row reveals them. */}
+          <SummaryChips
+            id="kundli-summary-chips"
+            data={data}
+            collapsed={belowMd ? !chipsOpen : scrollDir === 'down'}
+            hidden={belowMd && !chipsOpen}
+          />
 
-          {/* Row 3 — main tabs */}
-          <div className="border-t border-line/40 pt-1">
+          {/* Row 3 — main tabs. Laptops only: on phones the main tabs live
+              in the bottom NavBar and this band shows just the sub-tabs. */}
+          <div data-testid="kundli-main-tabs" className="hidden md:block border-t border-line/40 pt-1">
             <AnimatedTabRow
               tabs={MAIN_TABS}
               active={activeMain}
@@ -255,13 +363,16 @@ export default function Result() {
 
           {/* Row 4 — sub-tabs (only when the active main tab has them) */}
           {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
-            <div className="border-t border-line/40 py-2">
-              {activeMain === 'birth_chart' && (
-                <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
-              )}
-              {activeMain === 'analysis' && (
-                <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
-              )}
+            <div data-testid="kundli-sub-tabs" className="md:border-t border-line/40 py-2 flex items-center gap-1">
+              <div className="flex-1 min-w-0">
+                {activeMain === 'birth_chart' && (
+                  <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
+                )}
+                {activeMain === 'analysis' && (
+                  <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
+                )}
+              </div>
+              {belowMd && <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />}
             </div>
           )}
         </div>
@@ -302,7 +413,7 @@ export default function Result() {
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeBirthSub === 'transit' ? 'animate-fade-in-fast' : 'hidden'}>
-              <TransitPanel input={input} natalData={data} />
+              {mounted('transit') && <TransitPanel key={chartKey} input={input} natalData={data} />}
             </div>
           </Suspense>
         </div>
@@ -310,7 +421,7 @@ export default function Result() {
         {/* ══ LIFE AREAS (DIVISIONAL) ══ */}
         <div className={activeMain === 'divisional' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <DivisionalCharts input={input} defaultDivision={topic?.division} />
+            {mounted('divisional') && <DivisionalCharts key={chartKey} input={input} defaultDivision={topic?.division} />}
           </Suspense>
         </div>
 
@@ -318,13 +429,13 @@ export default function Result() {
         <div className={activeMain === 'analysis' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <div className={activeAnalysisSub === 'bhava' ? 'animate-fade-in-fast' : 'hidden'}>
-              <BhavaChalit input={input} />
+              {mounted('bhava') && <BhavaChalit key={chartKey} input={input} />}
             </div>
             <div className={activeAnalysisSub === 'ashtakavarga' ? 'animate-fade-in-fast' : 'hidden'}>
-              <AshtakavargaTable input={input} />
+              {mounted('ashtakavarga') && <AshtakavargaTable key={chartKey} input={input} />}
             </div>
             <div className={activeAnalysisSub === 'sarvatobhadra' ? 'animate-fade-in-fast' : 'hidden'}>
-              <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
+              {mounted('sarvatobhadra') && <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />}
             </div>
           </Suspense>
         </div>
@@ -338,7 +449,9 @@ export default function Result() {
 
       </div>
 
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={isAuthenticated} />
+      {/* The one bottom bar on mobile /kundli: BottomNav steps aside here, so
+          NavBar owns the true bottom edge (with the safe-area inset). */}
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={false} />
     </div>
   )
 }

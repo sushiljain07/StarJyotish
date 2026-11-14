@@ -1,5 +1,6 @@
 // Class-level check that nav/tab/header/footer controls are >= 44px tall.
 // Real measured sizes are verified in a browser (Phase 4 Task 8).
+// Page-level controls (tabs, chips, forms, home) are covered by src/theme/tapTargets.test.jsx.
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'

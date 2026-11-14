@@ -156,17 +156,12 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
         </p>
       </div>
 
-      <ScrollHint className="flex justify-center">
-        {/* Was width={W} height={H} with a hardcoded minWidth, which forced
-            this chart to never shrink below 416px — every phone in the
-            320–414px range would overflow horizontally. Every other chart
-            in this app (KundliChart, SouthIndiaChart, WesternChart) already
-            uses width="100%" + viewBox + a maxWidth cap instead, which lets
-            the SVG scale down freely on narrow screens while still capping
-            out at its intended size on larger ones. Matching that here. */}
-        <svg width="100%" viewBox={`0 0 ${W} ${H}`}
-             style={{ maxWidth: W }}
-             className="font-sans">
+      <ScrollHint>
+        {/* The 9×9 grid needs ~560px for its 7–10 unit labels to render at
+            10px or more, so it keeps that width and scrolls sideways on
+            phones (ScrollHint shows the fade) instead of shrinking. */}
+        <div className="min-w-[560px] max-w-[560px] mx-auto">
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`} className="block font-sans">
           {grid.map((row, ri) =>
             row.map((cell, ci) => {
               const x = ci * CELL + 1
@@ -190,7 +185,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                           fontWeight="bold" fill={cell.color}>
                       {cell.label.split('\n')[0]}
                     </text>
-                    <text x={cx} y={cy + 8} textAnchor="middle" fontSize="7" fill={withAlpha(cell.color, 0.67)}>
+                    <text x={cx} y={cy + 8} textAnchor="middle" fontSize="8" fill={withAlpha(cell.color, 0.67)}>
                       {cell.label.split('\n')[1]}
                     </text>
                   </g>
@@ -269,6 +264,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
             })
           )}
         </svg>
+        </div>
       </ScrollHint>
 
       {/* Legend */}

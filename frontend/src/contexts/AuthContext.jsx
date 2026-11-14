@@ -14,6 +14,8 @@ import {
   loginWithGoogle as apiLoginWithGoogle,
   refreshSession as apiRefreshSession,
   onSessionRefreshed,
+  awaitRefreshSettled,
+  markLoggedOut,
   logout as apiLogout,
   updateProfile as apiUpdateProfile,
   sendPhoneLinkOtp as apiSendPhoneLinkOtp,
@@ -27,6 +29,10 @@ import { LANGUAGES, currentLanguage } from '../i18n/languages'
 
 const AuthContext = createContext(null)
 
+// A refresh failure that says nothing about the session itself (429, 5xx,
+// no network) — as opposed to a 401/403, which means signed out.
+const isTransientRefreshError = err => err?.status !== 401 && err?.status !== 403
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [accessToken, setAccessToken] = useState(null)
@@ -35,12 +41,20 @@ export function AuthProvider({ children }) {
   // need this to avoid bouncing a genuinely-logged-in user to /login for
   // the one render before that attempt finishes.
   const [loading, setLoading] = useState(true)
+  // 'unreachable' when the silent refresh failed for a reason that says
+  // nothing about the session (rate limit, server error, no network). The
+  // person may well still be signed in, so ProtectedRoute offers a retry
+  // instead of sending them to /login.
+  const [sessionError, setSessionError] = useState(null)
 
   // Any successful refresh — here, in authedRequest, or in fetchWithAuth
   // (api/auth.js) — lands in this state, so the token never goes stale.
+  // A refresh that began before a logout never reaches here (api/auth.js
+  // rejects it — see markLoggedOut).
   useEffect(() => onSessionRefreshed(data => {
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
   }), [])
 
   useEffect(() => {
@@ -49,18 +63,32 @@ export function AuthProvider({ children }) {
     // StrictMode's double-run of this effect can't spend the refresh
     // token twice.
     apiRefreshSession()
-      .catch(() => {
-        // No valid refresh cookie (never logged in, or it expired) —
-        // that's an entirely normal outcome here, not an error to surface.
+      .catch(err => {
+        // A 401/403 (never logged in, or the cookie expired) is an
+        // entirely normal outcome, not an error to surface. Anything else
+        // is transient (api/auth.js already retried it).
+        if (!cancelled && isTransientRefreshError(err)) setSessionError('unreachable')
       })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
+  }, [])
+
+  // Leaves `loading` and the error flag alone while it runs, so the
+  // reconnect screen stays up (ProtectedRoute shows its own busy state);
+  // success clears the flag via onSessionRefreshed, a sign-out clears it here.
+  const retrySession = useCallback(async () => {
+    try {
+      await apiRefreshSession()  // updates state via onSessionRefreshed
+    } catch (err) {
+      setSessionError(isTransientRefreshError(err) ? 'unreachable' : null)
+    }
   }, [])
 
   const loginWithPhone = useCallback(async (phoneNumber, code) => {
     const data = await apiVerifyOtp(phoneNumber, code)
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
     return data.user
   }, [])
 
@@ -68,18 +96,28 @@ export function AuthProvider({ children }) {
     const data = await apiLoginWithGoogle(idToken)
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
     return data.user
   }, [])
 
   const logout = useCallback(async () => {
+    // Any refresh already running belongs to the old session: stop it from
+    // signing the user back in, and let it land first so the logout call
+    // revokes the newest cookie.
+    markLoggedOut()
+    await awaitRefreshSettled().catch(() => {})
     try {
       await apiLogout()
     } catch {
       // Best-effort — even if the network call fails, drop the local
       // session state so the UI reflects "logged out" immediately.
     }
+    // A refresh that started while the logout call was in flight still
+    // carries the old generation: bump it again so it can't sign back in.
+    markLoggedOut()
     setAccessToken(null)
     setUser(null)
+    setSessionError(null)
     clearChartSession()
   }, [])
 
@@ -161,6 +199,8 @@ export function AuthProvider({ children }) {
     user,
     accessToken,
     loading,
+    sessionError,
+    retrySession,
     isAuthenticated: !!user,
     loginWithPhone,
     loginWithGoogleToken,

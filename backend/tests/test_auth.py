@@ -125,12 +125,18 @@ def test_refresh_rotates_token_and_old_token_then_fails(client):
     new_cookie = client.cookies.get("sj_refresh")
     assert new_cookie != old_cookie
 
-    # Replaying the just-rotated token inside the grace window is treated
-    # as a lost concurrent-refresh race: 409, and the winner's new session
-    # must stay valid (no mass revocation).
+    # Replaying the just-rotated token inside the grace window means the
+    # first response was lost: accept it once more with a NEW session, and
+    # leave every other session alone.
     client.cookies.clear()
-    raced = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
-    assert raced.status_code == 409
+    replay = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
+    assert replay.status_code == 200
+    assert replay.json()["access_token"]
+    replay_cookie = client.cookies.get("sj_refresh")
+    assert replay_cookie and replay_cookie not in (old_cookie, new_cookie)
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": replay_cookie}).status_code == 200
+    # The session from the first (delivered) refresh was not revoked.
     client.cookies.clear()
     assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 200
 
@@ -152,6 +158,16 @@ def test_refresh_token_reuse_after_grace_window_revokes_everything(client, monke
     # Treated as theft: the legitimate new session is revoked too.
     client.cookies.clear()
     assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 401
+
+
+def test_refresh_reuse_of_non_rotated_revoked_token_is_rejected(client):
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    cookie = client.cookies.get("sj_refresh")
+    assert client.post("/api/auth/logout").status_code == 200  # revoked: "logout"
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": cookie}).status_code == 401
 
 
 def test_cannot_revoke_another_users_session(client):
@@ -324,3 +340,222 @@ def test_otp_send_with_real_provider_never_returns_code(client, monkeypatch):
     assert resp.status_code == 200
     assert resp.json()["debug_code"] is None
     sent_sms.assert_called_once()
+
+
+def test_refresh_limit_is_per_cookie_not_per_ip(client):
+    # Many users behind one IP (mobile CGNAT) must not exhaust each other's
+    # refresh budget; one cookie hammering refresh still gets limited.
+    from services.rate_limit import limiter
+    limiter.reset()
+    try:
+        for i in range(25):
+            resp = client.post("/api/auth/refresh", cookies={"sj_refresh": f"cookie-{i}"})
+            assert resp.status_code == 401, f"call {i} got {resp.status_code}"
+        limiter.reset()
+        for i in range(20):
+            assert client.post("/api/auth/refresh", cookies={"sj_refresh": "same"}).status_code == 401
+        assert client.post("/api/auth/refresh", cookies={"sj_refresh": "same"}).status_code == 429
+    finally:
+        limiter.reset()
+
+
+# ---- refresh reuse interval: accept-once, and never undo a sign-out ----
+
+def _login(client):
+    client.cookies.clear()
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+
+def _refresh(client, cookie):
+    client.cookies.clear()
+    resp = client.post("/api/auth/refresh", cookies={"sj_refresh": cookie})
+    return resp, client.cookies.get("sj_refresh")
+
+
+def _db_edit(raw_cookie, **fields):
+    from db.repositories.session_repository import hash_token
+    from db.models.session import UserSession
+    from db.models.user import User
+    import db.session as dbs
+    from sqlalchemy import select
+    from datetime import datetime, timedelta, timezone
+    with dbs.SessionLocal() as db:
+        row = db.scalars(select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_cookie))).first()
+        if "age_seconds" in fields:
+            row.revoked_at = datetime.now(timezone.utc) - timedelta(seconds=fields["age_seconds"])
+        if "revoked_reason" in fields:
+            row.revoked_reason = fields["revoked_reason"]
+        if fields.get("disable_user"):
+            db.get(User, row.user_id).is_active = False
+        db.commit()
+
+
+def test_refresh_reuse_is_accepted_only_once(client):
+    _, t1 = _login(client)
+    assert _refresh(client, t1)[0].status_code == 200
+    second, _ = _refresh(client, t1)
+    assert second.status_code == 200
+    third, _ = _refresh(client, t1)
+    # A third replay inside the window fails softly for that one request:
+    # nothing is revoked, so the sessions minted by calls 1 and 2 survive.
+    assert third.status_code == 409
+    assert "sj_refresh" not in third.headers.get("set-cookie", "")
+
+
+def test_refresh_reuse_third_replay_leaves_other_sessions_alive(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t1)  # accepted once (lost response / racing tab)
+    assert _refresh(client, t1)[0].status_code == 409
+    assert _refresh(client, t2)[0].status_code == 200
+    assert _refresh(client, t3)[0].status_code == 200
+
+
+def test_rotated_closed_replay_inside_window_is_soft_409(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, revoked_reason="rotated-closed")
+    resp, cookie = _refresh(client, t1)
+    assert resp.status_code == 409
+    assert cookie is None  # no session minted, cookie not touched
+    assert _refresh(client, t2)[0].status_code == 200  # other session not revoked
+
+
+def test_rotated_reused_replay_outside_window_still_revokes_all(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t1)
+    _db_edit(t1, age_seconds=1000)  # now "rotated-reused" and old
+    assert _refresh(client, t1)[0].status_code == 401
+    assert _refresh(client, t2)[0].status_code == 401
+    assert _refresh(client, t3)[0].status_code == 401
+
+
+def test_replay_after_logout_cannot_resurrect_session(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    client.cookies.clear()
+    assert client.post("/api/auth/logout", cookies={"sj_refresh": t2}).status_code == 200
+    resp, cookie = _refresh(client, t1)  # rotated-closed inside the window: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
+
+
+def test_replay_after_device_revoke_cannot_resurrect_session(client):
+    access, t1 = _login(client)
+    resp, t2 = _refresh(client, t1)
+    access2 = resp.json()["access_token"]
+    sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {access2}"}).json()
+    assert client.delete(f"/api/auth/sessions/{sessions[0]['id']}", headers={"Authorization": f"Bearer {access2}"}).status_code == 200
+    resp, cookie = _refresh(client, t1)  # rotated-closed inside the window: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
+
+
+def test_replay_after_theft_revoke_all_is_rejected(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t2)
+    _db_edit(t1, age_seconds=1000)  # t1 is old: replaying it is theft
+    assert _refresh(client, t1)[0].status_code == 401
+    resp, cookie = _refresh(client, t2)  # recent rotation was closed: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
+    assert _refresh(client, t3)[0].status_code == 401
+
+
+def test_refresh_reuse_of_user_revoked_token_is_rejected(client):
+    _, t1 = _login(client)
+    _db_edit(t1, age_seconds=1, revoked_reason="user")
+    assert _refresh(client, t1)[0].status_code == 401
+
+
+def test_refresh_reuse_by_disabled_user_is_rejected(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, disable_user=True)
+    assert _refresh(client, t1)[0].status_code == 401
+
+
+# ---- device revoke / logout replays are not theft; 401s clear the cookie ----
+
+def _assert_clears_refresh_cookie(resp):
+    set_cookie = resp.headers.get("set-cookie", "")
+    assert "sj_refresh=" in set_cookie, set_cookie
+    assert "max-age=0" in set_cookie.lower(), set_cookie
+
+
+def _two_devices(client, monkeypatch):
+    """Two independent sessions (device A, device B) for the same user."""
+    import db.repositories.otp_repository as otp_repo
+    monkeypatch.setattr(otp_repo, "OTP_RESEND_COOLDOWN_SECONDS", 0)
+    phone = _unique_phone()
+
+    def login():
+        client.cookies.clear()
+        sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+        resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+        return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+    access_a, token_a = login()
+    access_b, token_b = login()
+    return access_a, token_a, access_b, token_b
+
+
+def test_revoked_device_refresh_is_401_and_leaves_other_devices_alive(client, monkeypatch):
+    access_a, token_a, _, token_b = _two_devices(client, monkeypatch)
+    sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {access_a}"},
+                          cookies={"sj_refresh": token_a}).json()
+    other = [s for s in sessions if not s["is_current"]]
+    assert len(other) == 1
+    client.cookies.clear()
+    assert client.delete(f"/api/auth/sessions/{other[0]['id']}",
+                         headers={"Authorization": f"Bearer {access_a}"}).status_code == 200
+    resp_b, _ = _refresh(client, token_b)  # device B's next refresh
+    assert resp_b.status_code == 401
+    _assert_clears_refresh_cookie(resp_b)
+    assert _refresh(client, token_a)[0].status_code == 200  # the laptop is not signed out
+
+
+def test_logout_replay_outside_window_is_401_and_not_theft(client, monkeypatch):
+    _, token_a, _, token_b = _two_devices(client, monkeypatch)
+    client.cookies.clear()
+    assert client.post("/api/auth/logout", cookies={"sj_refresh": token_b}).status_code == 200
+    _db_edit(token_b, age_seconds=1000)
+    resp_b, _ = _refresh(client, token_b)
+    assert resp_b.status_code == 401
+    _assert_clears_refresh_cookie(resp_b)
+    assert _refresh(client, token_a)[0].status_code == 200
+
+
+def test_rotated_replay_outside_window_revokes_every_device(client, monkeypatch):
+    _, token_a, _, token_b = _two_devices(client, monkeypatch)
+    _, token_b2 = _refresh(client, token_b)
+    _db_edit(token_b, age_seconds=1000)
+    resp, _ = _refresh(client, token_b)
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+    assert _refresh(client, token_a)[0].status_code == 401
+    assert _refresh(client, token_b2)[0].status_code == 401
+
+
+def test_refresh_401_without_cookie_clears_cookie(client):
+    client.cookies.clear()
+    resp = client.post("/api/auth/refresh")
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+
+
+def test_refresh_401_for_disabled_user_clears_cookie(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, disable_user=True)
+    resp, _ = _refresh(client, t2)  # active-session path
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+
+
+def test_refresh_401_for_unknown_token_clears_cookie(client):
+    resp, _ = _refresh(client, "not-a-real-token")
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)

@@ -2,8 +2,9 @@
 // tab. Old in-app links that pass { activeTab } in router state still work.
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }))
 vi.mock('../components/Seo', () => ({ default: () => null }))
@@ -40,13 +41,14 @@ function renderAt(entry) {
 
 const shown = text => screen.getAllByText(text)[0].closest('.hidden') === null
 
+beforeAll(preloadKundliChunks, PRELOAD_TIMEOUT_MS)
 beforeEach(() => { lastSearch = undefined })
 afterEach(() => sessionStorage.clear())
 
 describe('Kundli tabs in the URL', () => {
   it('opens the tab named in the URL', async () => {
     renderAt({ pathname: '/kundli', search: '?tab=analysis&sub=ashtakavarga', state: CHART })
-    expect(await screen.findByText('ASHTAKAVARGA')).toBeInTheDocument()
+    expect(await screen.findByText('ASHTAKAVARGA', {}, { timeout: 4000 })).toBeInTheDocument()
     expect(shown('ASHTAKAVARGA')).toBe(true)
   })
 
@@ -59,7 +61,7 @@ describe('Kundli tabs in the URL', () => {
 
   it('still honours the legacy activeTab router state', async () => {
     renderAt({ pathname: '/kundli', state: { ...CHART, activeTab: 'advanced' } })
-    expect(await screen.findByText('BHAVA')).toBeInTheDocument()
+    expect(await screen.findByText('BHAVA', {}, { timeout: 4000 })).toBeInTheDocument()
     expect(shown('BHAVA')).toBe(true)
   })
 

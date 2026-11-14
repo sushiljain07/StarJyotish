@@ -145,7 +145,7 @@ export default function Blog() {
         <Reveal className="flex gap-2 overflow-x-auto pb-1 mb-6 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {CATEGORIES.map(cat => (
             <button key={cat.value} onClick={() => setCategory(cat.value)}
-              className={`whitespace-nowrap text-xs px-4 py-2 rounded-lg border transition ${category === cat.value ? 'bg-primary-dark text-night border-primary-dark font-semibold shadow-sm' : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'}`}>
+              className={`whitespace-nowrap min-h-11 md:min-h-0 text-xs px-4 py-2 rounded-lg border transition ${category === cat.value ? 'bg-primary-dark text-night border-primary-dark font-semibold shadow-sm' : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'}`}>
               {t(cat.key)}
             </button>
           ))}
@@ -211,9 +211,9 @@ export default function Blog() {
               >
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
                   placeholder={t('blog_email_placeholder')}
-                  className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
+                  className="flex-1 min-h-11 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
                 <button type="submit" disabled={notifyStatus === 'sending'}
-                  className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2.5 rounded-full transition sm:whitespace-nowrap">
+                  className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2.5 min-h-11 rounded-full transition sm:whitespace-nowrap">
                   {notifyStatus === 'sending' ? '…' : t('blog_notify_cta')}
                 </button>
               </form>

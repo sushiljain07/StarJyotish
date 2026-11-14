@@ -28,33 +28,10 @@ export default function KundliDownload({ data, input }) {
   const md   = dasha.current_mahadasha
   const ad   = dasha.current_antardasha
 
+  // The print stylesheet lives in index.css (@media print, keyed on
+  // #kundli-print-area), so the browser's own Print menu gives the same page.
   function handleDownload() {
-    const style = document.createElement('style')
-    style.id = '_kp_print_style'
-    style.textContent = `
-      @media print {
-        @page { margin: 10mm; size: A4 portrait; }
-        html, body {
-          height: auto !important;
-          overflow: visible !important;
-        }
-        body > * { visibility: hidden !important; }
-        #kundli-print-area,
-        #kundli-print-area * { visibility: visible !important; }
-        #kundli-print-area {
-          position: absolute; top: 0; left: 0;
-          width: 100%; background: white;
-          height: auto !important;
-          overflow: visible !important;
-        }
-        .no-print { display: none !important; }
-      }
-    `
-    document.head.appendChild(style)
     window.print()
-    setTimeout(() => {
-      document.getElementById('_kp_print_style')?.remove()
-    }, 500)
   }
 
   return (
@@ -73,7 +50,7 @@ export default function KundliDownload({ data, input }) {
       </div>
 
       {/* ── Printable area ── */}
-      <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 space-y-5">
+      <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 print:p-0 print:border-0 space-y-5">
 
         {/* Header */}
         <div className="text-center border-b border-line pb-4 print:break-inside-avoid-page">
@@ -105,22 +82,24 @@ export default function KundliDownload({ data, input }) {
         {/* Charts — Lagna + Navamsa */}
         <div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
+            <div className="flex-1 max-w-[380px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 {t('download_lagna_chart_d1')}
               </p>
               <KundliChart
+                detail="full"
                 planets={planets}
                 ascendant={ascendant}
                 navamsaPlanets={navamsa_planets}
                 title={t('chart_lagna_title')}
               />
             </div>
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
+            <div className="flex-1 max-w-[380px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 {t('download_navamsa_chart_d9')}
               </p>
               <KundliChart
+                detail="full"
                 planets={navamsa_planets}
                 ascendant={navamsa_ascendant}
                 title={t('tab_navamsa')}

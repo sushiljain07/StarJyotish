@@ -72,7 +72,7 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
             key={q.id}
             onClick={() => setActiveId(q.id)}
             aria-pressed={activeId === q.id}
-            className={`text-xs px-3 py-1.5 rounded-full border transition ${
+            className={`min-h-11 md:min-h-0 text-xs px-3 py-1.5 rounded-full border transition ${
               activeId === q.id
                 ? 'bg-primary-light border-primary text-primary-ink font-semibold'
                 : 'bg-parchment-card border-line text-ink-muted hover:border-primary'
@@ -89,14 +89,14 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
         <div className="flex justify-center mt-4">
           <button
             onClick={() => onAskQuestion(t(`landing_ai_q_${active.id}_question`))}
-            className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition"
+            className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-5 py-2.5 min-h-11 rounded-full shadow-sm hover:shadow-md transition"
           >
             {t('landing_ai_cta_start')} →
           </button>
         </div>
       )}
       <div className="flex justify-center mt-2">
-        <button onClick={onAskOwn} className="text-xs text-ink-muted underline hover:text-ink">
+        <button onClick={onAskOwn} className="inline-flex items-center min-h-11 text-xs text-ink-muted underline hover:text-ink">
           {t('landing_ai_cta_own')}
         </button>
       </div>

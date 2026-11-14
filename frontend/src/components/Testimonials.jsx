@@ -80,7 +80,7 @@ export default function Testimonials() {
 
         <Reveal delay={200} className="text-center mt-10">
           <Link to="/testimonials"
-            className="inline-flex items-center gap-2 text-sm text-primary-ink hover:underline font-medium">
+            className="inline-flex items-center gap-2 min-h-11 text-sm text-primary-ink hover:underline font-medium">
             {t('testimonials_read_all')}
           </Link>
           <p className="text-ink-muted text-xs mt-2">{t('landing_footer_note')}</p>

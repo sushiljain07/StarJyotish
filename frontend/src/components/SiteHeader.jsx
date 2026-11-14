@@ -4,6 +4,10 @@
 // Desktop (md+): Logo + nav links (from config/nav.js) + avatar/CTA
 // Mobile, signed in:  Logo + avatar only — page nav lives in BottomNav
 // Mobile, signed out: Logo + hamburger menu (public links) + Sign in
+// Mobile /kundli: slides up out of view on scroll-down (the chart gets the
+// screen) and back on scroll-up or near the top. While it is hidden,
+// <html data-header-hidden> drops --header-offset (index.css) to 0 so
+// sticky bands below it (Result.jsx) move up to the screen top with it.
 //
 // Active/hover states use design tokens (text-primary-glow etc.) — this
 // component previously hand-rolled them with inline styles and JS
@@ -17,6 +21,7 @@ import AccountMenu from './AccountMenu'
 import LanguageSwitcher from './LanguageSwitcher'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
+import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
 
 // The 16px gutter, widened to the landscape notch inset when there is one
 // (index.html sets viewport-fit=cover). The header itself is fixed, so the
@@ -29,7 +34,7 @@ function NavButton({ item, active, onClick }) {
     <button
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
-      className={`relative inline-flex items-center min-h-11 px-4 text-sm font-medium rounded-md transition-colors ${
+      className={`relative inline-flex items-center min-h-11 min-w-11 px-4 md:px-2 lg:px-4 whitespace-nowrap text-sm font-medium rounded-md transition-colors ${
         active ? 'text-primary-glow' : 'text-primary-light/60 hover:text-primary-light/90'
       }`}
     >
@@ -64,6 +69,22 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
   // Close the mobile menu on any navigation.
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
+  const belowMd = useBelowMd()
+  const hideOnScroll = belowMd && location.pathname === '/kundli'
+  const scrolledAway = useHideOnScroll({ enabled: hideOnScroll })
+  // Focus moving into the header while it is hidden (a keyboard user tabbing
+  // back up) brings it back, flag included, until focus leaves it or the
+  // next scroll-up. Focus gained while visible (a tap) does not pin it.
+  const [focusShown, setFocusShown] = useState(false)
+  useEffect(() => { if (!scrolledAway) setFocusShown(false) }, [scrolledAway])
+  const hidden = scrolledAway && !focusShown
+  useEffect(() => {
+    if (!hidden) return undefined
+    const root = document.documentElement
+    root.setAttribute('data-header-hidden', '')
+    return () => root.removeAttribute('data-header-hidden')
+  }, [hidden])
+
   const p = Math.min(1, Math.max(0, scrollProgress))
   const blurPx      = 6 + p * 6
   const borderAlpha = 0.06 + p * 0.08
@@ -81,7 +102,13 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
 
   return (
     <header
-      className="fixed top-0 inset-x-0 z-40 bg-night border-b transition-[backdrop-filter,border-color] duration-150 ease-out"
+      className={`fixed top-0 inset-x-0 z-40 bg-night border-b duration-150 ease-out ${
+        hideOnScroll
+          ? 'motion-safe:transition-[transform,backdrop-filter,border-color]'
+          : 'transition-[backdrop-filter,border-color]'
+      }${hidden ? ' -translate-y-full' : ''}`}
+      onFocus={() => { if (hidden) setFocusShown(true) }}
+      onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setFocusShown(false) }}
       style={{
         backdropFilter:       `blur(${blurPx}px)`,
         WebkitBackdropFilter: `blur(${blurPx}px)`,
@@ -102,7 +129,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1" aria-label={t('nav_bottom_aria', 'Main navigation')}>
+        <nav className="hidden md:flex items-center md:gap-0.5 lg:gap-1" aria-label={t('nav_bottom_aria', 'Main navigation')}>
           {items.map(item => (
             <NavButton
               key={item.id}

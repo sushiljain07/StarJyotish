@@ -1,8 +1,10 @@
 // frontend/src/components/layout/useBottomChrome.js
 //
 // One source of truth for the fixed bars at the bottom of a phone screen:
-// the app BottomNav (signed in), Result.jsx's NavBar on /kundli (raised above
-// BottomNav when it is mounted) and AskPersonaPanel's floating button.
+// the app BottomNav (signed in, every page but /kundli), Result.jsx's NavBar
+// on /kundli (the one bottom bar there, at the true bottom edge) and
+// AskPersonaPanel's floating button. NavBar's `raised` mode (stacked above
+// BottomNav) is still supported here but no page uses it now.
 // Each of those components registers itself while it actually renders
 // (useChromeRegistration), so pages that have a Footer but no BottomNav get no
 // phantom clearance. Heights come from CSS variables in index.css
@@ -10,8 +12,9 @@
 // ScrollToTop and the Ask FAB all use `spacerHeight`.
 import { useEffect, useSyncExternalStore } from 'react'
 
-// Keep in sync with the button in components/home/AskPersonaPanel.jsx.
-export const FAB_HEIGHT = '4rem'
+// Tallest height of the button in components/home/AskPersonaPanel.jsx: the
+// sm+ pill is about 3.25rem (the phone circle is 3rem). Keep in sync.
+export const FAB_HEIGHT = '3.25rem'
 
 const counts = { bottomNav: 0, fab: 0, subNav: 0, raisedSubNav: 0 }
 let snapshot = { ...counts }
@@ -51,10 +54,11 @@ export function useBottomChrome() {
   } else if (subNav) {
     spacerHeight = 'calc(var(--sub-nav-h) + var(--safe-bottom))'
   }
-  // Footer content must also end above the floating ScrollToTop button, which
-  // sits 0.75rem over the bars (plus the FAB and a gap when the FAB shows) and
-  // is 2.75rem tall. Keep in sync with ScrollToTop.jsx.
-  const sttReach = hasFab ? `${FAB_HEIGHT} + 4.25rem` : '3.5rem'
+  // Footer content must also end above whichever floating button shows: the
+  // Ask FAB (FAB_HEIGHT plus a 0.75rem gap, and ScrollToTop is then not
+  // rendered) or else ScrollToTop, 0.75rem over the bars and 2.75rem tall.
+  // Keep in sync with ScrollToTop.jsx.
+  const sttReach = hasFab ? `${FAB_HEIGHT} + 0.75rem` : '3.5rem'
   const footerClearance = spacerHeight === '0px'
     ? `calc(${sttReach})`
     : `calc(${spacerHeight} + ${sttReach})`

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette } from '../theme/chartPalette'
 import ScrollHint from './ui/ScrollHint'
 
 // Hand-written notes exist for these shifts; any other shift gets a generic line.
@@ -61,8 +62,8 @@ export default function BhavaChalit({ input }) {
     <div className="space-y-5">
 
       {/* Intro */}
-      <div className="pb-4" style={{ borderBottom: '2px solid #EAE1CC' }}>
-        <p className="text-[11px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#D9A441' }}>
+      <div className="pb-4 border-b-2 border-line">
+        <p className="text-[11px] font-semibold uppercase tracking-widest mb-1 text-primary-ink">
           {t('bhava_header')}
         </p>
         <h2 className="font-serif font-bold text-xl text-ink mb-2">
@@ -94,14 +95,14 @@ export default function BhavaChalit({ input }) {
         <>
           {/* Ascendant */}
           <div className="flex items-center gap-2 px-1">
-            <span className="text-xs font-semibold" style={{ color: '#D9A441' }}>{t('bhava_ascendant')}</span>
+            <span className="text-xs font-semibold text-primary-ink">{t('bhava_ascendant')}</span>
             <span className="text-sm font-bold text-ink">
               {signName(t, data.ascendant.sign)} {data.ascendant.degree.toFixed(1)}°
             </span>
           </div>
 
           {/* Summary */}
-          <div className="rounded-xl px-4 py-4 bg-parchment-card" style={{ border: '1px solid #EAE1CC' }}>
+          <div className="rounded-xl px-4 py-4 bg-parchment-card border border-line">
             <p className="text-sm font-bold text-ink mb-3">
               {shifted.length === 0
                 ? t('bhava_all_same')
@@ -117,11 +118,10 @@ export default function BhavaChalit({ input }) {
             {shifted.map(p => (
               <div key={p.name} className="mb-4 last:mb-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold" style={{ color: PLANET_COLORS[p.name] ?? '#D9A441' }}>
+                  <span className="text-sm font-bold" style={{ color: PLANET_COLORS[p.name] ?? chartPalette.signText }}>
                     {planetName(t, p.name)}
                   </span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-light"
-                        style={{ color: '#D9A441' }}>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
                     H{p.rashi_house} → H{p.bhava_house}
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export default function BhavaChalit({ input }) {
           {showFull && (
             <div className="rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-2.5 bg-parchment-card border-b border-line">
-                <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-ink">
                   {t('bhava_table_title')}
                 </p>
               </div>
@@ -170,7 +170,7 @@ export default function BhavaChalit({ input }) {
                         className={p.changed ? 'bg-primary-light/40' : (i % 2 === 0 ? '' : 'bg-night/[0.03]')}
                       >
                         <td className="p-2.5 border-b border-line font-bold"
-                            style={{ color: PLANET_COLORS[p.name] ?? '#2A2724' }}>
+                            style={{ color: PLANET_COLORS[p.name] ?? chartPalette.text }}>
                           {planetName(t, p.name)}
                         </td>
                         <td className="p-2.5 border-b border-line text-ink">{signName(t, p.sign)}</td>
@@ -178,15 +178,15 @@ export default function BhavaChalit({ input }) {
                           {p.degree.toFixed(2)}°
                         </td>
                         <td className="p-2.5 border-b border-line text-ink-muted hidden sm:table-cell">{nakshatraName(t, p.nakshatra)}</td>
-                        <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
+                        <td className="p-2.5 border-b border-line text-center font-bold text-primary-ink">
                           {p.rashi_house}
                         </td>
-                        <td className="p-2.5 border-b border-line text-center font-bold" style={{ color: '#D9A441' }}>
+                        <td className="p-2.5 border-b border-line text-center font-bold text-primary-ink">
                           {p.bhava_house}
                         </td>
                         <td className="p-2.5 border-b border-line text-center whitespace-nowrap">
                           {p.changed
-                            ? <span className="font-semibold" style={{ color: '#D9A441' }}>H{p.rashi_house}→H{p.bhava_house}</span>
+                            ? <span className="font-semibold text-primary-ink">H{p.rashi_house}→H{p.bhava_house}</span>
                             : <span className="text-sage font-medium">{t('bhava_same')}</span>}
                         </td>
                       </tr>

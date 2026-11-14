@@ -129,8 +129,8 @@ export default function DivisionalCharts({ input, defaultDivision }) {
     return (
       <div>
         {/* Header */}
-        <div className="mb-6 pb-4" style={{ borderBottom: '2px solid #EAE1CC' }}>
-          <p className="text-[11px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#D9A441' }}>
+        <div className="mb-6 pb-4 border-b-2 border-line">
+          <p className="text-[11px] font-semibold uppercase tracking-widest mb-1 text-primary-ink">
             {t('kundli_div_header')}
           </p>
           <h2 className="font-serif font-bold text-xl text-ink mb-1">
@@ -149,13 +149,12 @@ export default function DivisionalCharts({ input, defaultDivision }) {
                 <span className="text-base">{group.emoji}</span>
                 <h3 className="font-serif font-bold text-base text-ink">{t(`kundli_div_group_${group.id}`)}</h3>
               </div>
-              <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #EAE1CC' }}>
+              <div className="rounded-xl overflow-hidden border border-line">
                 {group.charts.map((chart, idx) => (
                   <button
                     key={`${group.id}-${chart.d}`}
                     onClick={() => openChart({ ...chart, groupId: group.id })}
-                    className="w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-primary-light/40"
-                    style={{ borderBottom: idx < group.charts.length - 1 ? '1px solid #EAE1CC' : 'none' }}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-primary-light/40 ${idx < group.charts.length - 1 ? 'border-b border-line' : ''}`}
                   >
                     <div className="min-w-0">
                       <span className="text-sm font-semibold text-ink">{t(`kundli_div_${chart.code}_area`)}</span>
@@ -163,7 +162,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
                         {t(`kundli_div_${chart.code}_chart`)} · {chart.code}
                       </span>
                     </div>
-                    <span className="shrink-0 ml-3 text-xs font-semibold" style={{ color: '#D9A441' }}>
+                    <span className="shrink-0 ml-3 text-xs font-semibold text-primary-ink">
                       {t('kundli_div_view')}
                     </span>
                   </button>
@@ -186,8 +185,8 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         {t('kundli_div_back')}
       </button>
 
-      <div className="pb-4" style={{ borderBottom: '1px solid #EAE1CC' }}>
-        <p className="text-[11px] font-semibold uppercase tracking-widest mb-0.5" style={{ color: '#D9A441' }}>
+      <div className="pb-4 border-b border-line">
+        <p className="text-[11px] font-semibold uppercase tracking-widest mb-0.5 text-primary-ink">
           {t(`kundli_div_group_${selected.groupId}`)}
         </p>
         <h2 className="font-serif font-bold text-xl text-ink leading-tight">{t(`kundli_div_${selected.code}_area`)}</h2>
@@ -196,8 +195,8 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         </p>
       </div>
 
-      <div className="rounded-xl px-4 py-3.5 bg-parchment-card" style={{ border: '1px solid #EAE1CC' }}>
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#D9A441' }}>
+      <div className="rounded-xl px-4 py-3.5 bg-parchment-card border border-line">
+        <p className="text-[10px] font-bold uppercase tracking-widest mb-2 text-primary-ink">
           {t('kundli_div_governs_label')}
         </p>
         <p className="text-sm leading-relaxed text-ink">{t(`kundli_div_${selected.code}_governs`)}</p>

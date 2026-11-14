@@ -63,10 +63,7 @@ import Home from './Home'
 import PersonalHome from './PersonalHome'
 import PanchangDetail from './PanchangDetail'
 import WeekAhead from './WeekAhead'
-import HeroBanner from '../components/home/HeroBanner'
 import LocationSection from '../components/home/LocationSection'
-import MobileTimelineCard from '../components/home/MobileTimelineCard'
-import CosmicSnapshot from '../components/home/CosmicSnapshot'
 import ContactUs from './ContactUs'
 import AboutUs from './AboutUs'
 import Learn from './Learn'
@@ -258,16 +255,6 @@ describe('Panchang pages', () => {
 })
 
 describe('home components outside the live page', () => {
-  const profile = {
-    label: 'Asha Verma', birth_date: '1990-08-16', birth_time: '19:05', place: PLACE, chart: kundli,
-  }
-
-  it('HeroBanner has no English', () => {
-    const { container } = renderPage(<HeroBanner profile={profile} user={null} onOpenChart={() => {}} />)
-    expect(container.textContent).toContain(hi.home_hero_namaste)
-    expectHindi(container)
-  })
-
   it('LocationSection has no English', () => {
     const { container } = renderPage(
       <LocationSection location={{ lat: 28.6, lon: 77.2 }} birthPlace={PLACE} onRetryGeolocation={() => {}} onSetManualLocation={() => {}} />,
@@ -276,18 +263,6 @@ describe('home components outside the live page', () => {
     expectHindi(container)
   })
 
-  it('MobileTimelineCard has no English, including an opened window', () => {
-    const { container } = renderPage(<MobileTimelineCard panchang={panchang} />)
-    fireEvent.click(screen.getByText(hi.slot_abhijit_label))
-    expect(container.textContent).toContain(hi.slot_abhijit_do_1)
-    expectHindi(container)
-  })
-
-  it('CosmicSnapshot has no English', () => {
-    const { container } = renderPage(<CosmicSnapshot panchang={panchang} profile={{ chart: kundli }} />)
-    expect(container.textContent).toContain(hi.snapshot_title)
-    expectHindi(container)
-  })
 })
 
 describe('site pages', () => {

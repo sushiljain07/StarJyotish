@@ -2,8 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import i18n from '../i18n'
 import KundliChart from './KundliChart'
-import SouthIndiaChart from './SouthIndiaChart'
-import WesternChart from './WesternChart'
 import SarvatobhadraChakra from './SarvatobhadraChakra'
 import KundliDownload from './KundliDownload'
 import { estimateTextWidth, NORTH_HOUSE_POLYGONS, pointInPolygon } from '../utils/chartLabelLayout'
@@ -183,37 +181,6 @@ describe('KundliChart on desktop (scale 1)', () => {
     const pos = [...container.querySelectorAll('g[data-house="6"] text')].map(t => [t.getAttribute('x'), t.getAttribute('y')])
     // centre (130,450), 2 columns ±22, row height 22
     expect(pos).toEqual([['108', '439'], ['152', '439'], ['108', '461'], ['152', '461']])
-  })
-})
-
-describe('SouthIndiaChart on a phone (scale 0.6)', () => {
-  it.each(['en', 'hi'])('legible, no degrees, no overlap (%s)', async lng => {
-    await i18n.changeLanguage(lng)
-    const { container } = renderAtWidth(
-      <SouthIndiaChart planets={kundli.planets} ascendant={kundli.ascendant} transitPlanets={transit.transit_planets} />, 288)
-    expect(container.querySelectorAll('[data-deg]')).toHaveLength(0)
-    const labels = container.querySelectorAll('text[data-label="planet"], text[data-label="transit"]')
-    expect(labels.length).toBe(kundli.planets.length + transit.transit_planets.length)
-    labels.forEach(p => expect(fs(p) * 0.6).toBeGreaterThanOrEqual(11))
-    container.querySelectorAll('[data-status]').forEach(s => expect(fs(s) * 0.6).toBeGreaterThanOrEqual(10))
-    container.querySelectorAll('text[data-label="sign"]').forEach(s => expect(fs(s) * 0.6).toBeGreaterThanOrEqual(10))
-    const cells = container.querySelectorAll('g[data-cell]')
-    expect(cells).toHaveLength(12)
-    for (const cell of cells) {
-      expectNoOverlap([...cell.querySelectorAll('text')])
-    }
-  })
-})
-
-describe('WesternChart on a phone', () => {
-  it('renders planet glyphs at ≥ 11px and hides degrees', () => {
-    const s = 296 / 520
-    const { container } = renderAtWidth(
-      <WesternChart planets={kundli.planets} ascendant={kundli.ascendant} transitPlanets={transit.transit_planets} />, 296)
-    expect(container.querySelectorAll('[data-deg]')).toHaveLength(0)
-    const glyphs = container.querySelectorAll('text[data-label="planet"], text[data-label="transit"]')
-    expect(glyphs.length).toBe(kundli.planets.length + transit.transit_planets.length)
-    glyphs.forEach(g => expect(fs(g) * s).toBeGreaterThanOrEqual(11))
   })
 })
 

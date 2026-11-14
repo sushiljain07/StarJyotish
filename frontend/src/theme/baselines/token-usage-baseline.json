@@ -56,18 +56,6 @@
   "components/home/KnowledgeCapsule.jsx": {
     "goldText": 1
   },
-  "components/home/LifeAreaGrid.jsx": {
-    "goldText": 1
-  },
-  "components/home/LocationBar.jsx": {
-    "faintText": 1
-  },
-  "components/home/ProfileSelector.jsx": {
-    "faintText": 1
-  },
-  "components/home/QuickPanchangStrip.jsx": {
-    "goldText": 1
-  },
   "components/home/ReflectionLoop.jsx": {
     "goldText": 3
   },

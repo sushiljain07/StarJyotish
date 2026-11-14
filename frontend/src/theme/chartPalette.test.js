@@ -37,8 +37,8 @@ describe('chartPalette', () => {
     }
   }
   it('has no hex or rgba literals in the chart components', () => {
-    const files = ['KundliChart', 'SouthIndiaChart', 'WesternChart', 'SarvatobhadraChakra',
-      'ChartReading', 'ChartHighlight', 'home/MobileTimelineCard']
+    const files = ['KundliChart', 'SarvatobhadraChakra',
+      'ChartReading', 'ChartHighlight']
     for (const f of files) {
       const src = readFileSync(resolve(import.meta.dirname, `../components/${f}.jsx`), 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')

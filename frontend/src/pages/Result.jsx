@@ -299,7 +299,6 @@ export default function Result() {
         <button
           onClick={() => navigate('/insights', { state: { data, input } })}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
-         
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">✨</span>
@@ -313,7 +312,6 @@ export default function Result() {
         <button
           onClick={openAsk}
           className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
-         
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">💬</span>

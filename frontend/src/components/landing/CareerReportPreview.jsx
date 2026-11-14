@@ -22,7 +22,7 @@ export default function CareerReportPreview() {
           <span
             key={label}
             className={`shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-lg font-medium ${
-              i === 0 ? 'bg-mauve text-white' : 'text-ink-muted border border-line'
+              i === 0 ? 'bg-primary text-night' : 'text-ink-muted border border-line'
             }`}
           >
             {t(label)}

@@ -23,7 +23,8 @@ describe('ashtakavarga heat-map bands', () => {
       expect(ratio(fills[i].hex, fills[i + 1].hex), `${fills[i].k} vs ${fills[i + 1].k}`).toBeGreaterThanOrEqual(1.15)
     }
   })
-  it('strong is the heaviest tint against the card (most saturated band)', () => {
+  // "Most saturated" is measured as the heaviest tint: contrast of the fill against the card.
+  it('strong is the heaviest tint against the card', () => {
     const card = c.parchment.card
     const weight = k => ratio(fills.find(f => f.k === k).hex, card)
     for (const k of ASHTAKAVARGA_BAND_ORDER.filter(k => k !== 'strong')) expect(weight('strong'), k).toBeGreaterThan(weight(k))

@@ -206,18 +206,26 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                     </text>
                     {/* Transit planet dots */}
                     {cell.transitPlanets.slice(0, 3).map((p, pi) => (
-                      <circle key={pi}
-                              cx={x + 6 + pi * 11} cy={y + CELL - 7}
-                              r={4} fill={PLANET_COLORS[p.name] ?? P.muted}
-                              stroke={P.transit} strokeWidth={1.5} />
+                      <g key={pi}>
+                        <circle cx={x + 6 + pi * 11} cy={y + CELL - 7}
+                                r={4} fill={PLANET_COLORS[p.name] ?? P.muted}
+                                stroke={P.transit} strokeWidth={1.5} />
+                        {/* paper inner stroke keeps the dot visible on a same-hue fill */}
+                        <circle cx={x + 6 + pi * 11} cy={y + CELL - 7}
+                                r={2.6} fill="none" stroke={P.paper} strokeWidth={1} />
+                      </g>
                     ))}
                     {/* Natal planet dots */}
                     {cell.natalPlanets.slice(0, 2).map((p, pi) => (
-                      <rect key={`n${pi}`}
-                            x={x + 6 + pi * 11} y={y + CELL - 16}
-                            width={8} height={8}
-                            rx={1} fill={PLANET_COLORS[p.name] ?? P.muted}
-                            stroke={P.natal} strokeWidth={1.5} />
+                      <g key={`n${pi}`}>
+                        <rect x={x + 6 + pi * 11} y={y + CELL - 16}
+                              width={8} height={8}
+                              rx={1} fill={PLANET_COLORS[p.name] ?? P.muted}
+                              stroke={P.natal} strokeWidth={1.5} />
+                        <rect x={x + 8 + pi * 11} y={y + CELL - 14}
+                              width={4} height={4}
+                              fill="none" stroke={P.paper} strokeWidth={1} />
+                      </g>
                     ))}
                   </g>
                 )

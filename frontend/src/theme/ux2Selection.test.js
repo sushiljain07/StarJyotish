@@ -48,3 +48,35 @@ describe('Sarvatobhadra natal / transit colours', () => {
     expect(src).not.toMatch(/border-(good|caution)/)
   })
 })
+
+describe('selection is always gold', () => {
+  const walk = (dir, out = []) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, e.name)
+      if (e.isDirectory()) walk(full, out)
+      else if (/\.jsx$/.test(e.name) && !/\.test\.jsx$/.test(e.name)) out.push(full)
+    }
+    return out
+  }
+  const files = [...walk(path.resolve(HERE, '../components')), ...walk(path.resolve(HERE, '../pages'))]
+  it('no bg-mauve / bg-sage (solid) fill sits on a selected or active state', () => {
+    const hits = []
+    for (const f of files) {
+      fs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
+        const solid = /(?<![\w-])bg-(mauve|sage)(?![\w/-])/.test(line.replace(/bar: '[^']*'/, ''))
+        if (solid && /(active|selected|aria-current|isActive)/i.test(line)) hits.push(`${path.basename(f)}:${i + 1}`)
+      })
+    }
+    expect(hits).toEqual([])
+  })
+  it('SectionJumpNav trigger and selected item use bg-primary text-night', () => {
+    const src = read('components/SectionJumpNav.jsx')
+    expect(src).toMatch(/active === s\.id \? 'bg-primary text-night/)
+    expect(src).toMatch(/rounded-full bg-primary text-night/)
+    expect(src).not.toMatch(/bg-mauve/)
+  })
+  it('CareerReportPreview mock selected tab is gold; DashaTable levels all select gold', () => {
+    expect(read('components/landing/CareerReportPreview.jsx')).toContain("i === 0 ? 'bg-primary text-night'")
+    expect(read('components/DashaTable.jsx').match(/active: 'bg-primary'/g)).toHaveLength(3)
+  })
+})

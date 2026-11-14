@@ -118,7 +118,7 @@ export default function SectionJumpNav({ sections, className = '' }) {
           onClick={() => setSheetOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={sheetOpen}
-          className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-mauve text-white text-sm font-medium shadow-sm"
+          className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-primary text-night text-sm font-medium shadow-sm"
         >
           <span className="truncate">{activeLabel}</span>
           <span className="shrink-0 opacity-80">▾</span>
@@ -157,7 +157,7 @@ export default function SectionJumpNav({ sections, className = '' }) {
                     type="button"
                     onClick={() => handleMobileSelect(s.id)}
                     className={`w-full text-left px-4 py-3 rounded-lg text-sm transition ${
-                      active === s.id ? 'bg-mauve text-white font-semibold' : 'text-ink hover:bg-night/5'
+                      active === s.id ? 'bg-primary text-night font-semibold' : 'text-ink hover:bg-night/5'
                     }`}
                   >
                     {s.label}

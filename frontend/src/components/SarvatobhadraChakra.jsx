@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, nakshatraName } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
 import ScrollHint from './ui/ScrollHint'
+import { chartPalette as P, withAlpha } from '../theme/chartPalette'
 
 const NAKSHATRAS_27 = [
   'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra',
@@ -61,10 +62,10 @@ const OUTER_CELLS = [
 ]
 
 const CORNER_CELLS = [
-  { row: 0, col: 0, planet: 'Sun',     color: '#FFA500' },
-  { row: 0, col: 8, planet: 'Moon',    color: '#7B61FF' },
-  { row: 8, col: 0, planet: 'Jupiter', color: '#2563EB' },
-  { row: 8, col: 8, planet: 'Saturn',  color: '#374151' },
+  { row: 0, col: 0, planet: 'Sun',     color: PLANET_COLORS.Sun },
+  { row: 0, col: 8, planet: 'Moon',    color: PLANET_COLORS.Moon },
+  { row: 8, col: 0, planet: 'Jupiter', color: PLANET_COLORS.Jupiter },
+  { row: 8, col: 8, planet: 'Saturn',  color: PLANET_COLORS.Saturn },
 ]
 
 // Inner ring signs (12 signs, 2 cells each in the 7×7 inner ring border)
@@ -176,7 +177,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
               if (cell.type === 'empty') {
                 return (
                   <rect key={`${ri}-${ci}`} x={x} y={y} width={CELL} height={CELL}
-                        fill="#f8f8f8" stroke="#e2e8f0" strokeWidth="0.5" />
+                        fill={P.paper} stroke={P.hairline} strokeWidth="0.5" />
                 )
               }
 
@@ -184,12 +185,12 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 return (
                   <g key={`${ri}-${ci}`}>
                     <rect x={x} y={y} width={CELL} height={CELL}
-                          fill={cell.color + '22'} stroke={cell.color} strokeWidth="1.5" />
+                          fill={withAlpha(cell.color, 0.13)} stroke={cell.color} strokeWidth="1.5" />
                     <text x={cx} y={cy - 4} textAnchor="middle" fontSize="9"
                           fontWeight="bold" fill={cell.color}>
                       {cell.label.split('\n')[0]}
                     </text>
-                    <text x={cx} y={cy + 8} textAnchor="middle" fontSize="7" fill={cell.color + 'aa'}>
+                    <text x={cx} y={cy + 8} textAnchor="middle" fontSize="7" fill={withAlpha(cell.color, 0.67)}>
                       {cell.label.split('\n')[1]}
                     </text>
                   </g>
@@ -197,29 +198,29 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
               }
 
               if (cell.type === 'nak') {
-                const bg = cell.highlighted ? '#d1fae5' : cell.natalHighlighted ? '#fef9c3' : '#fffef8'
-                const border = cell.highlighted ? '#059669' : cell.natalHighlighted ? '#D97706' : '#d1d5db'
+                const bg = cell.highlighted ? P.goodFill : cell.natalHighlighted ? P.cautionFill : P.paper
+                const border = cell.highlighted ? P.good : cell.natalHighlighted ? P.caution : P.hairline
                 const bw = cell.highlighted || cell.natalHighlighted ? 1.5 : 0.5
                 return (
                   <g key={`${ri}-${ci}`}>
                     <rect x={x} y={y} width={CELL} height={CELL}
                           fill={bg} stroke={border} strokeWidth={bw} />
                     <text x={cx} y={cy - 5} textAnchor="middle" fontSize="9"
-                          fontWeight="bold" fill="#374151">
+                          fontWeight="bold" fill={P.text}>
                       {cell.abbr}
                     </text>
                     {/* Transit planet dots */}
                     {cell.transitPlanets.slice(0, 3).map((p, pi) => (
                       <circle key={pi}
                               cx={x + 6 + pi * 11} cy={y + CELL - 7}
-                              r={4} fill={PLANET_COLORS[p.name] ?? '#888'} />
+                              r={4} fill={PLANET_COLORS[p.name] ?? P.muted} />
                     ))}
                     {/* Natal planet dots */}
                     {cell.natalPlanets.slice(0, 2).map((p, pi) => (
                       <rect key={`n${pi}`}
                             x={x + 6 + pi * 11} y={y + CELL - 16}
                             width={8} height={8}
-                            rx={1} fill={PLANET_COLORS[p.name] ?? '#888'} opacity="0.6" />
+                            rx={1} fill={PLANET_COLORS[p.name] ?? P.muted} opacity="0.6" />
                     ))}
                   </g>
                 )
@@ -229,9 +230,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 return (
                   <g key={`${ri}-${ci}`}>
                     <rect x={x} y={y} width={CELL} height={CELL}
-                          fill="#f0f4ff" stroke="#94a3b8" strokeWidth="0.5" />
+                          fill={P.paperAlt} stroke={P.muted} strokeWidth="0.5" />
                     <text x={cx} y={cy + 4} textAnchor="middle"
-                          fontSize="10" fontWeight="bold" fill="#3730a3">
+                          fontSize="10" fontWeight="bold" fill={P.signText}>
                       {cell.abbr}
                     </text>
                   </g>
@@ -242,9 +243,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 return (
                   <g key={`${ri}-${ci}`}>
                     <rect x={x} y={y} width={CELL} height={CELL}
-                          fill="#fafafa" stroke="#e2e8f0" strokeWidth="0.5" />
+                          fill={P.paper} stroke={P.hairline} strokeWidth="0.5" />
                     <text x={cx} y={cy + 4} textAnchor="middle"
-                          fontSize="10" fill="#94a3b8">
+                          fontSize="10" fill={P.muted}>
                       {cell.label}
                     </text>
                   </g>
@@ -255,9 +256,9 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                 return (
                   <g key={`${ri}-${ci}`}>
                     <rect x={x} y={y} width={CELL} height={CELL}
-                          fill="#fff8f0" stroke="#b5451b" strokeWidth="1.5" />
+                          fill={P.ascFill} stroke={P.line} strokeWidth="1.5" />
                     <text x={cx} y={cy + 4} textAnchor="middle"
-                          fontSize="13" fontWeight="bold" fill="#b5451b">
+                          fontSize="13" fontWeight="bold" fill={P.signText}>
                       ॐ
                     </text>
                   </g>
@@ -307,7 +308,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                   return (
                     <tr key={np.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                       <td className="p-2 border-b font-bold"
-                          style={{ color: PLANET_COLORS[np.name] ?? '#333' }}>
+                          style={{ color: PLANET_COLORS[np.name] ?? P.text }}>
                         {planetName(t, np.name)}
                       </td>
                       <td className="p-2 border-b">{nakshatraName(t, np.nakshatra)} (H{np.house})</td>

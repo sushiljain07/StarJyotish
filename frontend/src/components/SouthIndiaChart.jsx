@@ -4,6 +4,7 @@
 import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
 import { planetAbbr } from '../utils/astroNames'
+import { chartPalette as P } from '../theme/chartPalette'
 
 // 0-indexed sign → grid cell [row, col]  (4×4, centre 4 cells are empty)
 const SIGN_TO_CELL = {
@@ -66,7 +67,7 @@ export default function SouthIndiaChart({
     // Lagna marker
     if (isAsc && ascendant) {
       items.push(
-        <text key="la" x={cx + 4} y={cy + 14} fontSize="9" fill="#FF6B00" fontWeight="bold">
+        <text key="la" x={cx + 4} y={cy + 14} fontSize="9" fill={P.asc} fontWeight="bold">
           {Math.floor(ascendant.degree)}° {abbr('Ascendant')}
         </text>
       )
@@ -76,10 +77,10 @@ export default function SouthIndiaChart({
     for (const p of ps) {
       items.push(
         <text key={p.name} x={cx + 4} y={cy + yOff}
-              fontSize="10" fill={PLANET_COLORS[p.name] ?? '#333'} fontWeight="500">
+              fontSize="10" fill={PLANET_COLORS[p.name] ?? P.text} fontWeight="500">
           {abbr(p.name)}
           <tspan fontSize="8">{Math.floor(p.degree)}°</tspan>
-          {p.retrograde && <tspan fontSize="8" fill="#888">{t('col_retrograde')}</tspan>}
+          {p.retrograde && <tspan fontSize="8" fill={P.muted}>{t('col_retrograde')}</tspan>}
         </text>
       )
       yOff += 12
@@ -88,7 +89,7 @@ export default function SouthIndiaChart({
     for (const p of tps) {
       items.push(
         <text key={`t_${p.name}`} x={cx + 4} y={cy + yOff}
-              fontSize="9" fill={PLANET_COLORS[p.name] ?? '#888'}
+              fontSize="9" fill={PLANET_COLORS[p.name] ?? P.muted}
               fontStyle="italic" opacity="0.75">
           {t('chart_transit_marker')}{abbr(p.name)}<tspan fontSize="7">{Math.floor(p.degree)}°</tspan>
         </text>
@@ -111,12 +112,12 @@ export default function SouthIndiaChart({
           cells.push(
             <rect key={`c${row}${col}`} x={x} y={y}
                   width={CELL_SIZE * 2} height={CELL_SIZE * 2}
-                  fill="#fffbf0" stroke="#b5451b" strokeWidth="1" />
+                  fill={P.paper} stroke={P.line} strokeWidth="1" />
           )
           cells.push(
             <text key="centre-label" x={x + CELL_SIZE} y={y + CELL_SIZE}
                   textAnchor="middle" dominantBaseline="middle"
-                  fontSize="13" fill="#b5451b" fontWeight="bold" opacity="0.35">
+                  fontSize="13" fill={P.signText} fontWeight="bold" opacity="0.35">
               {t('chart_south_centre')}
             </text>
           )
@@ -136,25 +137,25 @@ export default function SouthIndiaChart({
       cells.push(
         <g key={`cell${row}${col}`}>
           <rect x={x} y={y} width={CELL_SIZE} height={CELL_SIZE}
-                fill={isAsc ? '#fff5e0' : '#fffef8'}
-                stroke="#b5451b" strokeWidth="1.5" />
+                fill={isAsc ? P.ascFill : P.paper}
+                stroke={P.line} strokeWidth="1.5" />
           {/* Sign abbreviation top-right */}
           <text x={x + CELL_SIZE - 4} y={y + 12}
-                textAnchor="end" fontSize="9" fill="#b5451b" fontWeight="bold">
+                textAnchor="end" fontSize="9" fill={P.signText} fontWeight="bold">
             {t(`sign_abbr.${SIGN_KEYS[signIdx]}`)}
           </text>
           {/* House number bottom-right */}
           <text x={x + CELL_SIZE - 4} y={y + CELL_SIZE - 4}
-                textAnchor="end" fontSize="10" fill={isAsc ? '#FF6B00' : '#888'} fontWeight="bold">
+                textAnchor="end" fontSize="10" fill={isAsc ? P.asc : P.muted} fontWeight="bold">
             {houseNum}
           </text>
           {/* Ascendant double-line on left edge */}
           {isAsc && (
             <>
               <line x1={x + 3} y1={y + 4} x2={x + 3} y2={y + CELL_SIZE - 4}
-                    stroke="#FF6B00" strokeWidth="2" />
+                    stroke={P.asc} strokeWidth="2" />
               <line x1={x + 6} y1={y + 4} x2={x + 6} y2={y + CELL_SIZE - 4}
-                    stroke="#FF6B00" strokeWidth="1" />
+                    stroke={P.asc} strokeWidth="1" />
             </>
           )}
           {/* Cell content */}

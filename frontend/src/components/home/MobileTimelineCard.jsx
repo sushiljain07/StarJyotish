@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { chartPalette as P, withAlpha } from '../../theme/chartPalette'
 
 // ─── Time helpers ─────────────────────────────────────────────────────────────
 
@@ -83,10 +84,10 @@ function findNextGood(slots, nowMin) {
 // ─── Zone 1: Status card ──────────────────────────────────────────────────────
 
 const STATUS_THEME = {
-  good:   { bg: '#1A2E22', border: '#5B7A5E', dot: '#5B7A5E', text: '#5B7A5E', labelKey: 'status_favorable', icon: '✓' },
-  avoid:  { bg: '#2E1A1A', border: '#A23B3B', dot: '#A23B3B', text: '#F7E8E4', labelKey: 'status_avoid',     icon: '✗' },
-  anchor: { bg: '#1F1C0E', border: '#D9A441', dot: '#D9A441', text: '#D9A441', labelKey: 'status_neutral',   icon: '◎' },
-  none:   { bg: '#171B33', border: '#262B4A', dot: '#C9C2D6', text: '#C9C2D6', labelKey: 'status_neutral',   icon: '◎' },
+  good:   { bg: withAlpha(P.good, 0.2), border: P.sage, dot: P.sage, text: P.sage, labelKey: 'status_favorable', icon: '✓' },
+  avoid:  { bg: withAlpha(P.bad, 0.2), border: P.bad, dot: P.bad, text: P.badFill, labelKey: 'status_avoid',     icon: '✗' },
+  anchor: { bg: withAlpha(P.gold, 0.1), border: P.gold, dot: P.gold, text: P.gold, labelKey: 'status_neutral',   icon: '◎' },
+  none:   { bg: P.night, border: P.nightLight, dot: P.onNight, text: P.onNight, labelKey: 'status_neutral',   icon: '◎' },
 }
 
 function StatusCard({ slot, nowMin, slots, t }) {
@@ -110,32 +111,32 @@ function StatusCard({ slot, nowMin, slots, t }) {
             {t(theme.labelKey)}
           </p>
           {slot && (
-            <p style={{ fontSize: 12, color: 'rgba(248,242,228,0.55)', marginTop: 2 }}>
+            <p style={{ fontSize: 12, color: withAlpha(P.onNight, 0.55), marginTop: 2 }}>
               {t(slot.labelKey)}{slot.kind !== 'anchor' && slot.end != null ? ` · ${t('timeline_until', { time: fmt(slot.end) })}` : ''}
             </p>
           )}
         </div>
-        <div style={{ width: 42, height: 42, borderRadius: '50%', background: theme.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#F8F3E7', fontWeight: 700, flexShrink: 0 }}>
+        <div style={{ width: 42, height: 42, borderRadius: '50%', background: theme.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: P.paperAlt, fontWeight: 700, flexShrink: 0 }}>
           {theme.icon}
         </div>
       </div>
 
       {next && nextTimeStr && (
-        <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '7px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: withAlpha(P.nightDeep, 0.5), borderRadius: 8, padding: '7px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: next.kind === 'good' ? '#5B7A5E' : next.kind === 'avoid' ? '#A23B3B' : '#D9A441', flexShrink: 0 }} />
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: next.kind === 'good' ? P.sage : next.kind === 'avoid' ? P.bad : P.gold, flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <p style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {t('status_card_next_event')}
               </p>
-              <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(248,242,228,0.85)' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: withAlpha(P.onNight, 0.85) }}>
                 {t(next.labelKey)}
               </p>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(248,242,228,0.7)' }}>{fmt(next.start)}</p>
-            <p style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)' }}>{nextTimeStr}</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: withAlpha(P.onNight, 0.7) }}>{fmt(next.start)}</p>
+            <p style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4) }}>{nextTimeStr}</p>
           </div>
         </div>
       )}
@@ -145,7 +146,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
 
 // ─── Zone 2: Bar timeline ─────────────────────────────────────────────────────
 
-const BAR_COLOR = { avoid: '#A23B3B', good: '#5B7A5E', neutral: '#262B4A' }
+const BAR_COLOR = { avoid: P.bad, good: P.sage, neutral: P.nightLight }
 
 function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin, t }) {
   const START = sunriseMin ?? 360
@@ -197,21 +198,21 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin, t }) {
 
       {/* Axis labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5, position: 'relative' }}>
-        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌅 {t('slot_sunrise_label')}</span>
+        <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>🌅 {t('slot_sunrise_label')}</span>
         {showNow && (
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#F8F3E7', background: 'rgba(80,80,80,0.8)', borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 9, fontWeight: 800, color: P.paperAlt, background: P.nightLight, borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
             {t('sky_now')}
           </span>
         )}
-        <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>🌇 {t('slot_sunset_label')}</span>
+        <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>🌇 {t('slot_sunset_label')}</span>
       </div>
 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
-        {[['#A23B3B', t('slot_badge_avoid')], ['#5B7A5E', t('status_favorable')], ['#262B4A', t('status_neutral')]].map(([color, label]) => (
+        {[[P.bad, t('slot_badge_avoid')], [P.sage, t('status_favorable')], [P.nightLight, t('status_neutral')]].map(([color, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
-            <span style={{ fontSize: 9, color: 'rgba(248,242,228,0.4)', fontWeight: 600 }}>{label}</span>
+            <span style={{ fontSize: 9, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>{label}</span>
           </div>
         ))}
       </div>
@@ -228,58 +229,58 @@ function WindowRow({ slot, isNow, t }) {
   const details = SLOT_DETAILS[slot.id]
   const timeStr = slot.kind === 'anchor' ? fmt(slot.start) : `${fmt(slot.start)} – ${fmt(slot.end)}`
 
-  const badgeBg    = isNow ? '#2A220A' : slot.kind === 'good' ? '#1A2E22' : slot.kind === 'avoid' ? '#2E1A1A' : '#171B33'
-  const badgeColor = isNow ? '#D9A441' : slot.kind === 'good' ? '#5B7A5E' : slot.kind === 'avoid' ? '#F7E8E4' : '#C9C2D6'
+  const badgeBg    = isNow ? withAlpha(P.gold, 0.12) : slot.kind === 'good' ? withAlpha(P.good, 0.2) : slot.kind === 'avoid' ? withAlpha(P.bad, 0.2) : P.night
+  const badgeColor = isNow ? P.gold : slot.kind === 'good' ? P.sage : slot.kind === 'avoid' ? P.badFill : P.onNight
 
   return (
     <div>
       <button
         onClick={() => setOpen(o => !o)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: isNow ? '1px solid rgba(217,164,65,0.35)' : '1px solid transparent', background: isNow ? 'rgba(217,164,65,0.06)' : open ? 'rgba(255,255,255,0.04)' : 'transparent', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: isNow ? `1px solid ${withAlpha(P.gold, 0.35)}` : '1px solid transparent', background: isNow ? withAlpha(P.gold, 0.06) : open ? withAlpha(P.paper, 0.04) : 'transparent', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
       >
-        <div style={{ width: 34, height: 34, borderRadius: '50%', background: badgeBg, border: `1px solid ${badgeColor}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, color: badgeColor }}>
+        <div style={{ width: 34, height: 34, borderRadius: '50%', background: badgeBg, border: `1px solid ${withAlpha(badgeColor, 0.2)}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, color: badgeColor }}>
           {SLOT_ICONS[slot.id]}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(248,242,228,0.9)' }}>{t(slot.labelKey)}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: withAlpha(P.onNight, 0.9) }}>{t(slot.labelKey)}</span>
             {isNow && (
-              <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: '#D9A441', background: 'rgba(217,164,65,0.15)', borderRadius: 4, padding: '1px 5px', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: P.gold, background: withAlpha(P.gold, 0.15), borderRadius: 4, padding: '1px 5px', textTransform: 'uppercase' }}>
                 {t('sky_now')}
               </span>
             )}
           </div>
-          <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.4)' }}>{timeStr}</span>
+          <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.4) }}>{timeStr}</span>
         </div>
         <span style={{ fontSize: 10, fontWeight: 700, background: badgeBg, color: badgeColor, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
           {t(slot.badgeKey)}
         </span>
         {details && (
-          <span style={{ fontSize: 10, color: 'rgba(248,242,228,0.3)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>▾</span>
+          <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.3), transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>▾</span>
         )}
       </button>
 
       {open && details && (
-        <div style={{ margin: '2px 8px 6px', padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ margin: '2px 8px 6px', padding: '10px 14px', borderRadius: 10, background: withAlpha(P.paper, 0.03), border: `1px solid ${withAlpha(P.paper, 0.07)}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#5B7A5E', marginBottom: 6 }}>{t('timeline_good_for')}</p>
+            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: P.sage, marginBottom: 6 }}>{t('timeline_good_for')}</p>
             {details.do.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
-                <span style={{ color: '#5B7A5E', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
-                <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{t(item)}</span>
+                <span style={{ color: P.sage, fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
+                <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
               </div>
             ))}
           </div>
           <div>
-            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#F7E8E4', marginBottom: 6 }}>{t('timeline_avoid')}</p>
+            <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: P.badFill, marginBottom: 6 }}>{t('timeline_avoid')}</p>
             {details.avoid.length > 0
               ? details.avoid.map((item, i) => (
                   <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
-                    <span style={{ color: '#A23B3B', fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
-                    <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.55)', lineHeight: 1.4 }}>{t(item)}</span>
+                    <span style={{ color: P.bad, fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
+                    <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
                   </div>
                 ))
-              : <span style={{ fontSize: 11, color: 'rgba(248,242,228,0.3)' }}>{t('timeline_no_restrictions')}</span>
+              : <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.3) }}>{t('timeline_no_restrictions')}</span>
             }
           </div>
         </div>
@@ -305,13 +306,13 @@ function AiInsight({ slot, nextGood, t }) {
   }
 
   return (
-    <div style={{ marginTop: 10, borderRadius: 12, background: 'rgba(217,164,65,0.06)', border: '1px solid rgba(217,164,65,0.2)', padding: '10px 14px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+    <div style={{ marginTop: 10, borderRadius: 12, background: withAlpha(P.gold, 0.06), border: `1px solid ${withAlpha(P.gold, 0.2)}`, padding: '10px 14px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>✦</span>
       <div>
-        <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#D9A441', marginBottom: 3 }}>
+        <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: P.gold, marginBottom: 3 }}>
           {t('ai_insight_label')}
         </p>
-        <p style={{ fontSize: 12, color: 'rgba(248,242,228,0.65)', lineHeight: 1.55 }}>{msg}</p>
+        <p style={{ fontSize: 12, color: withAlpha(P.onNight, 0.65), lineHeight: 1.55 }}>{msg}</p>
       </div>
     </div>
   )
@@ -342,11 +343,11 @@ export default function MobileTimelineCard({ panchang }) {
   const nextGood = findNextGood(slots, nowMin)
 
   return (
-    <div style={{ background: '#171B33', borderRadius: 14, padding: '14px 12px 12px', overflow: 'hidden' }}>
+    <div style={{ background: P.night, borderRadius: 14, padding: '14px 12px 12px', overflow: 'hidden' }}>
       <StatusCard slot={active} nowMin={nowMin} slots={slots} t={t} />
       <BarTimeline slots={slots} nowMin={nowMin} sunriseMin={sunriseMin} sunsetMin={sunsetMin} t={t} />
 
-      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(248,242,228,0.35)', margin: '12px 0 4px 4px' }}>
+      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: withAlpha(P.onNight, 0.35), margin: '12px 0 4px 4px' }}>
         {t('timeline_windows_heading')}
       </p>
       <div>

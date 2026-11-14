@@ -3,11 +3,9 @@
 // Small "how should this view render" control — distinct in purpose from
 // SubTabBar (Result.jsx, "which view am I looking at"), but visually
 // matching it: same filled-pill treatment, just used for fewer, denser
-// options. Previously this existed as three separate implementations —
-// a bordered-segment style here, and two near-identical hand-rolled pill
-// versions duplicated inline in PlanetTable.jsx and ShodashvargaPanel.jsx —
-// which is what produced the Birth Chart vs Planets inconsistency. One
-// shared component now backs all three call sites.
+// options. It replaced separate hand-rolled pill toggles (one of them
+// inline in PlanetTable.jsx), whose drift produced the Birth Chart vs
+// Planets inconsistency; one shared component now backs every call site.
 //
 // `ariaLabel` names the button group for screen readers when there is no
 // visible `label`; each button reports its state with aria-pressed.

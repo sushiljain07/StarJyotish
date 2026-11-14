@@ -1,13 +1,11 @@
 // frontend/src/components/home/ReportsStrip.jsx  v2 (Home reimagined)
 //
 // Reports as a Personal Library — the most relevant report is featured
-// full-width, the rest sit below as compact tiles. This version folds in
-// LifeAreaGrid's weekly signal (computeLifeAreas' output, passed in as the
-// new `lifeAreas` prop) so "your reports" and "this week, by life area"
-// are one beat instead of two: every card now also shows that area's
-// trend chip and a thin score bar, sourced from the same real house-lord
-// math LifeAreaGrid used — LifeAreaGrid.jsx itself is retired from the
-// home page (kept on disk, just unused here) rather than duplicated.
+// full-width, the rest sit below as compact tiles. It also carries the
+// weekly life-area signal (computeLifeAreas' output, passed in as the
+// `lifeAreas` prop) so "your reports" and "this week, by life area" are
+// one beat instead of two: every card shows that area's trend chip and a
+// thin score bar, sourced from the real house-lord math.
 //
 // Cover art is now subtle token tints on the shared night-card surface
 // (from-{accent}/20 → night → night-deep) instead of per-report gradient

@@ -3,7 +3,6 @@
 // Two-column location cards matching the design:
 // Left: "Currently in [City]" with city illustration placeholder
 // Right: "Chart cast for [birth place]" with update button
-// These replace the old LocationBar component on the home page.
 
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'

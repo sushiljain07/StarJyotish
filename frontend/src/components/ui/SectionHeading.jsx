@@ -32,7 +32,7 @@ export default function SectionHeading({
       {eyebrow && (
         <div
           className={`text-2xs font-sans font-semibold uppercase tracking-[0.14em] mb-1.5 ${
-            surfaceKey === 'night' ? 'text-primary-glow' : 'text-primary-dark'
+            surfaceKey === 'night' ? 'text-primary-glow' : 'text-primary-ink'
           }`}
         >
           {eyebrow}

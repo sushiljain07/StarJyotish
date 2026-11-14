@@ -21,16 +21,16 @@ function NextGuideCard({ title, item }) {
 
   const inner = (
     <>
-      <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{heading}</p>
+      <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{heading}</p>
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="font-serif font-semibold text-lg text-ink">{item.title}</p>
           {item.description && <p className="text-ink-muted text-sm mt-1 max-w-md">{item.description}</p>}
         </div>
         {isInteractive ? (
-          <span className="shrink-0 text-primary-dark text-sm font-medium">Continue →</span>
+          <span className="shrink-0 text-primary-ink text-sm font-medium">Continue →</span>
         ) : (
-          <span className="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-parchment text-ink-faint border border-line">
+          <span className="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-parchment text-ink-muted border border-line">
             Coming soon
           </span>
         )}
@@ -54,20 +54,20 @@ function GridCard({ item }) {
     <>
       <div className="flex items-center gap-2 mb-2">
         {item.badge && (
-          <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-dark">
+          <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
             {item.badge}
           </span>
         )}
         {item.comingSoon && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-faint border border-line ml-auto">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
             Soon
           </span>
         )}
       </div>
-      <p className={`font-semibold text-sm text-ink leading-snug ${isInteractive ? 'group-hover:text-primary-dark transition' : ''}`}>
+      <p className={`font-semibold text-sm text-ink leading-snug ${isInteractive ? 'group-hover:text-primary-ink transition' : ''}`}>
         {item.title}
       </p>
-      {item.meta && <p className="text-xs text-ink-faint mt-1">{item.meta}</p>}
+      {item.meta && <p className="text-xs text-ink-muted mt-1">{item.meta}</p>}
     </>
   )
 

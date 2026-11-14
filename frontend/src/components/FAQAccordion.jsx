@@ -22,7 +22,7 @@ export default function FAQAccordion({ items }) {
             >
               <span className="text-sm font-semibold text-ink">{item.question}</span>
               <span
-                className={`shrink-0 text-primary-dark transition-transform duration-300 ${
+                className={`shrink-0 text-primary-ink transition-transform duration-300 ${
                   isOpen ? 'rotate-45' : ''
                 }`}
                 aria-hidden="true"

@@ -5,7 +5,7 @@ import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2'
-const linkCls = 'text-primary-dark hover:underline'
+const linkCls = 'text-primary-ink hover:underline'
 
 export default function AboutUs() {
   const { t } = useTranslation()

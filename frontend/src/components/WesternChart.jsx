@@ -3,6 +3,7 @@
 
 import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette as P } from '../theme/chartPalette'
 
 const CX = 260
 const CY = 260
@@ -81,7 +82,7 @@ export default function WesternChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-2 w-full">
-        <div className="text-sm font-semibold text-primary-dark">{title}</div>
+        <div className="text-sm font-semibold text-primary-ink">{title}</div>
         <svg width="100%" viewBox={`0 0 ${CX * 2} ${viewH}`}
              style={{ maxWidth: 520 }} className="font-sans">
 
@@ -95,10 +96,10 @@ export default function WesternChart({
             return (
               <g key={`sign${s}`}>
                 <path d={sectorPath(R_OUTER, R_ZODIAC, startAngle, endAngle)}
-                      fill={s % 3 === 0 ? '#fff0e8' : s % 3 === 1 ? '#f0fff4' : '#e8f0ff'}
-                      stroke="#b5451b" strokeWidth="0.8" />
+                      fill={s % 3 === 0 ? P.paperAlt : s % 3 === 1 ? P.goodFill : P.paper}
+                      stroke={P.line} strokeWidth="0.8" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                      fontSize="12" fill="#b5451b" fontWeight="bold">
+                      fontSize="12" fill={P.signText} fontWeight="bold">
                   {SIGN_GLYPHS[signIdx]}
                 </text>
               </g>
@@ -114,10 +115,10 @@ export default function WesternChart({
             return (
               <g key={`house${h}`}>
                 <path d={sectorPath(R_ZODIAC, R_HOUSE, startAngle, endAngle)}
-                      fill={h === 0 ? '#fff7ed' : '#fafafa'}
-                      stroke="#94a3b8" strokeWidth="0.6" />
+                      fill={h === 0 ? P.ascFill : P.paper}
+                      stroke={P.muted} strokeWidth="0.6" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                      fontSize="11" fill={h === 0 ? '#FF6B00' : '#64748b'} fontWeight="500">
+                      fontSize="11" fill={h === 0 ? P.asc : P.muted} fontWeight="500">
                   {h + 1}
                 </text>
               </g>
@@ -125,8 +126,8 @@ export default function WesternChart({
           })}
 
           {/* ── Inner circle ── */}
-          <circle cx={CX} cy={CY} r={R_HOUSE} fill="#fffef8" stroke="#94a3b8" strokeWidth="0.5" />
-          <circle cx={CX} cy={CY} r={R_INNER} fill="#fff8f0" stroke="#b5451b" strokeWidth="1" />
+          <circle cx={CX} cy={CY} r={R_HOUSE} fill={P.paper} stroke={P.muted} strokeWidth="0.5" />
+          <circle cx={CX} cy={CY} r={R_INNER} fill={P.paper} stroke={P.line} strokeWidth="1" />
 
           {/* ── ASC/DSC/MC/IC lines ── */}
           {[0, 90, 180, 270].map(angle => {
@@ -134,7 +135,7 @@ export default function WesternChart({
             const [x2, y2] = polarXY(astroToSvgAngle(angle), R_HOUSE)
             return (
               <line key={`axis${angle}`} x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke={angle === 0 || angle === 180 ? '#FF6B00' : '#888'}
+                    stroke={angle === 0 || angle === 180 ? P.asc : P.muted}
                     strokeWidth={angle === 0 || angle === 180 ? 1.5 : 1}
                     strokeDasharray={angle === 90 || angle === 270 ? '3,3' : ''} />
             )
@@ -142,10 +143,10 @@ export default function WesternChart({
 
           {/* ── Axis labels ── */}
           {[
-            { angle: 0, label: 'AC', color: '#FF6B00' },
-            { angle: 180, label: 'DC', color: '#888' },
-            { angle: 90, label: 'IC', color: '#888' },
-            { angle: 270, label: 'MC', color: '#888' },
+            { angle: 0, label: 'AC', color: P.asc },
+            { angle: 180, label: 'DC', color: P.muted },
+            { angle: 90, label: 'IC', color: P.muted },
+            { angle: 270, label: 'MC', color: P.muted },
           ].map(({ angle, label, color }) => {
             const [lx, ly] = polarXY(astroToSvgAngle(angle), R_INNER - 14)
             return (
@@ -162,11 +163,11 @@ export default function WesternChart({
             return (
               <g key={p.name}>
                 <text x={px} y={py - 6} textAnchor="middle" fontSize="14"
-                      fill={PLANET_COLORS[p.name] ?? '#333'} fontWeight="500">
+                      fill={PLANET_COLORS[p.name] ?? P.text} fontWeight="500">
                   {glyph}
                 </text>
                 <text x={px} y={py + 7} textAnchor="middle" fontSize="8"
-                      fill={PLANET_COLORS[p.name] ?? '#333'}>
+                      fill={PLANET_COLORS[p.name] ?? P.text}>
                   {deg}°{p.retrograde ? 'R' : ''}
                 </text>
               </g>
@@ -180,7 +181,7 @@ export default function WesternChart({
             return (
               <text key={`tr_${p.name}`} x={px} y={py}
                     textAnchor="middle" fontSize="10"
-                    fill={PLANET_COLORS[p.name] ?? '#888'}
+                    fill={PLANET_COLORS[p.name] ?? P.muted}
                     opacity="0.85" fontStyle="italic">
                 {glyph}
               </text>
@@ -192,7 +193,7 @@ export default function WesternChart({
             const [ax, ay] = polarXY(180, R_INNER + 20)
             return (
               <text x={ax} y={ay} textAnchor="middle" fontSize="9"
-                    fill="#FF6B00" fontWeight="bold">
+                    fill={P.asc} fontWeight="bold">
                 {Math.floor(ascDeg)}°{Math.round((ascDeg % 1) * 60)}'
               </text>
             )
@@ -200,7 +201,7 @@ export default function WesternChart({
 
         </svg>
 
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-faint">
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-muted">
           <span>{t('western_chart_legend')}</span>
         </div>
       </div>

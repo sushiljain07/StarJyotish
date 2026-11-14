@@ -36,18 +36,18 @@ function PlanetCard({ planet }) {
     <div className="bg-parchment-card border border-line rounded-2xl p-5 hover:border-primary/40 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <span className="text-2xl" style={{ color: planet.color }}>{planet.symbol}</span>
-        <span className="text-xs text-ink-faint font-medium bg-parchment px-2 py-0.5 rounded-full">{planet.dasha}</span>
+        <span className="text-xs text-ink-muted font-medium bg-parchment px-2 py-0.5 rounded-full">{planet.dasha}</span>
       </div>
       <h3 className="font-serif font-semibold text-base text-ink mb-0.5">{planet.english}</h3>
-      <p className="text-xs font-medium text-primary-dark mb-2">{planet.sanskrit}</p>
+      <p className="text-xs font-medium text-primary-ink mb-2">{planet.sanskrit}</p>
       <p className="text-sm text-ink-muted leading-relaxed mb-3">{planet.tagline}</p>
       <dl className="space-y-1.5">
         <div className="flex gap-2">
-          <dt className="text-[11px] font-semibold text-ink-faint uppercase tracking-wide w-20 shrink-0">Rules</dt>
+          <dt className="text-[11px] font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Rules</dt>
           <dd className="text-[11px] text-ink-muted">{planet.ruler}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-[11px] font-semibold text-ink-faint uppercase tracking-wide w-20 shrink-0">Exalted</dt>
+          <dt className="text-[11px] font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Exalted</dt>
           <dd className="text-[11px] text-ink-muted">{planet.exaltation}</dd>
         </div>
       </dl>
@@ -111,7 +111,7 @@ export default function PlanetsGuideHub() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">
+            <p className="text-sm text-primary-ink leading-relaxed">
               यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है। हिंदी अनुवाद जल्द आएगा।
             </p>
           </div>

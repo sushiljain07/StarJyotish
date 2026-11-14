@@ -42,7 +42,7 @@ export default function BirthTimeSelector({ t, accuracy, onAccuracyChange, hour,
               <option value="">{t('form_hour_short')}</option>
               {HOURS_12.map(h => <option key={h} value={h}>{h}</option>)}
             </select>
-            <span className="text-ink-faint font-bold text-lg">:</span>
+            <span className="text-ink-muted font-bold text-lg">:</span>
             <select aria-label={t('form_minute')} value={minute} onChange={e => onTimeChange({ hour, minute: e.target.value, ampm })} className={selCls}>
               <option value="">{t('form_minute_short')}</option>
               {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
@@ -54,13 +54,13 @@ export default function BirthTimeSelector({ t, accuracy, onAccuracyChange, hour,
             </select>
           </div>
           {accuracy === 'approximate' && (
-            <p className="text-ink-faint text-xs mt-2">{t('onboarding_time_approximate_note')}</p>
+            <p className="text-ink-muted text-xs mt-2">{t('onboarding_time_approximate_note')}</p>
           )}
         </div>
       )}
 
       {accuracy === 'unknown' && (
-        <p className="text-ink-faint text-xs mt-3">{t('onboarding_time_unknown_note')}</p>
+        <p className="text-ink-muted text-xs mt-3">{t('onboarding_time_unknown_note')}</p>
       )}
     </div>
   )

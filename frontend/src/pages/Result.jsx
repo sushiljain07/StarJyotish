@@ -46,7 +46,7 @@ function SummaryChips({ data, collapsed }) {
           : 'max-h-16 opacity-100 py-2'
       }`}
     >
-      <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+      <span className="bg-primary-light text-primary-ink text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </span>
       {moon && (
@@ -271,20 +271,18 @@ export default function Result() {
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
 
         {/* ══ BIRTH CHART ══ */}
-        <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'birth_chart' ? 'animate-fade-in-fast' : 'hidden'}>
 
-          <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
+          <div className={activeBirthSub === 'chart' ? 'animate-fade-in-fast' : 'hidden'}>
             <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input } })} />
             <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />
           </div>
 
-          <div className={activeBirthSub === 'planets' ? 'tab-fade' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_planets_intro_title')}</p>
+          <div className={activeBirthSub === 'planets' ? 'animate-fade-in-fast' : 'hidden'}>
+            <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_planets_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
                 {t('kundli_planets_intro_body')}
               </p>
@@ -292,11 +290,9 @@ export default function Result() {
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
 
-          <div className={activeBirthSub === 'dasha' ? 'tab-fade' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_dasha_intro_title')}</p>
+          <div className={activeBirthSub === 'dasha' ? 'animate-fade-in-fast' : 'hidden'}>
+            <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_dasha_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
                 {t('kundli_dasha_intro_body')}
               </p>
@@ -305,36 +301,36 @@ export default function Result() {
           </div>
 
           <Suspense fallback={<TabLoader />}>
-            <div className={activeBirthSub === 'transit' ? 'tab-fade' : 'hidden'}>
+            <div className={activeBirthSub === 'transit' ? 'animate-fade-in-fast' : 'hidden'}>
               <TransitPanel input={input} natalData={data} />
             </div>
           </Suspense>
         </div>
 
         {/* ══ LIFE AREAS (DIVISIONAL) ══ */}
-        <div className={activeMain === 'divisional' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'divisional' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <DivisionalCharts input={input} defaultDivision={topic?.division} />
           </Suspense>
         </div>
 
         {/* ══ ANALYSIS ══ */}
-        <div className={activeMain === 'analysis' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'analysis' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <div className={activeAnalysisSub === 'bhava' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'bhava' ? 'animate-fade-in-fast' : 'hidden'}>
               <BhavaChalit input={input} />
             </div>
-            <div className={activeAnalysisSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'ashtakavarga' ? 'animate-fade-in-fast' : 'hidden'}>
               <AshtakavargaTable input={input} />
             </div>
-            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'animate-fade-in-fast' : 'hidden'}>
               <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
             </div>
           </Suspense>
         </div>
 
         {/* ══ DOWNLOAD ══ */}
-        <div className={activeMain === 'download' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'download' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <KundliDownload data={data} input={input} />
           </Suspense>

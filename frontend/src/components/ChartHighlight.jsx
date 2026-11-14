@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
 import { currentLanguage } from '../i18n/languages'
+import { chartPalette as P, withAlpha } from '../theme/chartPalette'
 
 // Faint wheel watermark — re-used from ChartReading, kept in sync
 function WheelBg() {
@@ -25,12 +26,12 @@ function WheelBg() {
     <svg width="160" height="160" viewBox="0 0 160 160"
          className="absolute right-0 top-0 pointer-events-none select-none"
          style={{ opacity: 0.06 }}>
-      <circle cx="80" cy="80" r="72" stroke="#D4AF37" fill="none" strokeWidth="1" />
-      <circle cx="80" cy="80" r="46" stroke="#D4AF37" fill="none" strokeWidth="0.7" />
-      <circle cx="80" cy="80" r="22" stroke="#D4AF37" fill="none" strokeWidth="0.7" />
+      <circle cx="80" cy="80" r="72" stroke={P.gold} fill="none" strokeWidth="1" />
+      <circle cx="80" cy="80" r="46" stroke={P.gold} fill="none" strokeWidth="0.7" />
+      <circle cx="80" cy="80" r="22" stroke={P.gold} fill="none" strokeWidth="0.7" />
       {spokes.map((s, i) => (
         <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
-              stroke="#D4AF37" strokeWidth="0.5" />
+              stroke={P.gold} strokeWidth="0.5" />
       ))}
     </svg>
   )
@@ -108,7 +109,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
       <button
         onClick={loadHighlight}
         className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"
-        style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.4)', color: '#D4AF37' }}
+        style={{ background: withAlpha(P.gold, 0.12), border: `1px solid ${withAlpha(P.gold, 0.4)}`, color: P.signText }}
       >
         <span>{meta.icon}</span>
         <span>{t('chart_highlight_get')}</span>
@@ -120,13 +121,13 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
   // ── LOADING ───────────────────────────────────────────────────────────────
   if (status === 'loading') return (
     <div role="status" className="mt-4 rounded-xl px-5 py-4 flex items-center gap-3"
-         style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.25)' }}>
+         style={{ background: P.night, border: `1px solid ${withAlpha(P.gold, 0.25)}` }}>
       <div aria-hidden="true" className="text-xl motion-safe:animate-spin shrink-0">⏳</div>
       <div>
-        <p className="text-sm font-medium" style={{ color: '#D4AF37' }}>
+        <p className="text-sm font-medium" style={{ color: P.gold }}>
           {t('chart_highlight_loading', { label: meta.label })}
         </p>
-        <p className="text-xs mt-0.5" style={{ color: 'rgba(212,175,55,0.5)' }}>
+        <p className="text-xs mt-0.5" style={{ color: withAlpha(P.gold, 0.5) }}>
           {t('chart_highlight_loading_sub', { life: meta.life })}
         </p>
       </div>
@@ -137,7 +138,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
   if (status === 'error') return (
     <div className="mt-4 text-center">
       <button onClick={() => { fetchedRef.current = false; setStatus('idle') }}
-        className="text-xs text-ink-faint hover:text-primary transition">
+        className="text-xs text-ink-muted hover:text-ink transition">
         {t('chart_highlight_retry')}
       </button>
     </div>
@@ -146,7 +147,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
   // ── DONE ──────────────────────────────────────────────────────────────────
   return (
     <div className="mt-4 relative overflow-hidden rounded-xl px-5 py-4 transition-all duration-700 opacity-100"
-         style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.3)', boxShadow: '0 0 20px rgba(212,175,55,0.08)' }}>
+         style={{ background: P.night, border: `1px solid ${withAlpha(P.gold, 0.3)}`, boxShadow: `0 0 20px ${withAlpha(P.gold, 0.08)}` }}>
       <WheelBg />
       <div className="relative z-10">
         {/* Header */}
@@ -154,22 +155,22 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
           <span className="text-lg">{meta.icon}</span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider"
-               style={{ color: 'rgba(212,175,55,0.6)' }}>
+               style={{ color: withAlpha(P.gold, 0.6) }}>
               {t('chart_highlight_title', { label: meta.label })}
             </p>
-            <p className="text-[11px]" style={{ color: 'rgba(212,175,55,0.4)' }}>{meta.life}</p>
+            <p className="text-[11px]" style={{ color: withAlpha(P.gold, 0.4) }}>{meta.life}</p>
           </div>
 
         </div>
 
         {/* Insight text */}
-        <p className="text-sm leading-relaxed" style={{ color: '#E8DCC8' }}>
+        <p className="text-sm leading-relaxed" style={{ color: P.onNight }}>
           {text}
         </p>
 
         {/* Footer */}
         {provider && (
-          <p className="text-[10px] mt-3 text-right" style={{ color: 'rgba(212,175,55,0.3)' }}>
+          <p className="text-[10px] mt-3 text-right" style={{ color: withAlpha(P.gold, 0.3) }}>
             {t('chart_highlight_powered', { provider })}
           </p>
         )}

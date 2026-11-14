@@ -35,7 +35,7 @@ const VARIANTS = {
   // Gold-outlined pill — section "view all" CTAs and low-emphasis actions
   // that still belong to the gold accent family.
   outline: {
-    light: 'border border-primary/50 text-primary-dark hover:bg-primary/10',
+    light: 'border border-primary/50 text-primary-ink hover:bg-primary/10',
     night: 'border border-primary/40 text-primary-glow hover:bg-primary/10',
   },
 }

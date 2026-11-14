@@ -31,7 +31,7 @@ export default function OnboardingLayout({ onBack, onSkip, skipLabel, children }
 
         <div className="w-20 text-right">
           {onSkip && (
-            <button onClick={onSkip} className="text-ink-faint hover:text-primary-dark text-xs font-medium transition">
+            <button onClick={onSkip} className="text-ink-muted hover:text-ink text-xs font-medium transition">
               {skipLabel}
             </button>
           )}

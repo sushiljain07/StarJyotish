@@ -10,7 +10,7 @@ import { DIFFICULTY_LABELS } from '../../config/learningTaxonomy'
 
 const DIFFICULTY_TONE = {
   beginner: 'bg-sage-light text-sage',
-  intermediate: 'bg-primary-light text-primary-dark',
+  intermediate: 'bg-primary-light text-primary-ink',
   advanced: 'bg-vermillion-light text-vermillion',
 }
 

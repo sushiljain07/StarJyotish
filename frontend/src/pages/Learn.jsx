@@ -68,7 +68,7 @@ export default function Learn() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">{t('learn_english_only_notice')}</p>
+            <p className="text-sm text-primary-ink leading-relaxed">{t('learn_english_only_notice')}</p>
           </div>
         </div>
       )}

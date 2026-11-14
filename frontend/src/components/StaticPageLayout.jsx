@@ -30,7 +30,7 @@ export default function StaticPageLayout({ title, eyebrow, maxWidth = 'max-w-2xl
       <SiteHeader />
       <main id="main" tabIndex={-1} className={`flex-1 px-4 sm:px-6 pt-20 sm:pt-24 pb-10 sm:pb-12 ${maxWidth} mx-auto w-full`}>
         {eyebrow && (
-          <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-1">{eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-wide uppercase mb-1">{eyebrow}</p>
         )}
         <h1 className="font-serif font-semibold text-3xl text-ink mt-4 mb-4 break-words">{title}</h1>
         <div className="text-ink-muted text-sm leading-relaxed space-y-4">

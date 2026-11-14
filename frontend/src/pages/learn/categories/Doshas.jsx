@@ -34,23 +34,23 @@ function DoshaCard({ dosha }) {
   return (
     <div className="bg-parchment-card border border-line rounded-2xl p-6">
       <h3 className="font-serif font-semibold text-xl text-ink mb-1">{dosha.name}</h3>
-      <p className="text-xs text-ink-faint font-medium mb-4">{dosha.altName}</p>
+      <p className="text-xs text-ink-muted font-medium mb-4">{dosha.altName}</p>
       <dl className="space-y-4">
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Formation</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{dosha.formation}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-1">Traditional effects</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Traditional effects</dt>
           <dd className="text-sm text-ink leading-relaxed">{dosha.effects}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-faint tracking-widest uppercase mb-2">Cancellations (Bhanga)</dt>
+          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-2">Cancellations (Bhanga)</dt>
           <dd>
             <ul className="space-y-1.5">
               {dosha.cancellations.map((c, i) => (
                 <li key={i} className="flex gap-2 text-sm text-ink-muted leading-snug">
-                  <span className="text-primary shrink-0 mt-0.5">✓</span>
+                  <span className="text-primary-ink shrink-0 mt-0.5">✓</span>
                   <span>{c}</span>
                 </li>
               ))}
@@ -58,7 +58,7 @@ function DoshaCard({ dosha }) {
           </dd>
         </div>
         <div className="pt-3 border-t border-line">
-          <dt className="text-[11px] font-bold text-primary-dark tracking-widest uppercase mb-1">What popular accounts miss</dt>
+          <dt className="text-[11px] font-bold text-primary-ink tracking-widest uppercase mb-1">What popular accounts miss</dt>
           <dd className="text-sm text-ink-muted leading-relaxed italic">{dosha.overstatement}</dd>
         </div>
       </dl>
@@ -119,7 +119,7 @@ export default function DoshasGuide() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
+            <p className="text-sm text-primary-ink leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
           </div>
         </div>
       )}

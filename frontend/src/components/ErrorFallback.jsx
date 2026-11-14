@@ -15,7 +15,7 @@ export default function ErrorFallback({ resetError }) {
   return (
     <div className="min-h-dvh bg-parchment flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
-        <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-2">
+        <p className="text-primary-ink text-xs font-bold tracking-wide uppercase mb-2">
           {t('error_fallback_eyebrow')}
         </p>
         <h1 className="font-serif font-semibold text-2xl text-ink mb-3">
@@ -37,7 +37,7 @@ export default function ErrorFallback({ resetError }) {
           </button>
           <a
             href="/"
-            className="px-5 py-2.5 rounded-lg border border-primary-dark/30 text-primary-dark text-sm font-semibold hover:bg-primary-dark/5 transition"
+            className="px-5 py-2.5 rounded-lg border border-primary-dark/30 text-primary-ink text-sm font-semibold hover:bg-primary-dark/5 transition"
           >
             {t('error_fallback_home')}
           </a>

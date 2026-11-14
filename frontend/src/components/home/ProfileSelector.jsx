@@ -47,7 +47,7 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
         >
           <HomeIcon
             id={profile.relation === 'other' ? 'people' : 'self'}
-            className="w-3.5 h-3.5 text-primary-dark shrink-0"
+            className="w-3.5 h-3.5 text-primary-ink shrink-0"
           />
           {profile.label}
           {hasMany && (
@@ -72,13 +72,13 @@ export default function ProfileSelector({ t, profile, profiles = [], onSwitch })
                   onClick={() => handleSelect(p)}
                   className={`w-full text-left px-3.5 py-2 text-sm flex items-center gap-2 transition ${
                     p.id === profile.id
-                      ? 'text-primary-dark font-semibold bg-primary-light/40'
+                      ? 'text-primary-ink font-semibold bg-primary-light/40'
                       : 'text-ink hover:bg-primary-light/30'
                   }`}
                 >
                   <HomeIcon
                     id={p.relation === 'other' ? 'people' : 'self'}
-                    className="w-3.5 h-3.5 shrink-0 text-primary-dark"
+                    className="w-3.5 h-3.5 shrink-0 text-primary-ink"
                   />
                   {p.label}
                 </button>

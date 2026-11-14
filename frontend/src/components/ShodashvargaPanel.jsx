@@ -80,8 +80,8 @@ export default function ShodashvargaPanel({ input }) {
   return (
     <div className="space-y-4">
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-        <h2 className="text-primary-dark font-bold text-base">{t('kundli_shv_title')}</h2>
-        <p className="text-primary-dark text-xs mt-1">
+        <h2 className="text-primary-ink font-bold text-base">{t('kundli_shv_title')}</h2>
+        <p className="text-primary-ink text-xs mt-1">
           {t('kundli_shv_intro')}
         </p>
       </div>
@@ -112,7 +112,7 @@ export default function ShodashvargaPanel({ input }) {
                       : 'bg-parchment-card border-line text-ink hover:border-primary/50 hover:bg-primary-light'
                   }`}>
             <span className="font-bold text-sm">{name}</span>
-            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-primary-light' : 'text-ink-faint'}`}>
+            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-night' : 'text-ink-muted'}`}>
               {titleOf({ name })}
             </span>
           </button>
@@ -126,7 +126,7 @@ export default function ShodashvargaPanel({ input }) {
           <span className="text-vermillion text-xs">{descOf(selected)}</span>
           {chartData && compareD === null && (
             <button onClick={() => selectCompare(selectedD === 9 ? 1 : 9)}
-                    className="ml-auto text-xs text-primary-dark border border-primary/40 px-2 py-1 rounded-lg hover:bg-primary-light">
+                    className="ml-auto text-xs text-primary-ink border border-primary/40 px-2 py-1 rounded-lg hover:bg-primary-light">
               {t('kundli_shv_compare', { n: selectedD === 9 ? 1 : 9 })}
             </button>
           )}
@@ -180,7 +180,7 @@ export default function ShodashvargaPanel({ input }) {
 
       {/* Empty state */}
       {!loading && !chartData && (
-        <div className="text-center py-12 text-ink-faint">
+        <div className="text-center py-12 text-ink-muted">
           <img src="/starjyotish.svg" alt="" className="w-10 h-10 mx-auto mb-3 opacity-60" />
           <p className="text-sm">{t('kundli_shv_empty')}</p>
         </div>

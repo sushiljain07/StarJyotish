@@ -2,6 +2,7 @@
 import { useTranslation } from 'react-i18next'
 import { planetAbbr } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette as P } from '../theme/chartPalette'
 
 // ── 500×500 chart geometry ───────────────────────────────────────────────────
 // Outer square : (10,10)→(490,490)   Centre : (250,250)
@@ -127,7 +128,7 @@ export default function KundliChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_lagna_title')}</div>
+      <div className="text-sm font-semibold text-primary-ink">{title ?? t('chart_lagna_title')}</div>
 
       <svg
         width="100%"
@@ -136,16 +137,16 @@ export default function KundliChart({
         className="font-sans"
       >
         {/* Outer square */}
-        <rect x="10" y="10" width="480" height="480" fill="#fff8f0" stroke="#b5451b" strokeWidth="2"/>
+        <rect x="10" y="10" width="480" height="480" fill={P.paper} stroke={P.line} strokeWidth="2"/>
 
         {/* Full diagonals */}
-        <line x1="10"  y1="10"  x2="490" y2="490" stroke="#b5451b" strokeWidth="1.5"/>
-        <line x1="490" y1="10"  x2="10"  y2="490" stroke="#b5451b" strokeWidth="1.5"/>
+        <line x1="10"  y1="10"  x2="490" y2="490" stroke={P.line} strokeWidth="1.5"/>
+        <line x1="490" y1="10"  x2="10"  y2="490" stroke={P.line} strokeWidth="1.5"/>
 
         {/* Inner diamond */}
         <polygon
           points="250,10 490,250 250,490 10,250"
-          fill="none" stroke="#b5451b" strokeWidth="1.5"
+          fill="none" stroke={P.line} strokeWidth="1.5"
         />
 
         {/* ── Rashi numbers (sign_index + 1) ── */}
@@ -154,7 +155,7 @@ export default function KundliChart({
           return (
             <text key={`r${i}`} x={rx} y={ry}
                 textAnchor="middle" fontSize="14"
-                  fill="#b5451b" fontWeight="bold">
+                  fill={P.signText} fontWeight="bold">
               {h.sign_index + 1}
             </text>
           )
@@ -175,7 +176,7 @@ export default function KundliChart({
           ps.forEach(p => {
             allItems.push({
               type:   'planet',
-              color:  PLANET_COLORS[p.name] ?? '#333',
+              color:  PLANET_COLORS[p.name] ?? P.text,
               name:   abbr(p.name),
               deg:    Math.floor(p.degree),
               status: getPlanetStatus(p, sun, navamsaPlanets),
@@ -186,7 +187,7 @@ export default function KundliChart({
           tps.forEach(p => {
             allItems.push({
               type:  'transit',
-              color: PLANET_COLORS[p.name] ?? '#888',
+              color: PLANET_COLORS[p.name] ?? P.muted,
               name:  abbr(p.name),
               deg:   Math.floor(p.degree),
             })
@@ -212,7 +213,7 @@ export default function KundliChart({
               return (
                 <text key="La" x={xPos} y={yPos}
                       textAnchor="middle" fontSize="15"
-                      fill="#FF6B00" fontWeight="bold">
+                      fill={P.asc} fontWeight="bold">
                   <tspan fontSize="11" dy="-3">{item.deg}</tspan>
                   <tspan dy="3">{abbr('Ascendant')}</tspan>
                 </text>

@@ -23,7 +23,7 @@ const VARIANTS = {
   },
   // On a plain parchment page background.
   light: {
-    link: 'text-ink-muted hover:text-primary-dark transition',
+    link: 'text-ink-muted hover:text-ink transition',
     separator: 'text-ink-faint',
     current: 'text-ink font-medium',
   },

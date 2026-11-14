@@ -149,7 +149,7 @@ export default function VerifiedContactField({ kind = 'phone' }) {
         </div>
         {error && <p className="text-vermillion text-sm">{error}</p>}
         <button type="button" onClick={handleResend} disabled={cooldown > 0}
-                className="text-primary-dark hover:underline disabled:text-ink-faint disabled:no-underline text-xs transition">
+                className="text-primary-ink hover:underline disabled:text-ink-faint disabled:no-underline text-xs transition">
           {cooldown > 0 ? t('login_resend_in', { seconds: cooldown }) : t('login_resend_code')}
         </button>
       </form>
@@ -164,8 +164,8 @@ export default function VerifiedContactField({ kind = 'phone' }) {
         <>
           {isVerified
             ? <span className="text-sage text-xs font-medium whitespace-nowrap">{t('profile_verified')}</span>
-            : <span className="text-ink-faint text-xs font-medium whitespace-nowrap">{t('profile_email_unverified')}</span>}
-          <button type="button" onClick={startFlow} className="text-primary-dark hover:underline text-sm whitespace-nowrap">
+            : <span className="text-ink-muted text-xs font-medium whitespace-nowrap">{t('profile_email_unverified')}</span>}
+          <button type="button" onClick={startFlow} className="text-primary-ink hover:underline text-sm whitespace-nowrap">
             {isVerified ? t('profile_change_number') : t('profile_verify_email')}
           </button>
         </>

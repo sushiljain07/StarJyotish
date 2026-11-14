@@ -16,7 +16,7 @@
 import Reveal from '../Reveal'
 
 const TONES = {
-  light: { eyebrow: 'text-primary-dark', title: 'text-ink', description: 'text-ink-muted' },
+  light: { eyebrow: 'text-primary-ink', title: 'text-ink', description: 'text-ink-muted' },
   dark:  { eyebrow: 'text-primary',      title: 'text-primary-light', description: 'text-ink-onnight' },
 }
 

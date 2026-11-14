@@ -61,7 +61,7 @@ export default function WhatIsKundli() {
       {/* ── The sky as a clock ─────────────────────────────────────────── */}
       <section className="mt-10" aria-labelledby="sky-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{SKY_AS_CLOCK.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{SKY_AS_CLOCK.eyebrow}</p>
           <h2 id="sky-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {SKY_AS_CLOCK.title}
           </h2>
@@ -75,7 +75,7 @@ export default function WhatIsKundli() {
       {/* ── Chart formats ──────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="formats-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{CHART_FORMATS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{CHART_FORMATS.eyebrow}</p>
           <h2 id="formats-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {CHART_FORMATS.title}
           </h2>
@@ -86,7 +86,7 @@ export default function WhatIsKundli() {
       {/* ── The twelve houses ──────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="houses-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{TWELVE_HOUSES.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{TWELVE_HOUSES.eyebrow}</p>
           <h2 id="houses-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {TWELVE_HOUSES.title}
           </h2>
@@ -96,7 +96,7 @@ export default function WhatIsKundli() {
           <dl>
             {TWELVE_HOUSES.houses.map((h, i) => (
               <div key={h.num} className={`flex items-start gap-4 px-5 py-3.5 ${i < TWELVE_HOUSES.houses.length - 1 ? 'border-b border-line' : ''}`}>
-                <dt className="shrink-0 w-6 h-6 rounded-md bg-primary-light flex items-center justify-center text-xs font-bold text-primary-dark mt-0.5">
+                <dt className="shrink-0 w-6 h-6 rounded-md bg-primary-light flex items-center justify-center text-xs font-bold text-primary-ink mt-0.5">
                   {h.num}
                 </dt>
                 <div className="flex flex-col sm:flex-row sm:gap-4 flex-1">
@@ -115,7 +115,7 @@ export default function WhatIsKundli() {
       {/* ── Why different ──────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="different-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{WHY_DIFFERENT.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{WHY_DIFFERENT.eyebrow}</p>
           <h2 id="different-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {WHY_DIFFERENT.title}
           </h2>
@@ -129,7 +129,7 @@ export default function WhatIsKundli() {
       {/* ── What it cannot tell you ────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="limits-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{WHAT_KUNDLI_CANNOT_TELL.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{WHAT_KUNDLI_CANNOT_TELL.eyebrow}</p>
           <h2 id="limits-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {WHAT_KUNDLI_CANNOT_TELL.title}
           </h2>
@@ -141,7 +141,7 @@ export default function WhatIsKundli() {
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

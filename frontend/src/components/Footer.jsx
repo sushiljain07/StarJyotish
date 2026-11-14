@@ -30,7 +30,7 @@ function FooterLink({ to, state, children }) {
         state={state}
         className="text-ink-onnightMuted hover:text-primary text-sm transition flex items-center gap-1.5 min-h-11"
       >
-        <span className="text-primary/50 text-xs">›</span>{children}
+        <span aria-hidden="true" className="text-primary/50 text-xs">›</span>{children}
       </Link>
     </li>
   )

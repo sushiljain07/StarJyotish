@@ -115,7 +115,7 @@ export default function WeekAhead() {
               className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
             >
               <div className="flex-shrink-0 w-12 text-center">
-                <p className="text-[10px] font-mono text-ink-onnightMuted">
+                <p className="text-2xs font-mono text-ink-onnightMuted">
                   {isToday ? t('week_page_today_label') : shortDayName(day.date)}
                 </p>
                 <p className="font-serif text-xl text-primary-light mt-0.5">{dayNumber(day.date)}</p>

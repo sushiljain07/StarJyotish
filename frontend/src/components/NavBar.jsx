@@ -52,10 +52,10 @@ export default function NavBar({ tabs, activeTab, onTabChange, raised = false })
                 <TabIcon id={tab.icon} className="w-[1.125rem] h-[1.125rem]" />
               </span>
               {tab.locked && (
-                <span className="absolute -top-0.5 right-1 text-[9px]">🔒</span>
+                <span className="absolute -top-0.5 right-1 text-2xs">🔒</span>
               )}
               <span
-                className={`text-[10px] font-semibold leading-none truncate ${active ? 'text-primary-glow' : 'text-ink-onnightMuted'}`}
+                className={`text-2xs font-semibold leading-none truncate ${active ? 'text-primary-glow' : 'text-ink-onnightMuted'}`}
               >
                 {tab.label}
               </span>

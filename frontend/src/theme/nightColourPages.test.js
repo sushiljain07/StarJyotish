@@ -1,6 +1,6 @@
 // UX2 colour, Task 4: night text on pages, footers, download and the NavBar.
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { colors } from './tokens.js'
@@ -53,6 +53,9 @@ describe('night text on pages, footers and download', () => {
     // The paksha dot sits on parchment-card rows and the parchment legend, so it uses the light token.
     // It is the only paksha cue, so it is opaque (non-text 3:1, WCAG 1.4.11).
     expect(s).toMatch(/Krishna: 'bg-ink-faint'/)
+    expect(s).toMatch(/Shukla: 'bg-primary-ink'/)
+    expect(ratio(colors.primary.ink, colors.parchment.card)).toBeGreaterThanOrEqual(3)
+    expect(ratio(colors.primary.ink, colors.parchment.DEFAULT)).toBeGreaterThanOrEqual(3)
     expect(ratio(colors.ink.faint, colors.parchment.card)).toBeGreaterThanOrEqual(3)
     expect(ratio(colors.ink.faint, colors.parchment.DEFAULT)).toBeGreaterThanOrEqual(3)
     expect(s).not.toMatch(/bg-ink-onnightFaint/)
@@ -67,5 +70,19 @@ describe('night text on pages, footers and download', () => {
     const s = read('components/NavBar.jsx')
     expect(s).toMatch(/bg-night\/\[0\.97\]/)
     expect(s).toMatch(/border-white\/\[0\.12\]/)
+  })
+})
+
+describe('ux2 final cleanup', () => {
+  it('Footer chevron is aria-hidden', () => {
+    expect(read('components/Footer.jsx')).toMatch(/<span aria-hidden="true" className="text-primary\/50 text-xs">›<\/span>/)
+  })
+  it('NavBar labels and WeekAhead day names are at least 11px', () => {
+    expect(read('components/NavBar.jsx')).not.toMatch(/text-\[10px\]/)
+    expect(read('pages/WeekAhead.jsx')).not.toMatch(/text-\[10px\]/)
+  })
+  it('unused home components are gone', () => {
+    expect(existsSync(resolve(SRC, 'components/home/JournalPrompt.jsx'))).toBe(false)
+    expect(existsSync(resolve(SRC, 'components/home/ReflectionLoop.jsx'))).toBe(false)
   })
 })

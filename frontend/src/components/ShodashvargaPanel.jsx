@@ -112,7 +112,7 @@ export default function ShodashvargaPanel({ input }) {
                       : 'bg-parchment-card border-line text-ink hover:border-primary/50 hover:bg-primary-light'
                   }`}>
             <span className="font-bold text-sm">{name}</span>
-            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-primary-light' : 'text-ink-muted'}`}>
+            <span className={`text-xs mt-0.5 ${selectedD === d ? 'text-night' : 'text-ink-muted'}`}>
               {titleOf({ name })}
             </span>
           </button>

@@ -62,7 +62,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
             return (
               <tr key={i}
                   className={isCurrent ? `${color.light} font-semibold`
-                    : isPast ? 'bg-parchment-card text-ink-muted' : 'bg-parchment-card text-ink-muted'}>
+                    : isPast ? 'bg-parchment-card text-ink-muted' : 'bg-parchment-card text-ink'}>
                 <td className="p-2 border border-line">
                   {isCurrent && <span className="mr-1">▶</span>}
                   {labelFn(r)}

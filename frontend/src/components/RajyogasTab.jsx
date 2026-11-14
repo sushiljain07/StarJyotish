@@ -71,7 +71,7 @@ function YogaCard({ yoga, defaultOpen }) {
               : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">{t('rajyogas_absent')}</span>
             }
           </div>
-          <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-ink-muted' : 'text-ink-muted'}`}>
+          <p className={`text-xs mt-1 leading-relaxed text-ink-muted`}>
             {yoga.description}
           </p>
         </div>

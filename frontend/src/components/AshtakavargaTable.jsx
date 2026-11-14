@@ -69,7 +69,7 @@ export default function AshtakavargaTable({ input }) {
           {t('ashtakavarga_intro')}
         </p>
         <button onClick={() => load({ force: true })} disabled={loading}
-                className="mt-3 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
+                className="mt-3 inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
           {loading ? t('ashtakavarga_calculating') : t('transit_refresh')}
         </button>
       </div>
@@ -89,7 +89,7 @@ export default function AshtakavargaTable({ input }) {
           {/* Sub-tabs */}
           <div className="flex gap-1 flex-wrap">
             <button onClick={() => setActiveTab('sarva')}
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition ${
+                    className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                       activeTab === 'sarva'
                         ? 'bg-primary border-primary text-night'
                         : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
@@ -98,7 +98,7 @@ export default function AshtakavargaTable({ input }) {
             </button>
             {PLANETS.map(p => (
               <button key={p} onClick={() => setActiveTab(p)}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition ${
+                      className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                         activeTab === p
                           ? 'text-white border-transparent'
                           : 'bg-parchment-card border-line text-ink-muted hover:border-ink-faint'

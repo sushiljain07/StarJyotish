@@ -101,7 +101,7 @@ function JournalRow({ t }) {
         />
         <button
           onClick={keep}
-          className="shrink-0 bg-primary hover:bg-primary-glow text-night font-semibold text-sm rounded-xl px-4.5 transition"
+          className="shrink-0 bg-primary hover:bg-primary-glow text-night font-semibold text-sm rounded-xl px-4 min-h-11 min-w-11 transition"
         >
           {t('home_journal_keep', 'Keep')}
         </button>

@@ -46,7 +46,7 @@ export default function TransitPanel({ input, natalData }) {
             </p>
           </div>
           <button onClick={() => loadTransit({ force: true })}
-                  className="text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
+                  className="inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
             {t('transit_refresh')}
           </button>
         </div>

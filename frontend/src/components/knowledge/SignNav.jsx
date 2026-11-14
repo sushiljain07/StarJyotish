@@ -25,7 +25,7 @@ function NavItem({ guide, direction }) {
     </span>
   )
 
-  const classes = `group flex items-center gap-3 ${isLeft ? 'flex-row' : 'flex-row-reverse text-right'}`
+  const classes = `group flex items-center min-h-11 gap-3 ${isLeft ? 'flex-row' : 'flex-row-reverse text-right'}`
 
   if (guide.href && !guide.comingSoon) {
     return (

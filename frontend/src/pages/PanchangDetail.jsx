@@ -97,7 +97,7 @@ function LocationPicker({ location, onSetLocation }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1.5 text-sm font-semibold text-primary-light hover:text-primary transition"
+        className="flex items-center gap-1.5 min-h-11 text-sm font-semibold text-primary-light hover:text-primary transition"
       >
         <span>📍</span>
         <span className="max-w-[220px] truncate">{label}</span>
@@ -118,7 +118,7 @@ function LocationPicker({ location, onSetLocation }) {
             <ul className="mt-1 max-h-44 overflow-y-auto rounded-xl border border-line bg-parchment">
               {matches.map((m, i) => (
                 <li key={i}>
-                  <button onClick={() => pick(m)} className="w-full text-left px-3 py-2.5 text-xs text-ink hover:bg-primary-light transition">
+                  <button onClick={() => pick(m)} className="w-full text-left min-h-11 px-3 py-2.5 text-xs text-ink hover:bg-primary-light transition">
                     {m.display_name}
                   </button>
                 </li>
@@ -127,11 +127,11 @@ function LocationPicker({ location, onSetLocation }) {
           )}
           <div className="mt-3 flex items-center gap-3">
             <button onClick={useDevice} disabled={geoStatus === 'requesting'}
-              className="text-xs text-primary-ink font-semibold hover:underline disabled:opacity-50">
+              className="inline-flex items-center min-h-11 text-xs text-primary-ink font-semibold hover:underline disabled:opacity-50">
               {geoStatus === 'requesting' ? t('panchang_detecting') : t('panchang_use_my_location')}
             </button>
             {geoStatus === 'denied' && <span className="text-xs text-vermillion">{t('panchang_blocked')}</span>}
-            <button onClick={() => { setOpen(false); setQuery('') }} className="ml-auto text-xs text-ink-muted hover:underline">{t('location_cancel')}</button>
+            <button onClick={() => { setOpen(false); setQuery('') }} className="ml-auto inline-flex items-center min-h-11 text-xs text-ink-muted hover:underline">{t('location_cancel')}</button>
           </div>
         </div>
       )}
@@ -149,7 +149,7 @@ function DatePicker({ value, onChange }) {
     <div className="flex items-center gap-2">
       <button
         onClick={() => inputRef.current?.showPicker?.() || inputRef.current?.click()}
-        className="flex items-center gap-1.5 text-sm font-semibold text-primary-light hover:text-primary transition"
+        className="flex items-center gap-1.5 min-h-11 text-sm font-semibold text-primary-light hover:text-primary transition"
       >
         <span>📅</span>
         <span>{value === today ? t('tab_today') : formatShort(value)}</span>
@@ -159,7 +159,7 @@ function DatePicker({ value, onChange }) {
         onChange={e => e.target.value && onChange(e.target.value)}
         className="sr-only" tabIndex={-1} aria-hidden="true" />
       {value !== today && (
-        <button onClick={() => onChange(today)} className="text-xs text-ink-onnight/40 hover:text-primary-light hover:underline transition">
+        <button onClick={() => onChange(today)} className="inline-flex items-center min-h-11 text-xs text-ink-onnight/40 hover:text-primary-light hover:underline transition">
           {t('tab_today')}
         </button>
       )}
@@ -196,12 +196,12 @@ function LocationPrompt({ onSetLocation }) {
         <input value={query} onChange={e => setQuery(e.target.value)}
           placeholder={t('panchang_search_city_short')}
           aria-label={t('panchang_search_city_short')}
-          className="w-full border border-line rounded-xl px-4 py-2.5 text-sm bg-parchment text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary" />
+          className="w-full min-h-11 border border-line rounded-xl px-4 py-2.5 text-sm bg-parchment text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary" />
         {matches.length > 0 && (
           <ul className="absolute left-0 right-0 top-full mt-1 z-20 max-h-48 overflow-y-auto rounded-xl border border-line bg-parchment-card shadow-xl text-left">
             {matches.map((m, i) => (
               <li key={i}>
-                <button onClick={() => pick(m)} className="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-primary-light transition">
+                <button onClick={() => pick(m)} className="w-full text-left min-h-11 px-4 py-2.5 text-sm text-ink hover:bg-primary-light transition">
                   {m.display_name}
                 </button>
               </li>
@@ -210,7 +210,7 @@ function LocationPrompt({ onSetLocation }) {
         )}
       </div>
       <button onClick={useDevice} disabled={geoStatus === 'requesting'}
-        className="mt-4 text-sm text-primary-ink font-semibold hover:underline disabled:opacity-50">
+        className="mt-4 inline-flex items-center min-h-11 text-sm text-primary-ink font-semibold hover:underline disabled:opacity-50">
         {geoStatus === 'requesting' ? t('panchang_detecting') : t('panchang_use_my_current_location')}
       </button>
       {geoStatus === 'denied' && <p className="text-xs text-vermillion mt-2">{t('panchang_blocked_search')}</p>}
@@ -549,7 +549,7 @@ export default function PanchangDetail() {
           <div className="flex gap-1 mt-5">
             {TABS.map(tabItem => (
               <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+                className={`min-h-11 md:min-h-0 px-4 py-1.5 rounded-full text-sm font-semibold transition ${
                   tab === tabItem.id ? 'bg-primary text-night' : 'text-ink-onnight/60 hover:text-primary-light'
                 }`}>
                 {t(tabItem.labelKey)}

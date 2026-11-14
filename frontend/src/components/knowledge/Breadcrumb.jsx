@@ -17,13 +17,13 @@ import { useTranslation } from 'react-i18next'
 const VARIANTS = {
   // On the night hero band — see Hero.jsx.
   dark: {
-    link: 'text-ink-onnight/70 hover:text-primary transition',
+    link: 'inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-ink-onnight/70 hover:text-primary transition',
     separator: 'text-ink-onnight/30',
     current: 'text-primary-light font-medium',
   },
   // On a plain parchment page background.
   light: {
-    link: 'text-ink-muted hover:text-ink transition',
+    link: 'inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-ink-muted hover:text-ink transition',
     separator: 'text-ink-faint',
     current: 'text-ink font-medium',
   },

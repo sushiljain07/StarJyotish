@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 
-const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
+const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const RESEND_COOLDOWN_SECONDS = 30
 
 export default function VerifiedContactField({ kind = 'phone' }) {
@@ -114,10 +114,10 @@ export default function VerifiedContactField({ kind = 'phone' }) {
             className={inputCls}
           />
           <button type="submit" disabled={loading}
-                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
+                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
             {loading ? t('login_sending') : t('login_send_code')}
           </button>
-          <button type="button" onClick={cancel} className="text-ink-muted hover:text-ink text-sm shrink-0">
+          <button type="button" onClick={cancel} className="inline-flex items-center min-h-11 text-ink-muted hover:text-ink text-sm shrink-0">
             {t('profile_cancel')}
           </button>
         </div>
@@ -140,16 +140,16 @@ export default function VerifiedContactField({ kind = 'phone' }) {
             className={`${inputCls} tracking-[0.4em] text-center`}
           />
           <button type="submit" disabled={loading || code.length !== 6}
-                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
+                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
             {loading ? t('login_verifying') : t('login_verify')}
           </button>
-          <button type="button" onClick={cancel} className="text-ink-muted hover:text-ink text-sm shrink-0">
+          <button type="button" onClick={cancel} className="inline-flex items-center min-h-11 text-ink-muted hover:text-ink text-sm shrink-0">
             {t('profile_cancel')}
           </button>
         </div>
         {error && <p className="text-vermillion text-sm">{error}</p>}
         <button type="button" onClick={handleResend} disabled={cooldown > 0}
-                className="text-primary-ink hover:underline disabled:text-ink-faint disabled:no-underline text-xs transition">
+                className="inline-flex items-center min-h-11 text-primary-ink hover:underline disabled:text-ink-faint disabled:no-underline text-xs transition">
           {cooldown > 0 ? t('login_resend_in', { seconds: cooldown }) : t('login_resend_code')}
         </button>
       </form>
@@ -165,13 +165,13 @@ export default function VerifiedContactField({ kind = 'phone' }) {
           {isVerified
             ? <span className="text-sage text-xs font-medium whitespace-nowrap">{t('profile_verified')}</span>
             : <span className="text-ink-muted text-xs font-medium whitespace-nowrap">{t('profile_email_unverified')}</span>}
-          <button type="button" onClick={startFlow} className="text-primary-ink hover:underline text-sm whitespace-nowrap">
+          <button type="button" onClick={startFlow} className="inline-flex shrink-0 items-center justify-center min-h-11 min-w-11 text-primary-ink hover:underline text-sm whitespace-nowrap">
             {isVerified ? t('profile_change_number') : t('profile_verify_email')}
           </button>
         </>
       ) : (
         <button type="button" onClick={startFlow}
-                className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
+                className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
           {isEmail ? t('profile_add_email') : t('profile_add_number')}
         </button>
       )}

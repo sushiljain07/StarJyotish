@@ -118,7 +118,7 @@ export default function DashaTable({ dasha }) {
       <div className="flex gap-1 flex-wrap">
         {tabsFor(t).map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
+                  className={`inline-flex items-center justify-center min-h-11 md:min-h-0 text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                     activeTab === tab.id
                       ? `${LEVEL_COLORS[tab.id].active} ${LEVEL_COLORS[tab.id].activeText} border-transparent shadow-sm`
                       : 'bg-parchment-card border-line text-ink-muted hover:border-primary/40'

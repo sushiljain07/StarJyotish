@@ -216,6 +216,42 @@ Phase 4 leftovers:
 - Delete the unused `home/LocationBar`, `ProfileSelector` and `TabsBar`.
 - Elements with `shadow-*` or `focus:ring` utilities lose the night halo.
 
+**UX slices (added 14 Nov 2026).** These follow the UX audit in `docs/superpowers/audits/2026-11-14-ux-audit.md`. The owner chose this order: bugs and mobile first, then colour, then laptop layout and polish.
+
+*UX slice 1, bugs and mobile (done on `feat/ux1-bugs-mobile`, plan `2026-11-14-ux1-bugs-mobile.md`).*
+
+Sign-in sessions:
+- A temporary refresh failure no longer signs the user out. The app retries and shows a "Reconnecting" screen if the server stays unreachable.
+- A refresh response lost in transit no longer signs the user out: a rotated token is accepted once within 30 s.
+- Logging out, signing out a device, or detecting a stolen token can't be undone by replaying an old token.
+- Signing out an old device no longer signs out every device.
+- A refused refresh now clears the cookie.
+
+Kundli page:
+- On phones there is one bottom bar, the header hides on scroll, and the main tabs no longer appear twice.
+- The summary chips start collapsed and open with a tap. The chart now gets 75–78% of the screen at rest, up from 58%.
+- Analysis panels load when opened. Transit data is always fetched fresh.
+- Opening a Kundli link with an empty browser cache now loads the chart instead of redirecting to /home.
+
+Rest of the app:
+- Week Ahead and the home page's "This week" ask for a location instead of showing a blank.
+- Floating buttons no longer cover content.
+- The tablet header fits on one row.
+- Chart labels are at least 11px on phones, and the print view keeps degrees with no top gap.
+- Mobile tap targets are 44px. In the browser check, only 3 controls under 44px remain, all inside Google's sign-in button.
+- The test suite is stable under load.
+
+*Left from UX slice 1:*
+- Old sessions whose refresh was replaced are never cleaned up.
+- A per-IP backstop limit on refresh.
+- DivisionalCharts should use `fetchReport` (cache and 429 retry).
+- Remove NavBar's unused `raised` mode, and SouthIndia/Western/Shodashvarga, which are not mounted anywhere.
+- Summary chips can't be opened on the phone Life Areas and Download tabs, which have no sub-tab row.
+- Printed labels are 10px; two charts side by side on A4 can't be larger.
+- Touch tablets at 768px and up get desktop-size pills.
+
+*UX slice 2, colour:* inline golds, /home night text tokens, the AA planet palette (owner-approved), the LocationSection hex colours, and the 5a follow-ups above. *UX slice 3, laptop layout and polish:* the audit items L4, X1–X11 and E1, the grid on laptop widths, and a two-column /home.
+
 **5b. Component adoption** (D-6, D-7):
 - Move the 37 hand-built CTAs onto `<Button>` and the cards onto `<Card>`.
 - Add `Pill`/`Badge` components.
@@ -259,4 +295,6 @@ Phase 4 leftovers:
 | 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — merged (#164); the glossary rows were settled by the owner on 10 Nov 2026 and applied on `feat/hindi-owner-decisions` |
 | 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — merged (#165); leftovers listed in the Phase 4 section |
 | 5a | `feat/phase5a-contrast-tokens` | `2026-11-14-phase5a-contrast-tokens.md` | Done; PR open. Follow-ups are listed in the 5a status above |
+| UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done; PR open, stacked on 5a |
+| UX2–3 | `feat/ux2-*`, `feat/ux3-*` | to write per slice | — |
 | 5b–g | `feat/phase5-*` | to write per slice | — |

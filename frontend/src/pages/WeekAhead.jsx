@@ -75,7 +75,7 @@ export default function WeekAhead() {
             {t('week_page_title')}
           </h1>
           {week?.length > 0 && (
-            <p className="text-sm text-ink-onnight/60 mt-1">
+            <p className="text-sm text-ink-onnight/75 mt-1">
               {formatDate(week[0].date)} – {formatDate(week[week.length - 1].date)}
               {location?.label ? ` · ${location.label}` : ''}
             </p>
@@ -92,7 +92,7 @@ export default function WeekAhead() {
             onSetManualLocation={setManualLocation}
           />
         )}
-        {loading && <p className="text-sm text-ink-onnight/60 py-6">{t('week_page_loading')}</p>}
+        {loading && <p className="text-sm text-ink-onnight/75 py-6">{t('week_page_loading')}</p>}
         {error && (
           <p className="text-sm text-vermillion py-6">
             {t('week_page_error')}

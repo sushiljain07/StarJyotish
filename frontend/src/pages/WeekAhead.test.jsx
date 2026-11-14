@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import '../i18n'
 
@@ -10,6 +10,9 @@ vi.mock('../components/Seo', () => ({ default: () => null }))
 vi.mock('../components/CelestialBackdrop', () => ({ default: () => null }))
 vi.mock('../hooks/usePlaceMatches', () => ({
   usePlaceMatches: q => (q ? [{ display_name: 'Pune, India', lat: 18.5, lon: 73.8 }] : []),
+}))
+vi.mock('../api/astro', () => ({
+  fetchPanchangWeek: () => Promise.resolve({ days: [{ date: '2026-11-14', tithi: { name: 'Pratipada' }, nakshatra: 'Ashwini' }] }),
 }))
 vi.mock('../services/astrologyProfiles', () => ({ getPrimaryProfile: () => ({ place: 'Jaipur, India' }) }))
 
@@ -47,5 +50,22 @@ describe('WeekAhead without a location', () => {
   it('LocationPrompt (used by the home week beat) renders the same picker', () => {
     render(<LocationPrompt status="denied" birthPlace="Jaipur, India" onRetryGeolocation={() => {}} onSetManualLocation={setManualLocation} />)
     expect(screen.getByPlaceholderText(/search city/i)).toBeTruthy()
+  })
+
+  it('card labels: birth card offers device location and is hidden without a birth place', () => {
+    const { rerender } = render(<LocationPrompt status="denied" birthPlace="Jaipur, India" onRetryGeolocation={() => {}} onSetManualLocation={() => {}} />)
+    expect(screen.getByText(/device location/i)).toBeTruthy()
+    rerender(<LocationPrompt status="denied" onRetryGeolocation={() => {}} onSetManualLocation={() => {}} />)
+    expect(screen.queryByText(/device location/i)).toBeNull()
+    expect(screen.queryByText(/chart cast for/i)).toBeNull()
+  })
+})
+
+describe('WeekAhead with a location', () => {
+  it('still renders the week and no prompt', async () => {
+    hook.value = { location: { lat: 1, lon: 2, label: 'Pune' }, status: 'ready', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }
+    renderIt()
+    await waitFor(() => expect(screen.getByText(/Pratipada/)).toBeTruthy())
+    expect(screen.queryByPlaceholderText(/search city/i)).toBeNull()
   })
 })

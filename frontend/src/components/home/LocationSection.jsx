@@ -96,25 +96,27 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
       </div>
 
       {/* Chart cast for */}
-      <div className="sj-loc-card">
-        <div className="sj-loc-card-body">
-          <p className="sj-loc-eyebrow">
-            <span style={{color:'#D9A441',marginRight:4}} aria-hidden="true">🪔</span>
-            {t('location_chart_cast_for')}
-          </p>
-          <p className="sj-loc-city sj-loc-birth">{birthPlace}</p>
-          <p className="sj-loc-sub">{t('location_birth_place_label')}</p>
-          <button
-            className="sj-loc-update-btn"
-            onClick={onRetryGeolocation}
-          >
-            {t('location_update_city')}
-          </button>
+      {birthPlace && (
+        <div className="sj-loc-card">
+          <div className="sj-loc-card-body">
+            <p className="sj-loc-eyebrow">
+              <span style={{color:'#D9A441',marginRight:4}} aria-hidden="true">🪔</span>
+              {t('location_chart_cast_for')}
+            </p>
+            <p className="sj-loc-city sj-loc-birth">{birthPlace}</p>
+            <p className="sj-loc-sub">{t('location_birth_place_label')}</p>
+            <button
+              className="sj-loc-update-btn"
+              onClick={onRetryGeolocation}
+            >
+              {location ? t('location_update_city') : t('location_use_device')}
+            </button>
+          </div>
+          <div className="sj-loc-illustration">
+            <CitySilhouette />
+          </div>
         </div>
-        <div className="sj-loc-illustration">
-          <CitySilhouette />
-        </div>
-      </div>
+      )}
 
       <style>{`
         .sj-loc-grid {
@@ -137,8 +139,8 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         }
         .sj-loc-card-body { padding: 16px 16px 8px; }
         .sj-loc-eyebrow {
-          font-size: 11px;
-          color: #7A7264;
+          font-size: 12px;
+          color: rgba(201,194,214,0.75);
           margin: 0 0 6px;
           font-weight: 500;
         }
@@ -151,8 +153,8 @@ export default function LocationSection({ location, onRetryGeolocation, onSetMan
         }
         .sj-loc-birth { color: #C9C2D6; }
         .sj-loc-sub {
-          font-size: 11px;
-          color: #7A7264;
+          font-size: 12px;
+          color: rgba(201,194,214,0.75);
           margin: 0 0 8px;
         }
         .sj-loc-update-btn {

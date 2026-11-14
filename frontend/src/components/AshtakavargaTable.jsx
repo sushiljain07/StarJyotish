@@ -11,10 +11,9 @@ const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
 
 function PointCell({ value, max = 8 }) {
   const pct = value / max
-  const bg = pct >= 0.75 ? '#d1fae5' : pct >= 0.5 ? '#fef9c3' : pct >= 0.375 ? '#fee2e2' : '#fecaca'
+  const bg = pct >= 0.75 ? 'bg-good-light' : pct >= 0.5 ? 'bg-caution-light' : pct >= 0.375 ? 'bg-bad-light' : 'bg-bad/25'
   return (
-    <td style={{ backgroundColor: bg }}
-        className="p-1.5 text-center border border-line font-bold text-sm tabular-nums">
+    <td className={`p-1.5 text-center border border-line font-bold text-sm tabular-nums ${bg}`}>
       {value}
     </td>
   )
@@ -22,10 +21,9 @@ function PointCell({ value, max = 8 }) {
 
 function SarvaCell({ value }) {
   const pct = value / 56
-  const bg = pct >= 0.65 ? '#d1fae5' : pct >= 0.45 ? '#fef9c3' : '#fee2e2'
+  const bg = pct >= 0.65 ? 'bg-good-light' : pct >= 0.45 ? 'bg-caution-light' : 'bg-bad-light'
   return (
-    <td style={{ backgroundColor: bg }}
-        className="p-1.5 text-center border border-line font-bold text-sm tabular-nums">
+    <td className={`p-1.5 text-center border border-line font-bold text-sm tabular-nums ${bg}`}>
       {value}
     </td>
   )
@@ -136,9 +134,9 @@ export default function AshtakavargaTable({ input }) {
                 </table>
                 </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_strong')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_average')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_weak')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-good-light mr-1 align-middle"></span>{t('ashtakavarga_sarva_strong')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-caution-light mr-1 align-middle"></span>{t('ashtakavarga_sarva_average')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-bad-light mr-1 align-middle"></span>{t('ashtakavarga_sarva_weak')}</span>
                 </div>
               </div>
             </div>
@@ -174,10 +172,10 @@ export default function AshtakavargaTable({ input }) {
                 </table>
                 </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_strong')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_average')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-200 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_weak')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-300 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_very_weak')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-good-light mr-1 align-middle"></span>{t('ashtakavarga_bhinna_strong')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-caution-light mr-1 align-middle"></span>{t('ashtakavarga_bhinna_average')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-bad-light mr-1 align-middle"></span>{t('ashtakavarga_bhinna_weak')}</span>
+                  <span><span className="inline-block w-3 h-3 rounded bg-bad/25 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_very_weak')}</span>
                 </div>
               </div>
             </div>

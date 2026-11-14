@@ -188,10 +188,10 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
         if (isHealth) return (
           <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-green-200
+               className={`rounded-xl overflow-hidden shadow-sm border border-good/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
-            <div className="bg-gradient-to-r from-green-500 to-emerald-400 px-5 py-3 flex items-center gap-2">
+            <div className="bg-gradient-to-r from-good to-good/80 px-5 py-3 flex items-center gap-2">
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
@@ -203,10 +203,10 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
         if (isRelationships) return (
           <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-rose-200
+               className={`rounded-xl overflow-hidden shadow-sm border border-bad/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
-            <div className="bg-gradient-to-r from-rose-500 to-pink-400 px-5 py-3 flex items-center gap-2">
+            <div className="bg-gradient-to-r from-bad to-bad/80 px-5 py-3 flex items-center gap-2">
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>

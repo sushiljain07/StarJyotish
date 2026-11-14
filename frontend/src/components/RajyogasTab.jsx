@@ -52,7 +52,7 @@ function YogaCard({ yoga, defaultOpen }) {
   return (
     <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
       isPresent
-        ? 'bg-parchment-card border-emerald-200 border-l-4 border-l-emerald-500'
+        ? 'bg-parchment-card border-good/30 border-l-4 border-l-good'
         : 'bg-night/[0.03] border-line'
     }`}>
       {/* Header row */}
@@ -67,7 +67,7 @@ function YogaCard({ yoga, defaultOpen }) {
               {yoga.yoga}
             </h3>
             {isPresent
-              ? <span className="text-xs font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t('rajyogas_present')}</span>
+              ? <span className="text-xs font-semibold bg-good-light text-good px-2 py-0.5 rounded-full">{t('rajyogas_present')}</span>
               : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">{t('rajyogas_absent')}</span>
             }
           </div>
@@ -82,7 +82,7 @@ function YogaCard({ yoga, defaultOpen }) {
 
       {/* Expandable details */}
       {open && info && (
-        <div className={`px-4 pb-4 pt-0 border-t ${isPresent ? 'border-emerald-100' : 'border-line'}`}>
+        <div className={`px-4 pb-4 pt-0 border-t ${isPresent ? 'border-good/20' : 'border-line'}`}>
           {/* Meaning */}
           <div className="mt-3">
             <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-primary-ink' : 'text-ink-muted'}`}>
@@ -110,14 +110,14 @@ function YogaCard({ yoga, defaultOpen }) {
             </div>
 
             {/* Benefits */}
-            <div className={`rounded-lg p-3 ${isPresent ? 'bg-emerald-50' : 'bg-night/10'}`}>
-              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-emerald-700' : 'text-ink-muted'}`}>
+            <div className={`rounded-lg p-3 ${isPresent ? 'bg-good/10' : 'bg-night/10'}`}>
+              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-good' : 'text-ink-muted'}`}>
                 {t('rajyogas_benefits')}
               </p>
               <ul className="space-y-1">
                 {info.benefits.map((b, i) => (
                   <li key={i} className={`flex gap-1.5 text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
-                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-emerald-400' : 'bg-ink-faint'}`} />
+                    <span className={`mt-1 shrink-0 w-1 h-1 rounded-full ${isPresent ? 'bg-good' : 'bg-ink-faint'}`} />
                     {b}
                   </li>
                 ))}
@@ -237,7 +237,7 @@ export default function RajyogasTab({ input, active = true }) {
       {/* Present yogas — open by default */}
       {present.length > 0 ? (
         <div>
-          <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide mb-3 px-1">
+          <h3 className="text-sm font-bold text-good uppercase tracking-wide mb-3 px-1">
             {t('rajyogas_active_heading', { count: present.length })}
           </h3>
           <div className="space-y-3">

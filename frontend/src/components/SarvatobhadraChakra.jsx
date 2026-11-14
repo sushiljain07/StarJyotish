@@ -276,13 +276,13 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
           <span className="inline-block w-3 h-3 rounded-full bg-primary"></span> {t('chart_sarvato_legend_transit')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-amber-400 opacity-70"></span> {t('chart_sarvato_legend_natal')}
+          <span className="inline-block w-3 h-3 rounded bg-caution opacity-70"></span> {t('chart_sarvato_legend_natal')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-green-100 border border-green-500"></span> {t('chart_sarvato_legend_transit_nak')}
+          <span className="inline-block w-4 h-3 rounded bg-good-light border border-good"></span> {t('chart_sarvato_legend_transit_nak')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-yellow-100 border border-amber-500"></span> {t('chart_sarvato_legend_natal_nak')}
+          <span className="inline-block w-4 h-3 rounded bg-caution-light border border-caution"></span> {t('chart_sarvato_legend_natal_nak')}
         </span>
       </div>
 

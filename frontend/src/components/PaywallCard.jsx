@@ -19,7 +19,7 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
         <ul className="text-sm text-ink text-left space-y-1.5 mb-6 inline-block">
           {bullets.map((b, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-emerald-500 shrink-0">✓</span>{b}
+              <span className="text-good shrink-0">✓</span>{b}
             </li>
           ))}
         </ul>

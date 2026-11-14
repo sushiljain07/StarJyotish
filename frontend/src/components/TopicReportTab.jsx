@@ -83,7 +83,7 @@ const TOPIC_CONFIG = {
 }
 
 const EFFORT_COLOR = {
-  low:    'text-emerald-600 bg-emerald-50',
+  low:    'text-good bg-good-light',
   medium: 'text-primary-ink bg-primary-light',
   high:   'text-vermillion bg-vermillion-light',
 }

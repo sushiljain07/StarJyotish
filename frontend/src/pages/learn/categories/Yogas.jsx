@@ -31,9 +31,9 @@ import {
 import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 
 function YogaCard({ yoga }) {
-  const typeColor = yoga.type === 'Auspicious' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-    : yoga.type === 'Challenging' ? 'bg-red-50 text-red-700 border-red-200'
-    : 'bg-amber-50 text-amber-700 border-amber-200'
+  const typeColor = yoga.type === 'Auspicious' ? 'bg-good-light text-good border-good/30'
+    : yoga.type === 'Challenging' ? 'bg-bad-light text-bad border-bad/30'
+    : 'bg-caution-light text-caution border-caution/30'
 
   return (
     <div className="bg-parchment-card border border-line rounded-2xl p-6">

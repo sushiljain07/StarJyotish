@@ -102,7 +102,7 @@ function reorderSections(careerContext, t) {
 }
 
 const EFFORT_COLOR = {
-  low:    'text-emerald-600 bg-emerald-50',
+  low:    'text-good bg-good-light',
   medium: 'text-primary-ink bg-primary-light',
   high:   'text-vermillion bg-vermillion-light',
 }
@@ -461,7 +461,7 @@ function AstrologicalEvidenceCard({ evidence }) {
 // The backend's label is a stable English id; its explanation text comes
 // from the server.
 const ALIGNMENT = {
-  'Strong Alignment':        { key: 'strong',        cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  'Strong Alignment':        { key: 'strong',        cls: 'bg-good-light text-good border-good/30' },
   'Partial Alignment':       { key: 'partial',       cls: 'bg-primary-light text-primary-ink border-primary/30' },
   'Underutilized Potential': { key: 'underutilized', cls: 'bg-mauve/10 text-mauve border-mauve/30' },
 }
@@ -512,12 +512,12 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
       {(roadmap.top_actions?.length > 0 || roadmap.top_avoid?.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {roadmap.top_actions?.length > 0 && (
-            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">{t('career_roadmap_actions')}</p>
+            <div className="bg-good-light rounded-xl p-4 border border-good/30">
+              <p className="text-xs font-semibold text-good uppercase tracking-wide mb-2">{t('career_roadmap_actions')}</p>
               <ul className="space-y-1.5">
                 {roadmap.top_actions.map((a, i) => (
                   <li key={i} className="text-sm text-ink flex gap-2">
-                    <span className="text-emerald-600 shrink-0">✓</span><span>{a}</span>
+                    <span className="text-good shrink-0">✓</span><span>{a}</span>
                   </li>
                 ))}
               </ul>

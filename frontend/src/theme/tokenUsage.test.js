@@ -72,7 +72,14 @@ describe('token usage (ratchet)', () => {
     expect(stale).toEqual([])
   })
 
-  // Regex for Task 3: /(?:text|bg|border|from|to)-(?:green|emerald|amber|yellow|red|rose)-\d{2,3}/g
-  // Enabled in Task 3, once ad-hoc green/amber/red status colours are migrated to good/caution/bad.
-  it.todo('adHocStatus is zero everywhere')
+  // Status meaning uses good / caution / bad tokens, never ad-hoc green/amber/red palette classes.
+  it('adHocStatus is zero everywhere', () => {
+    const re = /(?:text|bg|border|from|to)-(?:green|emerald|amber|yellow|red|rose)-\d{2,3}/g
+    const hits = []
+    for (const rel of files) {
+      const n = count(re, sources.get(rel))
+      if (n > 0) hits.push(`${rel}: ${n}`)
+    }
+    expect(hits, 'Use good / caution / bad tokens').toEqual([])
+  })
 })

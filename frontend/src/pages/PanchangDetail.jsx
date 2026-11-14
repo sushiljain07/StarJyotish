@@ -101,7 +101,7 @@ function LocationPicker({ location, onSetLocation }) {
       >
         <span>📍</span>
         <span className="max-w-[220px] truncate">{label}</span>
-        <span className="text-ink-onnight/40 text-xs">▾</span>
+        <span className="text-ink-onnightMuted text-xs">▾</span>
       </button>
 
       {open && (
@@ -153,13 +153,13 @@ function DatePicker({ value, onChange }) {
       >
         <span>📅</span>
         <span>{value === today ? t('tab_today') : formatShort(value)}</span>
-        <span className="text-ink-onnight/40 text-xs">▾</span>
+        <span className="text-ink-onnightMuted text-xs">▾</span>
       </button>
       <input ref={inputRef} type="date" value={value} max={today}
         onChange={e => e.target.value && onChange(e.target.value)}
         className="sr-only" tabIndex={-1} aria-hidden="true" />
       {value !== today && (
-        <button onClick={() => onChange(today)} className="inline-flex items-center min-h-11 text-xs text-ink-onnight/40 hover:text-primary-light hover:underline transition">
+        <button onClick={() => onChange(today)} className="inline-flex items-center min-h-11 text-xs text-ink-onnightMuted hover:text-primary-light hover:underline transition">
           {t('tab_today')}
         </button>
       )}
@@ -220,7 +220,7 @@ function LocationPrompt({ onSetLocation }) {
 
 // ─── Compact multi-day table (used by Week and Hindu Month tabs) ──────────────
 
-const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-slate-400/40' }
+const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-ink-onnightFaint' }
 
 function PanchangTable({ days, highlightToday = true }) {
   const { t } = useTranslation()
@@ -470,7 +470,7 @@ function PanchangTableLegend() {
         <span className="inline-block w-2 h-2 rounded-full bg-primary/80" /> {t('panchang_legend_shukla')}
       </span>
       <span className="inline-flex items-center gap-1">
-        <span className="inline-block w-2 h-2 rounded-full bg-slate-400/40 border border-line" /> {t('panchang_legend_krishna')}
+        <span className="inline-block w-2 h-2 rounded-full bg-ink-onnightFaint border border-line" /> {t('panchang_legend_krishna')}
       </span>
     </p>
   )
@@ -531,7 +531,7 @@ export default function PanchangDetail() {
           <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">{t('panchang_eyebrow')}</p>
           <h1 className="font-serif text-3xl font-medium text-primary-light leading-snug">{heroTitle}</h1>
           {tab === 'today' && isToday && (
-            <p className="text-sm text-ink-onnight/55 mt-1">{formatLong(date)}</p>
+            <p className="text-sm text-ink-onnightMuted mt-1">{formatLong(date)}</p>
           )}
 
           {/* Controls bar */}
@@ -550,7 +550,7 @@ export default function PanchangDetail() {
             {TABS.map(tabItem => (
               <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
                 className={`min-h-11 md:min-h-0 px-4 py-1.5 rounded-full text-sm font-semibold transition ${
-                  tab === tabItem.id ? 'bg-primary text-night' : 'text-ink-onnight/60 hover:text-primary-light'
+                  tab === tabItem.id ? 'bg-primary text-night' : 'text-ink-onnightMuted hover:text-primary-light'
                 }`}>
                 {t(tabItem.labelKey)}
               </button>

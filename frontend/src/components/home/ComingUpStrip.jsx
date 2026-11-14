@@ -30,7 +30,7 @@ export default function ComingUpStrip({ events }) {
       </div>
       <Link
         to="/week-ahead"
-        className="inline-flex items-center min-h-11 mt-1 text-2xs font-bold text-primary hover:text-primary-glow transition"
+        className="inline-flex items-center min-h-11 md:min-h-0 mt-1 md:mt-3.5 text-2xs font-bold text-primary hover:text-primary-glow transition"
       >
         {t('home_coming_up_see_all', 'See all →')}
       </Link>

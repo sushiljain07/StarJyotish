@@ -1,6 +1,7 @@
 // UX slice 1, Task 8: every mobile control the audit measured under 44px
 // must carry min-h-11 (and min-w-11 when icon-only). Real measured sizes
 // are checked in a browser; this is the class-level guard.
+// Nav, header, footer and tab-row chrome is covered by src/components/tapTargets.test.jsx.
 import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
@@ -95,7 +96,7 @@ const ROWS = [
   ['Home Coming up See all', () => <ComingUpStrip events={[{ when: 'Today', title: 'T', description: 'D' }]} />,
     byName('link', esc(t('home_coming_up_see_all')))],
   ['Home Ask panel close', () => <AskPersonaPanel userId={1} input={{}} />,
-    async () => { fireEvent.click(screen.getAllByRole('button')[0]); return [await screen.findByRole('button', { name: '✕' })] }, true],
+    async () => { fireEvent.click(screen.getAllByRole('button')[0]); return [await screen.findByRole('button', { name: en.jump_nav_close })] }, true],
   ['Account Edit / Start over / Change / Upload', () => <Profile />,
     async () => [await screen.findByRole('button', { name: esc(t('profile_astro_edit')) }), screen.getByRole('button', { name: esc(t('profile_astro_delete')) }), ...screen.getAllByRole('button', { name: /Add email|Change|Upload/i })]],
   ['Login Back', () => <Login />,

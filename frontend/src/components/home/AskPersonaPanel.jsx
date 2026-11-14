@@ -158,7 +158,7 @@ export default function AskPersonaPanel({ userId, input }) {
             <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{personaName}</h3>
             <p className="text-[11px] text-ink-onnight/50">{t('ask_persona_tagline')}</p>
           </div>
-          <button onClick={() => setOpen(false)} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
+          <button onClick={() => setOpen(false)} aria-label={t('jump_nav_close')} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnight/50 hover:text-ink-onnight text-lg">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">

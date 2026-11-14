@@ -1,9 +1,12 @@
 // Western-style circular astrological chart
 // Ascendant on left (9-o'clock); houses/signs go counter-clockwise
 
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PLANET_COLORS } from '../config/planetColors'
 import { chartPalette as P } from '../theme/chartPalette'
+import { useRenderedScale, legibleSize, COMPACT_SCALE } from '../hooks/useRenderedScale'
+import { boxesOverlap, estimateTextWidth, textBox } from '../utils/chartLabelLayout'
 
 const CX = 260
 const CY = 260
@@ -64,12 +67,43 @@ export default function WesternChart({
     return (pLon - ascLon + 360) % 360
   }
 
-  // Avoid label collisions: group planets within 5° of each other
+  const viewW = CX * 2
+  const svgRef = useRef(null)
+  const scale = useRenderedScale(svgRef, viewW)
+  const compact = scale < COMPACT_SCALE
+  const glyphFs = legibleSize(14, scale, 11)
+  const statusFs = compact ? legibleSize(8, scale, 10) : 8
+  const signFs = legibleSize(12, scale, 10)
+  const houseFs = legibleSize(11, scale, 10)
+  const axisFs = legibleSize(10, scale, 10)
+  const transitFs = legibleSize(10, scale, 11)
+  const ascDegFs = legibleSize(9, scale, 10)
+
+  // Each planet sits on the planet ring; when its label would touch one
+  // already placed (a conjunction), it moves one step inwards.
+  const step = glyphFs + (compact ? 4 : 12)
+  const placed = []
   const planetAngles = planets.map(p => ({
     ...p,
     lon: lonFromAsc(p),
     svgAngle: astroToSvgAngle(lonFromAsc(p)),
-  })).sort((a, b) => a.lon - b.lon)
+  })).sort((a, b) => a.lon - b.lon).map(p => {
+    const glyph = PLANET_ABBR[p.name] ?? p.name.slice(0, 2)
+    const width = estimateTextWidth(glyph, glyphFs) + (compact && p.retrograde ? estimateTextWidth('R', statusFs) : 0)
+    let best = null
+    for (let tier = 0; tier < (compact ? 4 : 3); tier++) {
+      const r = R_PLANET - tier * step
+      const [px, py] = polarXY(p.svgAngle, r)
+      const box = compact
+        ? textBox(px, py + 0.35 * glyphFs, width, glyphFs)
+        : { ...textBox(px, py - 6, width, glyphFs), y1: py + 9 }
+      const hits = placed.filter(b => boxesOverlap(b, box, 1)).length
+      if (!best || hits < best.hits) best = { r, box, hits }
+      if (hits === 0) break
+    }
+    placed.push(best.box)
+    return { ...p, glyph, r: best.r }
+  })
 
   const transitAngles = transitPlanets
     ? transitPlanets.map(p => ({
@@ -83,7 +117,7 @@ export default function WesternChart({
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-2 w-full">
         <div className="text-sm font-semibold text-primary-ink">{title}</div>
-        <svg width="100%" viewBox={`0 0 ${CX * 2} ${viewH}`}
+        <svg ref={svgRef} width="100%" viewBox={`0 0 ${viewW} ${viewH}`}
              style={{ maxWidth: 520 }} className="font-sans">
 
           {/* ── Outer ring (zodiac signs) ── */}
@@ -99,7 +133,7 @@ export default function WesternChart({
                       fill={s % 3 === 0 ? P.paperAlt : s % 3 === 1 ? P.goodFill : P.paper}
                       stroke={P.line} strokeWidth="0.8" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                      fontSize="12" fill={P.signText} fontWeight="bold">
+                      fontSize={signFs} fill={P.signText} fontWeight="bold">
                   {SIGN_GLYPHS[signIdx]}
                 </text>
               </g>
@@ -118,7 +152,7 @@ export default function WesternChart({
                       fill={h === 0 ? P.ascFill : P.paper}
                       stroke={P.muted} strokeWidth="0.6" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                      fontSize="11" fill={h === 0 ? P.asc : P.muted} fontWeight="500">
+                      fontSize={houseFs} fill={h === 0 ? P.asc : P.muted} fontWeight="500">
                   {h + 1}
                 </text>
               </g>
@@ -151,23 +185,32 @@ export default function WesternChart({
             const [lx, ly] = polarXY(astroToSvgAngle(angle), R_INNER - 14)
             return (
               <text key={label} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                    fontSize="10" fill={color} fontWeight="bold">{label}</text>
+                    fontSize={axisFs} fill={color} fontWeight="bold">{label}</text>
             )
           })}
 
           {/* ── Natal planets ── */}
           {planetAngles.map((p) => {
-            const [px, py] = polarXY(p.svgAngle, R_PLANET)
-            const glyph = PLANET_ABBR[p.name] ?? p.name.slice(0, 2)
+            const [px, py] = polarXY(p.svgAngle, p.r)
+            const color = PLANET_COLORS[p.name] ?? P.text
+            if (compact) {
+              return (
+                <text key={p.name} x={px} y={py + 0.35 * glyphFs} data-label="planet"
+                      textAnchor="middle" fontSize={glyphFs} fill={color} fontWeight="500">
+                  {p.glyph}
+                  {p.retrograde && <tspan data-status fontSize={statusFs}>R</tspan>}
+                </text>
+              )
+            }
             const deg = Math.floor(p.degree)
             return (
               <g key={p.name}>
-                <text x={px} y={py - 6} textAnchor="middle" fontSize="14"
-                      fill={PLANET_COLORS[p.name] ?? P.text} fontWeight="500">
-                  {glyph}
+                <text x={px} y={py - 6} data-label="planet" textAnchor="middle" fontSize={glyphFs}
+                      fill={color} fontWeight="500">
+                  {p.glyph}
                 </text>
-                <text x={px} y={py + 7} textAnchor="middle" fontSize="8"
-                      fill={PLANET_COLORS[p.name] ?? P.text}>
+                <text x={px} y={py + 7} data-deg textAnchor="middle" fontSize="8"
+                      fill={color}>
                   {deg}°{p.retrograde ? 'R' : ''}
                 </text>
               </g>
@@ -179,8 +222,8 @@ export default function WesternChart({
             const [px, py] = polarXY(p.svgAngle, R_OUTER + 14)
             const glyph = PLANET_ABBR[p.name] ?? p.name.slice(0, 2)
             return (
-              <text key={`tr_${p.name}`} x={px} y={py}
-                    textAnchor="middle" fontSize="10"
+              <text key={`tr_${p.name}`} x={px} y={py} data-label="transit"
+                    textAnchor="middle" fontSize={transitFs}
                     fill={PLANET_COLORS[p.name] ?? P.muted}
                     opacity="0.85" fontStyle="italic">
                 {glyph}
@@ -192,7 +235,7 @@ export default function WesternChart({
           {ascendant && (() => {
             const [ax, ay] = polarXY(180, R_INNER + 20)
             return (
-              <text x={ax} y={ay} textAnchor="middle" fontSize="9"
+              <text x={ax} y={ay} textAnchor="middle" fontSize={ascDegFs}
                     fill={P.asc} fontWeight="bold">
                 {Math.floor(ascDeg)}°{Math.round((ascDeg % 1) * 60)}'
               </text>

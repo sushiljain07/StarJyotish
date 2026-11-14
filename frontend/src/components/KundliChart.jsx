@@ -1,8 +1,13 @@
 // frontend/src/components/KundliChart.jsx
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetAbbr } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
 import { chartPalette as P } from '../theme/chartPalette'
+import { useRenderedScale, legibleSize, COMPACT_SCALE } from '../hooks/useRenderedScale'
+import {
+  NORTH_HOUSE_POLYGONS, estimateTextWidth, layoutNorthHouse, textBox,
+} from '../utils/chartLabelLayout'
 
 // ── 500×500 chart geometry ───────────────────────────────────────────────────
 // Outer square : (10,10)→(490,490)   Centre : (250,250)
@@ -85,10 +90,6 @@ function getPlanetStatus(p, sun, navamsaPlanets) {
   return sym.join('')
 }
 
-const LINE_H = 21   // vertical spacing — single column
-const ROW_H  = 22   // vertical spacing — 2-column grid
-const OFFSET = 22   // horizontal offset from centre in 2-col mode
-
 export default function KundliChart({
   planets = [],
   ascendant = null,
@@ -125,12 +126,29 @@ export default function KundliChart({
 
   const sun = planets.find(p => p.name === 'Sun')
 
+  // Phones render the 500-unit chart at ~0.6×: grow the labels so they stay
+  // legible, and below COMPACT_SCALE drop the degree superscripts (the Planets
+  // table has them) and show status markers as a full-size suffix.
+  const svgRef = useRef(null)
+  const scale = useRenderedScale(svgRef, 500)
+  const compact = scale < COMPACT_SCALE
+  const planetFs = legibleSize(15, scale, 11)
+  const transitFs = legibleSize(13, scale, 11)
+  const statusFs = compact ? legibleSize(11, scale, 10) : 11
+  const rashiFs = legibleSize(14, scale, 10)
+  const grow = planetFs / 15
+  const rashiBox = (i, n) => {
+    const [rx, ry] = RASHI_POS[i]
+    return textBox(rx, ry, estimateTextWidth(String(n), rashiFs), rashiFs)
+  }
+
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
       <div className="text-sm font-semibold text-primary-ink">{title ?? t('chart_lagna_title')}</div>
 
       <svg
+        ref={svgRef}
         width="100%"
         viewBox="0 0 500 500"
         style={{ maxWidth: 480 }}
@@ -153,8 +171,8 @@ export default function KundliChart({
         {houses.map((h, i) => {
           const [rx, ry] = RASHI_POS[i]
           return (
-            <text key={`r${i}`} x={rx} y={ry}
-                textAnchor="middle" fontSize="14"
+            <text key={`r${i}`} x={rx} y={ry} data-label="sign"
+                textAnchor="middle" fontSize={rashiFs}
                   fill={P.signText} fontWeight="bold">
               {h.sign_index + 1}
             </text>
@@ -195,52 +213,74 @@ export default function KundliChart({
 
           if (allItems.length === 0) return null
 
-          // 2-column grid for 3+ items to use horizontal space
-          const useGrid = allItems.length >= 3
-          const rh      = useGrid ? ROW_H : LINE_H
-          const rows    = useGrid ? Math.ceil(allItems.length / 2) : allItems.length
-          const startY  = cy - ((rows - 1) * rh) / 2
+          // Desktop: one column for 1–2 items, a 2-column grid for 3+.
+          // Grown labels fall back to tighter rows / an extra column.
+          const widthOf = item => item.type === 'planet'
+            ? estimateTextWidth(item.name, planetFs) + estimateTextWidth(item.status, statusFs)
+            : item.type === 'transit'
+              ? estimateTextWidth(t('chart_transit_marker') + item.name, transitFs)
+              : estimateTextWidth(abbr('Ascendant'), planetFs)
+          const positions = layoutNorthHouse({
+            center: [cx, cy],
+            poly: NORTH_HOUSE_POLYGONS[hIdx],
+            widths: allItems.map(widthOf),
+            fontSize: Math.max(planetFs, transitFs),
+            grow,
+            obstacles: [rashiBox(hIdx, houses[hIdx].sign_index + 1)],
+          })
 
           const rendered = allItems.map((item, idx) => {
-            const row = useGrid ? Math.floor(idx / 2) : idx
-            const col = useGrid ? idx % 2 : 0
-            // Last item in an odd-count grid → centre it
-            const isLoneLastRow = useGrid && allItems.length % 2 !== 0 && idx === allItems.length - 1
-            const xPos = isLoneLastRow ? cx : useGrid ? cx + (col === 0 ? -OFFSET : OFFSET) : cx
-            const yPos = startY + row * rh
+            const { x: xPos, y: yPos } = positions[idx]
 
             if (item.type === 'lag') {
               return (
-                <text key="La" x={xPos} y={yPos}
-                      textAnchor="middle" fontSize="15"
+                <text key="La" x={xPos} y={yPos} data-label="lagna"
+                      textAnchor="middle" fontSize={planetFs}
                       fill={P.asc} fontWeight="bold">
-                  <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                  <tspan dy="3">{abbr('Ascendant')}</tspan>
+                  {compact ? abbr('Ascendant') : (
+                    <>
+                      <tspan data-deg fontSize="11" dy="-3">{item.deg}</tspan>
+                      <tspan dy="3">{abbr('Ascendant')}</tspan>
+                    </>
+                  )}
                 </text>
               )
             }
             if (item.type === 'transit') {
               return (
-                <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos}
-                      textAnchor="middle" fontSize="13"
+                <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos} data-label="transit"
+                      textAnchor="middle" fontSize={transitFs}
                       fill={item.color} opacity="0.65" fontStyle="italic">
-                  <tspan fontSize="9" dy="-2">{item.deg}</tspan>
-                  <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
+                  {compact ? <>{t('chart_transit_marker')}{item.name}</> : (
+                    <>
+                      <tspan data-deg fontSize="9" dy="-2">{item.deg}</tspan>
+                      <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
+                    </>
+                  )}
                 </text>
               )
             }
             return (
-              <text key={item.name} x={xPos} y={yPos}
-                    textAnchor="middle" fontSize="15"
+              <text key={item.name} x={xPos} y={yPos} data-label="planet"
+                    textAnchor="middle" fontSize={planetFs}
                     fill={item.color} fontWeight="500">
-                <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                <tspan dy="3">{item.name}</tspan>
-                {item.status && <tspan fontSize="11" dy="-3">{item.status}</tspan>}
+                {compact ? (
+                  <>
+                    <tspan>{item.name}</tspan>
+                    {item.status && <tspan data-status fontSize={statusFs}>{item.status}</tspan>}
+                  </>
+                ) : (
+                  <>
+                    <tspan data-deg fontSize="11" dy="-3">{item.deg}</tspan>
+                    <tspan dy="3">{item.name}</tspan>
+                    {item.status && <tspan data-status fontSize="11" dy="-3">{item.status}</tspan>}
+                  </>
+                )}
               </text>
             )
           })
 
-          return <g key={`h${hNum}`}>{rendered}</g>
+          return <g key={`h${hNum}`} data-house={hNum}>{rendered}</g>
         })}
       </svg>
 

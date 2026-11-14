@@ -311,7 +311,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                         {planetName(t, np.name)}
                       </td>
                       <td className="p-2 border-b">{nakshatraName(t, np.nakshatra)} (H{np.house})</td>
-                      <td className="p-2 border-b text-primary-dark">
+                      <td className="p-2 border-b text-primary-ink">
                         {tp ? `${nakshatraName(t, tp.nakshatra)} (H${tp.house})` : '–'}
                       </td>
                     </tr>

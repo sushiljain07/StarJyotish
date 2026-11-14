@@ -141,7 +141,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
       <Button size="lg" onClick={() => generate()}>
         {t('reading_reveal_btn')}
       </Button>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')}</p>
     </div>
   )
 
@@ -153,12 +153,12 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
-      <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
+      <p className="font-medium text-primary-ink">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full motion-safe:animate-pulse"
              style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
       </div>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_loading_sub')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_loading_sub')}</p>
     </div>
   )
 
@@ -224,7 +224,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl">{icon}</span>
-              <h3 className="font-bold text-primary text-base">{title}</h3>
+              <h3 className="font-bold text-primary-ink text-base">{title}</h3>
             </div>
             <p className="text-ink text-sm leading-relaxed max-w-prose"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
@@ -265,18 +265,18 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
       <div className="text-center pb-4">
         <button onClick={() => generate({ force: true })}
-          className="text-sm text-primary hover:text-primary-dark transition">
+          className="text-sm text-primary-ink hover:text-ink transition">
           {t('reading_regenerate_btn')}
         </button>
       </div>
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {provider && (
-        <p className="text-center text-[11px] text-ink-faint pb-1">
+        <p className="text-center text-[11px] text-ink-muted pb-1">
           {t('reading_powered_by', { provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-2">
+      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-2">
         {t('disclaimer')}
       </p>
     </div>

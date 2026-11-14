@@ -27,7 +27,7 @@ function durationLabel(t, start, end) {
 }
 
 const LEVEL_COLORS = {
-  mahadasha:  { active: 'bg-primary',    activeText: 'text-night', light: 'bg-primary-light',    border: 'border-primary/30',    text: 'text-primary-dark', bar: 'bg-primary'    },
+  mahadasha:  { active: 'bg-primary',    activeText: 'text-night', light: 'bg-primary-light',    border: 'border-primary/30',    text: 'text-primary-ink', bar: 'bg-primary'    },
   antardasha: { active: 'bg-mauve',      activeText: 'text-white',  light: 'bg-mauve-light',      border: 'border-mauve/30',      text: 'text-mauve',        bar: 'bg-mauve'      },
   pratyantar: { active: 'bg-vermillion', activeText: 'text-white',  light: 'bg-vermillion-light', border: 'border-vermillion/30', text: 'text-vermillion',   bar: 'bg-vermillion' },
 }
@@ -41,7 +41,7 @@ const tabsFor = t => [
 function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
   const { t } = useTranslation()
   if (!rows || rows.length === 0)
-    return <p className="text-sm text-ink-faint italic">{t('dasha_no_data')}</p>
+    return <p className="text-sm text-ink-muted italic">{t('dasha_no_data')}</p>
 
   return (
     <ScrollHint fadeFrom="from-parchment-card">
@@ -62,7 +62,7 @@ function PeriodTable({ rows, currentPlanet, currentStart, color, labelFn }) {
             return (
               <tr key={i}
                   className={isCurrent ? `${color.light} font-semibold`
-                    : isPast ? 'bg-parchment-card text-ink-faint' : 'bg-parchment-card text-ink-muted'}>
+                    : isPast ? 'bg-parchment-card text-ink-muted' : 'bg-parchment-card text-ink-muted'}>
                 <td className="p-2 border border-line">
                   {isCurrent && <span className="mr-1">▶</span>}
                   {labelFn(r)}
@@ -108,7 +108,7 @@ export default function DashaTable({ dasha }) {
 
       {/* Current chain banner */}
       <div className="bg-primary-light border border-primary/30 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
-        <span className="font-bold text-primary-dark">{planetName(t, md.planet)} {t('dasha_md')}</span>
+        <span className="font-bold text-primary-ink">{planetName(t, md.planet)} {t('dasha_md')}</span>
         {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
         {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
         <span className="ml-auto text-xs text-ink-muted">{t('dasha_left_in_md', { years: yrsLeft })}</span>
@@ -134,7 +134,7 @@ export default function DashaTable({ dasha }) {
           <div className={`${c.light} border ${c.border} rounded-lg p-4`}>
             <div className={`text-xs ${c.text} uppercase tracking-wide mb-1`}>{t('dasha_current_md')}</div>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-2xl font-bold text-primary-dark">{planetName(t, md.planet)}</span>
+              <span className="text-2xl font-bold text-primary-ink">{planetName(t, md.planet)}</span>
               <span className="text-sm text-ink-muted">{formatDate(md.start)} – {formatDate(md.end)} · {t('dasha_years_short', { n: md.years })}</span>
             </div>
             <div className="mt-2 h-2 bg-primary-light rounded-full">
@@ -149,7 +149,7 @@ export default function DashaTable({ dasha }) {
                 return (
                   <span key={i}
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          isCurr ? 'bg-primary text-night' : 'bg-primary-light text-primary-dark'
+                          isCurr ? 'bg-primary text-night' : 'bg-primary-light text-primary-ink'
                         }`}>
                     {planetName(t, m.planet)} · {t('dasha_years_short', { n: m.years })}
                   </span>

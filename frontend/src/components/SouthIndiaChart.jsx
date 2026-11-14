@@ -167,7 +167,7 @@ export default function SouthIndiaChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-3 w-full">
-        <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_south_title')}</div>
+        <div className="text-sm font-semibold text-primary-ink">{title ?? t('chart_south_title')}</div>
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 480 }} className="font-sans">
           {cells}
         </svg>

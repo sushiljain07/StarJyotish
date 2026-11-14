@@ -81,7 +81,7 @@ export default function WesternChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
       <div className="flex flex-col items-center gap-2 w-full">
-        <div className="text-sm font-semibold text-primary-dark">{title}</div>
+        <div className="text-sm font-semibold text-primary-ink">{title}</div>
         <svg width="100%" viewBox={`0 0 ${CX * 2} ${viewH}`}
              style={{ maxWidth: 520 }} className="font-sans">
 
@@ -200,7 +200,7 @@ export default function WesternChart({
 
         </svg>
 
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-faint">
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-ink-muted">
           <span>{t('western_chart_legend')}</span>
         </div>
       </div>

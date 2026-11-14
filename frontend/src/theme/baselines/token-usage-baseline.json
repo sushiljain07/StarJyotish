@@ -1,70 +1,21 @@
 {
-  "components/AccountMenu.jsx": {
-    "faintText": 1
-  },
-  "components/AnimatedTabRow.jsx": {
-    "goldText": 1
-  },
-  "components/AshtakavargaTable.jsx": {
-    "goldText": 5
-  },
   "components/AskChart.jsx": {
-    "goldText": 1,
-    "faintText": 7
-  },
-  "components/AskPersonaCard.jsx": {
-    "goldText": 2,
-    "faintText": 3
+    "faintText": 2
   },
   "components/CareerReportTab.jsx": {
-    "goldText": 20,
-    "faintText": 11
-  },
-  "components/ChartHighlight.jsx": {
-    "goldText": 1,
-    "faintText": 1
-  },
-  "components/ChartReading.jsx": {
-    "goldText": 4,
-    "faintText": 4
+    "faintText": 2
   },
   "components/CompactFooter.jsx": {
     "goldText": 1
   },
   "components/DashaTable.jsx": {
-    "goldText": 4,
-    "faintText": 4
-  },
-  "components/ErrorFallback.jsx": {
-    "goldText": 2
-  },
-  "components/FAQAccordion.jsx": {
-    "goldText": 1
+    "faintText": 2
   },
   "components/Footer.jsx": {
     "goldText": 7
   },
-  "components/KPChart.jsx": {
-    "goldText": 5,
-    "faintText": 3
-  },
-  "components/KundliChart.jsx": {
-    "goldText": 1
-  },
-  "components/KundliDownload.jsx": {
-    "goldText": 7,
-    "faintText": 1
-  },
-  "components/PlanetTable.jsx": {
-    "goldText": 5,
-    "faintText": 2
-  },
   "components/RajyogasTab.jsx": {
-    "goldText": 3,
-    "faintText": 4
-  },
-  "components/SarvatobhadraChakra.jsx": {
-    "goldText": 1
+    "faintText": 1
   },
   "components/SectionDivider.jsx": {
     "goldText": 1
@@ -72,32 +23,13 @@
   "components/SectionJumpNav.jsx": {
     "faintText": 1
   },
-  "components/ShodashvargaPanel.jsx": {
-    "goldText": 3,
-    "faintText": 2
-  },
   "components/SocialButtons.jsx": {
-    "goldText": 2
-  },
-  "components/SouthIndiaChart.jsx": {
-    "goldText": 1
-  },
-  "components/StaticPageLayout.jsx": {
     "goldText": 1
   },
   "components/Testimonials.jsx": {
-    "goldText": 6,
-    "faintText": 2
+    "goldText": 1
   },
   "components/TopicReportTab.jsx": {
-    "goldText": 8,
-    "faintText": 8
-  },
-  "components/TransitPanel.jsx": {
-    "goldText": 5
-  },
-  "components/WesternChart.jsx": {
-    "goldText": 1,
     "faintText": 1
   },
   "components/auth/AvatarUpload.jsx": {

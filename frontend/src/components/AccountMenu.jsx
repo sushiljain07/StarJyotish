@@ -82,7 +82,7 @@ export default function AccountMenu() {
         >
           <div className="px-3.5 py-2 border-b border-line">
             <p className="text-ink text-sm font-medium truncate">{displayName}</p>
-            {secondaryLine && <p className="text-ink-faint text-xs truncate mt-0.5">{secondaryLine}</p>}
+            {secondaryLine && <p className="text-ink-muted text-xs truncate mt-0.5">{secondaryLine}</p>}
           </div>
           <Link
             to="/about"

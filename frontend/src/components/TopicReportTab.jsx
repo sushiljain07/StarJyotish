@@ -84,12 +84,12 @@ const TOPIC_CONFIG = {
 
 const EFFORT_COLOR = {
   low:    'text-emerald-600 bg-emerald-50',
-  medium: 'text-primary-dark bg-primary-light',
+  medium: 'text-primary-ink bg-primary-light',
   high:   'text-vermillion bg-vermillion-light',
 }
 
 function SectionContent({ content }) {
-  if (!content) return <span className="text-ink-faint italic">—</span>
+  if (!content) return <span className="text-ink-muted italic">—</span>
   const bullets = content
     .split('\n')
     .map(l => l.replace(/^[-•]\s*/, '').trim())
@@ -155,7 +155,7 @@ function SectionCard({ icon, section, style }) {
     <div className="bg-primary-light rounded-xl p-5 shadow-sm border border-primary/30">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-primary-dark text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
@@ -165,7 +165,7 @@ function SectionCard({ icon, section, style }) {
     <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-primary text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
@@ -188,7 +188,7 @@ function HighlightCard({ h }) {
             {h.category && <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{h.category}</span>}
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</span>
           </div>
-          {h.timeline && <p className="text-xs text-ink-faint mt-0.5">{h.timeline}</p>}
+          {h.timeline && <p className="text-xs text-ink-muted mt-0.5">{h.timeline}</p>}
         </div>
         <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
@@ -196,14 +196,14 @@ function HighlightCard({ h }) {
         <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">
           {h.reason && (
             <div>
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">{t('report_why_fits')}</p>
+              <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('report_why_fits')}</p>
               <p className="text-xs text-ink-muted leading-relaxed">{h.reason}</p>
             </div>
           )}
           {h.key_planets?.length > 0 && (
             <div className="flex gap-1 flex-wrap">
               {h.key_planets.map(p => (
-                <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
+                <span key={p} className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
               ))}
             </div>
           )}
@@ -314,7 +314,7 @@ export default function TopicReportTab({ topic, input, active = true }) {
       >
         {t(`topic_report_${topic}_generate_button`)}
       </button>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
     </div>
   )
 
@@ -324,8 +324,8 @@ export default function TopicReportTab({ topic, input, active = true }) {
   if (status === 'loading' || (status === 'idle' && skipIdleScreen)) return (
     <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
-      <p className="text-primary-dark font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>
-      <p className="text-xs text-ink-faint mt-1">{t(`topic_report_${topic}_loading_sub`)}</p>
+      <p className="text-primary-ink font-semibold">{t(`topic_report_${topic}_loading_text`)}</p>
+      <p className="text-xs text-ink-muted mt-1">{t(`topic_report_${topic}_loading_sub`)}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full motion-safe:animate-pulse w-3/4" />
       </div>
@@ -354,7 +354,7 @@ export default function TopicReportTab({ topic, input, active = true }) {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">🎯</span>
             <h3 className="font-bold text-ink text-base">{t(`topic_report_${topic}_highlights_heading`)}</h3>
-            <span className="text-xs text-ink-faint ml-1">· {t('topic_report_tap_to_expand')}</span>
+            <span className="text-xs text-ink-muted ml-1">· {t('topic_report_tap_to_expand')}</span>
           </div>
           <div className="space-y-2">
             {report.highlights.map(h => <HighlightCard key={h.rank} h={h} />)}
@@ -375,18 +375,18 @@ export default function TopicReportTab({ topic, input, active = true }) {
             forceNextRef.current = true
             setStatus('idle')
           }}
-          className="text-sm text-primary hover:text-primary-dark transition font-medium"
+          className="text-sm text-primary-ink hover:text-ink transition font-medium"
         >
           ↺ {t('topic_report_regenerate')}
         </button>
       </div>
 
       {report?.llm_provider && (
-        <p className="text-center text-[11px] text-ink-faint pb-1">
+        <p className="text-center text-[11px] text-ink-muted pb-1">
           {t('reading_powered_by', { provider: report.llm_provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-4">{t('disclaimer')}</p>
+      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-4">{t('disclaimer')}</p>
     </div>
   )
 }

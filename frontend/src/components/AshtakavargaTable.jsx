@@ -63,8 +63,8 @@ export default function AshtakavargaTable({ input }) {
   return (
     <div className="space-y-4">
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-        <h2 className="text-primary-dark font-bold text-base">{t('ashtakavarga_title')}</h2>
-        <p className="text-primary-dark text-xs mt-1">
+        <h2 className="text-primary-ink font-bold text-base">{t('ashtakavarga_title')}</h2>
+        <p className="text-primary-ink text-xs mt-1">
           {t('ashtakavarga_intro')}
         </p>
         <button onClick={load} disabled={loading}
@@ -112,7 +112,7 @@ export default function AshtakavargaTable({ input }) {
           {activeTab === 'sarva' && (
             <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-3 bg-primary-light border-b">
-                <h3 className="font-semibold text-primary-dark text-sm">
+                <h3 className="font-semibold text-primary-ink text-sm">
                   {t('ashtakavarga_sarva_title')}
                 </h3>
               </div>
@@ -222,11 +222,11 @@ export default function AshtakavargaTable({ input }) {
                     })}
                     {/* Sarva total row */}
                     <tr className="bg-primary-light font-bold">
-                      <td className="p-2 border border-primary/40 text-primary-dark">{t('ashtakavarga_total')}</td>
+                      <td className="p-2 border border-primary/40 text-primary-ink">{t('ashtakavarga_total')}</td>
                       {data.sarvashtakavarga.map((cell, i) => (
                         <SarvaCell key={i} value={cell.points} />
                       ))}
-                      <td className="p-2 text-center border border-primary/40 text-primary-dark">
+                      <td className="p-2 text-center border border-primary/40 text-primary-ink">
                         {data.sarvashtakavarga.reduce((s, c) => s + c.points, 0)}
                       </td>
                     </tr>

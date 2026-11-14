@@ -71,7 +71,7 @@ function YogaCard({ yoga, defaultOpen }) {
               : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">{t('rajyogas_absent')}</span>
             }
           </div>
-          <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-ink-muted' : 'text-ink-faint'}`}>
+          <p className={`text-xs mt-1 leading-relaxed ${isPresent ? 'text-ink-muted' : 'text-ink-muted'}`}>
             {yoga.description}
           </p>
         </div>
@@ -85,7 +85,7 @@ function YogaCard({ yoga, defaultOpen }) {
         <div className={`px-4 pb-4 pt-0 border-t ${isPresent ? 'border-emerald-100' : 'border-line'}`}>
           {/* Meaning */}
           <div className="mt-3">
-            <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-primary-dark' : 'text-ink-faint'}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isPresent ? 'text-primary-ink' : 'text-ink-muted'}`}>
               {t('rajyogas_what_is')}
             </p>
             <p className={`text-xs leading-relaxed ${isPresent ? 'text-ink' : 'text-ink-muted'}`}>
@@ -96,7 +96,7 @@ function YogaCard({ yoga, defaultOpen }) {
           <div className="grid sm:grid-cols-2 gap-3 mt-3">
             {/* Characteristics */}
             <div className={`rounded-lg p-3 ${isPresent ? 'bg-primary-light' : 'bg-night/10'}`}>
-              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-primary-dark' : 'text-ink-muted'}`}>
+              <p className={`text-xs font-semibold mb-2 ${isPresent ? 'text-primary-ink' : 'text-ink-muted'}`}>
                 {t('rajyogas_characteristics')}
               </p>
               <ul className="space-y-1">
@@ -206,7 +206,7 @@ export default function RajyogasTab({ input, active = true }) {
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="text-3xl">⚠️</div>
         <p className="text-sm text-vermillion">{errorMsg}</p>
-        <button onClick={load} className="text-sm text-primary-dark underline">{t('rajyogas_try_again')}</button>
+        <button onClick={load} className="text-sm text-primary-ink underline">{t('rajyogas_try_again')}</button>
       </div>
     )
   }
@@ -248,7 +248,7 @@ export default function RajyogasTab({ input, active = true }) {
         <div className="bg-parchment-card rounded-xl p-6 text-center border border-line shadow-sm">
           <div className="text-3xl mb-2">🌱</div>
           <p className="text-ink-muted text-sm">{t('rajyogas_none')}</p>
-          <p className="text-ink-faint text-xs mt-1">{t('rajyogas_none_note')}</p>
+          <p className="text-ink-muted text-xs mt-1">{t('rajyogas_none_note')}</p>
         </div>
       )}
     </div>

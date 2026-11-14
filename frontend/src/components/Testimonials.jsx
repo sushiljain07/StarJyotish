@@ -11,7 +11,7 @@ import { API_BASE } from '../api/config'
 import Reveal from './Reveal'
 
 const ACCENT_RING = ['ring-primary/30','ring-sage/30','ring-mauve/30','ring-primary/30']
-const AVATAR_BG   = ['bg-primary-light text-primary-dark','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-dark']
+const AVATAR_BG   = ['bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-ink']
 const MARKS       = ['✦','✧','✦','✧']
 
 // Default testimonials — shown while loading or when DB returns nothing.
@@ -31,7 +31,7 @@ function TestimonialCard({ t, i }) {
       <blockquote className="text-ink text-sm leading-relaxed flex-1">{t.text}</blockquote>
       {t.detail && (
         <div className="mt-4 mb-4">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-dark bg-primary-light px-2.5 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-ink bg-primary-light px-2.5 py-1 rounded-full">
             <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor" aria-hidden="true"><circle cx="8" cy="8" r="2.5"/></svg>
             {t.detail}
           </span>
@@ -43,7 +43,7 @@ function TestimonialCard({ t, i }) {
         </div>
         <div>
           <div className="text-sm font-semibold text-ink">{t.display_name}</div>
-          {t.location && <div className="text-xs text-ink-faint">{t.location}</div>}
+          {t.location && <div className="text-xs text-ink-muted">{t.location}</div>}
         </div>
       </figcaption>
     </figure>
@@ -66,7 +66,7 @@ export default function Testimonials() {
     <section className="px-4 py-12 sm:py-16" aria-label={t('testimonials_aria')}>
       <div className="max-w-4xl mx-auto">
         <Reveal className="text-center mb-10">
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{t('testimonials_subhead')}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{t('testimonials_subhead')}</p>
           <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink">{t('testimonials_heading')}</h2>
         </Reveal>
 
@@ -80,10 +80,10 @@ export default function Testimonials() {
 
         <Reveal delay={200} className="text-center mt-10">
           <Link to="/testimonials"
-            className="inline-flex items-center gap-2 text-sm text-primary-dark hover:underline font-medium">
+            className="inline-flex items-center gap-2 text-sm text-primary-ink hover:underline font-medium">
             {t('testimonials_read_all')}
           </Link>
-          <p className="text-ink-faint text-xs mt-2">{t('landing_footer_note')}</p>
+          <p className="text-ink-muted text-xs mt-2">{t('landing_footer_note')}</p>
         </Reveal>
       </div>
     </section>

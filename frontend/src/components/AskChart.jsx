@@ -106,14 +106,14 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
       <div className="px-4 py-3 border-b border-line flex items-center justify-between bg-night/[0.03]">
         <div>
           <div className="text-sm font-semibold text-ink">💬 {t('tab_ask')}</div>
-          <div className="text-xs text-ink-faint">{t('ask_subtitle')}</div>
+          <div className="text-xs text-ink-muted">{t('ask_subtitle')}</div>
         </div>
         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
           limitReached
             ? 'bg-vermillion-light text-vermillion'
             : remaining === 1
             ? 'bg-vermillion-light text-vermillion'
-            : 'bg-primary-light text-primary-dark'
+            : 'bg-primary-light text-primary-ink'
         }`}>
           {limitReached ? t('ask_zero_left') : t('ask_questions_remaining', { count: remaining })}
         </span>
@@ -124,8 +124,8 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
         {messages.length === 0 && !loading && (
           <div className="text-center py-8">
             <img src="/starjyotish.svg" alt="" className="w-8 h-8 mx-auto mb-2 opacity-60" />
-            <p className="text-ink-faint text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
-            <p className="text-ink-faint/70 text-xs mt-1">{t('ask_empty_example')}</p>
+            <p className="text-ink-muted text-sm">{t('ask_empty_heading', { count: MAX_QUESTIONS })}</p>
+            <p className="text-ink-muted text-xs mt-1">{t('ask_empty_example')}</p>
           </div>
         )}
         {messages.map((msg, i) => (
@@ -155,7 +155,7 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
         )}
         {limitReached && (
           <div className="text-center py-3">
-            <p className="text-xs text-ink-faint">{t('ask_limit_reached', { count: MAX_QUESTIONS })}</p>
+            <p className="text-xs text-ink-muted">{t('ask_limit_reached', { count: MAX_QUESTIONS })}</p>
           </div>
         )}
         <div ref={bottomRef} />
@@ -181,7 +181,7 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
             {t('ask_send')}
           </button>
         </div>
-        <p className="text-[11px] text-ink-faint text-center mt-2">
+        <p className="text-[11px] text-ink-muted text-center mt-2">
           {provider ? t('reading_powered_by', { provider }) : t('reading_powered_by_generic')}
         </p>
       </div>

@@ -137,7 +137,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
   if (status === 'error') return (
     <div className="mt-4 text-center">
       <button onClick={() => { fetchedRef.current = false; setStatus('idle') }}
-        className="text-xs text-ink-faint hover:text-primary transition">
+        className="text-xs text-ink-muted hover:text-ink transition">
         {t('chart_highlight_retry')}
       </button>
     </div>

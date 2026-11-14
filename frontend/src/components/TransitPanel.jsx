@@ -38,8 +38,8 @@ export default function TransitPanel({ input, natalData }) {
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-primary-dark font-bold text-base">{t('transit_title')}</h2>
-            <p className="text-primary-dark text-xs mt-0.5">
+            <h2 className="text-primary-ink font-bold text-base">{t('transit_title')}</h2>
+            <p className="text-primary-ink text-xs mt-0.5">
               {t('transit_subtitle')}
             </p>
           </div>
@@ -49,7 +49,7 @@ export default function TransitPanel({ input, natalData }) {
           </button>
         </div>
         {transitData && (
-          <p className="text-xs text-primary-dark mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
+          <p className="text-xs text-primary-ink mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
         )}
       </div>
 
@@ -84,7 +84,7 @@ export default function TransitPanel({ input, natalData }) {
           {/* Transit planet table */}
           <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
             <div className="px-4 py-3 bg-primary-light border-b border-primary/30">
-              <h3 className="font-semibold text-primary-dark text-sm">{t('transit_positions')}</h3>
+              <h3 className="font-semibold text-primary-ink text-sm">{t('transit_positions')}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -114,7 +114,7 @@ export default function TransitPanel({ input, natalData }) {
                           {tp.degree.toFixed(1)}°
                         </td>
                         <td className="p-2 border-b text-ink-muted">{nakshatraName(t, tp.nakshatra)}</td>
-                        <td className="p-2 border-b text-center text-primary-dark font-medium">
+                        <td className="p-2 border-b text-center text-primary-ink font-medium">
                           {tp.house}
                         </td>
                         <td className="p-2 border-b text-ink-muted">

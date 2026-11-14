@@ -127,7 +127,7 @@ export default function KundliChart({
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_lagna_title')}</div>
+      <div className="text-sm font-semibold text-primary-ink">{title ?? t('chart_lagna_title')}</div>
 
       <svg
         width="100%"

@@ -60,6 +60,25 @@ describe('Kundli sticky chrome', () => {
     expect(row.className).not.toContain('sm:flex')
   })
 
+  it('on phones the chips start collapsed, the main-tab row is hidden and the sub-tabs stay', () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(q => ({
+      matches: q === '(max-width: 767px)', media: q,
+      addEventListener: () => {}, removeEventListener: () => {},
+    }))
+    renderPage()
+    expect(screen.getByTestId('summary-chips').className).toContain('max-h-0')
+    const mainRow = screen.getAllByRole('tab', { name: /Birth Chart/ })[0].closest('[data-testid="kundli-main-tabs"]')
+    expect(mainRow.className).toContain('hidden')
+    expect(mainRow.className).toContain('md:block')
+    const subRow = screen.getByRole('tab', { name: 'Dasha' }).closest('[data-testid="kundli-sub-tabs"]')
+    expect(subRow.className).not.toMatch(/(^|\s)hidden(\s|$)/)
+  })
+
+  it('on laptops the chips start expanded', () => {
+    renderPage()
+    expect(screen.getByTestId('summary-chips').className).not.toContain('max-h-0')
+  })
+
   it('stops the sticky header from scroll anchoring', () => {
     renderPage()
     expect(screen.getByTestId('summary-chips').closest('.sticky').className).toContain('[overflow-anchor:none]')

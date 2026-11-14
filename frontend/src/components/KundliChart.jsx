@@ -1,5 +1,5 @@
 // frontend/src/components/KundliChart.jsx
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetAbbr } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
@@ -148,6 +148,62 @@ export default function KundliChart({
     return textBox(rx, ry, estimateTextWidth(String(n), rashiFs), rashiFs)
   }
 
+  // The per-house label layout is the expensive part (collision search in
+  // layoutNorthHouse); recompute it only when the chart or the rendered
+  // scale changes, not on every parent render.
+  const houseLayouts = useMemo(() => HOUSE_CENTERS.map(([cx, cy], hIdx) => {
+    const hNum   = hIdx + 1
+    const ps     = byHouse[hNum] ?? []
+    const hasLag = hIdx === 0 && ascendant
+
+    // Build a flat list of all items to render in this house
+    const allItems = []
+    if (hasLag) {
+      allItems.push({ type: 'lag', deg: Math.floor(ascendant.degree) })
+    }
+    ps.forEach(p => {
+      allItems.push({
+        type:   'planet',
+        color:  PLANET_COLORS[p.name] ?? P.text,
+        name:   abbr(p.name),
+        deg:    Math.floor(p.degree),
+        status: getPlanetStatus(p, sun, navamsaPlanets),
+      })
+    })
+    // Transit planets (italic, lighter)
+    const tps = byHouseTransit?.[hNum] ?? []
+    tps.forEach(p => {
+      allItems.push({
+        type:  'transit',
+        color: PLANET_COLORS[p.name] ?? P.muted,
+        name:  abbr(p.name),
+        deg:   Math.floor(p.degree),
+      })
+    })
+
+    if (allItems.length === 0) return null
+
+    // Desktop: one column for 1–2 items, a 2-column grid for 3+.
+    // Grown labels fall back to tighter rows / an extra column.
+    const widthOf = item => item.type === 'planet'
+      ? estimateTextWidth(item.name, planetFs)
+        + (item.status ? estimateTextWidth(item.status, statusFs) + statusGap : 0)
+      : item.type === 'transit'
+        ? estimateTextWidth(t('chart_transit_marker') + item.name, transitFs)
+        : estimateTextWidth(abbr('Ascendant'), planetFs)
+    const positions = layoutNorthHouse({
+      center: [cx, cy],
+      poly: NORTH_HOUSE_POLYGONS[hIdx],
+      widths: allItems.map(widthOf),
+      fontSize: Math.max(planetFs, transitFs),
+      grow,
+      obstacles: [rashiBox(hIdx, houses[hIdx].sign_index + 1)],
+    })
+    return { allItems, positions }
+    // Everything else it reads is derived from these.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [planets, transitPlanets, navamsaPlanets, ascendant, scale, detail, t])
+
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
@@ -186,55 +242,10 @@ export default function KundliChart({
         })}
 
         {/* ── House contents (Lagna marker + planets) ── */}
-        {HOUSE_CENTERS.map(([cx, cy], hIdx) => {
-          const hNum   = hIdx + 1
-          const ps     = byHouse[hNum] ?? []
-          const isH1   = hIdx === 0
-          const hasLag = isH1 && ascendant
-
-          // Build a flat list of all items to render in this house
-          const allItems = []
-          if (hasLag) {
-            allItems.push({ type: 'lag', deg: Math.floor(ascendant.degree) })
-          }
-          ps.forEach(p => {
-            allItems.push({
-              type:   'planet',
-              color:  PLANET_COLORS[p.name] ?? P.text,
-              name:   abbr(p.name),
-              deg:    Math.floor(p.degree),
-              status: getPlanetStatus(p, sun, navamsaPlanets),
-            })
-          })
-          // Transit planets (italic, lighter)
-          const tps = byHouseTransit?.[hNum] ?? []
-          tps.forEach(p => {
-            allItems.push({
-              type:  'transit',
-              color: PLANET_COLORS[p.name] ?? P.muted,
-              name:  abbr(p.name),
-              deg:   Math.floor(p.degree),
-            })
-          })
-
-          if (allItems.length === 0) return null
-
-          // Desktop: one column for 1–2 items, a 2-column grid for 3+.
-          // Grown labels fall back to tighter rows / an extra column.
-          const widthOf = item => item.type === 'planet'
-            ? estimateTextWidth(item.name, planetFs)
-              + (item.status ? estimateTextWidth(item.status, statusFs) + statusGap : 0)
-            : item.type === 'transit'
-              ? estimateTextWidth(t('chart_transit_marker') + item.name, transitFs)
-              : estimateTextWidth(abbr('Ascendant'), planetFs)
-          const positions = layoutNorthHouse({
-            center: [cx, cy],
-            poly: NORTH_HOUSE_POLYGONS[hIdx],
-            widths: allItems.map(widthOf),
-            fontSize: Math.max(planetFs, transitFs),
-            grow,
-            obstacles: [rashiBox(hIdx, houses[hIdx].sign_index + 1)],
-          })
+        {houseLayouts.map((layout, hIdx) => {
+          if (!layout) return null
+          const hNum = hIdx + 1
+          const { allItems, positions } = layout
 
           const rendered = allItems.map((item, idx) => {
             const { x: xPos, y: yPos } = positions[idx]

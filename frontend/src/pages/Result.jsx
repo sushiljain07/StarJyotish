@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName } from '../utils/astroNames'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState, saveLastChart } from '../services/lastChart'
+import { loadProfiles } from '../services/astrologyProfiles'
+import { chartStateFromProfile } from '../config/nav'
 import { chartBody } from '../api/reportCache'
 
 import { StateBlock } from '../components/ui'
@@ -14,6 +16,7 @@ import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { useScrollDirection } from '../hooks/useScrollDirection'
+import { useBelowMd } from '../hooks/useHideOnScroll'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -101,9 +104,27 @@ export default function Result() {
   const location  = useLocation()
   const navigate  = useNavigate()
   const scrollDir = useScrollDirection()
-  const { isAuthenticated, user, loading: authLoading } = useAuth()
-  // Router state, else the last chart in this tab, else the saved profile.
-  const state = resolveChartState(location.state, user)
+  const belowMd   = useBelowMd()
+  const { isAuthenticated, user, accessToken, loading: authLoading } = useAuth()
+  // Router state, else the last chart in this tab, else the saved profile
+  // (local cache), else — on a cold device or a shared link — the profile
+  // fetched from the API below.
+  const cachedState = resolveChartState(location.state, user)
+  const [fetched, setFetched] = useState({ done: false, state: null })
+  const needsFetch = !cachedState?.data && isAuthenticated && !authLoading
+  useEffect(() => {
+    if (!needsFetch) return undefined
+    let cancelled = false
+    loadProfiles(user, accessToken)
+      .catch(() => [])
+      .then(profiles => {
+        if (cancelled) return
+        const primary = profiles.find(p => p.is_primary) ?? profiles[0] ?? null
+        setFetched({ done: true, state: chartStateFromProfile(primary) })
+      })
+    return () => { cancelled = true }
+  }, [needsFetch, user, accessToken])
+  const state = cachedState?.data ? cachedState : (fetched.state ?? cachedState)
 
   const homeDestination = isAuthenticated ? '/home' : '/'
 
@@ -172,6 +193,10 @@ export default function Result() {
   // On a hard page load the saved profile is only known once sign-in
   // has resolved; redirecting before then would bounce a signed-in user.
   if (!state?.data && authLoading) return null
+
+  // Signed in but nothing cached on this device: wait for the profile
+  // fetch; only a person with no profile goes to /home.
+  if (!state?.data && isAuthenticated && !fetched.done) return <TabLoader />
 
   // <Navigate>, not navigate(): navigate() during render is ignored by
   // React Router, which left a blank page for bookmarked/refreshed URLs.
@@ -263,10 +288,13 @@ export default function Result() {
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}
-          <SummaryChips data={data} collapsed={scrollDir === 'down'} />
+          {/* Phones start collapsed: the band must leave ≥75% of the
+              screen to content (owner decision, 14 Nov). */}
+          <SummaryChips data={data} collapsed={belowMd || scrollDir === 'down'} />
 
-          {/* Row 3 — main tabs */}
-          <div className="border-t border-line/40 pt-1">
+          {/* Row 3 — main tabs. Laptops only: on phones the main tabs live
+              in the bottom NavBar and this band shows just the sub-tabs. */}
+          <div data-testid="kundli-main-tabs" className="hidden md:block border-t border-line/40 pt-1">
             <AnimatedTabRow
               tabs={MAIN_TABS}
               active={activeMain}
@@ -278,7 +306,7 @@ export default function Result() {
 
           {/* Row 4 — sub-tabs (only when the active main tab has them) */}
           {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
-            <div className="border-t border-line/40 py-2">
+            <div data-testid="kundli-sub-tabs" className="md:border-t border-line/40 py-2">
               {activeMain === 'birth_chart' && (
                 <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
               )}

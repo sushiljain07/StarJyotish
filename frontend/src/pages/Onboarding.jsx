@@ -260,7 +260,7 @@ export default function Onboarding() {
             <button
               type="button"
               onClick={() => setStep('birthDate')}
-              className="w-full min-h-[44px] text-sm font-medium text-primary-dark hover:underline"
+              className="w-full min-h-[44px] text-sm font-medium text-primary-ink hover:underline"
             >
               {t('onboarding_use_last_no')}
             </button>

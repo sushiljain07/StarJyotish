@@ -120,21 +120,21 @@ export default function PhoneOtpForm({ onSuccess }) {
             className={inputCls}
           />
           {PHONE_LOGIN_ENABLED && identifier.trim().length > 3 && (
-            <p className="text-xs text-ink-faint mt-1.5">
+            <p className="text-xs text-ink-muted mt-1.5">
               {emailMode
                 ? t('auth_email_code_hint')
                 : t('auth_sms_code_hint')}
             </p>
           )}
           {!PHONE_LOGIN_ENABLED && (
-            <p className="text-xs text-ink-faint mt-1.5">{t('auth_email_code_hint')}</p>
+            <p className="text-xs text-ink-muted mt-1.5">{t('auth_email_code_hint')}</p>
           )}
         </div>
         {error && <p id={errorId} role="alert" className="text-vermillion text-sm">{error}</p>}
         <button type="submit" disabled={loading || identifier.trim().length < 4} className={buttonCls}>
           {loading ? t('login_sending') : t('login_send_code')}
         </button>
-        <p className="text-ink-faint text-xs text-center">{t('login_disclaimer')}</p>
+        <p className="text-ink-muted text-xs text-center">{t('login_disclaimer')}</p>
       </form>
     )
   }
@@ -174,7 +174,7 @@ export default function PhoneOtpForm({ onSuccess }) {
           {t('login_change_number')}
         </button>
         <button type="button" onClick={handleResend} disabled={cooldown > 0}
-          className="min-h-11 text-primary-dark hover:underline disabled:text-ink-faint disabled:no-underline transition">
+          className="min-h-11 text-primary-ink hover:underline disabled:text-ink-faint disabled:no-underline transition">
           {cooldown > 0 ? t('login_resend_in', { seconds: cooldown }) : t('login_resend_code')}
         </button>
       </div>

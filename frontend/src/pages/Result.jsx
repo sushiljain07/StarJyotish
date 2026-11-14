@@ -46,7 +46,7 @@ function SummaryChips({ data, collapsed }) {
           : 'max-h-16 opacity-100 py-2'
       }`}
     >
-      <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+      <span className="bg-primary-light text-primary-ink text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </span>
       {moon && (

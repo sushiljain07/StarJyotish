@@ -32,7 +32,7 @@ const BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_b
 // sage, Insights = mauve, Ask = vermillion), so returning users recognize
 // the colors instead of learning a new palette just for the landing page.
 const INSIDE_ACCENTS = {
-  kundli:   { border: 'border-primary',   chip: 'bg-primary-light text-primary-dark' },
+  kundli:   { border: 'border-primary',   chip: 'bg-primary-light text-primary-ink' },
   advanced: { border: 'border-sage',      chip: 'bg-sage-light text-sage' },
   insights: { border: 'border-mauve',     chip: 'bg-mauve-light text-mauve' },
   ask:      { border: 'border-vermillion', chip: 'bg-vermillion-light text-vermillion' },
@@ -225,7 +225,7 @@ export default function Landing() {
       <section className="px-4 py-12 overflow-hidden">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <Reveal className="text-center lg:text-left">
-            <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-2">
+            <p className="text-primary-ink text-xs font-bold tracking-wide uppercase mb-2">
               {t('landing_ai_eyebrow')}
             </p>
             <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink">{t('landing_ai_heading')}</h2>
@@ -254,7 +254,7 @@ export default function Landing() {
                   className="w-full text-left bg-parchment-card rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 border border-line hover:border-primary/40 transition p-5 flex gap-4 items-start"
                 >
                   <span className="w-11 h-11 rounded-full bg-primary-light flex items-center justify-center shrink-0">
-                    <TopicIcon id={topic.id} className="w-5 h-5 text-primary-dark" />
+                    <TopicIcon id={topic.id} className="w-5 h-5 text-primary-ink" />
                   </span>
                   <span>
                     <span className="block font-bold text-ink text-sm mb-1">
@@ -291,7 +291,7 @@ export default function Landing() {
                 />
                 {[1, 2, 3].map((n, i) => (
                   <Reveal key={n} delay={i * 100} className="relative text-center">
-                    <div className="w-10 h-10 rounded-full bg-primary-light text-primary-dark font-bold flex items-center justify-center mx-auto mb-3 ring-4 ring-parchment">
+                    <div className="w-10 h-10 rounded-full bg-primary-light text-primary-ink font-bold flex items-center justify-center mx-auto mb-3 ring-4 ring-parchment">
                       {n}
                     </div>
                     <h3 className="font-semibold text-ink text-sm mb-1">{t(`landing_step${n}_title`)}</h3>

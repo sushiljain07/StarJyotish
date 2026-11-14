@@ -127,7 +127,7 @@ export default function AvatarUpload({ value, onChange }) {
         {error ? (
           <p className="text-vermillion text-xs mt-1">{error}</p>
         ) : (
-          <p className="text-ink-faint text-xs mt-1">{t('profile_photo_hint')}</p>
+          <p className="text-ink-muted text-xs mt-1">{t('profile_photo_hint')}</p>
         )}
       </div>
     </div>

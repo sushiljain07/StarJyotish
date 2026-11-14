@@ -27,7 +27,7 @@ const CATEGORIES = [
   { value: 'Remedies', key: 'blog_cat_remedies' },
 ]
 const CATEGORY_COLORS = {
-  Basics:   'bg-primary-light text-primary-dark',
+  Basics:   'bg-primary-light text-primary-ink',
   Timing:   'bg-mauve-light text-mauve',
   Planets:  'bg-sage-light text-sage',
   Remedies: 'bg-vermillion-light text-vermillion',
@@ -57,13 +57,13 @@ function ArticleCard({ article, featured = false, onClick }) {
     <button onClick={onClick} className="w-full text-left bg-parchment-card rounded-xl border border-line hover:border-primary/30 hover:shadow-md transition group p-5 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-3">
         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink-muted'}`}>{article.category}</span>
-        <span className="text-ink-faint text-[11px]">{t('blog_read_min_short', { n: article.readMin })}</span>
+        <span className="text-ink-muted text-[11px]">{t('blog_read_min_short', { n: article.readMin })}</span>
       </div>
-      <h3 className="font-semibold text-sm text-ink leading-snug group-hover:text-primary-dark transition mb-2 flex-1">{article.title}</h3>
+      <h3 className="font-semibold text-sm text-ink leading-snug group-hover:text-primary-ink transition mb-2 flex-1">{article.title}</h3>
       <p className="text-xs text-ink-muted leading-relaxed line-clamp-3 mb-4">{article.excerpt}</p>
       <div className="flex items-center justify-between pt-3 border-t border-line">
-        <span className="text-ink-faint text-[11px]">{article.date}</span>
-        <span className="text-primary-dark text-xs font-medium">{t('blog_read')}</span>
+        <span className="text-ink-muted text-[11px]">{article.date}</span>
+        <span className="text-primary-ink text-xs font-medium">{t('blog_read')}</span>
       </div>
     </button>
   )
@@ -160,8 +160,8 @@ export default function Blog() {
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-ink-faint text-sm mb-4">{t('blog_none')}</p>
-            <p className="text-ink-faint text-xs">{t('blog_none_hint')}</p>
+            <p className="text-ink-muted text-sm mb-4">{t('blog_none')}</p>
+            <p className="text-ink-muted text-xs">{t('blog_none_hint')}</p>
           </div>
         ) : (
           <>
@@ -169,13 +169,13 @@ export default function Blog() {
               <Reveal className="mb-8">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="h-px flex-1 bg-line" />
-                  <span className="text-xs font-bold text-ink-faint uppercase tracking-widest">{t('blog_featured')}</span>
+                  <span className="text-xs font-bold text-ink-muted uppercase tracking-widest">{t('blog_featured')}</span>
                   <span className="h-px flex-1 bg-line" />
                 </div>
                 <ArticleCard article={featured} featured onClick={() => navigate(`/blog/${featured.slug}`)} />
               </Reveal>
             )}
-            {rest.length === 0 && <p className="text-ink-faint text-sm text-center py-8">{t('blog_empty')}</p>}
+            {rest.length === 0 && <p className="text-ink-muted text-sm text-center py-8">{t('blog_empty')}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {rest.map((article, i) => (
                 <Reveal key={article.slug} delay={i * 60}>

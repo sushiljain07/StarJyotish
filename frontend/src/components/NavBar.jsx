@@ -10,8 +10,9 @@ import { useChromeRegistration } from './layout/useBottomChrome'
 
 // `raised` — for a page where the app shell's BottomNav also shows: this bar
 // then stacks directly above it instead of overlapping. Result.jsx passes
-// false: on /kundli BottomNav steps aside and this is the one bottom bar. The safe-area inset only applies at the real
-// screen bottom, so it's skipped when raised. The bar is box-border with an
+// false: on /kundli BottomNav steps aside and this is the one bottom bar.
+// The safe-area inset only applies at the real screen bottom, so it's
+// skipped when raised. The bar is box-border with an
 // explicit height so --sub-nav-h (index.css) is its real height, which the
 // spacers and ScrollToTop rely on. Side insets clear a landscape notch.
 export default function NavBar({ tabs, activeTab, onTabChange, raised = false }) {

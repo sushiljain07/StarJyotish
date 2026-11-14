@@ -1,7 +1,7 @@
 // Signing in from a page must come back to that page (with its chart),
 // not drop the user on /home.
 import { act, render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { MemoryRouter, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
 import en from '../i18n/en.json'
@@ -86,11 +86,23 @@ describe('SiteHeader signed-out links', () => {
 // Mobile /kundli: the header slides away on scroll-down so the chart gets
 // the screen, and comes back on scroll-up and at the top.
 describe('SiteHeader hide on scroll', () => {
+  // matchMedia stand-in that keeps its change listeners, so a test can
+  // rotate / resize the "device" mid-test with setWidth().
+  let mqlListeners = []
+  let mqlMobile = false
   function mockWidth(mobile) {
+    mqlMobile = mobile
     window.matchMedia = q => ({
-      matches: mobile && q === '(max-width: 767px)', media: q,
-      addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
+      get matches() { return mqlMobile && q === '(max-width: 767px)' },
+      media: q,
+      addEventListener: (_, fn) => { mqlListeners.push(fn) },
+      removeEventListener: (_, fn) => { mqlListeners = mqlListeners.filter(l => l !== fn) },
+      addListener() {}, removeListener() {},
     })
+  }
+  function setWidth(mobile) {
+    mqlMobile = mobile
+    act(() => { mqlListeners.forEach(fn => fn({ matches: mobile })) })
   }
   function scrollTo(y) {
     act(() => {
@@ -109,8 +121,10 @@ describe('SiteHeader hide on scroll', () => {
     )
     return screen.getByRole('banner')
   }
+  const originalMatchMedia = window.matchMedia
   afterEach(() => {
-    delete window.matchMedia
+    window.matchMedia = originalMatchMedia
+    mqlListeners = []
     window.scrollY = 0
     mockAuthed = false
   })
@@ -118,7 +132,9 @@ describe('SiteHeader hide on scroll', () => {
   it('hides on scroll-down on mobile /kundli and comes back on scroll-up', () => {
     mockWidth(true)
     const header = renderHeaderAt('/kundli')
-    expect(header.className).toContain('motion-safe:transition-transform')
+    // One transition-property utility, with the transform under motion-safe.
+    expect(header.className).toContain('motion-safe:transition-[transform,backdrop-filter,border-color]')
+    expect(header.className.match(/transition-\[/g)).toHaveLength(1)
     expect(header.className).not.toContain('-translate-y-full')
     scrollTo(300)
     expect(header.className).toContain('-translate-y-full')
@@ -137,11 +153,22 @@ describe('SiteHeader hide on scroll', () => {
     expect(header.className).not.toContain('-translate-y-full')
   })
 
-  it('a keyboard user tabbing into the hidden header sees it', () => {
+  it('a keyboard user tabbing into the hidden header shows it, and the band follows', () => {
     mockWidth(true)
     const header = renderHeaderAt('/kundli')
     scrollTo(300)
-    expect(header.className).toContain('focus-within:translate-y-0')
+    expect(header.className).toContain('-translate-y-full')
+    act(() => { screen.getByRole('button', { name: en.app_title }).focus() })
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
+  })
+
+  it('a header button focused by a tap while visible does not stop it hiding', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/kundli')
+    act(() => { screen.getByRole('button', { name: en.app_title }).focus() })
+    scrollTo(300)
+    expect(header.className).toContain('-translate-y-full')
   })
 
   it('never hides on desktop', () => {
@@ -150,7 +177,8 @@ describe('SiteHeader hide on scroll', () => {
     scrollTo(300)
     scrollTo(900)
     expect(header.className).not.toContain('-translate-y-full')
-    expect(header.className).not.toContain('motion-safe:transition-transform')
+    expect(header.className).not.toContain('transition-[transform')
+    expect(header.className).toContain('transition-[backdrop-filter,border-color]')
     expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
   })
 
@@ -178,5 +206,49 @@ describe('SiteHeader hide on scroll', () => {
     renderHeaderAt('/kundli')
     fireEvent.click(screen.getByRole('button', { name: en.app_title }))
     expect(await screen.findByText('AT /home')).toBeInTheDocument()
+  })
+
+  // The way out of /kundli without the app bar: navigating away while the
+  // header is hidden must never strand it hidden on the next page.
+  it('navigating away while hidden shows the header on the next page', async () => {
+    mockAuthed = true
+    mockWidth(true)
+    function Shell() {
+      return <><SiteHeader /><Outlet /></>
+    }
+    function KundliPage() {
+      const navigate = useNavigate()
+      return <button type="button" onClick={() => navigate('/home')}>GO HOME</button>
+    }
+    render(
+      <MemoryRouter initialEntries={['/kundli']}>
+        <Routes>
+          <Route element={<Shell />}>
+            <Route path="/kundli" element={<KundliPage />} />
+            <Route path="/home" element={<PathProbe label="AT" />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+    const header = screen.getByRole('banner')
+    scrollTo(300)
+    expect(header.className).toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(true)
+    fireEvent.click(screen.getByText('GO HOME'))
+    expect(await screen.findByText('AT /home')).toBeInTheDocument()
+    // Same header element: the shell keeps it mounted across the navigation.
+    expect(screen.getByRole('banner')).toBe(header)
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
+  })
+
+  it('growing to desktop while hidden shows the header', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/kundli')
+    scrollTo(300)
+    expect(header.className).toContain('-translate-y-full')
+    setWidth(false)
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
   })
 })

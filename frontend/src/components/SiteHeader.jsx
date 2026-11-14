@@ -71,7 +71,13 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
 
   const belowMd = useBelowMd()
   const hideOnScroll = belowMd && location.pathname === '/kundli'
-  const hidden = useHideOnScroll({ enabled: hideOnScroll })
+  const scrolledAway = useHideOnScroll({ enabled: hideOnScroll })
+  // Focus moving into the header while it is hidden (a keyboard user tabbing
+  // back up) brings it back, flag included, until focus leaves it or the
+  // next scroll-up. Focus gained while visible (a tap) does not pin it.
+  const [focusShown, setFocusShown] = useState(false)
+  useEffect(() => { if (!scrolledAway) setFocusShown(false) }, [scrolledAway])
+  const hidden = scrolledAway && !focusShown
   useEffect(() => {
     if (!hidden) return undefined
     const root = document.documentElement
@@ -96,9 +102,13 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-40 bg-night border-b transition-[backdrop-filter,border-color] duration-150 ease-out${
-        hideOnScroll ? ' motion-safe:transition-transform' : ''
-      }${hidden ? ' -translate-y-full focus-within:translate-y-0' : ''}`}
+      className={`fixed top-0 inset-x-0 z-40 bg-night border-b duration-150 ease-out ${
+        hideOnScroll
+          ? 'motion-safe:transition-[transform,backdrop-filter,border-color]'
+          : 'transition-[backdrop-filter,border-color]'
+      }${hidden ? ' -translate-y-full' : ''}`}
+      onFocus={() => { if (hidden) setFocusShown(true) }}
+      onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setFocusShown(false) }}
       style={{
         backdropFilter:       `blur(${blurPx}px)`,
         WebkitBackdropFilter: `blur(${blurPx}px)`,

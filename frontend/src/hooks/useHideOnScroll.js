@@ -7,7 +7,8 @@
 //
 // Scroll events that come with a page-height change are layout, not the
 // user: on /kundli the summary chips collapse on scroll-down (and expand on
-// scroll-up), and scroll anchoring then moves scrollY by the chips' height.
+// scroll-up), and lazy panels grow the page as they load; scroll anchoring
+// then moves scrollY by the height that changed.
 // Reading that as a scroll would flip the header back at once, so those
 // events only re-anchor.
 import { useEffect, useState } from 'react'

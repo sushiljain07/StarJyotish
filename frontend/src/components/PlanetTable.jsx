@@ -40,9 +40,9 @@ const DEBILITATION = { Sun:6, Moon:7, Mars:3, Mercury:11, Jupiter:9, Venus:5,  S
 const OWN_SIGNS    = { Sun:[4], Moon:[3], Mars:[0,7], Mercury:[2,5], Jupiter:[8,11], Venus:[1,6], Saturn:[9,10] }
 
 function getDignity(t, planet, signIdx) {
-  if (EXALTATION[planet] === signIdx) return { label: t('kundli_dignity_exalted'), short: t('kundli_dignity_exalted_short'), color: chartPalette.good }
-  if (DEBILITATION[planet] === signIdx) return { label: t('kundli_dignity_debilitated'), short: t('kundli_dignity_debilitated_short'), color: chartPalette.bad }
-  if (OWN_SIGNS[planet]?.includes(signIdx)) return { label: t('kundli_dignity_own'), short: t('kundli_dignity_own_short'), color: PLANET_COLORS.Saturn }
+  if (EXALTATION[planet] === signIdx) return { label: t('kundli_dignity_exalted'), short: t('kundli_dignity_exalted_short'), color: chartPalette.dignityExalted }
+  if (DEBILITATION[planet] === signIdx) return { label: t('kundli_dignity_debilitated'), short: t('kundli_dignity_debilitated_short'), color: chartPalette.dignityDebilitated }
+  if (OWN_SIGNS[planet]?.includes(signIdx)) return { label: t('kundli_dignity_own'), short: t('kundli_dignity_own_short'), color: chartPalette.dignityOwn }
   return null
 }
 

@@ -2,6 +2,9 @@ import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import '../i18n'
 import PlanetTable from './PlanetTable'
+import { colors } from '../theme/tokens'
+import { chartPalette } from '../theme/chartPalette'
+import src from './PlanetTable.jsx?raw'
 
 const planets = [
   { name: 'Sun', sign: 'Aries', sign_index: 0, degree: 10, house: 1, nakshatra: 'Ashwini', nakshatra_pada: 1, nakshatra_lord: 'Ketu', nakshatra_degree: 1 },
@@ -25,5 +28,18 @@ describe('PlanetTable sticky first column', () => {
     const second = container.querySelectorAll('tbody tr')[1]
     expect(second.className).toContain('bg-night/[0.03]')
     expect(second.querySelector('td').className).toContain('bg-parchment-alt')
+  })
+})
+
+describe('PlanetTable tokens', () => {
+  it('zebra token keeps its old value', () => {
+    expect(colors.parchment.alt).toBe('#F1ECE1')
+  })
+  it('own dignity does not borrow a planet colour', () => {
+    // Jupiter's colour is primary.ink by design, so check the source, not the value.
+    const line = src.split('\n').find(l => l.includes('kundli_dignity_own'))
+    expect(line).toContain('chartPalette.dignityOwn')
+    expect(line).not.toMatch(/PLANET_COLORS|LORD_COLORS/)
+    expect(chartPalette.dignityOwn).toBe(colors.primary.ink)
   })
 })

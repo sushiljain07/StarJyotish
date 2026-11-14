@@ -105,7 +105,6 @@ export default function SectionJumpNav({ sections, className = '' }) {
           active={active}
           onChange={scrollToSection}
           variant="pill"
-          accent="mauve"
           label={t('jump_nav_title')}
           semantics="nav"
         />

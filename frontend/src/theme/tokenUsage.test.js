@@ -76,7 +76,7 @@ describe('token usage (ratchet)', () => {
 
   // Status meaning uses good / caution / bad tokens, never ad-hoc green/amber/red palette classes.
   it('adHocStatus is zero everywhere', () => {
-    const re = /(?:text|bg|border|from|to)-(?:green|emerald|amber|yellow|red|rose)-\d{2,3}/g
+    const re = /(?:text|bg|border|from|via|to|ring|fill|stroke|divide|outline)-(?:green|emerald|amber|yellow|red|rose|orange|slate)-\d{2,3}/g
     const hits = []
     for (const rel of files) {
       const n = count(re, sources.get(rel))

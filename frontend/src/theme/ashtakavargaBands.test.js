@@ -23,6 +23,11 @@ describe('ashtakavarga heat-map bands', () => {
       expect(ratio(fills[i].hex, fills[i + 1].hex), `${fills[i].k} vs ${fills[i + 1].k}`).toBeGreaterThanOrEqual(1.15)
     }
   })
+  it('strong is the heaviest tint against the card (most saturated band)', () => {
+    const card = c.parchment.card
+    const weight = k => ratio(fills.find(f => f.k === k).hex, card)
+    for (const k of ASHTAKAVARGA_BAND_ORDER.filter(k => k !== 'strong')) expect(weight('strong'), k).toBeGreaterThan(weight(k))
+  })
   it('text-ink is at least 4.5:1 on every band', () => {
     for (const f of fills) expect(ratio(c.ink.DEFAULT, f.hex), f.k).toBeGreaterThanOrEqual(4.5)
   })

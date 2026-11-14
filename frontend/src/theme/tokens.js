@@ -93,10 +93,11 @@ export const colors = {
     jupiter: '#86621E', venus: '#8B5B72', saturn: '#2F5AA8', rahu: '#4A4458',
     ketu: '#7A4A2A', uranus: '#7C3AED', neptune: '#4F46B5', pluto: '#374151',
   },
-  // Lighter variants of the same hues for night surfaces (>=4.5:1 on night and night.deep).
+  // Lighter variants of the same hues for night surfaces (>=4.5:1 on night, night.light and night.deep).
+  // Pluto night is a slate blue so it does not read as Rahu's grey.
   planetNight: {
     sun: '#D27C7C', moon: '#9F8AC6', mars: '#BD8686', mercury: '#7E9C82',
-    jupiter: '#A9905F', venus: '#AD8B9C', saturn: '#7894C6', rahu: '#96939E',
-    ketu: '#AD8F7B', uranus: '#A97DF3', neptune: '#928CD1', pluto: '#8F959E',
+    jupiter: '#AA915F', venus: '#AD8B9C', saturn: '#7995C7', rahu: '#96939E',
+    ketu: '#AD8F7B', uranus: '#A97DF3', neptune: '#928CD1', pluto: '#7FA0B0',
   },
 }

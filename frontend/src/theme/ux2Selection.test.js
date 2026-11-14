@@ -69,6 +69,21 @@ describe('selection is always gold', () => {
     }
     expect(hits).toEqual([])
   })
+  it('no inline backgroundColor is chosen by a selected or active state', () => {
+    const hits = []
+    const re = /(active|selected|isActive|current)\w*\s*(===?|!==?)[^?\n]*\?\s*\{[^}]*\bbackground(Color)?\s*:/i
+    for (const f of files) {
+      const src = fs.readFileSync(f, 'utf8')
+      src.split('\n').forEach((line, i) => { if (re.test(line)) hits.push(`${path.basename(f)}:${i + 1}`) })
+    }
+    expect(hits).toEqual([])
+  })
+  it('Ashtakavarga planet sub-tabs select gold, like Sarva; any planet cue is an aria-hidden dot', () => {
+    const src = read('components/AshtakavargaTable.jsx')
+    expect(src.match(/\? 'bg-primary border-primary text-night'/g)).toHaveLength(2)
+    expect(src).not.toMatch(/'text-white border-transparent'/)
+    expect(src).toMatch(/<span aria-hidden="true" className="[^"]*\bw-2 h-2 rounded-full/)
+  })
   it('SectionJumpNav trigger and selected item use bg-primary text-night', () => {
     const src = read('components/SectionJumpNav.jsx')
     expect(src).toMatch(/active === s\.id \? 'bg-primary text-night/)

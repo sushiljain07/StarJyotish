@@ -99,12 +99,14 @@ export default function AshtakavargaTable({ input }) {
             </button>
             {PLANETS.map(p => (
               <button key={p} onClick={() => setActiveTab(p)}
-                      className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
+                      className={`inline-flex items-center justify-center gap-1.5 min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                         activeTab === p
-                          ? 'text-white border-transparent'
+                          ? 'bg-primary border-primary text-night'
                           : 'bg-parchment-card border-line text-ink-muted hover:border-ink-faint'
-                      }`}
-                      style={activeTab === p ? { backgroundColor: PLANET_COLORS[p] ?? chartPalette.muted } : {}}>
+                      }`}>
+                {/* Planet cue only; selection itself is the gold pill. */}
+                <span aria-hidden="true" className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: PLANET_COLORS[p] ?? chartPalette.muted }} />
                 {planetShort(t, p)}
               </button>
             ))}

@@ -18,10 +18,10 @@ export const chartPalette = Object.freeze({
   caution:    c.caution.DEFAULT,
   cautionFill: c.caution.light,
   bad:        c.bad.DEFAULT,
+  badFill:    c.bad.light,
   dignityExalted:     c.good.DEFAULT,
   dignityDebilitated: c.bad.DEFAULT,
   dignityOwn:         c.primary.ink,
-  badFill:    c.bad.light,
   sage:       c.sage.DEFAULT,
   gold:       c.primary.DEFAULT,   // decoration only
   night:      c.night.DEFAULT,

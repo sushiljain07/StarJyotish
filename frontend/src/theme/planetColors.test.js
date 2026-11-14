@@ -12,10 +12,18 @@ describe('planet palette contrast', () => {
     for (const [sn, bg] of Object.entries(light)) {
       it(`planet.${n} on ${sn} is at least 4.5:1`, () => expect(ratio(c.planet[n], bg)).toBeGreaterThanOrEqual(4.5))
     }
-    for (const [sn, bg] of Object.entries({ night: c.night.DEFAULT, 'night.deep': c.night.deep })) {
+    for (const [sn, bg] of Object.entries({ night: c.night.DEFAULT, 'night.light': c.night.light, 'night.deep': c.night.deep })) {
       it(`planetNight.${n} on ${sn} is at least 4.5:1`, () => expect(ratio(c.planetNight[n], bg)).toBeGreaterThanOrEqual(4.5))
     }
   }
+  it('every night planet colour is distinct (Pluto is not Rahu)', () => {
+    const vals = Object.values(c.planetNight).map(v => v.toUpperCase())
+    expect(new Set(vals).size).toBe(vals.length)
+    // Not just a different hex: far enough apart to read as a different colour.
+    const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
+    const [a, b] = [rgb(c.planetNight.pluto), rgb(c.planetNight.rahu)]
+    expect(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])).toBeGreaterThanOrEqual(30)
+  })
 })
 
 describe('planetColors.js', () => {

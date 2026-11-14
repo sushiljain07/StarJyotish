@@ -113,9 +113,9 @@ export default {
         lift: '0 6px 16px rgba(23, 27, 51, 0.10), 0 12px 32px rgba(23, 27, 51, 0.08)',
       },
       keyframes: {
-        // Content entrance — same motion as index.css's legacy
-        // .prediction-fade/.tab-fade classes; new components should use
-        // these utilities instead of those raw classes.
+        // Content entrance — single home for these two keyframes; used via
+        // animate-fade-in-up / animate-fade-in-fast (reduced-motion handled
+        // in index.css).
         fadeSlideIn: {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to:   { opacity: '1', transform: 'translateY(0)' },

@@ -471,30 +471,6 @@ export default function DailyPatrikaHero({
           font-size:12px;font-weight:600;color:rgba(248,242,228,0.78);margin:0 0 1px;
         }
         .sj-cd-theme{ font-size:10px;color:rgba(248,242,228,0.32);margin:0; }
-
-        /* ── Shimmer (loading placeholder) ── */
-        .sj-shimmer{
-          height:15px;border-radius:7px;
-          background:linear-gradient(90deg,rgba(248,242,228,0.04) 25%,rgba(248,242,228,0.09) 50%,rgba(248,242,228,0.04) 75%);
-          background-size:200% 100%;
-          animation:sj-shimmer-a 1.6s ease-in-out infinite;
-        }
-        @keyframes sj-shimmer-a{from{background-position:200% 0}to{background-position:-200% 0}}
-
-        /* ── Shared animations ── */
-        .sj-fade-up{animation:sj-fade-up 220ms cubic-bezier(.2,.7,.3,1) both}
-        @keyframes sj-fade-up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-        .sj-grow-bar{animation:sj-grow 240ms cubic-bezier(.2,.8,.3,1) both;transform-origin:left}
-        @keyframes sj-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-        .sj-ring-arc{animation:sj-ring-a 240ms cubic-bezier(.2,.8,.3,1) both}
-        @keyframes sj-ring-a{from{stroke-dasharray:0 999}}
-        .sj-ring-pulse{animation:sj-ring-a 240ms cubic-bezier(.2,.8,.3,1) both,sj-pulse 2.4s ease-in-out 400ms infinite}
-        @keyframes sj-pulse{0%,100%{opacity:1}50%{opacity:.72}}
-
-        @media(prefers-reduced-motion:reduce){
-          .sj-fade-up,.sj-shimmer,.sj-grow-bar,.sj-ring-arc,
-          .sj-ring-pulse,.sj-cd-chip{animation:none!important}
-        }
       `}</style>
     </div>
   )

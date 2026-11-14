@@ -23,3 +23,12 @@ describe('text token contrast (WCAG)', () => {
     for (const bg of Object.values(surfaces)) expect(ratio(c.ink.faint, bg)).toBeGreaterThanOrEqual(3)
   })
 })
+
+describe('focus ring contrast (non-text UI, 3:1)', () => {
+  it('primary.ink outline is at least 3:1 on both light surfaces', () => {
+    for (const bg of Object.values(surfaces)) expect(ratio(c.primary.ink, bg)).toBeGreaterThanOrEqual(3)
+  })
+  it('primary.glow halo is at least 3:1 on night.DEFAULT and night.deep', () => {
+    for (const bg of [c.night.DEFAULT, c.night.deep]) expect(ratio(c.primary.glow, bg)).toBeGreaterThanOrEqual(3)
+  })
+})

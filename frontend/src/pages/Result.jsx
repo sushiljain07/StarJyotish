@@ -271,16 +271,16 @@ export default function Result() {
       <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 sm:pb-4">
 
         {/* ══ BIRTH CHART ══ */}
-        <div className={activeMain === 'birth_chart' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'birth_chart' ? 'animate-fade-in-fast' : 'hidden'}>
 
-          <div className={activeBirthSub === 'chart' ? 'tab-fade' : 'hidden'}>
+          <div className={activeBirthSub === 'chart' ? 'animate-fade-in-fast' : 'hidden'}>
             <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input } })} />
             <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />
           </div>
 
-          <div className={activeBirthSub === 'planets' ? 'tab-fade' : 'hidden'}>
+          <div className={activeBirthSub === 'planets' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
@@ -292,7 +292,7 @@ export default function Result() {
             <PlanetTable planets={data.planets} ascendant={data.ascendant} />
           </div>
 
-          <div className={activeBirthSub === 'dasha' ? 'tab-fade' : 'hidden'}>
+          <div className={activeBirthSub === 'dasha' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3"
                  style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
@@ -305,36 +305,36 @@ export default function Result() {
           </div>
 
           <Suspense fallback={<TabLoader />}>
-            <div className={activeBirthSub === 'transit' ? 'tab-fade' : 'hidden'}>
+            <div className={activeBirthSub === 'transit' ? 'animate-fade-in-fast' : 'hidden'}>
               <TransitPanel input={input} natalData={data} />
             </div>
           </Suspense>
         </div>
 
         {/* ══ LIFE AREAS (DIVISIONAL) ══ */}
-        <div className={activeMain === 'divisional' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'divisional' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <DivisionalCharts input={input} defaultDivision={topic?.division} />
           </Suspense>
         </div>
 
         {/* ══ ANALYSIS ══ */}
-        <div className={activeMain === 'analysis' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'analysis' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <div className={activeAnalysisSub === 'bhava' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'bhava' ? 'animate-fade-in-fast' : 'hidden'}>
               <BhavaChalit input={input} />
             </div>
-            <div className={activeAnalysisSub === 'ashtakavarga' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'ashtakavarga' ? 'animate-fade-in-fast' : 'hidden'}>
               <AshtakavargaTable input={input} />
             </div>
-            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'tab-fade' : 'hidden'}>
+            <div className={activeAnalysisSub === 'sarvatobhadra' ? 'animate-fade-in-fast' : 'hidden'}>
               <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
             </div>
           </Suspense>
         </div>
 
         {/* ══ DOWNLOAD ══ */}
-        <div className={activeMain === 'download' ? 'tab-fade' : 'hidden'}>
+        <div className={activeMain === 'download' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <KundliDownload data={data} input={input} />
           </Suspense>

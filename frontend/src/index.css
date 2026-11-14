@@ -19,10 +19,11 @@
   /* Global focus-visible ring — keyboard users need a clearly visible
      focus indicator on both light (parchment) and dark (night) surfaces.
      Using :focus-visible rather than :focus keeps mouse clicks unaffected.
-     The ring uses the primary gold so it's always visible against both
-     bg-parchment and bg-night without needing separate dark-mode rules. */
+     Dark gold ink outline reads on parchment (3:1+); the light gold glow halo
+     reads on night (3:1+), so one rule serves both surfaces. */
   :focus-visible {
-    outline: 2px solid #D9A441;
+    outline: 2px solid theme('colors.primary.ink');
+    box-shadow: 0 0 0 4px theme('colors.primary.glow');
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -32,7 +33,8 @@
   button:focus-visible,
   a:focus-visible,
   [role="tab"]:focus-visible {
-    outline: 2px solid #D9A441;
+    outline: 2px solid theme('colors.primary.ink');
+    box-shadow: 0 0 0 4px theme('colors.primary.glow');
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -59,21 +61,8 @@
   }
 }
 
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.prediction-fade {
-  animation: fadeSlideIn 0.6s ease forwards;
-}
-/* Same motion, snappier timing — for tab panels clicked repeatedly. */
-@keyframes fadeSlideInFast {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.tab-fade {
-  animation: fadeSlideInFast 0.25s ease-out forwards;
-}
+/* fadeSlideIn / fadeSlideInFast live in tailwind.config.js (animate-fade-in-up,
+   animate-fade-in-fast). Every other @keyframes lives below, in this file. */
 
 @media (prefers-reduced-motion: no-preference) {
   @keyframes wheelSpin {
@@ -91,6 +80,43 @@
   .star-twinkle {
     animation: starTwinkle var(--star-dur, 3s) ease-in-out infinite;
   }
+}
+
+/* Home hero / Daily Patrika animations (moved from component <style> tags). */
+.sj-hb-star {
+  position:absolute;border-radius:50%;
+  background:rgba(240,203,128,0.9);
+  animation: sj-hb-twinkle linear infinite;
+}
+@keyframes sj-hb-twinkle {
+  0%,100%{opacity:0.08;transform:scale(1)}
+  50%{opacity:0.9;transform:scale(1.15)}
+}
+
+/* Shimmer (loading placeholder) */
+.sj-shimmer{
+  height:15px;border-radius:7px;
+  background:linear-gradient(90deg,rgba(248,242,228,0.04) 25%,rgba(248,242,228,0.09) 50%,rgba(248,242,228,0.04) 75%);
+  background-size:200% 100%;
+  animation:sj-shimmer-a 1.6s ease-in-out infinite;
+}
+@keyframes sj-shimmer-a{from{background-position:200% 0}to{background-position:-200% 0}}
+
+.sj-fade-up{animation:sj-fade-up 220ms cubic-bezier(.2,.7,.3,1) both}
+@keyframes sj-fade-up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.sj-grow-bar{animation:sj-grow 240ms cubic-bezier(.2,.8,.3,1) both;transform-origin:left}
+@keyframes sj-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.sj-ring-arc{animation:sj-ring-a 240ms cubic-bezier(.2,.8,.3,1) both}
+@keyframes sj-ring-a{from{stroke-dasharray:0 999}}
+.sj-ring-pulse{animation:sj-ring-a 240ms cubic-bezier(.2,.8,.3,1) both,sj-pulse 2.4s ease-in-out 400ms infinite}
+@keyframes sj-pulse{0%,100%{opacity:1}50%{opacity:.72}}
+
+/* Reduced motion: the animations above (plus .sj-cd-chip, which keeps its
+   layout rules in DailyPatrikaHero) and the Tailwind entrance utilities. */
+@media (prefers-reduced-motion: reduce) {
+  .sj-fade-up,.sj-shimmer,.sj-grow-bar,.sj-ring-arc,
+  .sj-ring-pulse,.sj-cd-chip,
+  .animate-fade-in-up,.animate-fade-in-fast{animation:none!important}
 }
 
 /* Non-Latin scripts (Devanagari today). Keyed on the script that

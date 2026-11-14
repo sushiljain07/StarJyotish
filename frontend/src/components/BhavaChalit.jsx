@@ -43,7 +43,7 @@ export default function BhavaChalit({ input }) {
       if (signal?.aborted) return
       setData(res)
     } catch (e) {
-      if (e?.name === 'AbortError') return
+      if (signal?.aborted || e?.name === 'AbortError') return
       setError('bhava_error')
     }
     setLoading(false)

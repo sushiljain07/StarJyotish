@@ -16,11 +16,11 @@ export default function TransitPanel({ input, natalData }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetchReport('/api/kundli/transit', { date, time, place }, { signal, force, retryOn429: true })
+      const res = await fetchReport('/api/kundli/transit', { date, time, place }, { signal, force, retryOn429: true, cache: false })
       if (signal?.aborted) return
       setTransitData(res)
     } catch (e) {
-      if (e?.name === 'AbortError') return
+      if (signal?.aborted || e?.name === 'AbortError') return
       setError('transit_error')
     }
     setLoading(false)

@@ -47,7 +47,7 @@ export default function AshtakavargaTable({ input }) {
       if (signal?.aborted) return
       setData(res)
     } catch (e) {
-      if (e?.name === 'AbortError') return
+      if (signal?.aborted || e?.name === 'AbortError') return
       setError('ashtakavarga_error')
     }
     setLoading(false)

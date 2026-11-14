@@ -25,7 +25,8 @@ const CHART = mk('1990-08-16')
 
 const AV = { sarvashtakavarga: [{ points: 28 }], bhinnashtakavarga: {} }
 const BHAVA = { ascendant: { sign: 'Virgo', degree: 5 }, planets: [], houses: [] }
-const bodyFor = url => (String(url).includes('/bhava-chalit') ? BHAVA : AV)
+const TRANSIT = { transit_date: '2026-11-14 10:00 IST', transit_planets: [] }
+const bodyFor = url => (String(url).includes('/bhava-chalit') ? BHAVA : String(url).includes('/transit') ? TRANSIT : AV)
 let fetchMock
 const calls = part => fetchMock.mock.calls.filter(([url]) => String(url).includes(part))
 
@@ -90,5 +91,26 @@ describe('lazy kundli analysis panels', () => {
     fireEvent.click(screen.getByText('go'))
     await waitFor(() => expect(calls('/ashtakavarga')).toHaveLength(2))
     expect(JSON.parse(calls('/ashtakavarga')[1][1].body).date).toBe('2000-01-01')
+  })
+
+  it('does not retry a non-429 error and shows the error state', async () => {
+    fetchMock.mockImplementation(async () => ({ ok: false, status: 500, json: async () => ({}) }))
+    renderAt('?tab=analysis&sub=ashtakavarga')
+    expect(await screen.findByText(/⚠️/)).toBeInTheDocument()
+    expect(calls('/ashtakavarga')).toHaveLength(1)
+  })
+
+  it('never caches transit: a remount fetches again and nothing is stored', async () => {
+    const first = renderAt('?tab=birth_chart&sub=transit')
+    await waitFor(() => expect(calls('/transit')).toHaveLength(1))
+    fireEvent.click(screen.getAllByRole('tab').find(el => /dasha/i.test(el.textContent)))
+    fireEvent.click(screen.getAllByRole('tab').find(el => /transit/i.test(el.textContent)))
+    await new Promise(r => setTimeout(r, 50))
+    expect(calls('/transit')).toHaveLength(1)
+    first.unmount()
+    renderAt('?tab=birth_chart&sub=transit')
+    await waitFor(() => expect(calls('/transit')).toHaveLength(2))
+    const keys = Object.keys(sessionStorage).filter(k => k.includes('/api/kundli/transit'))
+    expect(keys).toEqual([])
   })
 })

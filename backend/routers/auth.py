@@ -27,15 +27,21 @@ navigation mid-request, a dropped mobile connection) and two tabs that
 refresh at the same moment with the same cookie. The stale row is
 looked up under a row lock; a "rotated" token inside the window gets a
 NEW session (new cookie, new access token) and the row is re-marked
-"rotated-reused" in the same transaction, so a second replay is treated
-as theft. Nothing else is revoked on acceptance.
+"rotated-reused" in the same transaction, so it can never mint again.
+Nothing else is revoked on acceptance.
 
 The interval must never undo a sign-out: logout, revoking a device and the
 theft response also re-mark the user's tokens rotated within the window as
 "rotated-closed" (SessionRepository.close_recent_rotations), so they can't
-be replayed. Outside the window, or for a token revoked for any other
-reason, a replay is theft: every session for the user is revoked and the
-response is 401.
+be replayed into a session.
+
+A replay of a "rotated-reused" or "rotated-closed" row INSIDE the window
+fails softly with 409 for that one request: no session is minted, nothing
+is revoked and the cookie is left alone. Three tabs refreshing the same
+token at once must not kill the sessions the first two were handed.
+
+Outside the window, or for a token revoked for any other reason, a replay
+is theft: every session for the user is revoked and the response is 401.
 """
 import os
 import uuid
@@ -210,8 +216,14 @@ def refresh_session(
                     db.commit()
                     _clear_refresh_cookie(response)
                     raise HTTPException(status_code=401, detail="Account not found or disabled")
-                stale.revoked_reason = "rotated-reused"  # accepted once; a replay is now theft
+                stale.revoked_reason = "rotated-reused"  # accepted once; never mints again
                 return _issue_session_and_response(db, response, user, request)
+            if stale.revoked_reason in ("rotated-reused", "rotated-closed") and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
+                # A further replay inside the window (three racing tabs, or a
+                # replay after sign-out). Fail softly for this one request:
+                # no new session, nothing revoked, cookie left alone — the
+                # browser may already hold a newer cookie from a sibling call.
+                raise HTTPException(status_code=409, detail="Refresh already in progress. Please retry.")
             session_repo.revoke_all_for_user(stale.user_id, reason="reuse")
             session_repo.close_recent_rotations(stale.user_id, REFRESH_REUSE_GRACE_SECONDS)
             # Commit now, not just flush: this branch always ends in an

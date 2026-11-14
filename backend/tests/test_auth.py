@@ -399,7 +399,39 @@ def test_refresh_reuse_is_accepted_only_once(client):
     second, _ = _refresh(client, t1)
     assert second.status_code == 200
     third, _ = _refresh(client, t1)
-    assert third.status_code == 401
+    # A third replay inside the window fails softly for that one request:
+    # nothing is revoked, so the sessions minted by calls 1 and 2 survive.
+    assert third.status_code == 409
+    assert "sj_refresh" not in third.headers.get("set-cookie", "")
+
+
+def test_refresh_reuse_third_replay_leaves_other_sessions_alive(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t1)  # accepted once (lost response / racing tab)
+    assert _refresh(client, t1)[0].status_code == 409
+    assert _refresh(client, t2)[0].status_code == 200
+    assert _refresh(client, t3)[0].status_code == 200
+
+
+def test_rotated_closed_replay_inside_window_is_soft_409(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, revoked_reason="rotated-closed")
+    resp, cookie = _refresh(client, t1)
+    assert resp.status_code == 409
+    assert cookie is None  # no session minted, cookie not touched
+    assert _refresh(client, t2)[0].status_code == 200  # other session not revoked
+
+
+def test_rotated_reused_replay_outside_window_still_revokes_all(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _, t3 = _refresh(client, t1)
+    _db_edit(t1, age_seconds=1000)  # now "rotated-reused" and old
+    assert _refresh(client, t1)[0].status_code == 401
+    assert _refresh(client, t2)[0].status_code == 401
+    assert _refresh(client, t3)[0].status_code == 401
 
 
 def test_replay_after_logout_cannot_resurrect_session(client):
@@ -407,7 +439,8 @@ def test_replay_after_logout_cannot_resurrect_session(client):
     _, t2 = _refresh(client, t1)
     client.cookies.clear()
     assert client.post("/api/auth/logout", cookies={"sj_refresh": t2}).status_code == 200
-    assert _refresh(client, t1)[0].status_code == 401
+    resp, cookie = _refresh(client, t1)  # rotated-closed inside the window: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
 
 
 def test_replay_after_device_revoke_cannot_resurrect_session(client):
@@ -416,7 +449,8 @@ def test_replay_after_device_revoke_cannot_resurrect_session(client):
     access2 = resp.json()["access_token"]
     sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {access2}"}).json()
     assert client.delete(f"/api/auth/sessions/{sessions[0]['id']}", headers={"Authorization": f"Bearer {access2}"}).status_code == 200
-    assert _refresh(client, t1)[0].status_code == 401
+    resp, cookie = _refresh(client, t1)  # rotated-closed inside the window: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
 
 
 def test_replay_after_theft_revoke_all_is_rejected(client):
@@ -425,7 +459,8 @@ def test_replay_after_theft_revoke_all_is_rejected(client):
     _, t3 = _refresh(client, t2)
     _db_edit(t1, age_seconds=1000)  # t1 is old: replaying it is theft
     assert _refresh(client, t1)[0].status_code == 401
-    assert _refresh(client, t2)[0].status_code == 401  # recent rotation was closed
+    resp, cookie = _refresh(client, t2)  # recent rotation was closed: soft 409, no session
+    assert resp.status_code == 409 and cookie is None
     assert _refresh(client, t3)[0].status_code == 401
 
 

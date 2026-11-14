@@ -55,7 +55,7 @@ describe('useBottomChrome', () => {
   it('footer clearance adds the ScrollToTop reach (and the FAB) to the bars', () => {
     expect(chrome([]).footerClearance).toBe('calc(3.5rem)')
     expect(chrome(['bottomNav']).footerClearance).toContain('+ 3.5rem)')
-    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('3rem + 0.75rem')
+    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('3.25rem + 0.75rem')
   })
 })
 
@@ -69,6 +69,7 @@ describe('BottomChromeSpacer', () => {
     expect(spacer.className).toContain('xl:hidden')
     // Desktop ScrollToTop reaches md:bottom-5 (20px) + h-11 (44px) = 64px.
     expect(spacer.className).toContain('md:h-16')
+    expect(spacer.className).not.toContain('md:h-[5.5rem]')
   })
   it('signed in with a mounted BottomNav: reserves the nav height', () => {
     mockAuthed = true

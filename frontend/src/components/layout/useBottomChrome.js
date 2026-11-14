@@ -12,9 +12,9 @@
 // ScrollToTop and the Ask FAB all use `spacerHeight`.
 import { useEffect, useSyncExternalStore } from 'react'
 
-// Phone-size height of the button in components/home/AskPersonaPanel.jsx
-// (w-12 h-12 below sm). Keep in sync.
-export const FAB_HEIGHT = '3rem'
+// Tallest height of the button in components/home/AskPersonaPanel.jsx: the
+// sm+ pill is about 3.25rem (the phone circle is 3rem). Keep in sync.
+export const FAB_HEIGHT = '3.25rem'
 
 const counts = { bottomNav: 0, fab: 0, subNav: 0, raisedSubNav: 0 }
 let snapshot = { ...counts }

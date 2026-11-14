@@ -131,9 +131,9 @@ export default function AskPersonaPanel({ userId, input }) {
         onClick={() => setOpen(true)}
         aria-label={t('ask_persona_button', { name: personaName })}
         style={{ '--fab-bottom': `calc(${spacerHeight} + 0.75rem)` }}
-        className="fixed bottom-[var(--fab-bottom)] md:bottom-28 right-[max(1.25rem,var(--safe-right))] z-40 flex items-center justify-center gap-2.5 bg-night-light border border-primary/35 rounded-full w-12 h-12 sm:w-auto sm:h-auto sm:justify-start sm:pl-2 sm:pr-4 sm:py-2 shadow-xl motion-safe:hover:-translate-y-0.5 transition"
+        className="fixed bottom-[var(--fab-bottom)] md:bottom-6 right-[max(1.25rem,var(--safe-right))] z-40 flex items-center justify-center gap-2.5 bg-night-light border border-primary/35 rounded-full w-12 h-12 sm:w-auto sm:h-auto sm:justify-start sm:pl-2 sm:pr-4 sm:py-2 shadow-xl motion-safe:hover:-translate-y-0.5 transition"
       >
-        <span className="w-10 h-10 sm:w-9 sm:h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
+        <span aria-hidden="true" className="w-10 h-10 sm:w-9 sm:h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-primary/40">
           <JyotiAvatar />
         </span>
         <span className="hidden sm:block text-left">

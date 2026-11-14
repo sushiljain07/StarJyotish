@@ -52,7 +52,7 @@ from services.google_oauth import verify_google_id_token
 from services.jwt_service import REFRESH_TOKEN_TTL_DAYS, create_access_token, ACCESS_TOKEN_TTL_MINUTES
 from services.otp_provider import send_otp_sms
 from services.email_otp import send_otp_email
-from services.rate_limit import AUTH_LIMIT, OTP_SEND_LIMIT, OTP_VERIFY_LIMIT, limiter
+from services.rate_limit import AUTH_LIMIT, OTP_SEND_LIMIT, OTP_VERIFY_LIMIT, limiter, refresh_key
 
 router = APIRouter()
 
@@ -173,7 +173,7 @@ def login_with_google(request: Request, payload: GoogleLoginRequest, response: R
 
 
 @router.post("/auth/refresh", response_model=AuthResponse)
-@limiter.limit(AUTH_LIMIT)
+@limiter.limit(AUTH_LIMIT, key_func=refresh_key)
 def refresh_session(
     request: Request, response: Response,
     sj_refresh: str | None = Cookie(default=None),

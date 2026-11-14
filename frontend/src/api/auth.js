@@ -55,13 +55,32 @@ export function onSessionRefreshed(listener) {
   return () => { if (sessionListener === listener) sessionListener = null }
 }
 
-async function refreshOnce() {
+// Transient failures (429, 5xx, a dropped connection) are retried twice with
+// these delays; a 401/403 means the session is really gone and rejects at
+// once. Total wait stays under 2.5 s, so a signed-out visitor still reaches
+// /login promptly.
+const REFRESH_RETRY_DELAYS_MS = [600, 1800]
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+const isAuthRejection = err => err.status === 401 || err.status === 403
+
+async function refreshAttempt() {
   try {
     return await authFetch('/api/auth/refresh', { body: undefined })
   } catch (err) {
     if (err.status !== 409) throw err
-    await new Promise(resolve => setTimeout(resolve, 250))
+    await wait(250)
     return authFetch('/api/auth/refresh', { body: undefined })
+  }
+}
+
+async function refreshOnce() {
+  for (let i = 0; ; i++) {
+    try {
+      return await refreshAttempt()
+    } catch (err) {
+      if (isAuthRejection(err) || i >= REFRESH_RETRY_DELAYS_MS.length) throw err
+      await wait(REFRESH_RETRY_DELAYS_MS[i])
+    }
   }
 }
 

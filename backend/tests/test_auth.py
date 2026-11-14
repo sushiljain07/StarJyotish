@@ -324,3 +324,20 @@ def test_otp_send_with_real_provider_never_returns_code(client, monkeypatch):
     assert resp.status_code == 200
     assert resp.json()["debug_code"] is None
     sent_sms.assert_called_once()
+
+
+def test_refresh_limit_is_per_cookie_not_per_ip(client):
+    # Many users behind one IP (mobile CGNAT) must not exhaust each other's
+    # refresh budget; one cookie hammering refresh still gets limited.
+    from services.rate_limit import limiter
+    limiter.reset()
+    try:
+        for i in range(25):
+            resp = client.post("/api/auth/refresh", cookies={"sj_refresh": f"cookie-{i}"})
+            assert resp.status_code == 401, f"call {i} got {resp.status_code}"
+        limiter.reset()
+        for i in range(20):
+            assert client.post("/api/auth/refresh", cookies={"sj_refresh": "same"}).status_code == 401
+        assert client.post("/api/auth/refresh", cookies={"sj_refresh": "same"}).status_code == 429
+    finally:
+        limiter.reset()

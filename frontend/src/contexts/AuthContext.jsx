@@ -27,6 +27,10 @@ import { LANGUAGES, currentLanguage } from '../i18n/languages'
 
 const AuthContext = createContext(null)
 
+// A refresh failure that says nothing about the session itself (429, 5xx,
+// no network) — as opposed to a 401/403, which means signed out.
+const isTransientRefreshError = err => err?.status !== 401 && err?.status !== 403
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [accessToken, setAccessToken] = useState(null)
@@ -35,6 +39,11 @@ export function AuthProvider({ children }) {
   // need this to avoid bouncing a genuinely-logged-in user to /login for
   // the one render before that attempt finishes.
   const [loading, setLoading] = useState(true)
+  // 'unreachable' when the silent refresh failed for a reason that says
+  // nothing about the session (rate limit, server error, no network). The
+  // person may well still be signed in, so ProtectedRoute offers a retry
+  // instead of sending them to /login.
+  const [sessionError, setSessionError] = useState(null)
 
   // Any successful refresh — here, in authedRequest, or in fetchWithAuth
   // (api/auth.js) — lands in this state, so the token never goes stale.
@@ -49,12 +58,26 @@ export function AuthProvider({ children }) {
     // StrictMode's double-run of this effect can't spend the refresh
     // token twice.
     apiRefreshSession()
-      .catch(() => {
-        // No valid refresh cookie (never logged in, or it expired) —
-        // that's an entirely normal outcome here, not an error to surface.
+      .catch(err => {
+        // A 401/403 (never logged in, or the cookie expired) is an
+        // entirely normal outcome, not an error to surface. Anything else
+        // is transient (api/auth.js already retried it).
+        if (!cancelled && isTransientRefreshError(err)) setSessionError('unreachable')
       })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
+  }, [])
+
+  const retrySession = useCallback(async () => {
+    setSessionError(null)
+    setLoading(true)
+    try {
+      await apiRefreshSession()  // updates state via onSessionRefreshed
+    } catch (err) {
+      if (isTransientRefreshError(err)) setSessionError('unreachable')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   const loginWithPhone = useCallback(async (phoneNumber, code) => {
@@ -161,6 +184,8 @@ export function AuthProvider({ children }) {
     user,
     accessToken,
     loading,
+    sessionError,
+    retrySession,
     isAuthenticated: !!user,
     loginWithPhone,
     loginWithGoogleToken,

@@ -2058,5 +2058,8 @@
   "auth_sms_code_hint": "हम एसएमएस से एक कोड भेजेंगे",
   "skip_to_content": "मुख्य सामग्री पर जाएँ",
   "kundli_subsections_aria": "कुंडली के अनुभाग",
-  "insights_subtabs_aria": "AI इनसाइट्स के भाग"
+  "insights_subtabs_aria": "AI इनसाइट्स के भाग",
+  "session_reconnect_title": "अभी स्टार ज्योतिष से जुड़ नहीं पा रहे",
+  "session_reconnect_body": "आपका कनेक्शन या हमारा सर्वर अटक गया, इसलिए साइन-इन की पुष्टि नहीं हो सकी। आप साइन आउट नहीं हुए हैं। कृपया दोबारा कोशिश करें।",
+  "session_reconnect_retry": "दोबारा कोशिश करें"
 }

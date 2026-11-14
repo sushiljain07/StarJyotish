@@ -138,3 +138,45 @@ html:not([data-script="latn"]) .uppercase { text-transform: none; }
 html:not([data-script="latn"]) body { line-height: 1.6; }
 html:not([data-script="latn"]) .text-3xs, html:not([data-script="latn"]) .text-2xs { font-size: 0.75rem; line-height: 1.35; }
 html:not([data-script="latn"]) .leading-none { line-height: 1.25; }
+
+/* Kundli print / PDF (KundliDownload). Lives here, not in a style tag the
+   Download button injects, so the browser's own Print menu works too. Only
+   applies while the Download tab is showing (no .hidden ancestor); printing
+   any other page is untouched. Everything that neither holds nor sits inside
+   the print area is removed, and its ancestors lose their offsets, padding
+   and sticky/absolute positioning, so the report starts at the page top. */
+@media print {
+  @page { margin: 8mm; size: A4 portrait; }
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)),
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)) body,
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)) #root {
+    background: white !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)) body *:not(:has(#kundli-print-area)):not(#kundli-print-area):not(#kundli-print-area *) {
+    display: none !important;
+  }
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)) body *:has(#kundli-print-area) {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    background: none !important;
+  }
+  html:has(#kundli-print-area):not(:has(.hidden #kundli-print-area)) #kundli-print-area {
+    width: 100%;
+    background: white;
+    box-shadow: none;
+  }
+  .no-print { display: none !important; }
+}

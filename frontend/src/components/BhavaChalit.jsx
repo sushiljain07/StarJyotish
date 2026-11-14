@@ -137,7 +137,7 @@ export default function BhavaChalit({ input }) {
           {/* Detailed table toggle */}
           <button
             onClick={() => setShowFull(v => !v)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted hover:text-ink transition-colors"
+            className="flex items-center gap-1.5 min-h-11 text-xs font-semibold text-ink-muted hover:text-ink transition-colors"
           >
             {showFull ? t('bhava_hide_table') : t('bhava_show_table')}
           </button>

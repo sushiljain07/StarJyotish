@@ -67,7 +67,7 @@ export default function WeekAhead() {
         <div className="relative max-w-2xl mx-auto">
           <button
             onClick={() => navigate('/home')}
-            className="flex items-center gap-2 text-sm text-ink-onnight/70 hover:text-primary-light transition mb-4"
+            className="inline-flex items-center min-h-11 gap-2 text-sm text-ink-onnight/70 hover:text-primary-light transition mb-4"
           >
             <span aria-hidden="true">←</span> {t('week_page_back_cta')}
           </button>

@@ -20,7 +20,9 @@ vi.mock('../api/auth', () => ({ sendOtp: vi.fn().mockResolvedValue({}) }))
 vi.mock('../api/reportCache', () => ({
   fetchReport: vi.fn(path => (path.includes('ashtakavarga')
     ? Promise.resolve({ sarvashtakavarga: Array.from({ length: 12 }, () => ({ points: 28 })), bhinnashtakavarga: {} })
-    : new Promise(() => {}))),
+    : path.includes('bhava-chalit')
+      ? Promise.resolve({ ascendant: { sign: 'Virgo', degree: 12.3 }, planets: [] })
+      : new Promise(() => {}))),
 }))
 vi.mock('../api/astro', async importOriginal => ({
   ...(await importOriginal()),
@@ -45,6 +47,9 @@ import ComingUpStrip from '../components/home/ComingUpStrip'
 import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import Profile from '../pages/Profile'
 import Login from '../pages/Login'
+import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
+import BhavaChalit from '../components/BhavaChalit'
+import WeekAhead from '../pages/WeekAhead'
 
 // The footer only renders its <summary> accordions on a phone-width viewport.
 let phone = false
@@ -100,7 +105,17 @@ const ROWS = [
   ['Account Edit / Start over / Change / Upload', () => <Profile />,
     async () => [await screen.findByRole('button', { name: esc(t('profile_astro_edit')) }), screen.getByRole('button', { name: esc(t('profile_astro_delete')) }), ...screen.getAllByRole('button', { name: /Add email|Change|Upload/i })]],
   ['Login Back', () => <Login />,
-    byName('button', /Back/)],
+    byName('button', /Back/), true],
+  ['Account astro Edit', () => <Profile />,
+    byName('button', esc(t('profile_astro_edit'))), true],
+  ['Home Read the guide', () => <KnowledgeCapsule edition={{ headline_event: { planet: 'Moon' } }} />,
+    byName('link', /Read the guide/)],
+  ['Home Ask panel textarea', () => <AskPersonaPanel userId={1} input={{}} />,
+    async () => { fireEvent.click(screen.getAllByRole('button')[0]); return [await screen.findByRole('textbox')] }],
+  ['Bhava Show Detailed Table', () => <BhavaChalit input={{ date: '1990-05-15', time: '10:30', place: 'Delhi' }} />,
+    byName('button', esc(t('bhava_show_table')))],
+  ['Week ahead Back to today', () => <WeekAhead />,
+    byName('button', esc(t('week_page_back_cta')))],
 ]
 
 describe('44px tap targets (UX1 task 8)', () => {

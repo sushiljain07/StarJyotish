@@ -275,7 +275,7 @@ export default function Profile() {
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-serif font-semibold text-lg text-ink">{t('profile_astro_heading')}</h2>
               {!editingAstro && (
-                <button type="button" onClick={startEditingAstro} className="inline-flex items-center min-h-11 text-xs text-primary-ink hover:underline font-medium">
+                <button type="button" onClick={startEditingAstro} className="inline-flex items-center justify-center min-h-11 min-w-11 text-xs text-primary-ink hover:underline font-medium">
                   {t('profile_astro_edit')}
                 </button>
               )}

@@ -205,7 +205,7 @@ export default function AskPersonaPanel({ userId, input }) {
               maxLength={MAX_CHARS}
               rows={1}
               placeholder={t('ask_placeholder')}
-              className="flex-1 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 min-h-11 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}

@@ -43,10 +43,25 @@ export function loginWithGoogle(idToken) {
 // 401 retries, StrictMode's double-mounted effect, two tabs) used to look
 // like a stolen-token replay and logged the user out everywhere. So:
 //   - every caller in this tab shares one in-flight refresh promise;
-//   - the backend now accepts a just-rotated token again (reuse interval), so
-//     it no longer returns 409; the 409 retry below is legacy and harmless.
+//   - the backend accepts a just-rotated token once more (reuse interval);
+//     a further replay inside that window (a third racing tab, a replay
+//     after sign-out) gets a soft 409, which is retried below.
 let refreshInFlight = null
 let sessionListener = null
+// Bumped by AuthContext.logout(). A refresh that started before a logout
+// must not hand its session to the app afterwards: it rejects with a 401
+// instead of calling the listener.
+let logoutGeneration = 0
+
+export function markLoggedOut() {
+  logoutGeneration += 1
+}
+
+// The refresh currently in flight, or a resolved promise. Logout waits on
+// this so it revokes the newest cookie, not one a racing refresh replaces.
+export function awaitRefreshSettled() {
+  return refreshInFlight ?? Promise.resolve()
+}
 
 // AuthContext registers here so a refresh triggered anywhere — including
 // fetchWithAuth below, outside React — updates the in-memory token/user.
@@ -86,8 +101,17 @@ async function refreshOnce() {
 
 export function refreshSession() {
   if (!refreshInFlight) {
+    const generation = logoutGeneration
     refreshInFlight = refreshOnce()
-      .then(data => { sessionListener?.(data); return data })
+      .then(data => {
+        if (generation !== logoutGeneration) {
+          const err = new Error('Signed out')
+          err.status = 401
+          throw err
+        }
+        sessionListener?.(data)
+        return data
+      })
       .finally(() => { refreshInFlight = null })
   }
   return refreshInFlight

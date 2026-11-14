@@ -14,6 +14,8 @@ import {
   loginWithGoogle as apiLoginWithGoogle,
   refreshSession as apiRefreshSession,
   onSessionRefreshed,
+  awaitRefreshSettled,
+  markLoggedOut,
   logout as apiLogout,
   updateProfile as apiUpdateProfile,
   sendPhoneLinkOtp as apiSendPhoneLinkOtp,
@@ -47,9 +49,12 @@ export function AuthProvider({ children }) {
 
   // Any successful refresh — here, in authedRequest, or in fetchWithAuth
   // (api/auth.js) — lands in this state, so the token never goes stale.
+  // A refresh that began before a logout never reaches here (api/auth.js
+  // rejects it — see markLoggedOut).
   useEffect(() => onSessionRefreshed(data => {
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
   }), [])
 
   useEffect(() => {
@@ -68,15 +73,14 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true }
   }, [])
 
+  // Leaves `loading` and the error flag alone while it runs, so the
+  // reconnect screen stays up (ProtectedRoute shows its own busy state);
+  // success clears the flag via onSessionRefreshed, a sign-out clears it here.
   const retrySession = useCallback(async () => {
-    setSessionError(null)
-    setLoading(true)
     try {
       await apiRefreshSession()  // updates state via onSessionRefreshed
     } catch (err) {
-      if (isTransientRefreshError(err)) setSessionError('unreachable')
-    } finally {
-      setLoading(false)
+      setSessionError(isTransientRefreshError(err) ? 'unreachable' : null)
     }
   }, [])
 
@@ -84,6 +88,7 @@ export function AuthProvider({ children }) {
     const data = await apiVerifyOtp(phoneNumber, code)
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
     return data.user
   }, [])
 
@@ -91,10 +96,16 @@ export function AuthProvider({ children }) {
     const data = await apiLoginWithGoogle(idToken)
     setAccessToken(data.access_token)
     setUser(data.user)
+    setSessionError(null)
     return data.user
   }, [])
 
   const logout = useCallback(async () => {
+    // Any refresh already running belongs to the old session: stop it from
+    // signing the user back in, and let it land first so the logout call
+    // revokes the newest cookie.
+    markLoggedOut()
+    await awaitRefreshSettled().catch(() => {})
     try {
       await apiLogout()
     } catch {
@@ -103,6 +114,7 @@ export function AuthProvider({ children }) {
     }
     setAccessToken(null)
     setUser(null)
+    setSessionError(null)
     clearChartSession()
   }, [])
 

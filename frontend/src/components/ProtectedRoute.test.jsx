@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -27,6 +27,21 @@ describe('ProtectedRoute', () => {
     expect(screen.queryByText('login page')).toBeNull()
     fireEvent.click(screen.getByRole('button'))
     expect(retrySession).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps the reconnect block up, with a busy retry button, while a retry runs', async () => {
+    let finish
+    const retrySession = vi.fn(() => new Promise(r => { finish = r }))
+    auth.value = { isAuthenticated: false, loading: false, sessionError: 'unreachable', retrySession }
+    renderAt()
+    const btn = screen.getByRole('button')
+    await act(async () => { fireEvent.click(btn) })
+    expect(screen.getByRole('button')).toBeDisabled()
+    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true')
+    fireEvent.click(screen.getByRole('button'))
+    expect(retrySession).toHaveBeenCalledTimes(1)
+    await act(async () => { finish() })
+    expect(screen.getByRole('button')).not.toBeDisabled()
   })
 
   it('still redirects signed-out users to /login', () => {

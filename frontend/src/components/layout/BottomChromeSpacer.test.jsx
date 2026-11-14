@@ -55,7 +55,7 @@ describe('useBottomChrome', () => {
   it('footer clearance adds the ScrollToTop reach (and the FAB) to the bars', () => {
     expect(chrome([]).footerClearance).toBe('calc(3.5rem)')
     expect(chrome(['bottomNav']).footerClearance).toContain('+ 3.5rem)')
-    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('4rem + 4.25rem')
+    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('3rem + 0.75rem')
   })
 })
 

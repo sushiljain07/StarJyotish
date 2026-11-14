@@ -13,7 +13,9 @@
 // FAB + panel header) already just renders <JyotiAvatar className="..." />,
 // not raw markup.
 import { useTranslation } from 'react-i18next'
+import { colors } from '../../theme/tokens'
 
+// Skin, hair and lip shades have no token; the remaining hex literals are illustration art.
 export default function JyotiAvatar({ className = 'w-full h-full' }) {
   const { t } = useTranslation()
   return (
@@ -28,7 +30,7 @@ export default function JyotiAvatar({ className = 'w-full h-full' }) {
           <stop offset="100%" stopColor="#1A140E" />
         </linearGradient>
       </defs>
-      <circle cx="50" cy="50" r="50" fill="#F0CB80" />
+      <circle cx="50" cy="50" r="50" fill={colors.primary.glow} />
       {/* Hair, behind the face */}
       <path d="M50 14c-16 0-27 12-27 28 0 9 2 17 4 23 1-6 2-13 2-19 3 3 8 5 13 5h16c5 0 10-2 13-5 0 6 1 13 2 19 2-6 4-14 4-23 0-16-11-28-27-28z" fill="url(#jyotiHair)" />
       {/* Face */}
@@ -40,17 +42,17 @@ export default function JyotiAvatar({ className = 'w-full h-full' }) {
       <path d="M38 52c2-2 6-2 8 0" stroke="#2B2118" strokeWidth="2" fill="none" strokeLinecap="round" />
       <path d="M54 52c2-2 6-2 8 0" stroke="#2B2118" strokeWidth="2" fill="none" strokeLinecap="round" />
       {/* Bindi */}
-      <circle cx="50" cy="45" r="1.6" fill="#A23B3B" />
+      <circle cx="50" cy="45" r="1.6" fill={colors.vermillion.DEFAULT} />
       {/* Nose */}
       <path d="M50 54v6c0 1.2 1 2 2 2" stroke="#B8794A" strokeWidth="1.4" fill="none" strokeLinecap="round" />
       {/* Smile */}
       <path d="M43 66c3 3 11 3 14 0" stroke="#8A4A3A" strokeWidth="2" fill="none" strokeLinecap="round" />
       {/* Earrings */}
-      <circle cx="30" cy="60" r="2" fill="#D9A441" />
-      <circle cx="70" cy="60" r="2" fill="#D9A441" />
+      <circle cx="30" cy="60" r="2" fill={colors.primary.DEFAULT} />
+      <circle cx="70" cy="60" r="2" fill={colors.primary.DEFAULT} />
       {/* Dupatta/shoulders */}
-      <path d="M20 100c2-14 14-22 30-22s28 8 30 22z" fill="#A23B3B" />
-      <path d="M20 100c2-14 14-22 30-22s28 8 30 22" fill="none" stroke="#D9A441" strokeWidth="1.5" opacity="0.6" />
+      <path d="M20 100c2-14 14-22 30-22s28 8 30 22z" fill={colors.vermillion.DEFAULT} />
+      <path d="M20 100c2-14 14-22 30-22s28 8 30 22" fill="none" stroke={colors.primary.DEFAULT} strokeWidth="1.5" opacity="0.6" />
     </svg>
   )
 }

@@ -250,7 +250,27 @@ Rest of the app:
 - Printed labels are 10px; two charts side by side on A4 can't be larger.
 - Touch tablets at 768px and up get desktop-size pills.
 
-*UX slice 2, colour:* inline golds, /home night text tokens, the AA planet palette (owner-approved), the LocationSection hex colours, and the 5a follow-ups above. *UX slice 3, laptop layout and polish:* the audit items L4, X1–X11 and E1, the grid on laptop widths, and a two-column /home.
+*UX slice 2, colour (done on `feat/ux2-colour`, plan `2026-11-14-ux2-colour.md`).*
+
+What changed:
+- **One token source.** `src/theme/tokens.js` feeds Tailwind, `chartPalette` and `planetColors`, and the Tailwind config is no longer bundled.
+- **New tokens.** Night text tokens (`ink-onnightMuted`, `ink-onnightFaint`, plus `-onnight` accents) and the owner's AA planet palette, with night variants. There is now one planet map everywhere, including print and dignity colours.
+- **Selection.** Selected tabs and pills are gold everywhere, which was an owner decision.
+- **Dead code.** 14 unused components were deleted.
+
+Results:
+- In a real browser, /home went from 55–58 contrast failures per load to 0. Kundli (all sub-tabs), Learn, Insights, Panchang, Landing and the footer are also at 0.
+- Readable /home text is at least 11px.
+- Repo-wide guards now block hex literals, inline style colours, and parchment colours on night surfaces.
+
+*Left from UX slice 2:*
+- The 10px uppercase headings on /panchang and on the Kundli sections.
+- Chart SVG numerals at 10.8px.
+- 12 baselined hex values: JyotiAvatar art and the HomeMasthead sky.
+- `PLANET_COLORS_NIGHT` is ready but nothing consumes it yet.
+- The Admin and Astrologer dashboard tabs are not gold yet.
+
+*UX slice 3, laptop layout and polish:* the audit items L4, X1–X11 and E1, the grid on laptop widths, and a two-column /home.
 
 **5b. Component adoption** (D-6, D-7):
 - Move the 37 hand-built CTAs onto `<Button>` and the cards onto `<Card>`.
@@ -296,5 +316,6 @@ Rest of the app:
 | 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — merged (#165); leftovers listed in the Phase 4 section |
 | 5a | `feat/phase5a-contrast-tokens` | `2026-11-14-phase5a-contrast-tokens.md` | Done; PR open. Follow-ups are listed in the 5a status above |
 | UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done; PR open, stacked on 5a |
-| UX2–3 | `feat/ux2-*`, `feat/ux3-*` | to write per slice | — |
+| UX2 | `feat/ux2-colour` | `2026-11-14-ux2-colour.md` | Done; PR open |
+| UX3 | `feat/ux3-*` | to write | — |
 | 5b–g | `feat/phase5-*` | to write per slice | — |

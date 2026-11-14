@@ -46,17 +46,17 @@ export default function CompactFooter() {
             <Link
               key={link.to}
               to={link.to}
-              className="text-ink-onnight/60 hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center justify-center min-h-11 min-w-11"
+              className="text-ink-onnightMuted hover:text-primary text-xs font-medium transition whitespace-nowrap inline-flex items-center justify-center min-h-11 min-w-11"
             >
               {t(link.key, link.fallback)}
             </Link>
           ))}
         </nav>
         <div className="flex items-center justify-center gap-3 mt-3">
-          <p className="text-ink-onnight/40 text-xs">
+          <p className="text-ink-onnightMuted text-xs">
             {t('footer_copyright', { year: FOOTER_YEAR })}
           </p>
-          <LanguageSwitcher size="sm" />
+          <LanguageSwitcher />
         </div>
       </div>
       <BottomChromeSpacer />

@@ -20,13 +20,11 @@ export default function NavBar({ tabs, activeTab, onTabChange, raised = false })
   useChromeRegistration(raised ? ['subNav', 'raisedSubNav'] : 'subNav')
   return (
     <nav
-      className={`md:hidden fixed left-0 right-0 z-50 border-t box-border pl-[var(--safe-left)] pr-[var(--safe-right)] ${raised ? '' : 'bottom-0'}`}
+      className={`md:hidden fixed left-0 right-0 z-50 border-t border-white/[0.12] bg-night/[0.97] box-border pl-[var(--safe-left)] pr-[var(--safe-right)] ${raised ? '' : 'bottom-0'}`}
       aria-label={t('nav_kundli_sections_aria', 'Kundli sections')}
       style={{
-        background: "rgba(19,24,58,0.97)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderColor: "rgba(248,242,228,0.12)",
         ...(raised
           ? { bottom: 'calc(var(--bottom-nav-h) + var(--safe-bottom))', height: 'var(--sub-nav-h)' }
           : { paddingBottom: 'var(--safe-bottom)', height: 'calc(var(--sub-nav-h) + var(--safe-bottom))' }),
@@ -50,15 +48,14 @@ export default function NavBar({ tabs, activeTab, onTabChange, raised = false })
                   aria-hidden="true"
                 />
               )}
-              <span style={{ color: active ? '#F0CB80' : 'rgba(248,242,228,0.65)' }}>
+              <span className={active ? 'text-primary-glow' : 'text-ink-onnightMuted'}>
                 <TabIcon id={tab.icon} className="w-[1.125rem] h-[1.125rem]" />
               </span>
               {tab.locked && (
-                <span className="absolute -top-0.5 right-1 text-[9px]">🔒</span>
+                <span className="absolute -top-0.5 right-1 text-2xs">🔒</span>
               )}
               <span
-                className="text-[10px] font-semibold leading-none truncate"
-                style={{ color: active ? '#F0CB80' : 'rgba(248,242,228,0.65)' }}
+                className={`text-2xs font-semibold leading-none truncate ${active ? 'text-primary-glow' : 'text-ink-onnightMuted'}`}
               >
                 {tab.label}
               </span>

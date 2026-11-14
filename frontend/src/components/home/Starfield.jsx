@@ -10,6 +10,7 @@
 // layout doesn't reshuffle on every re-render), twinkling via a sine wave,
 // with roughly 1 in 7 stars tinted warm gold instead of ink-onnight white.
 import { useEffect, useRef } from 'react'
+import { colors } from '../../theme/tokens'
 
 function seedStars(width, height) {
   const stars = []
@@ -60,7 +61,7 @@ export default function Starfield() {
         ctx.globalAlpha = a
         // Canvas fillStyle needs a literal color — these are the
         // primary-glow and ink-onnight token hex values, not new colors.
-        ctx.fillStyle = s.gold ? '#F0CB80' : '#C9C2D6'
+        ctx.fillStyle = s.gold ? colors.primary.glow : colors.ink.onnight
         ctx.beginPath()
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
         ctx.fill()

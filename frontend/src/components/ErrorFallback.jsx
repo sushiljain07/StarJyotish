@@ -31,7 +31,7 @@ export default function ErrorFallback({ resetError }) {
               resetError()
               window.location.reload()
             }}
-            className="px-5 py-2.5 rounded-lg bg-primary-dark text-white text-sm font-semibold hover:opacity-90 transition"
+            className="min-h-[44px] px-5 py-2.5 rounded-lg bg-primary text-night text-sm font-semibold hover:bg-primary-dark transition"
           >
             {t('error_fallback_reload')}
           </button>

@@ -1,9 +1,7 @@
 // Colours for chart SVGs and inline styles, derived from the Tailwind tokens so
 // there is one palette. Where a colour sits in a className, use the Tailwind
-// class instead. Planet colours live in config/planetColors.js (separate).
-import config from '../../tailwind.config.js'
-
-const c = config.theme.extend.colors
+// class instead. Planet colours live in config/planetColors.js, built from the same tokens.
+import { colors as c } from './tokens.js'
 
 export const chartPalette = Object.freeze({
   paper:      c.parchment.card,
@@ -21,6 +19,9 @@ export const chartPalette = Object.freeze({
   cautionFill: c.caution.light,
   bad:        c.bad.DEFAULT,
   badFill:    c.bad.light,
+  dignityExalted:     c.good.DEFAULT,
+  dignityDebilitated: c.bad.DEFAULT,
+  dignityOwn:         c.primary.ink,
   sage:       c.sage.DEFAULT,
   gold:       c.primary.DEFAULT,   // decoration only
   night:      c.night.DEFAULT,
@@ -28,6 +29,10 @@ export const chartPalette = Object.freeze({
   nightDeep:  c.night.deep,
   onNight:    c.ink.onnight,
   cream:      c.parchment.DEFAULT, // text on night (was rgba(248,242,228,a))
+  transit:    c.planet.saturn,     // Sarvatobhadra transit marker and nakshatra
+  transitFill: withAlpha(c.planet.saturn, 0.14),
+  natal:      c.mauve.DEFAULT,     // Sarvatobhadra natal marker and nakshatra
+  natalFill:  withAlpha(c.mauve.DEFAULT, 0.16),
 })
 
 export function withAlpha(hex, alpha) {

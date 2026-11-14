@@ -97,7 +97,7 @@ function JournalRow({ t }) {
           type="text"
           placeholder={t('home_journal_placeholder', 'One line for tonight’s sky…')}
           aria-label={t('home_journal_aria', 'Journal entry')}
-          className="flex-1 min-w-0 bg-white/[0.05] border border-white/[0.14] rounded-xl px-3.5 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight/40 focus:outline-none focus:border-primary"
+          className="flex-1 min-w-0 bg-white/[0.05] border border-white/[0.14] rounded-xl px-3.5 py-2.5 text-sm text-primary-light placeholder:text-ink-onnightMuted focus:outline-none focus:border-primary"
         />
         <button
           onClick={keep}
@@ -106,7 +106,7 @@ function JournalRow({ t }) {
           {t('home_journal_keep', 'Keep')}
         </button>
       </div>
-      {echo && <p className="text-2xs text-sage mt-2.5">{echo}</p>}
+      {echo && <p className="text-2xs text-good-onnight mt-2.5">{echo}</p>}
     </div>
   )
 }
@@ -118,7 +118,7 @@ export default function SkyRemembers({ profile, lang = 'en', journeySummary }) {
   return (
     <div className="bg-white/[0.045] border border-white/[0.09] rounded-card px-5 py-4">
       {memoryLine && (
-        <p className="text-sm text-ink-onnight/85 leading-relaxed mb-4">{memoryLine}</p>
+        <p className="text-sm text-ink-onnight leading-relaxed mb-4">{memoryLine}</p>
       )}
       <JournalRow t={t} />
     </div>

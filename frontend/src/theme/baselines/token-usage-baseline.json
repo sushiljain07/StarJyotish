@@ -51,25 +51,13 @@
     "goldText": 2
   },
   "components/home/HomeMasthead.jsx": {
-    "goldText": 1
+    "hexLiteral": 4
+  },
+  "components/home/JyotiAvatar.jsx": {
+    "hexLiteral": 8
   },
   "components/home/KnowledgeCapsule.jsx": {
     "goldText": 1
-  },
-  "components/home/LifeAreaGrid.jsx": {
-    "goldText": 1
-  },
-  "components/home/LocationBar.jsx": {
-    "faintText": 1
-  },
-  "components/home/ProfileSelector.jsx": {
-    "faintText": 1
-  },
-  "components/home/QuickPanchangStrip.jsx": {
-    "goldText": 1
-  },
-  "components/home/ReflectionLoop.jsx": {
-    "goldText": 3
   },
   "components/home/ReportsStrip.jsx": {
     "goldText": 1

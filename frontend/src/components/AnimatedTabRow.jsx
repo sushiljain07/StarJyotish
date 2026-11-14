@@ -4,7 +4,7 @@
 //   - 'underline': top-level Kundli/Advanced/Insights/Ask row.
 //     Sliding background indicator that looks like the active tab's
 //     own card background + top-border.
-//   - 'pill': SubTabBar's filled accent-colored pills. Horizontally
+//   - 'pill': SubTabBar's filled gold pills (selection is always gold). Horizontally
 //     scrollable on mobile to accommodate up to 6 labels.
 //
 // Indicator positioning uses offsetLeft/offsetTop (container-relative)
@@ -12,21 +12,9 @@
 // correct inside scrollable or sticky containers.
 import { useEffect, useRef, useState } from 'react'
 
-const PILL_ACCENT_BG = {
-  primary: 'bg-primary',
-  mauve:   'bg-mauve',
-  sage:    'bg-sage',
-}
-
-const PILL_ACCENT_TEXT = {
-  primary: 'text-night',
-  mauve:   'text-white',
-  sage:    'text-white',
-}
-
 export default function AnimatedTabRow({
   tabs, active, onChange, renderIcon,
-  variant = 'underline', accent = 'primary', className = '', label, semantics = 'tabs'
+  variant = 'underline', className = '', label, semantics = 'tabs'
 }) {
   const containerRef = useRef(null)
   const buttonRefs  = useRef({})
@@ -97,7 +85,7 @@ export default function AnimatedTabRow({
         className={`absolute top-0 left-0 transition-all duration-300 ease-out ${
           isUnderline
             ? 'bg-parchment border-t border-x border-line rounded-t-lg'
-            : `${PILL_ACCENT_BG[accent]} rounded-lg shadow-sm`
+            : `bg-primary rounded-lg shadow-sm`
         }`}
         style={{ ...indicatorStyle, transitionProperty: 'transform, width, height' }}
       />
@@ -122,7 +110,7 @@ export default function AnimatedTabRow({
                 }`
               : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border transition-colors duration-200 ${
                   active === tab.id
-                    ? `${PILL_ACCENT_TEXT[accent]} font-medium border-transparent`
+                    ? `text-night font-medium border-transparent`
                     : 'text-ink-muted hover:text-ink border-line hover:border-primary/50'
                 }`
           }

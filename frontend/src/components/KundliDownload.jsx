@@ -1,6 +1,7 @@
 // frontend/src/components/KundliDownload.jsx
 import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
+import { chartPalette } from '../theme/chartPalette'
 import { formatDate as fmtDate, formatTime as fmtTime } from '../utils/format'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 
@@ -19,7 +20,7 @@ function getDignity(name, signIndex) {
   return ''
 }
 
-const DIGNITY_COLOR = { exalted: '#16a34a', debilitated: '#dc2626', own: '#2563eb' }
+const DIGNITY_COLOR = { exalted: chartPalette.dignityExalted, debilitated: chartPalette.dignityDebilitated, own: chartPalette.dignityOwn }
 
 export default function KundliDownload({ data, input }) {
   const { t } = useTranslation()
@@ -136,7 +137,7 @@ export default function KundliDownload({ data, input }) {
                       <td className="p-1.5 border border-line text-ink-muted">{nakshatraName(t, p.nakshatra)}</td>
                       <td className="p-1.5 border border-line text-center text-ink-muted">{p.nakshatra_pada}</td>
                       <td className="p-1.5 border border-line font-medium"
-                          style={{ color: DIGNITY_COLOR[dignity] ?? '#64748b' }}>
+                          style={{ color: DIGNITY_COLOR[dignity] ?? chartPalette.muted }}>
                         {dignity && t(`kundli_dignity_${dignity}`)}
                       </td>
                       <td className="p-1.5 border border-line text-center font-bold text-vermillion">
@@ -165,21 +166,21 @@ export default function KundliDownload({ data, input }) {
             </div>
             {ad && (
               <div className="bg-mauve-light border border-mauve/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-mauve/70 uppercase font-medium">{t('dasha_antardasha')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_antardasha')}</div>
                 <div className="text-sm font-bold text-mauve">{planetName(t, ad.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(ad.start)} – {fmtDate(ad.end)}</div>
               </div>
             )}
             {dasha.current_pratyantar && (
               <div className="bg-vermillion-light border border-vermillion/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-vermillion/70 uppercase font-medium">{t('dasha_pratyantar')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_pratyantar')}</div>
                 <div className="text-sm font-bold text-vermillion">{planetName(t, dasha.current_pratyantar.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_pratyantar.start)} – {fmtDate(dasha.current_pratyantar.end)}</div>
               </div>
             )}
             {dasha.current_sookshma && (
               <div className="bg-sage-light border border-sage/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-                <div className="text-xs text-sage/70 uppercase font-medium">{t('dasha_sookshma')}</div>
+                <div className="text-xs text-ink-muted uppercase font-medium">{t('dasha_sookshma')}</div>
                 <div className="text-sm font-bold text-sage">{planetName(t, dasha.current_sookshma.planet)}</div>
                 <div className="text-xs text-ink-muted">{fmtDate(dasha.current_sookshma.start)} – {fmtDate(dasha.current_sookshma.end)}</div>
               </div>

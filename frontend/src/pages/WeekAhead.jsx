@@ -23,6 +23,8 @@ import { computeWindow, minutesToLabel } from '../utils/muhurtaWindow'
 import { localDateStr } from '../utils/localDate'
 import { formatDate } from '../utils/format'
 import { nakshatraName, panchangName } from '../utils/astroNames'
+import { colors } from '../theme/tokens'
+import { withAlpha } from '../theme/chartPalette'
 
 function shortDayName(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
@@ -67,7 +69,7 @@ export default function WeekAhead() {
         <div className="relative max-w-2xl mx-auto">
           <button
             onClick={() => navigate('/home')}
-            className="inline-flex items-center min-h-11 gap-2 text-sm text-ink-onnight/70 hover:text-primary-light transition mb-4"
+            className="inline-flex items-center min-h-11 gap-2 text-sm text-ink-onnightMuted hover:text-primary-light transition mb-4"
           >
             <span aria-hidden="true">←</span> {t('week_page_back_cta')}
           </button>
@@ -75,7 +77,7 @@ export default function WeekAhead() {
             {t('week_page_title')}
           </h1>
           {week?.length > 0 && (
-            <p className="text-sm text-ink-onnight/75 mt-1">
+            <p className="text-sm text-ink-onnightMuted mt-1">
               {formatDate(week[0].date)} – {formatDate(week[week.length - 1].date)}
               {location?.label ? ` · ${location.label}` : ''}
             </p>
@@ -92,9 +94,9 @@ export default function WeekAhead() {
             onSetManualLocation={setManualLocation}
           />
         )}
-        {loading && <p className="text-sm text-ink-onnight/75 py-6">{t('week_page_loading')}</p>}
+        {loading && <p className="text-sm text-ink-onnightMuted py-6">{t('week_page_loading')}</p>}
         {error && (
-          <p className="text-sm text-vermillion py-6">
+          <p className="text-sm text-bad-onnight py-6">
             {t('week_page_error')}
           </p>
         )}
@@ -113,7 +115,7 @@ export default function WeekAhead() {
               className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
             >
               <div className="flex-shrink-0 w-12 text-center">
-                <p className="text-[10px] font-mono text-ink-onnight/45">
+                <p className="text-2xs font-mono text-ink-onnightMuted">
                   {isToday ? t('week_page_today_label') : shortDayName(day.date)}
                 </p>
                 <p className="font-serif text-xl text-primary-light mt-0.5">{dayNumber(day.date)}</p>
@@ -122,26 +124,26 @@ export default function WeekAhead() {
                 <div className="flex items-center gap-3">
                   <span
                     className="font-serif text-2xl text-primary-glow shrink-0"
-                    style={{ textShadow: '0 0 12px rgba(240,203,128,0.35)' }}
+                    style={{ textShadow: `0 0 12px ${withAlpha(colors.primary.glow, 0.35)}` }}
                   >
                     {score}
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-ink-onnight">{label}</p>
                     {(tithiName || nakName) && (
-                      <p className="text-xs text-ink-onnight/45 truncate mt-0.5">
+                      <p className="text-xs text-ink-onnightMuted truncate mt-0.5">
                         {[tithiName, nakName].filter(Boolean).join(' · ')}
                       </p>
                     )}
                   </div>
                 </div>
                 {bestStart != null && (
-                  <p className="text-xs text-ink-onnight/70 mt-2">
+                  <p className="text-xs text-ink-onnightMuted mt-2">
                     {t('week_page_best_window', {
                       start: minutesToLabel(bestStart),
                       end: minutesToLabel(bestEnd),
                     })}
-                    {bestNote && <span className="block text-2xs text-vermillion/70 mt-0.5">{t('window_rahu_overlap_note')}</span>}
+                    {bestNote && <span className="block text-2xs text-bad-onnight mt-0.5">{t('window_rahu_overlap_note')}</span>}
                   </p>
                 )}
               </div>

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, planetShort } from '../utils/astroNames'
 import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette } from '../theme/chartPalette'
 import ScrollHint from './ui/ScrollHint'
 import { ASHTAKAVARGA_BANDS as BANDS } from '../config/ashtakavargaBands'
 
@@ -98,12 +99,14 @@ export default function AshtakavargaTable({ input }) {
             </button>
             {PLANETS.map(p => (
               <button key={p} onClick={() => setActiveTab(p)}
-                      className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
+                      className={`inline-flex items-center justify-center gap-1.5 min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                         activeTab === p
-                          ? 'text-white border-transparent'
+                          ? 'bg-primary border-primary text-night'
                           : 'bg-parchment-card border-line text-ink-muted hover:border-ink-faint'
-                      }`}
-                      style={activeTab === p ? { backgroundColor: PLANET_COLORS[p] ?? '#666' } : {}}>
+                      }`}>
+                {/* Planet cue only; selection itself is the gold pill. */}
+                <span aria-hidden="true" className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: PLANET_COLORS[p] ?? chartPalette.muted }} />
                 {planetShort(t, p)}
               </button>
             ))}
@@ -194,7 +197,7 @@ export default function AshtakavargaTable({ input }) {
                 <table className="w-full text-xs whitespace-nowrap">
                   <thead>
                     <tr className="bg-night/[0.03]">
-                      <th className="p-2 text-left border border-line sticky left-0 z-10 bg-[#F8F6F2]">{t('col_planet')}</th>
+                      <th className="p-2 text-left border border-line sticky left-0 z-10 bg-parchment-alt">{t('col_planet')}</th>
                       {SIGN_ABBR.map(s => (
                         <th key={s} className="p-1 text-center border border-line">{s}</th>
                       ))}
@@ -208,8 +211,8 @@ export default function AshtakavargaTable({ input }) {
                       const total = row.reduce((s, c) => s + c.points, 0)
                       return (
                         <tr key={planet} className={pi % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
-                          <td className={`p-2 border border-line font-bold sticky left-0 z-10 ${pi % 2 === 0 ? 'bg-parchment-card' : 'bg-[#F8F6F2]'}`}
-                              style={{ color: PLANET_COLORS[planet] ?? '#333' }}>
+                          <td className={`p-2 border border-line font-bold sticky left-0 z-10 ${pi % 2 === 0 ? 'bg-parchment-card' : 'bg-parchment-alt'}`}
+                              style={{ color: PLANET_COLORS[planet] ?? chartPalette.text }}>
                             {planetShort(t, planet)}
                           </td>
                           {row.map((cell, i) => (

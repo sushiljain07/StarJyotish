@@ -152,13 +152,13 @@ export default function Insights() {
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
         <div className="max-w-5xl mx-auto px-4">
           <div className="pt-2 pb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#D9A441' }}>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-ink">
               {t('insights_header')}
             </p>
           </div>
 
           <div className="border-t border-line/40 py-2">
-            <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={selectSub} variant="pill" accent="mauve" label={t('insights_subtabs_aria')} />
+            <AnimatedTabRow tabs={SUBTABS} active={activeSub} onChange={selectSub} variant="pill" label={t('insights_subtabs_aria')} />
           </div>
         </div>
       </div>

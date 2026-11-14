@@ -20,6 +20,8 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { computeWindow, minutesToLabel } from '../../utils/muhurtaWindow'
+import { colors } from '../../theme/tokens'
+import { withAlpha } from '../../theme/chartPalette'
 import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
 
 // Position as % along the sunrise→sunset bar
@@ -34,7 +36,7 @@ function PanchangCell({ label, value }) {
   if (!value) return null
   return (
     <div className="min-w-0">
-      <p className="text-3xs uppercase tracking-wider text-ink-onnight/75">{label}</p>
+      <p className="text-2xs uppercase tracking-wider text-ink-onnight">{label}</p>
       <p className="text-xs text-ink-onnight truncate">{value}</p>
     </div>
   )
@@ -92,22 +94,22 @@ export default function TodayWindow({ panchang }) {
           style={{
             left: `${goodLeft}%`,
             width: `${goodWidth}%`,
-            background: 'linear-gradient(90deg, rgba(217,164,65,0.55), rgba(240,203,128,0.85))',
-            boxShadow: '0 0 12px rgba(240,203,128,0.35)',
+            background: `linear-gradient(90deg, ${withAlpha(colors.primary.DEFAULT, 0.55)}, ${withAlpha(colors.primary.glow, 0.85)})`,
+            boxShadow: `0 0 12px ${withAlpha(colors.primary.glow, 0.35)}`,
           }}
         />
         {/* Rahu Kaal — avoid (red) */}
         <div
-          className="absolute top-0 h-full rounded-full bg-vermillion/40"
+          className="absolute top-0 h-full rounded-full bg-bad-onnight/40"
           style={{ left: `${avoidLeft}%`, width: `${avoidWidth}%` }}
         />
         {/* Now marker — only while today's daylight window is still current */}
         {showNow && (
           <div
             className="absolute -top-1.5 w-0.5 h-[26px] bg-white rounded-sm motion-reduce:transition-none"
-            style={{ left: `${nowPct}%`, boxShadow: '0 0 8px rgba(255,255,255,0.8)' }}
+            style={{ left: `${nowPct}%`, boxShadow: `0 0 8px ${withAlpha(colors.parchment.card, 0.8)}` }}
           >
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] tracking-widest uppercase text-white whitespace-nowrap">
+            <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-2xs tracking-widest uppercase text-white whitespace-nowrap">
               {t('home_window_now', 'now')}
             </span>
           </div>
@@ -115,18 +117,18 @@ export default function TodayWindow({ panchang }) {
       </div>
 
       {/* Axis labels: sunrise and sunset times */}
-      <div className="flex justify-between text-3xs text-ink-onnight/75 px-1">
+      <div className="flex justify-between text-2xs text-ink-onnight px-1">
         <span>☀ {sunriseLabel}</span>
         <span>{sunsetLabel} ☀</span>
       </div>
 
-      <div className="flex gap-5 mt-3 text-2xs text-ink-onnight/75 flex-wrap">
+      <div className="flex gap-5 mt-3 text-2xs text-ink-onnight flex-wrap">
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-primary-glow shrink-0" style={{ boxShadow: '0 0 6px rgba(240,203,128,0.6)' }} />
+          <span className="w-2 h-2 rounded-full bg-primary-glow shrink-0" style={{ boxShadow: `0 0 6px ${withAlpha(colors.primary.glow, 0.6)}` }} />
           {t('home_window_abhijit', 'Abhijit muhurta — favorable')}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-vermillion shrink-0" />
+          <span className="w-2 h-2 rounded-full bg-bad-onnight shrink-0" />
           {t('home_window_rahu', 'Rahu kaal — avoid beginnings')}
         </span>
       </div>
@@ -141,16 +143,16 @@ export default function TodayWindow({ panchang }) {
           {' — '}
           {t('home_window_best_hint', 'sign, send, or start it here.')}
           {bestNote && (
-            <span className="block text-2xs text-vermillion/70 mt-0.5">{t('window_rahu_overlap_note')}</span>
+            <span className="block text-2xs text-bad-onnight mt-0.5">{t('window_rahu_overlap_note')}</span>
           )}
         </p>
       ) : (
-        <p className="text-sm text-ink-onnight/75 mt-3">
+        <p className="text-sm text-ink-onnight mt-3">
           {t('window_abhijit_in_rahu_note')}
         </p>
       )}
 
-      <p className="text-sm text-ink-onnight/75 mt-1.5">
+      <p className="text-sm text-ink-onnight mt-1.5">
         {t('home_window_avoid', {
           defaultValue: 'Avoid: {{start}} – {{end}}',
           start: minutesToLabel(rahuStart),

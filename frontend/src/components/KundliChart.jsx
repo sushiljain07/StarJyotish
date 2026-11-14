@@ -170,7 +170,7 @@ export default function KundliChart({
         status: getPlanetStatus(p, sun, navamsaPlanets),
       })
     })
-    // Transit planets (italic, lighter)
+    // Transit planets: full colour (AA on paper and ascFill), told apart by italics and the T: prefix
     const tps = byHouseTransit?.[hNum] ?? []
     tps.forEach(p => {
       allItems.push({
@@ -268,7 +268,7 @@ export default function KundliChart({
               return (
                 <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos} data-label="transit"
                       textAnchor="middle" fontSize={transitFs}
-                      fill={item.color} opacity="0.65" fontStyle="italic">
+                      fill={item.color} fontStyle="italic">
                   {compact ? <>{t('chart_transit_marker')}{item.name}</> : (
                     <>
                       <tspan data-deg fontSize="9" dy="-2">{item.deg}</tspan>

@@ -10,6 +10,7 @@
 // whisper, not a banner. It disappears on the user's first ever visit.
 
 import { useMemo } from 'react'
+import { chartPalette, withAlpha } from '../../theme/chartPalette'
 import { localDateStr } from '../../utils/localDate'
 
 const CARD_LABELS = {
@@ -72,7 +73,7 @@ export default function ContinuityStrip({ summary }) {
     <div
       style={{
         fontSize: '12px',
-        color: 'rgba(217,164,65,0.7)',
+        color: withAlpha(chartPalette.gold, 0.7),
         fontWeight: 500,
         letterSpacing: '0.01em',
         padding: '6px 4px',

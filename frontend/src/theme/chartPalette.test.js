@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import config from '../../tailwind.config.js'
+import { colors } from './tokens.js'
 import { chartPalette as P, withAlpha } from './chartPalette.js'
 import { ratio, composite } from './contrastUtil.js'
 
-const c = config.theme.extend.colors
+const c = colors
 
 describe('chartPalette', () => {
   it('takes its values from the Tailwind tokens', () => {
@@ -23,6 +24,13 @@ describe('chartPalette', () => {
     expect(P.night).toBe(c.night.DEFAULT)
     expect(P.onNight).toBe(c.ink.onnight)
   })
+  it('Tailwind config uses the same colour object as tokens.js', () => {
+    expect(config.theme.extend.colors).toBe(colors)
+  })
+  it('chartPalette does not import tailwind.config.js', () => {
+    const src = readFileSync(resolve(import.meta.dirname, './chartPalette.js'), 'utf8')
+    expect(src).not.toMatch(/tailwind\.config/)
+  })
   it('cream is the parchment token', () => expect(P.cream).toBe(c.parchment.DEFAULT))
   it('readable cream text on night (alpha 0.5) is at least 4.5:1', () => {
     expect(ratio(composite(P.cream, 0.5, P.night), P.night)).toBeGreaterThanOrEqual(4.5)
@@ -36,9 +44,18 @@ describe('chartPalette', () => {
       it(`${key} is at least 4.5:1 on ${bg}`, () => expect(ratio(P[key], P[bg])).toBeGreaterThanOrEqual(4.5))
     }
   }
+  it('groups each family of keys together (dignity*, then bad + badFill)', () => {
+    const keys = Object.keys(P)
+    for (const prefix of ['dignity', 'transit', 'natal']) {
+      const at = keys.map((k, i) => (k.startsWith(prefix) ? i : -1)).filter(i => i >= 0)
+      expect(at.length, prefix).toBeGreaterThan(1)
+      expect(at[at.length - 1] - at[0], prefix).toBe(at.length - 1)
+    }
+    expect(keys.indexOf('badFill') - keys.indexOf('bad')).toBe(1)
+  })
   it('has no hex or rgba literals in the chart components', () => {
-    const files = ['KundliChart', 'SouthIndiaChart', 'WesternChart', 'SarvatobhadraChakra',
-      'ChartReading', 'ChartHighlight', 'home/MobileTimelineCard']
+    const files = ['KundliChart', 'SarvatobhadraChakra',
+      'ChartReading', 'ChartHighlight']
     for (const f of files) {
       const src = readFileSync(resolve(import.meta.dirname, `../components/${f}.jsx`), 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')

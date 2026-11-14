@@ -1,6 +1,6 @@
 // Phase 5a: pin WCAG contrast for the text tokens on both light surfaces.
 import { describe, it, expect } from 'vitest'
-import config from '../../tailwind.config.js'
+import { colors } from './tokens.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -8,7 +8,7 @@ import { ratio, composite } from './contrastUtil.js'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 
-const c = config.theme.extend.colors
+const c = colors
 const surfaces = { parchment: c.parchment.DEFAULT, card: c.parchment.card }
 
 describe('text token contrast (WCAG)', () => {
@@ -52,4 +52,23 @@ describe('chip and night-card text contrast', () => {
     const src = fs.readFileSync(path.resolve(HERE, '../components/home/TodayWindow.jsx'), 'utf8')
     expect(src).not.toContain('text-ink-onnight/60')
   })
+})
+
+describe('night and tint tokens', () => {
+  const nights = { night: c.night.DEFAULT, 'night.deep': c.night.deep, 'night.light': c.night.light }
+  const AAN = { 'ink.onnightMuted': c.ink.onnightMuted, 'good.onnight': c.good.onnight, 'bad.onnight': c.bad.onnight,
+    'mauve.onnight': c.mauve.onnight, 'sage.onnight': c.sage.onnight }
+  for (const [name, fg] of Object.entries(AAN)) {
+    for (const [sn, bg] of Object.entries(nights)) {
+      it(`${name} on ${sn} is at least 4.5:1`, () => expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5))
+    }
+  }
+  it('ink.onnightFaint is at least 3:1 on night surfaces (decoration only)', () => {
+    for (const bg of Object.values(nights)) expect(ratio(c.ink.onnightFaint, bg)).toBeGreaterThanOrEqual(3)
+  })
+  for (const k of ['sage', 'mauve']) {
+    for (const [sn, bg] of [...Object.entries(surfaces), ['light', c[k].light]]) {
+      it(`${k} text on ${sn} is at least 4.5:1`, () => expect(ratio(c[k].DEFAULT, bg)).toBeGreaterThanOrEqual(4.5))
+    }
+  }
 })

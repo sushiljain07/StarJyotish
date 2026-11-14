@@ -43,7 +43,7 @@ export default function ClosingBeat({ headline, comingUpEvents }) {
         {t('home_closing_title', 'The page turns at sunrise.')}
       </h2>
       {nearest && (
-        <p className="text-sm text-ink-onnight/55 max-w-xs mx-auto">
+        <p className="text-sm text-ink-onnightMuted max-w-xs mx-auto">
           {t('home_closing_teaser', {
             defaultValue: "Tomorrow's edition is already forming — {{event}}",
             event: nearest.title,

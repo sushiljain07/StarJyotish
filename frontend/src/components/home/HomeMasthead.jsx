@@ -20,6 +20,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { localDateStr } from '../../utils/localDate'
 import { formatDate } from '../../utils/format'
+import { chartPalette, withAlpha } from '../../theme/chartPalette'
+import { colors } from '../../theme/tokens'
 import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
@@ -47,11 +49,12 @@ function currentBucket(sunrise, sunset) {
 }
 
 // PAGE_BG must match the page body's actual background exactly
-// (bg-night-deep in tailwind.config = #0F1226) — the gradient always ends
+// (bg-night-deep) — the gradient always ends
 // on this color regardless of time-of-day bucket, so the masthead fades
 // into the page instead of cutting off with a visible seam. Only the top
 // of the gradient (sky1) varies by bucket.
-const PAGE_BG = '#0F1226'
+const PAGE_BG = chartPalette.nightDeep
+// Sky-top tints have no token (one-off atmospheric shades); they stay as literals.
 const SKY = {
   dawn:  { sky1: '#33294F' },
   day:   { sky1: '#1D2C56' },
@@ -122,7 +125,7 @@ function TodayDateLabel() {
     () => formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' }),
     [i18n.language],
   )
-  return <span className="text-2xs font-mono text-ink-onnight/45 whitespace-nowrap">{label}</span>
+  return <span className="text-2xs font-mono text-ink-onnightMuted whitespace-nowrap">{label}</span>
 }
 
 function StreakPill({ streak, beads, t }) {
@@ -137,7 +140,7 @@ function StreakPill({ streak, beads, t }) {
           <span
             key={i}
             className={`w-[5px] h-[5px] rounded-full ${lit ? 'bg-primary' : 'bg-primary/20'}`}
-            style={lit ? { boxShadow: '0 0 6px rgba(240,203,128,0.7)' } : undefined}
+            style={lit ? { boxShadow: `0 0 6px ${withAlpha(colors.primary.glow, 0.7)}` } : undefined}
           />
         ))}
       </div>
@@ -157,7 +160,7 @@ function dayOfYear() {
 
 function EditionChip({ t }) {
   return (
-    <p className="inline-flex items-center text-3xs text-primary bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
+    <p className="inline-flex items-center text-2xs text-primary-glow bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
       {t('home_edition_chip', { n: dayOfYear() })}
     </p>
   )
@@ -177,7 +180,7 @@ function TithiLine({ panchang, t }) {
   if (horaName) parts.push(t('home_tithi_hora', { planet: planetName(t, horaName) }))
 
   if (!parts.length) return null
-  return <p className="text-xs text-ink-onnight/55 mt-1.5">{parts.join(' · ')}</p>
+  return <p className="text-xs text-ink-onnightMuted mt-1.5">{parts.join(' · ')}</p>
 }
 
 // ── Celestial clock ──────────────────────────────────────────────────────────
@@ -197,8 +200,8 @@ function SunDisc({ size = 52 }) {
       style={{
         width: size,
         height: size,
-        background: 'radial-gradient(circle at 35% 32%, #F0CB80 0%, #D9A441 100%)',
-        boxShadow: `0 0 ${glow}px ${spread}px rgba(217,164,65,0.45)`,
+        background: `radial-gradient(circle at 35% 32%, ${colors.primary.glow} 0%, ${chartPalette.gold} 100%)`,
+        boxShadow: `0 0 ${glow}px ${spread}px ${withAlpha(chartPalette.gold, 0.45)}`,
       }}
       aria-hidden="true"
     />
@@ -231,7 +234,7 @@ function MoonDisc({ t, size = 52 }) {
     ctx.clearRect(0, 0, size, size)
 
     // Step 1: draw the full lit disc
-    ctx.fillStyle = '#FBF0DC'
+    ctx.fillStyle = colors.primary.light
     ctx.beginPath()
     ctx.arc(CX, CY, R, 0, Math.PI * 2)
     ctx.fill()
@@ -253,7 +256,7 @@ function MoonDisc({ t, size = 52 }) {
     // ellipse x-radius: at new moon illum≈0 → w≈R (fully dark);
     //                   at full moon illum≈1 → w≈R (fully lit, dark side gone);
     //                   at quarter moon illum≈0.5 → w≈0 (straight terminator).
-    ctx.fillStyle = '#171B33'
+    ctx.fillStyle = chartPalette.night
     ctx.beginPath()
     if (waxing) {
       // Dark left half
@@ -277,9 +280,9 @@ function MoonDisc({ t, size = 52 }) {
         ref={canvasRef}
         width={size}
         height={size}
-        style={{ filter: `drop-shadow(0 0 ${Math.round(size * 0.27)}px rgba(240,203,128,0.32))` }}
+        style={{ filter: `drop-shadow(0 0 ${Math.round(size * 0.27)}px ${withAlpha(colors.primary.glow, 0.32)})` }}
       />
-      <p className="text-3xs text-ink-onnight/45 mt-1 whitespace-nowrap">
+      <p className="text-2xs text-ink-onnightMuted mt-1 whitespace-nowrap">
         {waxing ? t('home_moon_waxing') : t('home_moon_waning')}
         {' · '}
         {Math.round(illum * 100)}%
@@ -354,12 +357,12 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
             </p>
             <div className="flex gap-2 mt-1.5 flex-wrap">
               {currentCity && (
-                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
                   {t('home_masthead_current', { city: currentCity })}
                 </span>
               )}
               {birthCity && (
-                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
                   {t('home_masthead_birth', { city: birthCity })}
                 </span>
               )}

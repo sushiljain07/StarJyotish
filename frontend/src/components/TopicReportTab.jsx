@@ -190,7 +190,7 @@ function HighlightCard({ h }) {
           </div>
           {h.timeline && <p className="text-xs text-ink-muted mt-0.5">{h.timeline}</p>}
         </div>
-        <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+        <span aria-hidden="true" className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
       {open && (
         <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">

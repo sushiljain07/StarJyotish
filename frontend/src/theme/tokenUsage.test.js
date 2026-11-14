@@ -13,6 +13,8 @@ const BASELINE_PATH = path.join(HERE, 'baselines', 'token-usage-baseline.json')
 const COUNTERS = {
   goldText: /(?<![\w-])(?:hover:|group-hover:|focus:)?text-primary(?:-dark)?(?![\w-])/g,
   faintText: /text-ink-faint(?![\w-])/g,
+  // Colour literals in components; use tokens / chartPalette / withAlpha. Target is zero.
+  hexLiteral: /#[0-9a-fA-F]{3,8}\b|rgba?\(/g,
 }
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -51,7 +53,7 @@ describe('token usage (ratchet)', () => {
 
   const baseline = JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'))
 
-  it('no file uses more gold/faint text than its baseline', () => {
+  it('no file uses more gold/faint text or colour literals than its baseline', () => {
     const over = []
     for (const rel of files) {
       for (const name of Object.keys(COUNTERS)) {
@@ -60,7 +62,7 @@ describe('token usage (ratchet)', () => {
         if (found > allowed) over.push(`${rel}: ${name} baseline ${allowed}, found ${found}`)
       }
     }
-    expect(over, 'Use text-primary-ink on light / text-ink-muted for readable text').toEqual([])
+    expect(over, 'Use text-primary-ink on light / text-ink-muted for readable text; tokens, not hex').toEqual([])
   })
 
   it('the baseline has no stale entries', () => {
@@ -76,7 +78,7 @@ describe('token usage (ratchet)', () => {
 
   // Status meaning uses good / caution / bad tokens, never ad-hoc green/amber/red palette classes.
   it('adHocStatus is zero everywhere', () => {
-    const re = /(?:text|bg|border|from|to)-(?:green|emerald|amber|yellow|red|rose)-\d{2,3}/g
+    const re = /(?:text|bg|border|from|via|to|ring|fill|stroke|divide|outline)-(?:green|emerald|amber|yellow|red|rose|orange|slate)-\d{2,3}/g
     const hits = []
     for (const rel of files) {
       const n = count(re, sources.get(rel))

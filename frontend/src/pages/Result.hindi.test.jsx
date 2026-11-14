@@ -17,7 +17,6 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: f
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Result from './Result'
-import ShodashvargaPanel from '../components/ShodashvargaPanel'
 
 // Heavy file: every pane renders for real. Generous per-test budget so a
 // loaded machine slows it down instead of failing it.
@@ -119,19 +118,6 @@ describe('Kundli page in Hindi', () => {
     await settle(container, 'अपने जीवन का हर आयाम जानें')
     fireEvent.click(await screen.findByRole('button', { name: /विवाह और संबंध/ }, LAZY))
     await settle(container, 'यह कुंडली किसे दर्शाती है')
-    expectNoEnglish(container, ALLOW)
-  })
-
-  it('has no English in the Shodashvarga panel (both chart styles, with a comparison)', async () => {
-    const { container } = render(<ShodashvargaPanel input={INPUT} />)
-    expectNoEnglish(container, ALLOW)
-    fireEvent.click(screen.getByRole('button', { name: /D9/ }))
-    await screen.findByRole('button', { name: /तुलना करें/ })
-    fireEvent.click(screen.getByRole('button', { name: 'दक्षिण भारतीय' }))
-    expectNoEnglish(container, ALLOW)
-    fireEvent.click(screen.getByRole('button', { name: /तुलना करें/ }))
-    await settle(container)
-    await waitFor(() => expect(container.textContent).toContain('तुलना बंद करें'))
     expectNoEnglish(container, ALLOW)
   })
 

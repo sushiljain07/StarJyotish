@@ -28,8 +28,8 @@ function durationLabel(t, start, end) {
 
 const LEVEL_COLORS = {
   mahadasha:  { active: 'bg-primary',    activeText: 'text-night', light: 'bg-primary-light',    border: 'border-primary/30',    text: 'text-primary-ink', bar: 'bg-primary'    },
-  antardasha: { active: 'bg-mauve',      activeText: 'text-white',  light: 'bg-mauve-light',      border: 'border-mauve/30',      text: 'text-mauve',        bar: 'bg-mauve'      },
-  pratyantar: { active: 'bg-vermillion', activeText: 'text-white',  light: 'bg-vermillion-light', border: 'border-vermillion/30', text: 'text-vermillion',   bar: 'bg-vermillion' },
+  antardasha: { active: 'bg-primary',    activeText: 'text-night', light: 'bg-mauve-light',      border: 'border-mauve/30',      text: 'text-mauve',        bar: 'bg-mauve'      },
+  pratyantar: { active: 'bg-primary',    activeText: 'text-night', light: 'bg-vermillion-light', border: 'border-vermillion/30', text: 'text-vermillion',   bar: 'bg-vermillion' },
 }
 
 const tabsFor = t => [
@@ -109,8 +109,8 @@ export default function DashaTable({ dasha }) {
       {/* Current chain banner */}
       <div className="bg-primary-light border border-primary/30 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
         <span className="font-bold text-primary-ink">{planetName(t, md.planet)} {t('dasha_md')}</span>
-        {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
-        {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
+        {ad && <><span aria-hidden="true" className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
+        {pd && <><span aria-hidden="true" className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
         <span className="ml-auto text-xs text-ink-muted">{t('dasha_left_in_md', { years: yrsLeft })}</span>
       </div>
 

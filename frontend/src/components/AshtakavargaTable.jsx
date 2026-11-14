@@ -1,8 +1,8 @@
 // Ashtakavarga table: Bhinnashtakavarga + Sarvashtakavarga
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetName, planetShort } from '../utils/astroNames'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import ScrollHint from './ui/ScrollHint'
 import { ASHTAKAVARGA_BANDS as BANDS } from '../config/ashtakavargaBands'
@@ -32,32 +32,34 @@ function SarvaCell({ value }) {
 
 export default function AshtakavargaTable({ input }) {
   const { t } = useTranslation()
+  const { date, time, place } = input
   const SIGN_ABBR = SIGN_KEYS.map(k => t(`sign_abbr.${k}`))
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('sarva')
 
-  async function load() {
+  const load = useCallback(async ({ signal, force = false } = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/ashtakavarga`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setData(await res.json())
-    } catch {
+      const res = await fetchReport('/api/kundli/ashtakavarga', { date, time, place }, { signal, force, retryOn429: true })
+      if (signal?.aborted) return
+      setData(res)
+    } catch (e) {
+      if (e?.name === 'AbortError') return
       setError('ashtakavarga_error')
     }
     setLoading(false)
-  }
+  }, [date, time, place])
 
-  // Pure Swiss Ephemeris calculation, not an LLM call — auto-load like
-  // every other non-LLM tab, instead of gating behind a click.
-  useEffect(() => { load() }, [])
+  // Pure Swiss Ephemeris calculation, not an LLM call, so it loads on
+  // mount (Result mounts it when the tab is first opened). Cached.
+  useEffect(() => {
+    const ctrl = new AbortController()
+    load({ signal: ctrl.signal })
+    return () => ctrl.abort()
+  }, [load])
 
   return (
     <div className="space-y-4">
@@ -66,7 +68,7 @@ export default function AshtakavargaTable({ input }) {
         <p className="text-primary-ink text-xs mt-1">
           {t('ashtakavarga_intro')}
         </p>
-        <button onClick={load} disabled={loading}
+        <button onClick={() => load({ force: true })} disabled={loading}
                 className="mt-3 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
           {loading ? t('ashtakavarga_calculating') : t('transit_refresh')}
         </button>

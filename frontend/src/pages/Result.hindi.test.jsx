@@ -105,7 +105,8 @@ describe('Kundli page in Hindi', () => {
       fireEvent.click(screen.getAllByRole('button', { name: label })[0])
       expectNoEnglish(container, ALLOW)
     }
-    // divisional chart detail
+    // divisional chart detail (the panel mounts when its tab is first opened)
+    fireEvent.click(screen.getAllByRole('tab', { name: /जीवन क्षेत्र/ })[0])
     fireEvent.click(await screen.findByRole('button', { name: /विवाह और संबंध/ }))
     await waitFor(() => expect(container.textContent).toContain('यह कुंडली किसे दर्शाती है'))
     await settle(container)

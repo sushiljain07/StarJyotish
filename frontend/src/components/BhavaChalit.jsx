@@ -2,10 +2,10 @@
 // Story-first: intro → shifted-planets summary → full table (collapsed).
 // Parchment color scheme to match the Analysis tab context.
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import ScrollHint from './ui/ScrollHint'
 
@@ -29,29 +29,31 @@ function shiftNote(t, planet, from, to) {
 
 export default function BhavaChalit({ input }) {
   const { t } = useTranslation()
+  const { date, time, place } = input
   const [data, setData]         = useState(null)
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState(null)
   const [showFull, setShowFull] = useState(false)
 
-  async function load() {
+  const load = useCallback(async ({ signal, force = false } = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/bhava-chalit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setData(await res.json())
-    } catch {
+      const res = await fetchReport('/api/kundli/bhava-chalit', { date, time, place }, { signal, force, retryOn429: true })
+      if (signal?.aborted) return
+      setData(res)
+    } catch (e) {
+      if (e?.name === 'AbortError') return
       setError('bhava_error')
     }
     setLoading(false)
-  }
+  }, [date, time, place])
 
-  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const ctrl = new AbortController()
+    load({ signal: ctrl.signal })
+    return () => ctrl.abort()
+  }, [load])
 
   const shifted = data?.planets?.filter(p => p.changed) ?? []
 

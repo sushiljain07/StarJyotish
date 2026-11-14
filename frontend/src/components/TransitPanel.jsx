@@ -1,34 +1,36 @@
 // Transit chart panel: shows current planet positions on natal chart
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import KundliChart from './KundliChart'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 
 export default function TransitPanel({ input, natalData }) {
   const { t } = useTranslation()
+  const { date, time, place } = input
   const [transitData, setTransitData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  async function loadTransit() {
+  const loadTransit = useCallback(async ({ signal, force = false } = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/transit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setTransitData(await res.json())
-    } catch {
+      const res = await fetchReport('/api/kundli/transit', { date, time, place }, { signal, force, retryOn429: true })
+      if (signal?.aborted) return
+      setTransitData(res)
+    } catch (e) {
+      if (e?.name === 'AbortError') return
       setError('transit_error')
     }
     setLoading(false)
-  }
+  }, [date, time, place])
 
-  useEffect(() => { loadTransit() }, [])
+  useEffect(() => {
+    const ctrl = new AbortController()
+    loadTransit({ signal: ctrl.signal })
+    return () => ctrl.abort()
+  }, [loadTransit])
 
   const natalAsc = natalData?.ascendant
   const natalPlanets = natalData?.planets ?? []
@@ -43,7 +45,7 @@ export default function TransitPanel({ input, natalData }) {
               {t('transit_subtitle')}
             </p>
           </div>
-          <button onClick={loadTransit}
+          <button onClick={() => loadTransit({ force: true })}
                   className="text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
             {t('transit_refresh')}
           </button>

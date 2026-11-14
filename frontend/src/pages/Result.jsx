@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName } from '../utils/astroNames'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState, saveLastChart } from '../services/lastChart'
+import { chartBody } from '../api/reportCache'
 
 import { StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
@@ -138,6 +139,26 @@ export default function Result() {
   function selectSub(id) {
     setSearchParams({ tab: activeMain, sub: id }, { replace: true, state: location.state })
   }
+
+  // Data panels mount the first time their tab is opened, then stay mounted
+  // (hidden), so tab switches don't refetch and a first /kundli load doesn't
+  // fire every compute endpoint at once (30/min rate limit). The set is tied
+  // to the chart: a different chart starts with nothing visited.
+  const chartKey = state?.input ? JSON.stringify(chartBody(state.input)) : ''
+  const openPanel = activeMain === 'analysis' ? activeAnalysisSub
+    : activeMain === 'divisional' ? 'divisional'
+    : activeMain === 'birth_chart' && activeBirthSub === 'transit' ? 'transit'
+    : null
+  const [visitedState, setVisitedState] = useState(() => ({ key: chartKey, ids: new Set([openPanel]) }))
+  const visited = visitedState.key === chartKey ? visitedState.ids : new Set()
+  useEffect(() => {
+    if (!openPanel) return
+    setVisitedState(prev => {
+      const ids = prev.key === chartKey ? prev.ids : new Set()
+      return ids.has(openPanel) ? prev : { key: chartKey, ids: new Set(ids).add(openPanel) }
+    })
+  }, [openPanel, chartKey])
+  const mounted = id => visited.has(id) || openPanel === id
 
   const [chartStyle, setChartStyle]               = useState('north')
   const MAIN_TABS = mainTabs(t)
@@ -302,7 +323,7 @@ export default function Result() {
 
           <Suspense fallback={<TabLoader />}>
             <div className={activeBirthSub === 'transit' ? 'animate-fade-in-fast' : 'hidden'}>
-              <TransitPanel input={input} natalData={data} />
+              {mounted('transit') && <TransitPanel key={chartKey} input={input} natalData={data} />}
             </div>
           </Suspense>
         </div>
@@ -310,7 +331,7 @@ export default function Result() {
         {/* ══ LIFE AREAS (DIVISIONAL) ══ */}
         <div className={activeMain === 'divisional' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
-            <DivisionalCharts input={input} defaultDivision={topic?.division} />
+            {mounted('divisional') && <DivisionalCharts key={chartKey} input={input} defaultDivision={topic?.division} />}
           </Suspense>
         </div>
 
@@ -318,10 +339,10 @@ export default function Result() {
         <div className={activeMain === 'analysis' ? 'animate-fade-in-fast' : 'hidden'}>
           <Suspense fallback={<TabLoader />}>
             <div className={activeAnalysisSub === 'bhava' ? 'animate-fade-in-fast' : 'hidden'}>
-              <BhavaChalit input={input} />
+              {mounted('bhava') && <BhavaChalit key={chartKey} input={input} />}
             </div>
             <div className={activeAnalysisSub === 'ashtakavarga' ? 'animate-fade-in-fast' : 'hidden'}>
-              <AshtakavargaTable input={input} />
+              {mounted('ashtakavarga') && <AshtakavargaTable key={chartKey} input={input} />}
             </div>
             <div className={activeAnalysisSub === 'sarvatobhadra' ? 'animate-fade-in-fast' : 'hidden'}>
               <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />

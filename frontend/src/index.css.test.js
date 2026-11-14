@@ -39,14 +39,14 @@ describe('index.css', () => {
       expect(body).not.toMatch(/#[0-9a-fA-F]{3,8}/)
     }
   })
-  it('moved sj-* animations are disabled under prefers-reduced-motion: reduce', () => {
-    const m = css.match(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?animation:\s*none\s*!important[\s\S]*?)\}\s*\}/)
-    expect(m).not.toBeNull()
-    for (const cls of ['.sj-fade-up', '.sj-shimmer', '.sj-grow-bar', '.sj-ring-arc', '.sj-ring-pulse', '.sj-cd-chip']) {
-      expect(m[1]).toContain(cls)
+  it('moved animations are disabled under prefers-reduced-motion: reduce', () => {
+    // Collect every reduce block that sets animation: none, not just the first.
+    const blocks = [...css.matchAll(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?)\}\s*\}/g)]
+      .map(m => m[1]).filter(b => /animation:\s*none\s*!important/.test(b))
+    expect(blocks.length).toBeGreaterThan(0)
+    for (const cls of ['.sj-fade-up', '.sj-shimmer', '.sj-grow-bar', '.sj-ring-arc', '.sj-ring-pulse', '.sj-cd-chip', '.sj-hb-star', '.animate-fade-in-up', '.animate-fade-in-fast']) {
+      expect(blocks.some(b => b.includes(cls)), cls).toBe(true)
     }
-    expect(m[1]).toMatch(/\.animate-fade-in-up/)
-    expect(m[1]).toMatch(/\.animate-fade-in-fast/)
   })
   it('defines the moved keyframes', () => {
     for (const k of ['sj-hb-twinkle', 'sj-shimmer-a', 'sj-fade-up', 'sj-grow', 'sj-ring-a', 'sj-pulse', 'wheelSpin', 'starTwinkle']) {

@@ -115,7 +115,7 @@
    layout rules in DailyPatrikaHero) and the Tailwind entrance utilities. */
 @media (prefers-reduced-motion: reduce) {
   .sj-fade-up,.sj-shimmer,.sj-grow-bar,.sj-ring-arc,
-  .sj-ring-pulse,.sj-cd-chip,
+  .sj-ring-pulse,.sj-cd-chip,.sj-hb-star,
   .animate-fade-in-up,.animate-fade-in-fast{animation:none!important}
 }
 

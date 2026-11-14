@@ -125,7 +125,7 @@ function TodayDateLabel() {
     () => formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' }),
     [i18n.language],
   )
-  return <span className="text-2xs font-mono text-ink-onnight/45 whitespace-nowrap">{label}</span>
+  return <span className="text-2xs font-mono text-ink-onnightMuted whitespace-nowrap">{label}</span>
 }
 
 function StreakPill({ streak, beads, t }) {
@@ -160,7 +160,7 @@ function dayOfYear() {
 
 function EditionChip({ t }) {
   return (
-    <p className="inline-flex items-center text-3xs text-primary bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
+    <p className="inline-flex items-center text-2xs text-primary-glow bg-primary/[0.08] border border-dashed border-primary/40 rounded-lg px-2.5 py-1.5 mt-3">
       {t('home_edition_chip', { n: dayOfYear() })}
     </p>
   )
@@ -180,7 +180,7 @@ function TithiLine({ panchang, t }) {
   if (horaName) parts.push(t('home_tithi_hora', { planet: planetName(t, horaName) }))
 
   if (!parts.length) return null
-  return <p className="text-xs text-ink-onnight/55 mt-1.5">{parts.join(' · ')}</p>
+  return <p className="text-xs text-ink-onnightMuted mt-1.5">{parts.join(' · ')}</p>
 }
 
 // ── Celestial clock ──────────────────────────────────────────────────────────
@@ -282,7 +282,7 @@ function MoonDisc({ t, size = 52 }) {
         height={size}
         style={{ filter: `drop-shadow(0 0 ${Math.round(size * 0.27)}px ${withAlpha(colors.primary.glow, 0.32)})` }}
       />
-      <p className="text-3xs text-ink-onnight/45 mt-1 whitespace-nowrap">
+      <p className="text-2xs text-ink-onnightMuted mt-1 whitespace-nowrap">
         {waxing ? t('home_moon_waxing') : t('home_moon_waning')}
         {' · '}
         {Math.round(illum * 100)}%
@@ -357,12 +357,12 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
             </p>
             <div className="flex gap-2 mt-1.5 flex-wrap">
               {currentCity && (
-                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
                   {t('home_masthead_current', { city: currentCity })}
                 </span>
               )}
               {birthCity && (
-                <span className="text-3xs font-mono text-ink-onnight/55 bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
                   {t('home_masthead_birth', { city: birthCity })}
                 </span>
               )}

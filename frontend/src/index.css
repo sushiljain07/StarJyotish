@@ -252,7 +252,8 @@ html:not([data-script="latn"]) .leading-none { line-height: 1.25; }
   font-size:11px;color:theme('colors.ink.onnightMuted');margin:0 0 8px;
 }
 .sj-why-btn{
-  background:theme('colors.parchment.DEFAULT / 7%');border-radius:99px;
+  /* 4% keeps the caution label at 4.58:1 on night.light (7% gave 4.20). */
+  background:theme('colors.parchment.DEFAULT / 4%');border-radius:99px;
   padding:5px 12px;font-size:11px;font-weight:700;
   cursor:pointer;transition:all 150ms;
   -webkit-tap-highlight-color:transparent;

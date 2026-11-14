@@ -1,14 +1,14 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { dayScoreBand } from '../../utils/dayScoreBand'
 import { colors } from '../../theme/tokens'
 import { ratio, composite } from '../../theme/contrastUtil'
 import { computeOneAction } from '../../utils/dailyInsights'
 
-const FILES = [
-  'DailyPatrikaHero', 'ReportsStrip', 'DoAvoidCards', 'ChartSpotlight', 'TodayWindow',
-  'AskPersonaPanel', 'Starfield', 'LocationSection', 'LocationPrompt',
-]
+// Every /home component: the whole page is a night surface.
+const FILES = readdirSync('src/components/home')
+  .filter(f => /\.jsx$/.test(f) && !/\.test\.jsx$/.test(f))
+  .map(f => f.replace(/\.jsx$/, ''))
 const src = Object.fromEntries(FILES.map(f => [f, readFileSync(`src/components/home/${f}.jsx`, 'utf8')]))
 const index = readFileSync('src/index.css', 'utf8')
 
@@ -16,6 +16,10 @@ const styleBlocks = s => [...s.matchAll(/<style>\{`([\s\S]*?)`\}<\/style>/g)].ma
 const movedCss = () => index.slice(index.indexOf('.sj-night-card'))
 
 describe('/home night colour', () => {
+  it('scans every home component (guards against a broken walk)', () => {
+    expect(FILES.length).toBeGreaterThan(20)
+    expect(FILES).toEqual(expect.arrayContaining(['HomeMasthead', 'WeekStrip', 'DisclaimerBlock', 'BottomNav']))
+  })
   it('embedded <style> blocks hold no hex or rgba literals', () => {
     for (const f of FILES) {
       for (const block of styleBlocks(src[f])) expect(block, f).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(/)
@@ -46,6 +50,33 @@ describe('/home night colour', () => {
   })
   it('moved day-card rules have no sub-11px font-size', () => {
     for (const m of movedCss().matchAll(/font-size:\s*(\d+(\.\d+)?)px/g)) expect(Number(m[1])).toBeGreaterThanOrEqual(11)
+  })
+})
+
+describe('One Action "why" button (.sj-why-btn) over the tone card', () => {
+  // The card sits on the sj-night-card gradient; night.light is its lightest stop.
+  const tint = Number(index.match(/\.sj-why-btn\{[^}]*background:theme\('colors\.parchment\.DEFAULT \/ (\d+)%'\)/)[1]) / 100
+  const tones = [
+    ['opportunity', colors.sage.DEFAULT, 0.22, colors.good.onnight],
+    ['steady', colors.primary.DEFAULT, 0.12, colors.primary.glow],
+    ['caution', colors.bad.DEFAULT, 0.16, colors.bad.onnight],
+  ]
+  it.each(tones)('%s label reaches 4.5:1', (_n, from, a, fg) => {
+    for (const base of [colors.night.light, colors.night.DEFAULT]) {
+      const card = composite(from, a, base)
+      expect(ratio(fg, composite(colors.parchment.DEFAULT, tint, card))).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+  it('the hero still uses these tone colours', () => {
+    expect(src.DailyPatrikaHero).toMatch(/caution:\s*\{ bg: withAlpha\(colors\.bad\.DEFAULT, 0\.16\).*ac: colors\.bad\.onnight/)
+  })
+})
+
+describe('WeekStrip day labels', () => {
+  it('render at >= 11px through useRenderedScale, at full opacity', () => {
+    expect(src.WeekStrip).toMatch(/useRenderedScale\(/)
+    expect(src.WeekStrip).toMatch(/fontSize=\{legibleSize\([^)]*11\)\}/)
+    expect(src.WeekStrip).not.toMatch(/fillOpacity=\{p\.isToday \? 1 : 0\.\d+\}/)
   })
 })
 

@@ -39,7 +39,7 @@ export default function LanguageSwitcher({ size = 'md', tone = 'night' }) {
   const pad = size === 'sm' ? 'px-2 text-[11px]' : 'px-3 text-xs'
   const idle = tone === 'light'
     ? 'bg-ink/5 text-ink/70 hover:bg-ink/10'
-    : 'bg-white/5 text-ink-onnight/60 hover:bg-white/10'
+    : 'bg-white/5 text-ink-onnightMuted hover:bg-white/10'
 
   if (LANGUAGES.length > MAX_BUTTONS) {
     return (

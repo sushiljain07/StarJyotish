@@ -95,7 +95,7 @@ export default function ReflectionLoop({ profile, lang = 'en' }) {
 
         <div className="flex-1 min-w-0">
           {thanked ? (
-            <p className="text-sm text-ink-onnight/80 leading-relaxed">
+            <p className="text-sm text-ink-onnight leading-relaxed">
               {t('reflection_thanks')}{' '}
               <button onClick={tellJyoti} className="text-primary font-semibold hover:underline">
                 {t('reflection_tell_more')}
@@ -103,7 +103,7 @@ export default function ReflectionLoop({ profile, lang = 'en' }) {
             </p>
           ) : isEvening ? (
             <>
-              <p className="text-sm text-ink-onnight/80 leading-relaxed mb-2.5">{t('reflection_evening_prompt')}</p>
+              <p className="text-sm text-ink-onnight leading-relaxed mb-2.5">{t('reflection_evening_prompt')}</p>
               <button
                 onClick={tellJyoti}
                 className="text-xs font-semibold bg-primary text-night rounded-full px-4 py-2 hover:bg-primary-dark transition"
@@ -116,11 +116,11 @@ export default function ReflectionLoop({ profile, lang = 'en' }) {
               <p className="text-[11px] uppercase tracking-wider font-bold text-primary mb-1">
                 {t('reflection_yesterday_label')}
               </p>
-              <p className="text-[13px] text-ink-onnight/70 italic leading-snug mb-2.5 line-clamp-2">
+              <p className="text-[13px] text-ink-onnight italic leading-snug mb-2.5 line-clamp-2">
                 “{yHeadline}”
               </p>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[13px] text-ink-onnight/85 font-medium mr-1">{t('reflection_how_did_it_go')}</span>
+                <span className="text-[13px] text-ink-onnight font-medium mr-1">{t('reflection_how_did_it_go')}</span>
                 {REACTIONS.map(r => (
                   <button
                     key={r.id}

@@ -12,12 +12,13 @@
 // (contrast dailyInsights.js's computeDayScore, which is); it's a display
 // heuristic, same spirit as the old rahuTone() dot but explicitly labeled
 // as decorative here rather than implied to be real.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchPanchangWeek } from '../../api/astro'
 import { weekDayScore } from '../../utils/weekScore'
 import { localDateStr } from '../../utils/localDate'
 import { formatDate } from '../../utils/format'
+import { useRenderedScale, legibleSize } from '../../hooks/useRenderedScale'
 
 function shortDayName(dateStr) {
   return formatDate(dateStr, { weekday: 'short' })
@@ -41,6 +42,9 @@ export default function WeekStrip({ location }) {
   const [week, setWeek] = useState(null)
   const [hover, setHover] = useState(null)
   const [reducedMotion, setReducedMotion] = useState(false)
+  // The 400-unit viewBox renders at ~296px on a phone; keep day labels >= 11px.
+  const svgRef = useRef(null)
+  const scale = useRenderedScale(svgRef, 400)
 
   useEffect(() => {
     setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -75,7 +79,7 @@ export default function WeekStrip({ location }) {
   return (
     <div className="bg-white/[0.045] border border-white/[0.09] rounded-card p-4 sm:p-5">
       <div className="relative">
-        <svg viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria')}>
+        <svg ref={svgRef} viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria')}>
           <path d={pathD} fill="none" className="stroke-primary-glow" strokeOpacity={0.28} strokeWidth={1} strokeDasharray="3 4" />
           {points.map((p, i) => {
             const r = 2.5 + (p.score / 100) * 5
@@ -102,9 +106,8 @@ export default function WeekStrip({ location }) {
                   )}
                 </circle>
                 <text
-                  x={p.x} y={148} textAnchor="middle" fontSize="10" fontFamily="inherit"
+                  x={p.x} y={148} textAnchor="middle" fontSize={legibleSize(10, scale, 11)} fontFamily="inherit"
                   className={p.isToday ? 'fill-primary-glow' : 'fill-ink-onnight'}
-                  fillOpacity={p.isToday ? 1 : 0.45}
                 >
                   {shortDayName(p.day.date)}
                 </text>
@@ -129,7 +132,7 @@ export default function WeekStrip({ location }) {
         )}
       </div>
 
-      <p className="text-center text-2xs text-ink-onnight/50 mt-2">
+      <p className="text-center text-2xs text-ink-onnightMuted mt-2">
         {t('home_week_caption', {
           day: shortDayName(brightest.day.date),
         })}

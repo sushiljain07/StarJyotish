@@ -1,9 +1,9 @@
 // frontend/src/components/home/ChartsStrip.jsx
 //
 // Surfaces a few divisional charts through today's lens, then hands off to
-// the existing ShodashvargaPanel (components/ShodashvargaPanel.jsx) at
-// /kundli's divisional tab, which already renders all 16 — this strip is a
-// teaser into that panel, not a second implementation of it.
+// /kundli's divisional tab (components/DivisionalCharts.jsx), which renders
+// them in full — this strip is a teaser into that tab, not a second
+// implementation of it.
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -34,9 +34,9 @@ export default function ChartsStrip({ profile }) {
           onClick={openDivisional}
           className="flex-shrink-0 w-[148px] text-left rounded-xl border border-white/[0.09] bg-white/[0.045] p-3.5 hover:bg-white/[0.07] transition"
         >
-          <p className="text-3xs font-mono text-ink-onnight/60 mb-1.5">{code}</p>
+          <p className="text-2xs font-mono text-ink-onnightMuted mb-1.5">{code}</p>
           <p className="font-serif text-sm font-medium text-primary-light mb-1 leading-tight">{t(`home_charts_${code}_name`)}</p>
-          <p className="text-[11px] text-ink-onnight/50 leading-snug">{t(`home_charts_${code}_blurb`)}</p>
+          <p className="text-2xs text-ink-onnightMuted leading-snug">{t(`home_charts_${code}_blurb`)}</p>
         </button>
       ))}
     </div>

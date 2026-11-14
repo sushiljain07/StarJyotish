@@ -190,7 +190,7 @@ export default function AskPersonaPanel({ userId, input }) {
         </div>
 
         <div className="px-5 pt-3 border-t border-line bg-parchment-card" style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom,0px))" }}>
-          <p className="text-[11px] text-ink-faint mb-2">
+          <p className="text-[11px] text-ink-muted mb-2">
             {limitReached
               ? t('ask_limit_reached', { count: MAX_QUESTIONS })
               : t('ask_questions_remaining', { count: remaining })}
@@ -204,7 +204,7 @@ export default function AskPersonaPanel({ userId, input }) {
               maxLength={MAX_CHARS}
               rows={1}
               placeholder={t('ask_placeholder')}
-              className="flex-1 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}
@@ -214,7 +214,7 @@ export default function AskPersonaPanel({ userId, input }) {
               ↑
             </button>
           </div>
-          <p className="text-[10px] text-ink-faint text-right mt-1">{value.length} / {MAX_CHARS}</p>
+          <p className="text-[10px] text-ink-muted text-right mt-1">{value.length} / {MAX_CHARS}</p>
         </div>
       </div>
     </>

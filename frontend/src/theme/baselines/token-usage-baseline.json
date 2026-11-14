@@ -112,7 +112,7 @@
     "faintText": 2
   },
   "components/home/AskPersonaPanel.jsx": {
-    "faintText": 4
+    "faintText": 1
   },
   "components/home/ClosingBeat.jsx": {
     "goldText": 1
@@ -133,11 +133,9 @@
     "goldText": 1
   },
   "components/home/LocationBar.jsx": {
-    "goldText": 4,
-    "faintText": 3
+    "faintText": 1
   },
   "components/home/ProfileSelector.jsx": {
-    "goldText": 3,
     "faintText": 1
   },
   "components/home/QuickPanchangStrip.jsx": {
@@ -150,55 +148,29 @@
     "goldText": 1
   },
   "components/home/TodayWindow.jsx": {
-    "goldText": 1,
-    "faintText": 2
+    "goldText": 1
   },
   "components/knowledge/ArticleCard.jsx": {
-    "goldText": 6,
-    "faintText": 2
+    "goldText": 2
   },
   "components/knowledge/Breadcrumb.jsx": {
-    "goldText": 2,
+    "goldText": 1,
     "faintText": 1
   },
   "components/knowledge/CTA.jsx": {
-    "goldText": 1
-  },
-  "components/knowledge/Callout.jsx": {
-    "goldText": 1
-  },
-  "components/knowledge/ConceptLink.jsx": {
     "goldText": 1
   },
   "components/knowledge/Hero.jsx": {
     "goldText": 1
   },
   "components/knowledge/LearningMetadata.jsx": {
-    "goldText": 1,
     "faintText": 1
   },
   "components/knowledge/LearningPath.jsx": {
-    "goldText": 2,
     "faintText": 2
-  },
-  "components/knowledge/QuickFacts.jsx": {
-    "goldText": 1,
-    "faintText": 1
-  },
-  "components/knowledge/RelatedArticles.jsx": {
-    "goldText": 4,
-    "faintText": 3
   },
   "components/knowledge/Section.jsx": {
-    "goldText": 2
-  },
-  "components/knowledge/SignNav.jsx": {
-    "goldText": 1,
-    "faintText": 2
-  },
-  "components/knowledge/ZodiacCard.jsx": {
-    "goldText": 2,
-    "faintText": 1
+    "goldText": 1
   },
   "components/landing/CareerReportPreview.jsx": {
     "goldText": 1
@@ -221,14 +193,8 @@
     "goldText": 1,
     "faintText": 1
   },
-  "components/ui/Button.jsx": {
-    "goldText": 1
-  },
   "components/ui/InlineNotice.jsx": {
     "faintText": 1
-  },
-  "components/ui/SectionHeading.jsx": {
-    "goldText": 1
   },
   "pages/AboutUs.jsx": {
     "goldText": 1

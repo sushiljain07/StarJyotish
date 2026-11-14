@@ -29,13 +29,13 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
         {status === 'requesting' && <span>{t('location_finding')}</span>}
         {status !== 'requesting' && (
           <span>
-            📍 {t('location_currently_in')}: <b className="text-primary-dark font-semibold">{currentLabel ?? t('location_set_city')}</b>
+            📍 {t('location_currently_in')}: <b className="text-primary-ink font-semibold">{currentLabel ?? t('location_set_city')}</b>
           </span>
         )}
         {birthPlace && (
           <>
             <span className="text-ink-faint">|</span>
-            <span>🪔 {t('location_chart_cast_for')} <b className="text-primary-dark font-semibold">{birthPlace}</b> {t('location_birth_place_label')}</span>
+            <span>🪔 {t('location_chart_cast_for')} <b className="text-primary-ink font-semibold">{birthPlace}</b> {t('location_birth_place_label')}</span>
           </>
         )}
       </div>
@@ -43,7 +43,7 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
       {!editing && (
         <button
           onClick={() => setEditing(true)}
-          className="text-xs font-semibold text-primary-dark hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5 transition hover:bg-primary-light/40"
+          className="text-xs font-semibold text-primary-ink hover:underline shrink-0 border border-primary/40 rounded-full px-3 py-1.5 transition hover:bg-primary-light/40"
         >
           {location ? t('location_update_city') : t('location_set_city')}
         </button>
@@ -56,7 +56,7 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={t('location_search_placeholder')}
-            className="w-full border border-line rounded-xl px-3 py-1.5 text-xs bg-parchment text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-line rounded-xl px-3 py-1.5 text-xs bg-parchment text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary"
           />
           {matches.length > 0 && (
             <ul className="absolute z-10 mt-1 w-full bg-parchment-card border border-line rounded-2xl shadow-xl max-h-48 overflow-y-auto">
@@ -73,10 +73,10 @@ export default function LocationBar({ location, status, onRetryGeolocation, onSe
             </ul>
           )}
           <div className="flex items-center gap-3 mt-1.5">
-            <button onClick={onRetryGeolocation} className="text-[11px] text-primary-dark hover:underline">
+            <button onClick={onRetryGeolocation} className="text-[11px] text-primary-ink hover:underline">
               {t('location_use_device')}
             </button>
-            <button onClick={() => { setEditing(false); setQuery('') }} className="text-[11px] text-ink-faint hover:underline">
+            <button onClick={() => { setEditing(false); setQuery('') }} className="text-[11px] text-ink-muted hover:underline">
               {t('location_cancel')}
             </button>
           </div>

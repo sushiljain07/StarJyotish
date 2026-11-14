@@ -34,7 +34,7 @@ function PanchangCell({ label, value }) {
   if (!value) return null
   return (
     <div className="min-w-0">
-      <p className="text-3xs uppercase tracking-wider text-ink-faint">{label}</p>
+      <p className="text-3xs uppercase tracking-wider text-ink-onnight/60">{label}</p>
       <p className="text-xs text-ink-onnight truncate">{value}</p>
     </div>
   )
@@ -115,7 +115,7 @@ export default function TodayWindow({ panchang }) {
       </div>
 
       {/* Axis labels: sunrise and sunset times */}
-      <div className="flex justify-between text-3xs text-ink-faint px-1">
+      <div className="flex justify-between text-3xs text-ink-onnight/60 px-1">
         <span>☀ {sunriseLabel}</span>
         <span>{sunsetLabel} ☀</span>
       </div>

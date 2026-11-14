@@ -23,7 +23,7 @@ export default function ConceptLink({ id, children }) {
     return (
       <Link
         to={concept.href}
-        className="text-primary-dark border-b border-dotted border-primary/50 hover:border-primary transition"
+        className="text-primary-ink border-b border-dotted border-primary/50 hover:border-primary transition"
       >
         {label}
       </Link>

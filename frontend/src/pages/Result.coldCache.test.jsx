@@ -3,8 +3,9 @@
 // them to /home.
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import '../i18n'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 const auth = vi.hoisted(() => ({ value: {} }))
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => auth.value }))
@@ -32,6 +33,7 @@ function renderKundli() {
   )
 }
 
+beforeAll(preloadKundliChunks, PRELOAD_TIMEOUT_MS)
 afterEach(() => { vi.unstubAllGlobals(); localStorage.clear(); sessionStorage.clear() })
 
 describe('/kundli with a cold cache', () => {

@@ -3,8 +3,9 @@
 // measures a real width and shows its fade.
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }))
 vi.mock('../components/Seo', () => ({ default: () => null }))
@@ -15,6 +16,8 @@ vi.mock('../components/DivisionalCharts', () => ({ default: () => null }))
 vi.mock('../components/KundliDownload', () => ({ default: () => null }))
 
 import Result from './Result'
+
+vi.setConfig({ testTimeout: 15000 })
 
 const CHART = {
   data: { planets: [], ascendant: { sign: 'Virgo' }, navamsa_planets: [], navamsa_ascendant: { sign: 'Leo' },
@@ -29,6 +32,7 @@ const dims = {
   clientWidth() { return this.closest('.hidden') ? 0 : this.querySelector('.min-w-\\[560px\\]') ? 328 : 0 },
 }
 
+beforeAll(preloadKundliChunks, PRELOAD_TIMEOUT_MS)
 beforeEach(() => {
   for (const k of Object.keys(dims)) {
     Object.defineProperty(HTMLElement.prototype, k, { configurable: true, get: dims[k] })
@@ -43,18 +47,18 @@ afterEach(() => {
 
 describe('Sarvatobhadra sub-tab', () => {
   it('mounts on first open and shows the scroll fade at phone width', async () => {
-    // Resolve the lazy chunk first, so "not mounted" below is not just "still loading".
-    await import('../components/SarvatobhadraChakra')
+    // The lazy chunks are resolved in beforeAll, so "not mounted" below is
+    // not just "still loading".
     const { container } = render(
       <MemoryRouter initialEntries={[{ pathname: '/kundli', search: '?tab=analysis&sub=bhava', state: CHART }]}>
         <Routes><Route path="/kundli" element={<Result />} /></Routes>
       </MemoryRouter>,
     )
-    await screen.findAllByRole('tab')
+    await screen.findAllByRole('tab', {}, { timeout: 4000 })
     await new Promise(r => setTimeout(r, 50))
     expect(container.querySelector('.min-w-\\[560px\\]')).toBeNull() // not mounted while hidden
     fireEvent.click(screen.getAllByRole('tab').find(el => /sarvatobhadra/i.test(el.textContent)))
-    await waitFor(() => expect(container.querySelector('.min-w-\\[560px\\]')).not.toBeNull())
-    await waitFor(() => expect(container.querySelector('[data-scroll-fade]')).not.toBeNull())
+    await waitFor(() => expect(container.querySelector('.min-w-\\[560px\\]')).not.toBeNull(), { timeout: 4000 })
+    await waitFor(() => expect(container.querySelector('[data-scroll-fade]')).not.toBeNull(), { timeout: 4000 })
   })
 })

@@ -2,7 +2,7 @@
 // Fixtures in src/test/fixtures were captured from the local backend.
 import { render, screen, act, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n'
 import { expectNoEnglish } from '../test/expectNoEnglish'
 import kundli from '../test/fixtures/kundli.json'
@@ -11,12 +11,18 @@ import ashtakavarga from '../test/fixtures/ashtakavarga.json'
 import bhava from '../test/fixtures/bhava.json'
 import kp from '../test/fixtures/kp.json'
 import div1 from '../test/fixtures/divisional-1.json'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }))
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Result from './Result'
 import ShodashvargaPanel from '../components/ShodashvargaPanel'
+
+// Heavy file: every pane renders for real. Generous per-test budget so a
+// loaded machine slows it down instead of failing it.
+vi.setConfig({ testTimeout: 15000 })
+const LAZY = { timeout: 4000 }
 
 const INPUT = { name: 'Asha', date: '1990-08-16', time: '19:05', place: 'New Delhi, India' }
 const ALLOW = [INPUT.place, INPUT.name]
@@ -56,60 +62,63 @@ const PANES = [
   ['?tab=download', 'PDF डाउनलोड करें'],
 ]
 
-// Lazy panes show a skeleton first; wait until it is gone.
-async function settle(container) {
+// Lazy panes show a skeleton first. Wait for the pane's own content marker
+// (so "no skeleton" can't pass before the pane even started), then for every
+// skeleton to be gone.
+async function settle(container, marker) {
+  if (marker) await waitFor(() => expect(container.textContent).toContain(marker), LAZY)
   await waitFor(() => {
     if (container.querySelector('[class*="animate-pulse"], [aria-busy="true"]')) throw new Error('still loading')
-  }, { timeout: 4000 })
+  }, LAZY)
   await act(async () => { await new Promise(r => setTimeout(r, 50)) })
 }
 
+beforeAll(preloadKundliChunks, PRELOAD_TIMEOUT_MS)
 beforeEach(async () => { stubFetch(); await i18n.changeLanguage('hi') })
 afterEach(async () => { vi.unstubAllGlobals(); await i18n.changeLanguage('en') })
 
 describe('Kundli page in Hindi', () => {
   it.each(PANES)('%s has no English', async (search, marker) => {
     const { container } = renderAt(search)
-    await screen.findAllByRole('button')
-    await settle(container)
-    await waitFor(() => expect(container.textContent).toContain(marker))
+    await settle(container, marker)
     expectNoEnglish(container, ALLOW)
   })
 
   it('has no English after switching from en to hi', async () => {
     await i18n.changeLanguage('en')
     const { container } = renderAt('?tab=birth_chart&sub=planets')
-    await screen.findAllByRole('button')
-    await settle(container)
+    await settle(container, 'Planetary Positions')
     await act(() => i18n.changeLanguage('hi'))
-    await settle(container)
+    await settle(container, 'ग्रह स्थिति')
     expectNoEnglish(container, ALLOW)
   })
 
-  it('has no English in the KP style, planet modes, dasha levels and a divisional chart', async () => {
+  it('has no English in the KP chart style', async () => {
     const { container } = renderAt('?tab=birth_chart&sub=chart')
-    await screen.findAllByRole('button')
-    await settle(container)
-    // KP chart style
+    await settle(container, 'लग्न कुंडली')
     fireEvent.click(screen.getByRole('button', { name: 'KP' }))
-    await waitFor(() => expect(container.textContent).toContain('KP (कृष्णमूर्ति पद्धति) कुंडली'))
-    await settle(container)
+    await settle(container, 'KP (कृष्णमूर्ति पद्धति) कुंडली')
     expectNoEnglish(container, ALLOW)
-    // planet table modes
+  })
+
+  it('has no English in the planet table modes and dasha levels', async () => {
+    const { container } = renderAt('?tab=birth_chart&sub=planets')
+    await settle(container, 'ग्रह स्थिति')
     for (const label of ['नक्षत्र', 'पूर्ण']) {
       fireEvent.click(screen.getAllByRole('button', { name: label })[0])
       expectNoEnglish(container, ALLOW)
     }
-    // dasha levels
     for (const label of ['अंतर्दशा', 'प्रत्यंतर']) {
       fireEvent.click(screen.getAllByRole('button', { name: label })[0])
       expectNoEnglish(container, ALLOW)
     }
-    // divisional chart detail (the panel mounts when its tab is first opened)
-    fireEvent.click(screen.getAllByRole('tab', { name: /जीवन क्षेत्र/ })[0])
-    fireEvent.click(await screen.findByRole('button', { name: /विवाह और संबंध/ }))
-    await waitFor(() => expect(container.textContent).toContain('यह कुंडली किसे दर्शाती है'))
-    await settle(container)
+  })
+
+  it('has no English in a divisional chart detail', async () => {
+    const { container } = renderAt('?tab=divisional')
+    await settle(container, 'अपने जीवन का हर आयाम जानें')
+    fireEvent.click(await screen.findByRole('button', { name: /विवाह और संबंध/ }, LAZY))
+    await settle(container, 'यह कुंडली किसे दर्शाती है')
     expectNoEnglish(container, ALLOW)
   })
 

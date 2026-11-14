@@ -1,7 +1,8 @@
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
+import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
 
 let mockAuthed = false
 vi.mock('../contexts/AuthContext', () => ({
@@ -42,6 +43,8 @@ function scrollTo(y) {
     window.dispatchEvent(new Event('scroll'))
   })
 }
+
+beforeAll(preloadKundliChunks, PRELOAD_TIMEOUT_MS)
 
 let now
 beforeEach(() => {

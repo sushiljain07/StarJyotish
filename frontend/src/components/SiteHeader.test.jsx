@@ -252,3 +252,31 @@ describe('SiteHeader hide on scroll', () => {
     expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
   })
 })
+
+// Tablet (md to lg): the signed-in links must not wrap to two lines.
+describe('SiteHeader signed-in tablet row', () => {
+  function renderSignedIn() {
+    mockAuthed = true
+    render(
+      <MemoryRouter initialEntries={['/home']}>
+        <SiteHeader />
+      </MemoryRouter>,
+    )
+    return screen.getAllByRole('navigation')[0]
+  }
+  afterEach(() => { mockAuthed = false })
+
+  it('keeps every link on one line with tighter spacing at md', () => {
+    const nav = renderSignedIn()
+    const links = [...nav.querySelectorAll('button')]
+    expect(links).toHaveLength(5)
+    for (const b of links) {
+      expect(b.className).toContain('whitespace-nowrap')
+      expect(b.className).toContain('md:px-2')
+      expect(b.className).toContain('lg:px-4')
+      expect(b.className).toContain('min-h-11')
+    }
+    expect(nav.className).toContain('md:gap-0.5')
+    expect(nav.className).toContain('lg:gap-1')
+  })
+})

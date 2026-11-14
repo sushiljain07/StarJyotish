@@ -34,7 +34,7 @@ function NavButton({ item, active, onClick }) {
     <button
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
-      className={`relative inline-flex items-center min-h-11 px-4 text-sm font-medium rounded-md transition-colors ${
+      className={`relative inline-flex items-center min-h-11 md:px-2 lg:px-4 px-4 whitespace-nowrap text-sm font-medium rounded-md transition-colors ${
         active ? 'text-primary-glow' : 'text-primary-light/60 hover:text-primary-light/90'
       }`}
     >
@@ -129,7 +129,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1" aria-label={t('nav_bottom_aria', 'Main navigation')}>
+        <nav className="hidden md:flex items-center md:gap-0.5 lg:gap-1" aria-label={t('nav_bottom_aria', 'Main navigation')}>
           {items.map(item => (
             <NavButton
               key={item.id}

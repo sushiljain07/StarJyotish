@@ -5,6 +5,7 @@ import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import KundliChart from './KundliChart'
 import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette } from '../theme/chartPalette'
 
 export default function TransitPanel({ input, natalData }) {
   const { t } = useTranslation()
@@ -107,7 +108,7 @@ export default function TransitPanel({ input, natalData }) {
                       <tr key={tp.name}
                           className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                         <td className="p-2 border-b font-medium"
-                            style={{ color: PLANET_COLORS[tp.name] ?? '#333' }}>
+                            style={{ color: PLANET_COLORS[tp.name] ?? chartPalette.text }}>
                           {planetName(t, tp.name)}
                           {tp.retrograde && <span className="text-vermillion ml-1">{t('col_retrograde')}</span>}
                         </td>

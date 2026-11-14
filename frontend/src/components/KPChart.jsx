@@ -5,13 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName, planetShort } from '../utils/astroNames'
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
+import { chartPalette } from '../theme/chartPalette'
 
 function LordChip({ lord }) {
   const { t } = useTranslation()
   if (!lord) return <span className="text-ink-muted">—</span>
   return (
     <span className="inline-block px-1.5 py-0.5 rounded text-white text-xs font-bold"
-          style={{ backgroundColor: LORD_COLORS[lord] ?? '#64748b' }}>
+          style={{ backgroundColor: LORD_COLORS[lord] ?? chartPalette.muted }}>
       {planetShort(t, lord)}
     </span>
   )
@@ -105,7 +106,7 @@ export default function KPChart({ input }) {
                   {data.planets.map((p, i) => (
                     <tr key={p.name} className={i % 2 === 0 ? 'bg-parchment-card' : 'bg-night/[0.03]'}>
                       <td className="p-2.5 border-b font-bold"
-                          style={{ color: PLANET_COLORS[p.name] ?? '#333' }}>
+                          style={{ color: PLANET_COLORS[p.name] ?? chartPalette.text }}>
                         {planetName(t, p.name)}
                       </td>
                       <td className="p-2.5 border-b">

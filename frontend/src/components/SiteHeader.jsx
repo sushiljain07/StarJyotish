@@ -17,6 +17,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { chartPalette, withAlpha } from '../theme/chartPalette'
 import AccountMenu from './AccountMenu'
 import LanguageSwitcher from './LanguageSwitcher'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
@@ -112,7 +113,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
       style={{
         backdropFilter:       `blur(${blurPx}px)`,
         WebkitBackdropFilter: `blur(${blurPx}px)`,
-        borderColor: `rgba(255, 255, 255, ${borderAlpha})`,
+        borderColor: `${withAlpha(chartPalette.cream, borderAlpha)}`,
       }}
     >
       <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto ${SAFE_GUTTER} py-0 flex items-center justify-between gap-4 h-[60px]`}>

@@ -1,6 +1,7 @@
 // frontend/src/components/KundliDownload.jsx
 import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
+import { chartPalette } from '../theme/chartPalette'
 import { formatDate as fmtDate, formatTime as fmtTime } from '../utils/format'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 
@@ -19,7 +20,7 @@ function getDignity(name, signIndex) {
   return ''
 }
 
-const DIGNITY_COLOR = { exalted: '#16a34a', debilitated: '#dc2626', own: '#2563eb' }
+const DIGNITY_COLOR = { exalted: chartPalette.dignityExalted, debilitated: chartPalette.dignityDebilitated, own: chartPalette.dignityOwn }
 
 export default function KundliDownload({ data, input }) {
   const { t } = useTranslation()
@@ -136,7 +137,7 @@ export default function KundliDownload({ data, input }) {
                       <td className="p-1.5 border border-line text-ink-muted">{nakshatraName(t, p.nakshatra)}</td>
                       <td className="p-1.5 border border-line text-center text-ink-muted">{p.nakshatra_pada}</td>
                       <td className="p-1.5 border border-line font-medium"
-                          style={{ color: DIGNITY_COLOR[dignity] ?? '#64748b' }}>
+                          style={{ color: DIGNITY_COLOR[dignity] ?? chartPalette.muted }}>
                         {dignity && t(`kundli_dignity_${dignity}`)}
                       </td>
                       <td className="p-1.5 border border-line text-center font-bold text-vermillion">

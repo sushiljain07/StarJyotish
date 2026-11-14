@@ -24,6 +24,6 @@ describe('PlanetTable sticky first column', () => {
     const { container } = render(<PlanetTable planets={planets} />)
     const second = container.querySelectorAll('tbody tr')[1]
     expect(second.className).toContain('bg-night/[0.03]')
-    expect(second.querySelector('td').className).toContain('bg-[#F1ECE1]')
+    expect(second.querySelector('td').className).toContain('bg-parchment-alt')
   })
 })

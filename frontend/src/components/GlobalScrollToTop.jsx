@@ -8,7 +8,10 @@
 import ScrollToTop from './ScrollToTop'
 import { useWindowScrolledPast } from '../hooks/useWindowScrolledPast'
 
+// Appears only after two screens of scrolling.
+const twoScreens = () => 2 * window.innerHeight
+
 export default function GlobalScrollToTop() {
-  const visible = useWindowScrolledPast()
+  const visible = useWindowScrolledPast(twoScreens)
   return <ScrollToTop visible={visible} />
 }

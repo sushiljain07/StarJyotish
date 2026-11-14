@@ -1,0 +1,16 @@
+// WCAG relative-luminance helpers shared by the theme tests.
+export const lum = hex => {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+export const ratio = (a, b) => {
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Composite fg at `alpha` over an opaque bg; returns an opaque hex.
+export const composite = (fg, alpha, bg) => {
+  const ch = i => Math.round(parseInt(fg.slice(i, i + 2), 16) * alpha + parseInt(bg.slice(i, i + 2), 16) * (1 - alpha))
+  return '#' + [1, 3, 5].map(i => ch(i).toString(16).padStart(2, '0')).join('')
+}

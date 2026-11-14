@@ -16,7 +16,19 @@ export default function ScrollHint({ children, className = '', fadeFrom = 'from-
   useEffect(() => {
     update()
     window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
+    // A region that mounts inside a display:none tab measures 0 at first;
+    // re-measure whenever the region or its content changes size.
+    let ro
+    const el = ref.current
+    if (el && typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(update)
+      ro.observe(el)
+      if (el.firstElementChild) ro.observe(el.firstElementChild)
+    }
+    return () => {
+      window.removeEventListener('resize', update)
+      ro?.disconnect()
+    }
   }, [update])
 
   return (

@@ -1,0 +1,153 @@
+{
+  "components/AskChart.jsx": {
+    "faintText": 2
+  },
+  "components/CareerReportTab.jsx": {
+    "faintText": 2
+  },
+  "components/CompactFooter.jsx": {
+    "goldText": 1
+  },
+  "components/DashaTable.jsx": {
+    "faintText": 2
+  },
+  "components/Footer.jsx": {
+    "goldText": 7
+  },
+  "components/RajyogasTab.jsx": {
+    "faintText": 1
+  },
+  "components/SectionDivider.jsx": {
+    "goldText": 1
+  },
+  "components/SectionJumpNav.jsx": {
+    "faintText": 1
+  },
+  "components/SocialButtons.jsx": {
+    "goldText": 1
+  },
+  "components/Testimonials.jsx": {
+    "goldText": 1
+  },
+  "components/TopicReportTab.jsx": {
+    "faintText": 1
+  },
+  "components/auth/PhoneOtpForm.jsx": {
+    "faintText": 1
+  },
+  "components/auth/VerifiedContactField.jsx": {
+    "faintText": 1
+  },
+  "components/home/AskPersonaPanel.jsx": {
+    "faintText": 1
+  },
+  "components/home/ClosingBeat.jsx": {
+    "goldText": 1
+  },
+  "components/home/ComingUpStrip.jsx": {
+    "goldText": 2
+  },
+  "components/home/DailyPatrikaHero.jsx": {
+    "goldText": 2
+  },
+  "components/home/HomeMasthead.jsx": {
+    "goldText": 1
+  },
+  "components/home/KnowledgeCapsule.jsx": {
+    "goldText": 1
+  },
+  "components/home/LifeAreaGrid.jsx": {
+    "goldText": 1
+  },
+  "components/home/LocationBar.jsx": {
+    "faintText": 1
+  },
+  "components/home/ProfileSelector.jsx": {
+    "faintText": 1
+  },
+  "components/home/QuickPanchangStrip.jsx": {
+    "goldText": 1
+  },
+  "components/home/ReflectionLoop.jsx": {
+    "goldText": 3
+  },
+  "components/home/ReportsStrip.jsx": {
+    "goldText": 1
+  },
+  "components/home/TodayWindow.jsx": {
+    "goldText": 1
+  },
+  "components/knowledge/ArticleCard.jsx": {
+    "goldText": 2
+  },
+  "components/knowledge/Breadcrumb.jsx": {
+    "goldText": 1,
+    "faintText": 1
+  },
+  "components/knowledge/CTA.jsx": {
+    "goldText": 1
+  },
+  "components/knowledge/Hero.jsx": {
+    "goldText": 1
+  },
+  "components/knowledge/LearningMetadata.jsx": {
+    "faintText": 1
+  },
+  "components/knowledge/LearningPath.jsx": {
+    "faintText": 2
+  },
+  "components/knowledge/Section.jsx": {
+    "goldText": 1
+  },
+  "components/onboarding/OnboardingLayout.jsx": {
+    "goldText": 1
+  },
+  "components/ui/InlineNotice.jsx": {
+    "faintText": 1
+  },
+  "pages/AdminDashboard.jsx": {
+    "faintText": 1
+  },
+  "pages/Blog.jsx": {
+    "goldText": 3
+  },
+  "pages/BlogArticle.jsx": {
+    "goldText": 3
+  },
+  "pages/Home.jsx": {
+    "goldText": 1
+  },
+  "pages/Landing.jsx": {
+    "goldText": 3
+  },
+  "pages/Login.jsx": {
+    "goldText": 2
+  },
+  "pages/PanchangDetail.jsx": {
+    "goldText": 3
+  },
+  "pages/PersonalHome.jsx": {
+    "goldText": 1
+  },
+  "pages/Pricing.jsx": {
+    "goldText": 1
+  },
+  "pages/TestimonialsPage.jsx": {
+    "goldText": 3
+  },
+  "pages/WeekAhead.jsx": {
+    "goldText": 1
+  },
+  "pages/learn/Zodiac.jsx": {
+    "goldText": 1
+  },
+  "pages/learn/basics/PlanetsGuide.jsx": {
+    "faintText": 1
+  },
+  "pages/learn/categories/Houses.jsx": {
+    "goldText": 1
+  },
+  "pages/learn/categories/Nakshatras.jsx": {
+    "goldText": 2
+  }
+}

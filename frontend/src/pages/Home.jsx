@@ -79,10 +79,10 @@ export default function Home() {
         <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
           {topic && (
             <div className="mb-4 flex items-center justify-between bg-primary-light border border-primary/30 rounded-lg px-3 py-2 text-xs">
-              <span className="text-primary-dark font-medium flex items-center gap-1.5">
+              <span className="text-primary-ink font-medium flex items-center gap-1.5">
                 <TopicIcon id={topic.id} className="w-3.5 h-3.5" /> {t('focused_on')}: {t(`landing_topic_${topic.id}_label`)}
               </span>
-              <button onClick={() => navigate('/')} className="text-primary-dark underline shrink-0 ml-2">
+              <button onClick={() => navigate('/')} className="text-primary-ink underline shrink-0 ml-2">
                 {t('change_focus')}
               </button>
             </div>

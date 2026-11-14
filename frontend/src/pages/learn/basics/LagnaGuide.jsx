@@ -54,7 +54,7 @@ export default function LagnaGuide() {
       {/* ── The Lagna is your chart's spine ────────────────────────────── */}
       <section className="mt-10" aria-labelledby="spine-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_SPINE.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_SPINE.eyebrow}</p>
           <h2 id="spine-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {LAGNA_SPINE.title}
           </h2>
@@ -68,7 +68,7 @@ export default function LagnaGuide() {
       {/* ── Lagna Lord ─────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="lord-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_LORD.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_LORD.eyebrow}</p>
           <h2 id="lord-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {LAGNA_LORD.title}
           </h2>
@@ -79,7 +79,7 @@ export default function LagnaGuide() {
       {/* ── 12 Lagnas table ────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="lagnas-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{TWELVE_LAGNAS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{TWELVE_LAGNAS.eyebrow}</p>
           <h2 id="lagnas-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-4">
             {TWELVE_LAGNAS.title}
           </h2>
@@ -90,8 +90,8 @@ export default function LagnaGuide() {
             {TWELVE_LAGNAS.items.map((l, i) => (
               <div key={l.sign} className={`grid grid-cols-[1fr_auto] sm:grid-cols-[7rem_5rem_7rem_1fr] gap-x-4 gap-y-0.5 items-center px-5 py-3 ${i < TWELVE_LAGNAS.items.length - 1 ? 'border-b border-line' : ''}`}>
                 <dt className="font-semibold text-sm text-ink">{l.sign}</dt>
-                <dd className="text-xs text-ink-faint sm:col-auto col-start-2">Lord: {l.lord}</dd>
-                <dd className="text-xs text-ink-faint hidden sm:block">{l.quality}</dd>
+                <dd className="text-xs text-ink-muted sm:col-auto col-start-2">Lord: {l.lord}</dd>
+                <dd className="text-xs text-ink-muted hidden sm:block">{l.quality}</dd>
                 <dd className="text-sm text-ink-muted col-span-2 sm:col-span-1 mt-0.5 sm:mt-0">{l.vibe}</dd>
               </div>
             ))}
@@ -102,7 +102,7 @@ export default function LagnaGuide() {
       {/* ── Why two Libras differ ──────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="different-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{WHY_DIFFERENT.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{WHY_DIFFERENT.eyebrow}</p>
           <h2 id="different-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {WHY_DIFFERENT.title}
           </h2>
@@ -116,7 +116,7 @@ export default function LagnaGuide() {
       {/* ── Using your Lagna in practice ──────────────────────────────── */}
       <section className="mt-14" aria-labelledby="practice-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_IN_PRACTICE.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{LAGNA_IN_PRACTICE.eyebrow}</p>
           <h2 id="practice-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {LAGNA_IN_PRACTICE.title}
           </h2>
@@ -128,7 +128,7 @@ export default function LagnaGuide() {
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

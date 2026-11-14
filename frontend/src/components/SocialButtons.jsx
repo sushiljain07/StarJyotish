@@ -46,7 +46,7 @@ function SocialButton({ icon, dark }) {
         className={`w-8 h-8 rounded-full border flex items-center justify-center transition ${
           dark
             ? 'bg-white/5 border-white/10 text-ink-onnight group-hover:text-primary group-hover:border-primary/40'
-            : 'bg-parchment-card border-line text-ink-muted group-hover:text-primary-dark group-hover:border-primary/40'
+            : 'bg-parchment-card border-line text-ink-muted group-hover:text-ink group-hover:border-primary/40'
         }`}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">

@@ -52,7 +52,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-primary-dark">{t('planet_table_heading')}</h3>
+        <h3 className="font-semibold text-primary-ink">{t('planet_table_heading')}</h3>
         <SegmentedToggle
           options={['basic', 'nakshatra', 'full'].map(id => ({ id, label: t(`kundli_planets_mode_${id}`) }))}
           active={mode}
@@ -61,10 +61,10 @@ export default function PlanetTable({ planets = [], ascendant }) {
       </div>
 
       {ascendant && (
-        <div className="text-sm text-primary-dark bg-primary-light border border-line rounded-lg p-3">
+        <div className="text-sm text-primary-ink bg-primary-light border border-line rounded-lg p-3">
           <span className="font-semibold">{t('kundli_planets_ascendant')}</span>
           <span>{signName(t, ascendant.sign)} {formatDeg(ascendant.degree)}</span>
-          <span className="text-primary-dark ml-2">· {nakshatraName(t, ascendant.nakshatra)}</span>
+          <span className="text-primary-ink ml-2">· {nakshatraName(t, ascendant.nakshatra)}</span>
           {ascendant.nakshatra_lord && (
             <span className="ml-2">{t('kundli_planets_lord')} <LordBadge lord={ascendant.nakshatra_lord} /></span>
           )}
@@ -74,7 +74,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
       <ScrollHint className="rounded-xl border border-line" fadeFrom="from-parchment-card">
         <table className="w-full text-sm border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-primary-light text-primary-dark">
+            <tr className="bg-primary-light text-primary-ink">
               <th className="p-2.5 border-b text-left sticky left-0 z-10 bg-primary-light">{t('col_planet')}</th>
               <th className="p-2.5 border-b text-left">{t('col_sign')}</th>
               <th className="p-2.5 border-b text-right">{t('col_degree')}</th>
@@ -123,7 +123,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
                   <td className="p-2.5 border-b text-right tabular-nums font-mono text-xs">
                     {formatDeg(p.degree)}
                   </td>
-                  <td className="p-2.5 border-b text-center font-bold text-primary-dark">{p.house}</td>
+                  <td className="p-2.5 border-b text-center font-bold text-primary-ink">{p.house}</td>
 
                   {(mode === 'nakshatra' || mode === 'full') && (
                     <>
@@ -149,7 +149,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
                     <td className="p-2.5 border-b text-center text-xs">
                       {dignity
                         ? <span className="font-semibold" style={{ color: dignity.color }}>{dignity.label}</span>
-                        : <span className="text-ink-faint">—</span>
+                        : <span className="text-ink-muted">—</span>
                       }
                     </td>
                   )}
@@ -164,7 +164,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
         </table>
       </ScrollHint>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-faint px-1">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted px-1">
         <span>{t('kundli_planets_legend_r')}</span>
         <span>{t('kundli_planets_legend_dignity')}</span>
         <span>{t('kundli_planets_legend_nak')}</span>

@@ -32,14 +32,14 @@ export default function PrivacyPolicy() {
       <StaticPageLayout title={t('footer_bottom_privacy')} maxWidth="max-w-3xl">
         <LegalLanguageNote />
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-ink mb-2">In plain language</p>
           <ul className="space-y-1.5 text-sm text-ink">
             <li>✦ We only collect what we need: your birth details to generate charts, and your phone/email to secure your account.</li>
             <li>✦ We never sell your data. Birth details are used only for calculations.</li>
             <li>✦ You can delete your account and all associated data at any time from your profile.</li>
           </ul>
         </div>
-        <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
+        <p className="text-ink-muted text-xs">Last updated: 29 June 2026</p>
 
         <p>
           This Privacy Policy explains how Star Jyotish ("Star Jyotish", "we", "us", "our") collects, uses,
@@ -55,7 +55,7 @@ export default function PrivacyPolicy() {
 
         <nav aria-label="Table of contents" className="bg-parchment-card border border-line rounded-xl p-4 text-sm">
           <p className="font-semibold text-ink mb-2">On this page</p>
-          <ol className="list-decimal pl-5 space-y-1 text-primary-dark">
+          <ol className="list-decimal pl-5 space-y-1 text-primary-ink">
             <li><a href="#what-we-collect" className="hover:underline">Information we collect</a></li>
             <li><a href="#how-we-use" className="hover:underline">How we use your information</a></li>
             <li><a href="#ai-processing" className="hover:underline">AI processing disclosure</a></li>
@@ -193,10 +193,10 @@ export default function PrivacyPolicy() {
 
         <h2 id="contact" className={h2}>12. Grievance officer & contact</h2>
         <p>
-          Grievance Officer: <em className="text-ink-faint">[Name to be appointed upon incorporation]</em><br />
-          Operated by: <em className="text-ink-faint">[Legal entity name and registered address — to be added once
+          Grievance Officer: <em className="text-ink-muted">[Name to be appointed upon incorporation]</em><br />
+          Operated by: <em className="text-ink-muted">[Legal entity name and registered address — to be added once
           Star Jyotish is formally incorporated]</em><br />
-          Email: <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>
+          Email: <a href="mailto:contact@starjyotish.com" className="text-primary-ink hover:underline">contact@starjyotish.com</a>
         </p>
         <p>We aim to acknowledge privacy-related requests within a reasonable time and resolve them as quickly as
           the nature of the request allows.</p>

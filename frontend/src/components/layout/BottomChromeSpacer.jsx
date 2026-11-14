@@ -10,10 +10,14 @@
 import { useBottomChrome } from './useBottomChrome'
 
 export default function BottomChromeSpacer() {
-  const { footerClearance } = useBottomChrome()
+  const { footerClearance, hasFab } = useBottomChrome()
+  // md+: no bars, but the Ask FAB (md:bottom-6, 3.25rem pill) still floats over
+  // the page end, so reserve pill + offset + gap, at xl too. Without the FAB,
+  // keep the ScrollToTop strip below xl.
+  const md = hasFab ? 'md:h-[5.5rem]' : 'md:h-16 xl:hidden'
   return (
     <div
-      className="h-[var(--chrome-clear)] md:h-16 xl:hidden"
+      className={`h-[var(--chrome-clear)] ${md}`}
       style={{ '--chrome-clear': footerClearance }}
       aria-hidden="true"
     />

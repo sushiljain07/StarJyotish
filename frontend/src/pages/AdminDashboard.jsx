@@ -28,7 +28,7 @@ function Badge({ color, children }) {
   const colors = {
     green:  'bg-sage-light text-sage',
     red:    'bg-vermillion-light text-vermillion',
-    yellow: 'bg-primary-light text-primary-dark',
+    yellow: 'bg-primary-light text-primary-ink',
     gray:   'bg-parchment text-ink-muted',
   }
   return (
@@ -86,12 +86,12 @@ function UsersTab({ token }) {
   if (selected) return (
     <div>
       <button onClick={() => setSelected(null)}
-        className="text-primary-dark text-sm font-medium mb-4 hover:underline">
+        className="text-primary-ink text-sm font-medium mb-4 hover:underline">
         ← Back to users
       </button>
       <SectionCard>
         <div className="flex items-start gap-4 mb-5">
-          <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary-dark font-bold">
+          <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary-ink font-bold">
             {(selected.name || selected.phone_number || '?')[0].toUpperCase()}
           </div>
           <div>
@@ -105,21 +105,21 @@ function UsersTab({ token }) {
             </div>
           </div>
         </div>
-        <div className="text-xs text-ink-faint mb-4">
+        <div className="text-xs text-ink-muted mb-4">
           Joined {new Date(selected.created_at).toLocaleDateString('en-IN')}
         </div>
         <div className="font-semibold text-sm text-ink mb-3">Reports ({repLoad ? '…' : reports?.length ?? 0})</div>
         {repLoad ? <Spinner /> : (reports || []).length === 0 ? (
-          <p className="text-ink-faint text-sm">No reports yet.</p>
+          <p className="text-ink-muted text-sm">No reports yet.</p>
         ) : (
           <div className="space-y-2">
             {reports.map(r => (
               <div key={r.id} className="flex items-center justify-between py-2 border-b border-line last:border-0">
                 <div>
-                  <span className="text-xs font-semibold text-primary-dark capitalize">{r.report_type}</span>
+                  <span className="text-xs font-semibold text-primary-ink capitalize">{r.report_type}</span>
                   {r.question && <span className="text-xs text-ink-muted ml-2">"{r.question.slice(0, 60)}…"</span>}
                 </div>
-                <span className="text-xs text-ink-faint">{new Date(r.created_at).toLocaleDateString('en-IN')}</span>
+                <span className="text-xs text-ink-muted">{new Date(r.created_at).toLocaleDateString('en-IN')}</span>
               </div>
             ))}
           </div>
@@ -135,7 +135,7 @@ function UsersTab({ token }) {
           value={q} onChange={e => setQ(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && load(q)}
           placeholder="Search name, phone, email…"
-          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark"
+          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark"
         />
         <button onClick={() => load(q)}
           className="px-4 py-2 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition">
@@ -145,17 +145,17 @@ function UsersTab({ token }) {
       <ErrorBanner msg={error} />
       {loading ? <Spinner /> : (
         <SectionCard>
-          <div className="text-xs text-ink-faint mb-3">{data?.total ?? 0} total users</div>
+          <div className="text-xs text-ink-muted mb-3">{data?.total ?? 0} total users</div>
           <div className="divide-y divide-line">
             {(data?.users ?? []).map(u => (
               <button key={u.id} onClick={() => openUser(u)}
                 className="w-full text-left flex items-center gap-3 py-3 hover:bg-parchment rounded-lg px-2 transition">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-primary-dark text-xs font-bold flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-primary-ink text-xs font-bold flex-shrink-0">
                   {(u.name || u.phone_number || '?')[0].toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium text-ink truncate">{u.name || u.phone_number || u.email || '—'}</div>
-                  <div className="text-xs text-ink-faint">{u.phone_number}</div>
+                  <div className="text-xs text-ink-muted">{u.phone_number}</div>
                 </div>
                 <div className="flex gap-1.5 flex-shrink-0">
                   <Badge color={u.role === 'admin' ? 'red' : u.role === 'astrologer' ? 'yellow' : 'gray'}>
@@ -248,7 +248,7 @@ function AstrologersTab({ token }) {
                   type={type} required={key === 'phone_number'}
                   value={form[key]} onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  className="w-full bg-parchment border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark"
+                  className="w-full bg-parchment border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark"
                 />
               </div>
             ))}
@@ -268,7 +268,7 @@ function AstrologersTab({ token }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-semibold text-ink text-sm">{a.name || '—'}</div>
-                  <div className="text-xs text-ink-faint">{a.phone_number}</div>
+                  <div className="text-xs text-ink-muted">{a.phone_number}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <Badge color={kycColor[a.kyc_status] ?? 'gray'}>{a.kyc_status}</Badge>
                     <Badge color="gray">⭐ {Number(a.rating_avg).toFixed(1)} ({a.rating_count})</Badge>
@@ -297,7 +297,7 @@ function AstrologersTab({ token }) {
             </SectionCard>
           ))}
           {(astrologers ?? []).length === 0 && (
-            <p className="text-ink-faint text-sm text-center py-8">No astrologers yet. Click "+ Onboard Astrologer" to add one.</p>
+            <p className="text-ink-muted text-sm text-center py-8">No astrologers yet. Click "+ Onboard Astrologer" to add one.</p>
           )}
         </div>
       )}
@@ -402,11 +402,11 @@ function SettingsTab({ token }) {
             <SectionCard key={s.key}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="font-mono text-xs text-primary-dark font-semibold">{s.key}</div>
+                  <div className="font-mono text-xs text-primary-ink font-semibold">{s.key}</div>
                   {s.description && <div className="text-xs text-ink-muted mt-0.5">{s.description}</div>}
                   <div className="flex gap-2 mt-1.5">
                     {s.is_public && <Badge color="green">public</Badge>}
-                    <span className="text-xs text-ink-faint">Updated {new Date(s.updated_at).toLocaleDateString('en-IN')}</span>
+                    <span className="text-xs text-ink-muted">Updated {new Date(s.updated_at).toLocaleDateString('en-IN')}</span>
                   </div>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-3">
@@ -428,7 +428,7 @@ function SettingsTab({ token }) {
             </SectionCard>
           ))}
           {(settings ?? []).length === 0 && (
-            <p className="text-ink-faint text-sm text-center py-8">No flags yet. Create one above.</p>
+            <p className="text-ink-muted text-sm text-center py-8">No flags yet. Create one above.</p>
           )}
         </div>
       )}
@@ -479,10 +479,10 @@ function PricingTab({ token }) {
     <div>
       <p className="text-sm text-ink-muted mb-2">
         Edit the <code className="text-xs bg-parchment px-1.5 py-0.5 rounded border border-line">pricing_plans</code> setting
-        that the <a href="/pricing" target="_blank" rel="noreferrer" className="text-primary-dark underline">Pricing page</a> reads.
+        that the <a href="/pricing" target="_blank" rel="noreferrer" className="text-primary-ink underline">Pricing page</a> reads.
         Changes live immediately.
       </p>
-      <p className="text-xs text-ink-faint mb-4">Fields: <code>id</code> <code>name</code> <code>price_monthly</code> <code>features[]</code> <code>cta</code> <code>tagline</code> <code>highlight</code> <code>badge</code> <code>accent</code>. Hindi: <code>name_hi</code> <code>tagline_hi</code> <code>cta_hi</code></p>
+      <p className="text-xs text-ink-muted mb-4">Fields: <code>id</code> <code>name</code> <code>price_monthly</code> <code>features[]</code> <code>cta</code> <code>tagline</code> <code>highlight</code> <code>badge</code> <code>accent</code>. Hindi: <code>name_hi</code> <code>tagline_hi</code> <code>cta_hi</code></p>
       {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-3">{error}</div>}
       {success && <div className="bg-sage-light text-sage text-sm rounded-lg px-4 py-3 mb-3">Saved</div>}
       {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : (
@@ -497,7 +497,7 @@ function PricingTab({ token }) {
             {raw !== current && (
               <button onClick={() => setRaw(current)} className="px-5 py-2.5 border border-line text-ink-muted text-sm rounded-lg hover:bg-parchment transition">Reset</button>
             )}
-            <a href="/pricing" target="_blank" rel="noreferrer" className="ml-auto px-4 py-2.5 text-sm text-primary-dark underline self-center">Preview →</a>
+            <a href="/pricing" target="_blank" rel="noreferrer" className="ml-auto px-4 py-2.5 text-sm text-primary-ink underline self-center">Preview →</a>
           </div>
         </SectionCard>
       )}
@@ -526,7 +526,7 @@ const BLOG_ARTICLE_TEMPLATE = {
   ],
 }
 
-const STATUS_COLOR = { published: 'bg-sage-light text-sage', draft: 'bg-primary-light text-primary-dark', archived: 'bg-parchment text-ink-faint' }
+const STATUS_COLOR = { published: 'bg-sage-light text-sage', draft: 'bg-primary-light text-primary-ink', archived: 'bg-parchment text-ink-muted' }
 
 function BlogTab({ token }) {
   const [settings, setSettings] = useState({})
@@ -623,13 +623,13 @@ function BlogTab({ token }) {
   if (editing !== null) {
     return (
       <div>
-        <button onClick={() => setEditing(null)} className="text-primary-dark text-sm font-medium mb-4 hover:underline">← Back to articles</button>
+        <button onClick={() => setEditing(null)} className="text-primary-ink text-sm font-medium mb-4 hover:underline">← Back to articles</button>
         <div className="flex items-center justify-between mb-3">
           <div>
             <div className="font-semibold text-ink text-sm">{settings[`blog_article_${editing}`] ? 'Editing' : 'New article'}: <code className="text-xs bg-parchment px-1.5 py-0.5 rounded border border-line">{editing}</code></div>
             <div className="text-xs text-ink-muted mt-0.5">Set <code>status</code> to <code>"published"</code> to make it live on /blog.</div>
           </div>
-          <a href={`/blog/${editing}`} target="_blank" rel="noreferrer" className="text-xs text-primary-dark underline">Preview →</a>
+          <a href={`/blog/${editing}`} target="_blank" rel="noreferrer" className="text-xs text-primary-ink underline">Preview →</a>
         </div>
         {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-3">{error}</div>}
         <SectionCard>
@@ -655,12 +655,12 @@ function BlogTab({ token }) {
         <input value={newSlug} onChange={e => setNewSlug(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && createArticle()}
           placeholder="new-article-slug (e.g. saturn-in-aries)"
-          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
+          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark" />
         <button onClick={createArticle} className="px-4 py-2 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition">+ New Article</button>
       </div>
-      <p className="text-xs text-ink-faint mb-4">Order controls /blog listing. Use ▲/▼ to reorder published articles. Archived articles are hidden from visitors.</p>
+      <p className="text-xs text-ink-muted mb-4">Order controls /blog listing. Use ▲/▼ to reorder published articles. Archived articles are hidden from visitors.</p>
       {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : allSlugs.length === 0 ? (
-        <p className="text-ink-faint text-sm text-center py-12">No articles yet. Create the first one above.</p>
+        <p className="text-ink-muted text-sm text-center py-12">No articles yet. Create the first one above.</p>
       ) : (
         <div className="space-y-2">
           {allSlugs.map((slug) => {
@@ -672,20 +672,20 @@ function BlogTab({ token }) {
                 <div className="flex items-start gap-3">
                   <div className="flex flex-col gap-1 flex-shrink-0 pt-0.5">
                     <button onClick={() => moveUp(slug)} disabled={!inIndex || index.indexOf(slug) === 0}
-                      className="text-ink-faint hover:text-ink disabled:opacity-20 text-xs">▲</button>
+                      className="text-ink-muted hover:text-ink disabled:opacity-20 text-xs">▲</button>
                     <button onClick={() => moveDown(slug)} disabled={!inIndex || index.indexOf(slug) === index.length - 1}
-                      className="text-ink-faint hover:text-ink disabled:opacity-20 text-xs">▼</button>
+                      className="text-ink-muted hover:text-ink disabled:opacity-20 text-xs">▼</button>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOR[status] ?? STATUS_COLOR.draft}`}>{status}</span>
                       {art.category && <span className="text-xs text-ink-muted">{art.category}</span>}
-                      {art.featured && <span className="text-xs text-primary font-medium">★ Featured</span>}
-                      {inIndex && <span className="text-xs text-ink-faint">#{index.indexOf(slug)+1}</span>}
+                      {art.featured && <span className="text-xs text-primary-ink font-medium">★ Featured</span>}
+                      {inIndex && <span className="text-xs text-ink-muted">#{index.indexOf(slug)+1}</span>}
                     </div>
                     <div className="font-medium text-sm text-ink truncate">{art.title || slug}</div>
                     {art.excerpt && <div className="text-xs text-ink-muted mt-0.5 line-clamp-1">{art.excerpt}</div>}
-                    <div className="text-xs text-ink-faint mt-1 font-mono">{slug}</div>
+                    <div className="text-xs text-ink-muted mt-1 font-mono">{slug}</div>
                   </div>
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     <button onClick={() => { setEditing(slug); setEditRaw(JSON.stringify(art, null, 2)) }}
@@ -712,7 +712,7 @@ function BlogTab({ token }) {
 // ── Testimonials admin tab ─────────────────────────────────────────────────────
 
 const STATUS_LABELS = {
-  pending:  { label: 'Pending',  color: 'bg-primary-light text-primary-dark' },
+  pending:  { label: 'Pending',  color: 'bg-primary-light text-primary-ink' },
   approved: { label: 'Approved', color: 'bg-sage-light text-sage' },
   featured: { label: 'Featured', color: 'bg-primary text-night' },
   rejected: { label: 'Rejected', color: 'bg-vermillion-light text-vermillion' },
@@ -746,9 +746,9 @@ function TestimonialsAdminTab({ token }) {
   return (
     <div>
       {error && <div className="bg-vermillion-light text-vermillion text-sm rounded-lg px-4 py-3 mb-4">{error}</div>}
-      <p className="text-xs text-ink-faint mb-4">
+      <p className="text-xs text-ink-muted mb-4">
         <strong>Featured</strong> (max 4) — shown on the landing page. <strong>Approved</strong> — shown on /testimonials page only. <strong>Rejected</strong> — hidden everywhere.
-        <a href="/testimonials" target="_blank" rel="noreferrer" className="ml-2 text-primary-dark underline">View /testimonials page →</a>
+        <a href="/testimonials" target="_blank" rel="noreferrer" className="ml-2 text-primary-ink underline">View /testimonials page →</a>
       </p>
 
       {loading ? <div className="flex justify-center py-12 text-2xl animate-spin">🪐</div> : (
@@ -767,12 +767,12 @@ function TestimonialsAdminTab({ token }) {
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
                       <span className="text-xs font-semibold text-ink">{t.display_name}</span>
-                      {t.location && <span className="text-xs text-ink-faint">{t.location}</span>}
+                      {t.location && <span className="text-xs text-ink-muted">{t.location}</span>}
                     </div>
                     <p className="text-sm text-ink leading-relaxed">{t.text}</p>
-                    {t.detail && <p className="text-xs text-primary-dark mt-1">Used: {t.detail}</p>}
-                    {t.admin_notes && <p className="text-xs text-ink-faint mt-1 italic">Note: {t.admin_notes}</p>}
-                    <p className="text-xs text-ink-faint mt-1">{new Date(t.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</p>
+                    {t.detail && <p className="text-xs text-primary-ink mt-1">Used: {t.detail}</p>}
+                    {t.admin_notes && <p className="text-xs text-ink-muted mt-1 italic">Note: {t.admin_notes}</p>}
+                    <p className="text-xs text-ink-muted mt-1">{new Date(t.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</p>
                   </div>
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     {t.status !== 'featured' && (
@@ -811,7 +811,7 @@ function TestimonialsAdminTab({ token }) {
             )
           })}
           {(items ?? []).length === 0 && (
-            <p className="text-ink-faint text-sm text-center py-12">No testimonials submitted yet.</p>
+            <p className="text-ink-muted text-sm text-center py-12">No testimonials submitted yet.</p>
           )}
         </div>
       )}
@@ -844,7 +844,7 @@ function AuditTab({ token }) {
         <input value={filter} onChange={e => setFilter(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && load()}
           placeholder="Filter by entity type (e.g. AstrologerProfile)"
-          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark"
+          className="flex-1 bg-parchment-card border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark"
         />
         <button onClick={load}
           className="px-4 py-2 bg-primary-dark text-night text-sm font-semibold rounded-lg hover:opacity-90 transition">
@@ -855,7 +855,7 @@ function AuditTab({ token }) {
       {loading ? <Spinner /> : (
         <SectionCard>
           {(logs ?? []).length === 0 ? (
-            <p className="text-ink-faint text-sm text-center py-8">No audit entries.</p>
+            <p className="text-ink-muted text-sm text-center py-8">No audit entries.</p>
           ) : (
             <div className="divide-y divide-line">
               {logs.map(log => (
@@ -864,16 +864,16 @@ function AuditTab({ token }) {
                   <div className="min-w-0 flex-1">
                     <span className="text-sm text-ink font-medium">{log.entity_type}</span>
                     {log.entity_id && (
-                      <span className="text-xs text-ink-faint ml-2 font-mono">{log.entity_id.slice(0, 8)}…</span>
+                      <span className="text-xs text-ink-muted ml-2 font-mono">{log.entity_id.slice(0, 8)}…</span>
                     )}
                     {log.meta && (
                       <div className="text-xs text-ink-muted mt-0.5">{JSON.stringify(log.meta)}</div>
                     )}
                     {log.actor_user_id && (
-                      <div className="text-xs text-ink-faint mt-0.5">by {log.actor_user_id.slice(0, 8)}…</div>
+                      <div className="text-xs text-ink-muted mt-0.5">by {log.actor_user_id.slice(0, 8)}…</div>
                     )}
                   </div>
-                  <span className="text-xs text-ink-faint flex-shrink-0">
+                  <span className="text-xs text-ink-muted flex-shrink-0">
                     {new Date(log.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -917,7 +917,7 @@ export default function AdminDashboard() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition ${
-                tab === t.id ? 'bg-parchment-card text-primary-dark' : 'text-ink-onnight hover:bg-white/10'
+                tab === t.id ? 'bg-parchment-card text-primary-ink' : 'text-ink-onnight hover:bg-white/10'
               }`}>
               {t.label}
             </button>

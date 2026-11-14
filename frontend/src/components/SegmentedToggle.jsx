@@ -23,7 +23,7 @@ export default function SegmentedToggle({ label, ariaLabel, options, active, onC
            aria-label={label ? undefined : ariaLabel}>
         {options.map(o => (
           <button key={o.id} type="button" onClick={() => onChange(o.id)} aria-pressed={active === o.id}
-                  className={`text-xs px-3 min-h-11 rounded-lg border transition ${
+                  className={`text-xs px-3 min-h-11 min-w-11 rounded-lg border transition ${
                     active === o.id
                       ? 'bg-primary border-primary text-night'
                       : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'

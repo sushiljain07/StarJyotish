@@ -10,7 +10,7 @@ import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
 const ACCENT_RING = ['ring-primary/30','ring-sage/30','ring-mauve/30','ring-primary/30','ring-sage/30','ring-mauve/30']
-const AVATAR_BG   = ['bg-primary-light text-primary-dark','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-dark','bg-sage-light text-sage','bg-mauve-light text-mauve']
+const AVATAR_BG   = ['bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve']
 const MARKS       = ['✦','✧','✦','✧','✦','✧']
 
 function TestimonialCard({ t, i }) {
@@ -20,7 +20,7 @@ function TestimonialCard({ t, i }) {
       <blockquote className="text-ink text-sm leading-relaxed flex-1">{t.text}</blockquote>
       {t.detail && (
         <div className="mt-4 mb-4">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-dark bg-primary-light px-2.5 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-ink bg-primary-light px-2.5 py-1 rounded-full">
             <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor"><circle cx="8" cy="8" r="2.5"/></svg>
             {t.detail}
           </span>
@@ -32,7 +32,7 @@ function TestimonialCard({ t, i }) {
         </div>
         <div>
           <div className="text-sm font-semibold text-ink">{t.display_name}</div>
-          {t.location && <div className="text-xs text-ink-faint">{t.location}</div>}
+          {t.location && <div className="text-xs text-ink-muted">{t.location}</div>}
         </div>
       </figcaption>
     </figure>
@@ -94,34 +94,34 @@ function SubmitForm() {
             <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_name')}</label>
             <input required value={form.display_name} onChange={e => setForm(p => ({...p, display_name: e.target.value}))}
               placeholder={t('testimonials_placeholder_name')}
-              className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
+              className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark" />
           </div>
           <div>
             <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_location')}</label>
             <input value={form.location} onChange={e => setForm(p => ({...p, location: e.target.value}))}
               placeholder={t('testimonials_placeholder_location')}
-              className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
+              className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark" />
           </div>
         </div>
 
         <div>
-          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_detail')} <span className="text-ink-faint">{t('testimonials_optional')}</span></label>
+          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_detail')} <span>{t('testimonials_optional')}</span></label>
           <input value={form.detail} onChange={e => setForm(p => ({...p, detail: e.target.value}))}
             placeholder={t('testimonials_placeholder_detail')}
-            className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark" />
+            className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark" />
         </div>
 
         <div>
-          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_text')} <span className="text-ink-faint">{t('testimonials_text_range')}</span></label>
+          <label className="text-xs text-ink-muted mb-1 block">{t('testimonials_field_text')} <span>{t('testimonials_text_range')}</span></label>
           <textarea required rows={5} value={form.text} onChange={e => setForm(p => ({...p, text: e.target.value}))}
             placeholder={t('testimonials_placeholder_text')}
-            className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark resize-none" />
-          <div className={`text-xs mt-1 text-right ${remaining < 50 ? 'text-vermillion' : 'text-ink-faint'}`}>
+            className="w-full bg-parchment border border-line rounded-lg px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark resize-none" />
+          <div className={`text-xs mt-1 text-right ${remaining < 50 ? 'text-vermillion' : 'text-ink-muted'}`}>
             {t('testimonials_remaining', { n: remaining })}
           </div>
         </div>
 
-        <p className="text-xs text-ink-faint">{t('testimonials_consent')}</p>
+        <p className="text-xs text-ink-muted">{t('testimonials_consent')}</p>
 
         <button type="submit" disabled={saving || form.text.length < 20}
           className="w-full py-3 bg-primary-dark text-night text-sm font-semibold rounded-xl hover:opacity-90 transition disabled:opacity-50">
@@ -193,7 +193,7 @@ export default function TestimonialsPage() {
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-ink-faint text-sm">{t('testimonials_empty')}</p>
+            <p className="text-ink-muted text-sm">{t('testimonials_empty')}</p>
           </div>
         ) : (
           <>

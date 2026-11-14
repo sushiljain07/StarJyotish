@@ -25,7 +25,7 @@ import { fetchReverseGeocode } from '../api/astro'
 import { LANGUAGES, DEFAULT_LANGUAGE, currentLanguage, localeFor } from '../i18n/languages'
 import { markLanguageChosenByUser } from '../i18n'
 
-const inputCls = 'w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
+const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
 
 // A short, curated list rather than every IANA zone — this product's
@@ -225,7 +225,7 @@ export default function Profile() {
           </div>
 
           <div>
-            <label className={labelCls}>{t('profile_photo')} <span className="text-ink-faint font-normal">({t('profile_optional')})</span></label>
+            <label className={labelCls}>{t('profile_photo')} <span className="text-ink-muted font-normal">({t('profile_optional')})</span></label>
             <AvatarUpload value={form.avatar_url} onChange={dataUrl => setField('avatar_url', dataUrl)} />
           </div>
 
@@ -237,7 +237,7 @@ export default function Profile() {
               </select>
             </div>
             <div>
-              <label className={labelCls}>{t('profile_timezone')} <span className="text-ink-faint font-normal">({t('profile_optional')})</span></label>
+              <label className={labelCls}>{t('profile_timezone')} <span className="text-ink-muted font-normal">({t('profile_optional')})</span></label>
               <select value={form.timezone} onChange={e => setField('timezone', e.target.value)} className={inputCls}>
                 <option value="">{t('profile_not_set')}</option>
                 {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
@@ -249,7 +249,7 @@ export default function Profile() {
 
           <div className="flex items-center gap-3">
             <button type="submit" disabled={saving}
-                    className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 rounded-full transition">
+                    className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 min-h-11 rounded-full transition">
               {saving ? t('profile_saving') : t('profile_save')}
             </button>
             {savedAt && <span className="text-sage text-sm">{t('profile_saved')}</span>}
@@ -275,7 +275,7 @@ export default function Profile() {
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-serif font-semibold text-lg text-ink">{t('profile_astro_heading')}</h2>
               {!editingAstro && (
-                <button type="button" onClick={startEditingAstro} className="text-xs text-primary-dark hover:underline font-medium">
+                <button type="button" onClick={startEditingAstro} className="inline-flex items-center justify-center min-h-11 min-w-11 text-xs text-primary-ink hover:underline font-medium">
                   {t('profile_astro_edit')}
                 </button>
               )}
@@ -298,12 +298,12 @@ export default function Profile() {
                     <Link
                       to="/kundli"
                       state={{ data: profileState.chart, input: { name: profileState.label, date: profileState.birth_date, time: profileState.birth_time, place: profileState.place } }}
-                      className="text-xs text-primary-dark hover:underline font-medium"
+                      className="inline-flex items-center min-h-11 text-xs text-primary-ink hover:underline font-medium"
                     >
                       {t('profile_astro_view')}
                     </Link>
                   )}
-                  <button type="button" onClick={handleDeleteAstro} className="text-xs text-vermillion hover:underline font-medium">
+                  <button type="button" onClick={handleDeleteAstro} className="inline-flex items-center min-h-11 text-xs text-vermillion hover:underline font-medium">
                     {t('profile_astro_delete')}
                   </button>
                 </div>
@@ -341,7 +341,7 @@ export default function Profile() {
 
                 <div>
                   <label className={labelCls}>
-                    {t('profile_current_location')} <span className="text-ink-faint font-normal">({t('profile_optional')})</span>
+                    {t('profile_current_location')} <span className="text-ink-muted font-normal">({t('profile_optional')})</span>
                   </label>
                   {astroForm.currentLocationLabel && (
                     <div className="flex items-center justify-between gap-3 border border-line rounded-lg px-3 py-2 mb-2 bg-parchment">
@@ -349,7 +349,7 @@ export default function Profile() {
                       <button
                         type="button"
                         onClick={() => setAstroForm(f => ({ ...f, currentLat: null, currentLon: null, currentLocationLabel: '' }))}
-                        className="text-xs text-ink-muted underline shrink-0"
+                        className="inline-flex items-center min-h-11 text-xs text-ink-muted underline shrink-0"
                       >
                         {t('profile_current_location_clear')}
                       </button>
@@ -360,7 +360,7 @@ export default function Profile() {
                       type="button"
                       onClick={useMyLocationForAstro}
                       disabled={astroLocationStatus === 'requesting'}
-                      className="text-xs font-semibold border border-primary rounded-full px-3.5 py-2 text-primary-dark hover:bg-primary-light/40 transition disabled:opacity-50"
+                      className="text-xs font-semibold border border-primary rounded-full px-3.5 py-2 min-h-11 text-primary-ink hover:bg-primary-light/40 transition disabled:opacity-50"
                     >
                       {astroLocationStatus === 'requesting' ? t('profile_current_location_requesting') : t('profile_current_location_use_gps')}
                     </button>
@@ -387,10 +387,10 @@ export default function Profile() {
 
                 <div className="flex items-center gap-3">
                   <button type="submit" disabled={astroSaving}
-                          className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 rounded-full transition">
+                          className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 min-h-11 rounded-full transition">
                     {astroSaving ? t('profile_saving') : t('profile_save')}
                   </button>
-                  <button type="button" onClick={() => setEditingAstro(false)} className="text-sm text-ink-muted hover:underline">
+                  <button type="button" onClick={() => setEditingAstro(false)} className="inline-flex items-center min-h-11 text-sm text-ink-muted hover:underline">
                     {t('profile_astro_cancel')}
                   </button>
                 </div>
@@ -402,7 +402,7 @@ export default function Profile() {
         {!profileState && (
           <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 mt-6 text-center">
             <p className="text-ink-muted text-sm mb-3">{t('profile_astro_none')}</p>
-            <Link to="/onboarding" className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-5 py-2.5 rounded-full transition">
+            <Link to="/onboarding" className="inline-flex items-center min-h-11 bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-5 py-2.5 rounded-full transition">
               {t('profile_astro_create')}
             </Link>
           </div>
@@ -411,12 +411,12 @@ export default function Profile() {
         {/* Privacy & account settings */}
         <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 mt-6 space-y-3">
           <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('profile_privacy_heading')}</h2>
-          <a href="/privacy" className="block text-primary-dark hover:underline text-sm">{t('profile_privacy_link')}</a>
+          <a href="/privacy" className="flex items-center min-h-11 text-primary-ink hover:underline text-sm">{t('profile_privacy_link')}</a>
           {/* No account-deletion endpoint exists yet — this is a real,
               working contact path, not a dead button pretending to
               delete anything. */}
           <a href="mailto:contact@starjyotish.com?subject=Account%20deletion%20request"
-             className="block text-primary-dark hover:underline text-sm">
+             className="flex items-center min-h-11 text-primary-ink hover:underline text-sm">
             {t('profile_delete_account_link')}
           </a>
         </div>

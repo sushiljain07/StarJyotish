@@ -1,6 +1,6 @@
 import hashlib
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from sqlalchemy import select
@@ -48,14 +48,17 @@ class SessionRepository(BaseRepository[UserSession]):
             return None
         return session
 
-    def get_by_raw_token_any_state(self, raw_token: str) -> Optional[UserSession]:
+    def get_by_raw_token_any_state(self, raw_token: str, *, for_update: bool = False) -> Optional[UserSession]:
         """Same lookup as get_active_by_raw_token but returns the row even
         if it's already revoked/expired. Used only for refresh-token-reuse
         detection: if a *revoked* token gets presented again, that's not
         an expired-session edge case, it's a strong signal the raw token
         leaked and a stale copy is being replayed by someone else — see
-        services/jwt_service.py's rotate_refresh_token()."""
+        services/jwt_service.py's rotate_refresh_token().
+        `for_update=True` row-locks the row so concurrent replays serialize."""
         stmt = select(UserSession).where(UserSession.refresh_token_hash == hash_token(raw_token))
+        if for_update:
+            stmt = stmt.with_for_update()
         return self.db.scalars(stmt).first()
 
     def revoke(self, session: UserSession, reason: Optional[str] = None) -> UserSession:
@@ -70,6 +73,22 @@ class SessionRepository(BaseRepository[UserSession]):
             s.revoked_reason = reason
         self.db.flush()
         return len(sessions)
+
+    def close_recent_rotations(self, user_id: uuid.UUID, within_seconds: float) -> int:
+        """Mark this user's recently rotated tokens as "rotated-closed" so
+        the refresh reuse interval can no longer resurrect a session after
+        logout / device revoke / theft response."""
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=within_seconds)
+        stmt = select(UserSession).where(
+            UserSession.user_id == user_id,
+            UserSession.revoked_reason == "rotated",
+            UserSession.revoked_at > cutoff,
+        )
+        rows = list(self.db.scalars(stmt))
+        for s in rows:
+            s.revoked_reason = "rotated-closed"
+        self.db.flush()
+        return len(rows)
 
     def list_active_for_user(self, user_id: uuid.UUID) -> list[UserSession]:
         """Powers a "where you're logged in" / "log out other devices"

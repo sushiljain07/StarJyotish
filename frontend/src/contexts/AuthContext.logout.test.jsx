@@ -7,6 +7,7 @@ vi.mock('../api/auth', () => ({
   verifyOtp: vi.fn(), loginWithGoogle: vi.fn(),
   refreshSession: vi.fn(() => Promise.reject(new Error('no session'))),
   onSessionRefreshed: () => () => {},
+  awaitRefreshSettled: () => Promise.resolve(), markLoggedOut: () => {},
   logout: vi.fn(() => Promise.resolve()),
   updateProfile: vi.fn(), sendPhoneLinkOtp: vi.fn(), verifyPhoneLinkOtp: vi.fn(),
   sendEmailLinkOtp: vi.fn(), verifyEmailLinkOtp: vi.fn(),

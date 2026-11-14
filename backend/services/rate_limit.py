@@ -19,10 +19,27 @@ swap to Redis-backed storage (`Limiter(storage_uri="redis://...")`) so all
 instances share one counter — worth doing at the same time Redis gets added
 for the background-job queue in a later phase.
 """
+import hashlib
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 limiter = Limiter(key_func=get_remote_address)
+
+
+def refresh_key(request) -> str:
+    """Rate-limit key for /auth/refresh: the refresh cookie, not the IP.
+
+    Many people share one IP (mobile CGNAT), and a refresh runs on every
+    page load, so an IP key let one busy network lock everyone out of
+    refreshing. Keying on a hash of the cookie gives each session its own
+    budget (and keeps the raw token out of limiter storage). Requests with
+    no cookie fall back to the IP.
+    """
+    cookie = request.cookies.get("sj_refresh")
+    if cookie:
+        return "refresh:" + hashlib.sha256(cookie.encode()).hexdigest()[:32]
+    return get_remote_address(request)
 
 # Reused across every route file so the actual numbers only live in one place.
 LLM_LIMIT = "10/minute"

@@ -16,16 +16,16 @@ function NavItem({ guide, direction }) {
 
   const label = (
     <span className="flex flex-col">
-      <span className="text-[10px] font-semibold tracking-widest uppercase text-ink-faint mb-0.5">
+      <span className="text-[10px] font-semibold tracking-widest uppercase text-ink-muted mb-0.5">
         {isLeft ? '← Previous' : 'Next →'}
       </span>
-      <span className="text-sm font-semibold text-ink group-hover:text-primary-dark transition leading-snug">
+      <span className="text-sm font-semibold text-ink group-hover:text-primary-ink transition leading-snug">
         {guide.title}
       </span>
     </span>
   )
 
-  const classes = `group flex items-center gap-3 ${isLeft ? 'flex-row' : 'flex-row-reverse text-right'}`
+  const classes = `group flex items-center min-h-11 md:min-h-0 gap-3 ${isLeft ? 'flex-row' : 'flex-row-reverse text-right'}`
 
   if (guide.href && !guide.comingSoon) {
     return (
@@ -38,7 +38,7 @@ function NavItem({ guide, direction }) {
   return (
     <div className={classes} aria-label={`${guide.title} — coming soon`}>
       {label}
-      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-parchment border border-line text-ink-faint">
+      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-parchment border border-line text-ink-muted">
         Soon
       </span>
     </div>

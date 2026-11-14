@@ -51,7 +51,7 @@ export default function CareerReportPreview() {
           </div>
           <div className="px-4 py-3 grid grid-cols-2 gap-2">
             {ROADMAP_HORIZONS.map(label => (
-              <p key={label} className="text-2xs font-semibold text-primary uppercase tracking-wide">
+              <p key={label} className="text-2xs font-semibold text-primary-ink uppercase tracking-wide">
                 {t(label)}
               </p>
             ))}

@@ -65,7 +65,7 @@ export default function MoonSignGuide() {
       {/* ── East vs West ───────────────────────────────────────────────── */}
       <section className="mt-10" aria-labelledby="split-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{EAST_WEST_SPLIT.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{EAST_WEST_SPLIT.eyebrow}</p>
           <h2 id="split-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {EAST_WEST_SPLIT.title}
           </h2>
@@ -79,7 +79,7 @@ export default function MoonSignGuide() {
       {/* ── Rashi as emotional OS ──────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="rashi-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{RASHI_EMOTIONAL_OS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{RASHI_EMOTIONAL_OS.eyebrow}</p>
           <h2 id="rashi-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {RASHI_EMOTIONAL_OS.title}
           </h2>
@@ -90,7 +90,7 @@ export default function MoonSignGuide() {
       {/* ── Moon signs table ───────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="signs-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{MOON_SIGNS_TABLE.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{MOON_SIGNS_TABLE.eyebrow}</p>
           <h2 id="signs-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-4">
             {MOON_SIGNS_TABLE.title}
           </h2>
@@ -101,15 +101,15 @@ export default function MoonSignGuide() {
             <Reveal key={m.sign} delay={i * 30} className="bg-parchment-card border border-line rounded-xl px-5 py-4">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="font-semibold text-sm text-ink">{m.sign}</span>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-dark">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
                   Needs: {m.need}
                 </span>
               </div>
               <p className="text-sm text-ink-muted leading-relaxed">
-                <span className="text-ink-faint">Restored by: </span>{m.comfort}
+                <span className="text-ink-muted">Restored by: </span>{m.comfort}
               </p>
               <p className="text-sm text-ink-muted leading-relaxed mt-1">
-                <span className="text-ink-faint">Drained by: </span>{m.drains}
+                <span className="text-ink-muted">Drained by: </span>{m.drains}
               </p>
             </Reveal>
           ))}
@@ -119,7 +119,7 @@ export default function MoonSignGuide() {
       {/* ── Timing: Dasha, Sade Sati ────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="timing-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{MOON_TIMING.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{MOON_TIMING.eyebrow}</p>
           <h2 id="timing-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {MOON_TIMING.title}
           </h2>
@@ -133,7 +133,7 @@ export default function MoonSignGuide() {
       {/* ── Chandrashtama ──────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="chandrashtama-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{CHANDRASHTAMA.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{CHANDRASHTAMA.eyebrow}</p>
           <h2 id="chandrashtama-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {CHANDRASHTAMA.title}
           </h2>
@@ -147,7 +147,7 @@ export default function MoonSignGuide() {
       {/* ── FAQ ────────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

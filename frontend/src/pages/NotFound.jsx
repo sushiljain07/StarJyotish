@@ -43,7 +43,7 @@ export default function NotFound() {
           </Link>
           <Link
             to="/generate"
-            className="inline-block px-5 py-2.5 rounded-full border border-primary/40 text-primary-dark text-sm font-semibold hover:bg-primary-light transition"
+            className="inline-block px-5 py-2.5 rounded-full border border-primary/40 text-primary-ink text-sm font-semibold hover:bg-primary-light transition"
           >
             {t('not_found_generate', 'Generate a chart')}
           </Link>

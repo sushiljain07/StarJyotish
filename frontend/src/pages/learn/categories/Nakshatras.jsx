@@ -39,7 +39,7 @@ import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
 function SystemCard({ system, accent = false }) {
   return (
     <div className={`rounded-2xl p-7 h-full ${accent ? 'bg-night' : 'bg-parchment-card border border-line'}`}>
-      <p className={`text-xs font-bold tracking-widest uppercase mb-2 ${accent ? 'text-primary' : 'text-primary-dark'}`}>
+      <p className={`text-xs font-bold tracking-widest uppercase mb-2 ${accent ? 'text-primary' : 'text-primary-ink'}`}>
         {system.label}
       </p>
       <h3 className={`font-serif font-semibold text-xl mb-5 ${accent ? 'text-primary-light' : 'text-ink'}`}>
@@ -48,7 +48,7 @@ function SystemCard({ system, accent = false }) {
       <dl className="space-y-4">
         {[['Anchored to', system.anchor], ['Origin', system.origin], ['Emphasis', system.focus]].map(([label, val]) => (
           <div key={label}>
-            <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-faint'}`}>{label}</dt>
+            <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-muted'}`}>{label}</dt>
             <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{val}</dd>
           </div>
         ))}
@@ -61,15 +61,15 @@ function NakshatraCard({ nakshatra }) {
   return (
     <div className="bg-parchment-card border border-line rounded-2xl p-5 hover:border-primary/40 transition-colors">
       <div className="flex items-start justify-between mb-3">
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary-dark text-xs font-bold shrink-0">
+        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary-ink text-xs font-bold shrink-0">
           {nakshatra.id}
         </span>
-        <span className="text-xs text-ink-faint font-medium">{nakshatra.ruler}</span>
+        <span className="text-xs text-ink-muted font-medium">{nakshatra.ruler}</span>
       </div>
       <h3 className="font-serif font-semibold text-base text-ink mb-0.5">{nakshatra.name}</h3>
-      <p className="text-xs text-ink-faint mb-2">{nakshatra.devanagari} · {nakshatra.degrees}</p>
+      <p className="text-xs text-ink-muted mb-2">{nakshatra.devanagari} · {nakshatra.degrees}</p>
       <p className="text-sm text-ink-muted leading-relaxed">{nakshatra.nature}</p>
-      <p className="text-xs text-primary-dark mt-2 font-medium">{nakshatra.gana}</p>
+      <p className="text-xs text-primary-ink mt-2 font-medium">{nakshatra.gana}</p>
     </div>
   )
 }
@@ -130,7 +130,7 @@ export default function NakshatrasGuide() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">
+            <p className="text-sm text-primary-ink leading-relaxed">
               यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है। हिंदी अनुवाद जल्द आएगा।
               <span className="font-medium"> (This guide is currently available in English only.)</span>
             </p>

@@ -46,7 +46,7 @@ function Card({ children, className = '' }) {
 function StatBox({ label, value, sub }) {
   return (
     <Card>
-      <div className="text-xs text-ink-faint mb-1">{label}</div>
+      <div className="text-xs text-ink-muted mb-1">{label}</div>
       <div className="text-2xl font-bold text-ink">{value}</div>
       {sub && <div className="text-xs text-ink-muted mt-1">{sub}</div>}
     </Card>
@@ -56,7 +56,7 @@ function StatBox({ label, value, sub }) {
 function KycBadge({ status }) {
   const map = {
     verified: { color: 'bg-sage-light text-sage', label: '✓ KYC Verified' },
-    pending:  { color: 'bg-primary-light text-primary-dark', label: '⏳ KYC Pending' },
+    pending:  { color: 'bg-primary-light text-primary-ink', label: '⏳ KYC Pending' },
     rejected: { color: 'bg-vermillion-light text-vermillion', label: '✗ KYC Rejected' },
   }
   const s = map[status] ?? map.pending
@@ -64,7 +64,7 @@ function KycBadge({ status }) {
 }
 
 const STATUS_COLOR = {
-  pending:   'bg-primary-light text-primary-dark',
+  pending:   'bg-primary-light text-primary-ink',
   confirmed: 'bg-sage-light text-sage',
   completed: 'bg-parchment text-ink-muted',
   cancelled: 'bg-vermillion-light text-vermillion',
@@ -125,7 +125,7 @@ function OverviewTab({ token }) {
       {profile && (
         <Card>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center text-primary-dark font-bold text-lg flex-shrink-0">
+            <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center text-primary-ink font-bold text-lg flex-shrink-0">
               {(profile.name || '?')[0].toUpperCase()}
             </div>
             <div className="min-w-0">
@@ -141,7 +141,7 @@ function OverviewTab({ token }) {
                 </span>
               </div>
               {profile.specialties?.length > 0 && (
-                <div className="text-xs text-ink-faint mt-2">{profile.specialties.join(' · ')}</div>
+                <div className="text-xs text-ink-muted mt-2">{profile.specialties.join(' · ')}</div>
               )}
             </div>
           </div>
@@ -190,7 +190,7 @@ function BookingsTab({ token }) {
 
       {filtered.length === 0 ? (
         <Card>
-          <p className="text-ink-faint text-sm text-center py-6">
+          <p className="text-ink-muted text-sm text-center py-6">
             {filter === 'all' ? 'No bookings yet.' : `No ${filter} bookings.`}
           </p>
         </Card>
@@ -201,7 +201,7 @@ function BookingsTab({ token }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-medium text-ink text-sm">{b.client_name || 'Anonymous'}</div>
-                  {b.client_phone && <div className="text-xs text-ink-faint">{b.client_phone}</div>}
+                  {b.client_phone && <div className="text-xs text-ink-muted">{b.client_phone}</div>}
                   <div className="text-xs text-ink-muted mt-1">
                     {new Date(b.scheduled_at).toLocaleString('en-IN', {
                       day: 'numeric', month: 'short', year: 'numeric',
@@ -266,7 +266,7 @@ function ProfileTab({ token }) {
   return (
     <Card>
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary-dark font-bold">
+        <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary-ink font-bold">
           {(profile?.name || '?')[0].toUpperCase()}
         </div>
         <div>
@@ -283,7 +283,7 @@ function ProfileTab({ token }) {
           <label className="text-xs text-ink-muted mb-1 block">Bio</label>
           <textarea rows={4} value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
             placeholder="Your background, approach, and areas of expertise…"
-            className="w-full bg-parchment border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-primary-dark resize-none" />
+            className="w-full bg-parchment border border-line rounded-lg px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-primary-dark resize-none" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -347,7 +347,7 @@ export default function AstrologerDashboard() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition ${
-                tab === t.id ? 'bg-parchment-card text-primary-dark' : 'text-ink-onnight hover:bg-white/10'
+                tab === t.id ? 'bg-parchment-card text-primary-ink' : 'text-ink-onnight hover:bg-white/10'
               }`}>
               {t.label}
             </button>

@@ -23,21 +23,21 @@ export default function TermsOfUse() {
       <StaticPageLayout title={t('footer_bottom_terms')} maxWidth="max-w-3xl">
         <LegalLanguageNote />
         <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-4 mb-2 not-prose">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary-dark mb-2">In plain language</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-ink mb-2">In plain language</p>
           <ul className="space-y-1.5 text-sm text-ink">
             <li>✦ You must be 13+ to use this service. Readings are for personal guidance only.</li>
             <li>✦ AI-generated content is not a substitute for professional advice — medical, legal, or financial.</li>
             <li>✦ Free tier is free. Paid features (when live) are clearly labelled. Refunds follow our refund policy.</li>
           </ul>
         </div>
-        <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
+        <p className="text-ink-muted text-xs">Last updated: 29 June 2026</p>
 
         <p>
           These Terms of Use ("Terms") govern your access to and use of starjyotish.com and related services
           (the "Platform"), operated by Star Jyotish ("we", "us", "our"). By using the Platform, you agree to
-          these Terms. Please also read our <Link to="/disclaimer" className="text-primary-dark hover:underline">Astrology
-          Disclaimer</Link>, <Link to="/privacy" className="text-primary-dark hover:underline">Privacy Policy</Link>, and{' '}
-          <Link to="/refund-policy" className="text-primary-dark hover:underline">Refund & Cancellation Policy</Link>,
+          these Terms. Please also read our <Link to="/disclaimer" className="text-primary-ink hover:underline">Astrology
+          Disclaimer</Link>, <Link to="/privacy" className="text-primary-ink hover:underline">Privacy Policy</Link>, and{' '}
+          <Link to="/refund-policy" className="text-primary-ink hover:underline">Refund & Cancellation Policy</Link>,
           which form part of these Terms by reference.
         </p>
         <p className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 text-ink text-xs leading-relaxed">
@@ -46,7 +46,7 @@ export default function TermsOfUse() {
 
         <nav aria-label="Table of contents" className="bg-parchment-card border border-line rounded-xl p-4 text-sm">
           <p className="font-semibold text-ink mb-2">On this page</p>
-          <ol className="list-decimal pl-5 space-y-1 text-primary-dark">
+          <ol className="list-decimal pl-5 space-y-1 text-primary-ink">
             <li><a href="#eligibility" className="hover:underline">Eligibility</a></li>
             <li><a href="#nature-of-service" className="hover:underline">Nature of this service</a></li>
             <li><a href="#ai-content" className="hover:underline">AI-generated content</a></li>
@@ -79,7 +79,7 @@ export default function TermsOfUse() {
           financial, or psychological advice, and no outcome, prediction, or remedy is guaranteed.</strong> You
           are solely responsible for any decisions you make based on content from the Platform, and we strongly
           recommend consulting a qualified professional before making significant medical, legal, or financial
-          decisions. See our full <Link to="/disclaimer" className="text-primary-dark hover:underline">Disclaimer</Link>.</p>
+          decisions. See our full <Link to="/disclaimer" className="text-primary-ink hover:underline">Disclaimer</Link>.</p>
 
         <h2 id="ai-content" className={h2}>3. AI-generated content</h2>
         <p>Readings, "Ask the Chart" answers, and topic reports (career, relationship, health, finance) are
@@ -111,14 +111,14 @@ export default function TermsOfUse() {
           reproduce, or create derivative works from these except for your own personal, non-commercial use of
           the reports you generate. You retain ownership of the birth details and questions you submit; by
           submitting them, you grant us a license to process them solely to provide you the requested chart,
-          reading, or report (see our <Link to="/privacy" className="text-primary-dark hover:underline">Privacy
+          reading, or report (see our <Link to="/privacy" className="text-primary-ink hover:underline">Privacy
           Policy</Link> for how that data is handled).</p>
 
         <h2 id="fees" className={h2}>7. Fees & payments</h2>
         <p>Some reports and features may require payment, at prices displayed to you at the time of purchase,
           inclusive of any applicable taxes (e.g. GST) unless stated otherwise. Payments will be processed by a
           licensed third-party payment gateway; we do not store your full payment card details. Refunds and
-          cancellations are governed by our <Link to="/refund-policy" className="text-primary-dark hover:underline">Refund
+          cancellations are governed by our <Link to="/refund-policy" className="text-primary-ink hover:underline">Refund
           & Cancellation Policy</Link>.</p>
 
         <h2 id="subscriptions" className={h2}>8. Subscriptions — once available</h2>
@@ -133,7 +133,7 @@ export default function TermsOfUse() {
             premium features until then and are not charged for the next cycle.</li>
           <li><strong className="text-ink">No partial-period refunds.</strong> We do not pro-rate or refund the
             unused portion of a subscription period after cancellation, except where required by applicable law
-            or our <Link to="/refund-policy" className="text-primary-dark hover:underline">Refund &amp;
+            or our <Link to="/refund-policy" className="text-primary-ink hover:underline">Refund &amp;
             Cancellation Policy</Link> (e.g. a technical failure on our end).</li>
           <li><strong className="text-ink">Plan changes.</strong> Upgrading to a higher tier takes effect
             immediately and is charged on a pro-rated basis. Downgrading takes effect at the next renewal date.</li>
@@ -172,7 +172,7 @@ export default function TermsOfUse() {
 
         <h2 id="governing-law" className={h2}>14. Governing law & jurisdiction</h2>
         <p>These Terms are governed by the laws of India. Subject to applicable consumer-protection law, courts
-          at <em className="text-ink-faint">Raigarh, Chhattisgarh, India [to be updated to match the company's
+          at <em className="text-ink-muted">Raigarh, Chhattisgarh, India [to be updated to match the company's
           registered office once incorporated]</em> shall have exclusive jurisdiction over any dispute arising
           from these Terms.</p>
 
@@ -182,7 +182,7 @@ export default function TermsOfUse() {
 
         <h2 id="contact" className={h2}>16. Contact</h2>
         <p>Questions about these Terms can be sent to{' '}
-          <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>.</p>
+          <a href="mailto:contact@starjyotish.com" className="text-primary-ink hover:underline">contact@starjyotish.com</a>.</p>
       </StaticPageLayout>
     </>
   )

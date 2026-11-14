@@ -227,15 +227,6 @@ export default function HeroBanner({ profile, user, onOpenChart }) {
           /* Extend edge-to-edge outside the content container */
         }
         .sj-hb-stars { position:absolute;inset:0;pointer-events:none; }
-        .sj-hb-star {
-          position:absolute;border-radius:50%;
-          background:rgba(240,203,128,0.9);
-          animation: sj-hb-twinkle linear infinite;
-        }
-        @keyframes sj-hb-twinkle {
-          0%,100%{opacity:0.08;transform:scale(1)}
-          50%{opacity:0.9;transform:scale(1.15)}
-        }
 
         .sj-hb-inner {
           position: relative;

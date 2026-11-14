@@ -14,7 +14,7 @@ import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
 const CATEGORY_COLORS = {
-  Basics:   'bg-primary-light text-primary-dark',
+  Basics:   'bg-primary-light text-primary-ink',
   Timing:   'bg-mauve-light text-mauve',
   Planets:  'bg-sage-light text-sage',
   Remedies: 'bg-vermillion-light text-vermillion',
@@ -207,8 +207,8 @@ export default function BlogArticle() {
                   <Link key={rel.slug} to={`/blog/${rel.slug}`}
                     className="group bg-parchment-card rounded-xl border border-line p-4 hover:border-primary/30 hover:shadow-md transition">
                     <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full mb-2 ${CATEGORY_COLORS[rel.category] ?? ''}`}>{rel.category}</span>
-                    <p className="font-semibold text-sm text-ink group-hover:text-primary-dark transition leading-snug">{rel.title}</p>
-                    <p className="text-xs text-ink-faint mt-1">{t('blog_read_min_long', { n: rel.readMin })}</p>
+                    <p className="font-semibold text-sm text-ink group-hover:text-primary-ink transition leading-snug">{rel.title}</p>
+                    <p className="text-xs text-ink-muted mt-1">{t('blog_read_min_long', { n: rel.readMin })}</p>
                   </Link>
                 ))}
               </div>

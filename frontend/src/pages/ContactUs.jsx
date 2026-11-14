@@ -63,8 +63,8 @@ export default function ContactUs() {
 
         <div className="bg-parchment-card border border-line rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold tracking-wide uppercase text-ink-faint mb-1">{t('contact_email_label')}</p>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary-dark font-semibold hover:underline break-all">
+            <p className="text-xs font-semibold tracking-wide uppercase text-ink-muted mb-1">{t('contact_email_label')}</p>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary-ink font-semibold hover:underline break-all">
               {CONTACT_EMAIL}
             </a>
           </div>
@@ -87,7 +87,7 @@ export default function ContactUs() {
             <p className="text-ink-muted text-sm">{t('contact_sent_body')}</p>
             <button
               onClick={() => setStatus('idle')}
-              className="mt-4 text-sm text-primary-dark hover:underline font-medium"
+              className="mt-4 text-sm text-primary-ink hover:underline font-medium"
             >
               {t('contact_send_another')}
             </button>
@@ -124,11 +124,11 @@ export default function ContactUs() {
         )}
 
         <div className="text-center pt-2">
-          <p className="text-xs font-semibold tracking-wide uppercase text-ink-faint mb-3">{t('contact_follow')}</p>
+          <p className="text-xs font-semibold tracking-wide uppercase text-ink-muted mb-3">{t('contact_follow')}</p>
           <div className="flex justify-center">
             <SocialButtons dark={false} />
           </div>
-          <p className="text-ink-faint text-xs mt-2">{t('contact_follow_note')}</p>
+          <p className="text-ink-muted text-xs mt-2">{t('contact_follow_note')}</p>
         </div>
       </StaticPageLayout>
     </>

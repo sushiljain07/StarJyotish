@@ -6,6 +6,7 @@ import { useLatestRequest } from '../hooks/useLatestRequest'
 import { Button } from './ui'
 import { errorMessage } from '../api/errors'
 import { currentLanguage } from '../i18n/languages'
+import { chartPalette as P, withAlpha } from '../theme/chartPalette'
 
 // Faint kundli wheel SVG watermark
 function KundliWheelBg() {
@@ -19,7 +20,7 @@ function KundliWheelBg() {
   return (
     <svg width="320" height="320" viewBox="0 0 300 300"
          className="absolute inset-0 m-auto pointer-events-none select-none"
-         style={{ opacity: 0.05, color: '#D4AF37' }}>
+         style={{ opacity: 0.05, color: P.gold }}>
       <circle cx="150" cy="150" r="140" stroke="currentColor" fill="none" strokeWidth="1" />
       <circle cx="150" cy="150" r="90"  stroke="currentColor" fill="none" strokeWidth="0.8" />
       <circle cx="150" cy="150" r="45"  stroke="currentColor" fill="none" strokeWidth="0.8" />
@@ -141,7 +142,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
       <Button size="lg" onClick={() => generate()}>
         {t('reading_reveal_btn')}
       </Button>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')}</p>
     </div>
   )
 
@@ -153,12 +154,12 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
-      <p className="font-medium text-primary-dark">{t('reading_loading_text')}</p>
+      <p className="font-medium text-primary-ink">{t('reading_loading_text')}</p>
       <div className="mt-4 w-48 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full rounded-full motion-safe:animate-pulse"
-             style={{ width: '75%', background: 'linear-gradient(90deg,#2D1B69,#D4AF37)' }} />
+             style={{ width: '75%', background: `linear-gradient(90deg,${P.nightLight},${P.gold})` }} />
       </div>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_loading_sub')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_loading_sub')}</p>
     </div>
   )
 
@@ -188,10 +189,10 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
         if (isHealth) return (
           <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-green-200
+               className={`rounded-xl overflow-hidden shadow-sm border border-good/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
-            <div className="bg-gradient-to-r from-green-500 to-emerald-400 px-5 py-3 flex items-center gap-2">
+            <div className="bg-good px-5 py-3 flex items-center gap-2">
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
@@ -203,10 +204,10 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
         if (isRelationships) return (
           <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-rose-200
+               className={`rounded-xl overflow-hidden shadow-sm border border-bad/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
-            <div className="bg-gradient-to-r from-rose-500 to-pink-400 px-5 py-3 flex items-center gap-2">
+            <div className="bg-bad px-5 py-3 flex items-center gap-2">
               <span className="text-xl">{icon}</span>
               <h3 className="font-bold text-white text-base">{title}</h3>
             </div>
@@ -224,7 +225,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl">{icon}</span>
-              <h3 className="font-bold text-primary text-base">{title}</h3>
+              <h3 className="font-bold text-primary-ink text-base">{title}</h3>
             </div>
             <p className="text-ink text-sm leading-relaxed max-w-prose"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
@@ -238,15 +239,15 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
       {topic === 'career' && activeYogas.length > 0 && (
         <div className="relative overflow-hidden rounded-2xl p-6"
              style={{
-               background: '#1A0A3B',
-               border: '2px solid #D4AF37',
-               boxShadow: '0 0 28px rgba(212,175,55,0.18)',
+               background: P.nightDeep,
+               border: `2px solid ${P.gold}`,
+               boxShadow: `0 0 28px ${withAlpha(P.gold, 0.18)}`,
              }}>
           <KundliWheelBg />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">👑</span>
-              <h3 className="font-extrabold text-lg" style={{ color: '#D4AF37' }}>
+              <h3 className="font-extrabold text-lg" style={{ color: P.gold }}>
                 {t('reading_yogas_title', { count: activeYogas.length })}
               </h3>
             </div>
@@ -256,7 +257,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
             </p>
             <button onClick={onOpenRajyogas}
               className="px-4 py-2 rounded-lg font-semibold text-sm"
-              style={{ background: '#D4AF37', color: '#1A0A3B' }}>
+              style={{ background: P.gold, color: P.nightDeep }}>
               {t('reading_see_yogas')}
             </button>
           </div>
@@ -265,18 +266,18 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
       <div className="text-center pb-4">
         <button onClick={() => generate({ force: true })}
-          className="text-sm text-primary hover:text-primary-dark transition">
+          className="text-sm text-primary-ink hover:text-ink transition">
           {t('reading_regenerate_btn')}
         </button>
       </div>
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {provider && (
-        <p className="text-center text-[11px] text-ink-faint pb-1">
+        <p className="text-center text-[11px] text-ink-muted pb-1">
           {t('reading_powered_by', { provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-2">
+      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-2">
         {t('disclaimer')}
       </p>
     </div>

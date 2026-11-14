@@ -8,7 +8,7 @@ import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
 
 function LordChip({ lord }) {
   const { t } = useTranslation()
-  if (!lord) return <span className="text-ink-faint">—</span>
+  if (!lord) return <span className="text-ink-muted">—</span>
   return (
     <span className="inline-block px-1.5 py-0.5 rounded text-white text-xs font-bold"
           style={{ backgroundColor: LORD_COLORS[lord] ?? '#64748b' }}>
@@ -47,8 +47,8 @@ export default function KPChart({ input }) {
   return (
     <div className="space-y-4">
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-        <h2 className="text-primary-dark font-bold text-base">{t('kp_title')}</h2>
-        <p className="text-primary-dark text-xs mt-1">
+        <h2 className="text-primary-ink font-bold text-base">{t('kp_title')}</h2>
+        <p className="text-primary-ink text-xs mt-1">
           {t('kp_subtitle')}
         </p>
         <button onClick={loadKP} disabled={loading}
@@ -73,7 +73,7 @@ export default function KPChart({ input }) {
         <>
           {/* Ascendant KP data */}
           <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-            <h3 className="text-primary-dark font-semibold text-sm mb-2">{t('kp_ascendant')}</h3>
+            <h3 className="text-primary-ink font-semibold text-sm mb-2">{t('kp_ascendant')}</h3>
             <div className="flex flex-wrap gap-3 text-sm">
               <span className="text-ink font-medium">
                 {signName(t, data.ascendant.sign)} {data.ascendant.degree.toFixed(2)}°
@@ -90,7 +90,7 @@ export default function KPChart({ input }) {
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-primary-light text-primary-dark">
+                  <tr className="bg-primary-light text-primary-ink">
                     <th className="p-2.5 text-left border-b border-primary/30">{t('col_planet')}</th>
                     <th className="p-2.5 text-left border-b border-primary/30">{t('kp_col_sign_deg')}</th>
                     <th className="p-2.5 text-center border-b border-primary/30">{t('col_house')}</th>
@@ -110,9 +110,9 @@ export default function KPChart({ input }) {
                       </td>
                       <td className="p-2.5 border-b">
                         <span className="font-medium">{signName(t, p.sign)}</span>
-                        <span className="text-ink-faint ml-1">{p.degree.toFixed(2)}°</span>
+                        <span className="text-ink-muted ml-1">{p.degree.toFixed(2)}°</span>
                       </td>
-                      <td className="p-2.5 border-b text-center text-primary-dark font-bold">{p.house}</td>
+                      <td className="p-2.5 border-b text-center text-primary-ink font-bold">{p.house}</td>
                       <td className="p-2.5 border-b text-ink-muted">{nakshatraName(t, p.nakshatra)}</td>
                       <td className="p-2.5 border-b text-center"><LordChip lord={p.star_lord} /></td>
                       <td className="p-2.5 border-b text-center"><LordChip lord={p.sub} /></td>
@@ -133,7 +133,7 @@ export default function KPChart({ input }) {
             <p><strong>{t('kp_star_lord')}</strong>: {t('kp_guide_star')}</p>
             <p><strong>{t('kp_col_sub_lord')}</strong>: {t('kp_guide_sub')}</p>
             <p><strong>{t('kp_sub_sub')}</strong>: {t('kp_guide_sub_sub')}</p>
-            <p className="mt-2 text-ink-faint">
+            <p className="mt-2 text-ink-muted">
               {t('kp_sequence')}
             </p>
           </div>

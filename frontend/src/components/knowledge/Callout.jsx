@@ -7,7 +7,7 @@
 // introduced): the same pairing already used for category pills in
 // Blog.jsx / BlogArticle.jsx, just applied to a block instead of a chip.
 const VARIANTS = {
-  tip:     { bg: 'bg-primary-light',    border: 'border-primary',    label: 'text-primary-dark' },
+  tip:     { bg: 'bg-primary-light',    border: 'border-primary',    label: 'text-primary-ink' },
   note:    { bg: 'bg-sage-light',       border: 'border-sage',       label: 'text-sage' },
   warning: { bg: 'bg-vermillion-light', border: 'border-vermillion', label: 'text-vermillion' },
   insight: { bg: 'bg-mauve-light',      border: 'border-mauve',      label: 'text-mauve' },

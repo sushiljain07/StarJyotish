@@ -33,24 +33,24 @@ export default function ArticleCard({
     <>
       <div className="flex items-center gap-2.5 mb-3">
         {icon && (
-          <span className={`shrink-0 ${featured ? 'text-primary' : 'text-primary-dark'}`}>{icon}</span>
+          <span className={`shrink-0 ${featured ? 'text-primary' : 'text-primary-ink'}`}>{icon}</span>
         )}
         {badge && (
           <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-            featured ? 'bg-white/10 text-primary-light' : 'bg-primary-light text-primary-dark'
+            featured ? 'bg-white/10 text-primary-light' : 'bg-primary-light text-primary-ink'
           }`}>
             {badge}
           </span>
         )}
         {comingSoon && (
-          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-parchment text-ink-faint border border-line ml-auto">
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
             {t('knowledge_coming_soon')}
           </span>
         )}
       </div>
       <h3 className={`font-semibold leading-snug mb-2 ${
         featured ? 'font-serif text-lg sm:text-xl text-primary-light' : 'text-sm text-ink'
-      } ${isInteractive ? 'group-hover:text-primary-dark transition' : ''}`}>
+      } ${isInteractive ? (featured ? 'group-hover:text-primary-glow' : 'group-hover:text-primary-ink') + ' transition' : ''}`}>
         {title}
       </h3>
       {description && (
@@ -60,9 +60,9 @@ export default function ArticleCard({
       )}
       {meta && (
         <div className={`flex items-center justify-between mt-4 pt-3 border-t ${featured ? 'border-white/10' : 'border-line'}`}>
-          <span className={`text-[11px] ${featured ? 'text-ink-onnight' : 'text-ink-faint'}`}>{meta}</span>
+          <span className={`text-[11px] ${featured ? 'text-ink-onnight' : 'text-ink-muted'}`}>{meta}</span>
           {isInteractive && (
-            <span className={`text-xs font-medium transition-transform group-hover:translate-x-0.5 ${featured ? 'text-primary' : 'text-primary-dark'}`}>
+            <span className={`text-xs font-medium transition-transform group-hover:translate-x-0.5 ${featured ? 'text-primary' : 'text-primary-ink'}`}>
               {t('knowledge_read')}
             </span>
           )}

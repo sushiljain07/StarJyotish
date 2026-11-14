@@ -23,7 +23,8 @@ describe('ScrollToTop', () => {
   it('does not reserve nav height when no BottomNav is mounted', () => {
     expect(renderWith([])).not.toContain('--bottom-nav-h')
   })
-  it('floats above the FAB when one is mounted', () => {
-    expect(renderWith(['bottomNav', 'fab'])).toContain('var(--fab-h) + 0.75rem')
+  it('is not rendered while the Ask FAB is registered', () => {
+    render(<MemoryRouter><Bars names={['bottomNav', 'fab']} /><ScrollToTop visible /></MemoryRouter>)
+    expect(screen.queryByRole('button')).toBeNull()
   })
 })

@@ -28,33 +28,10 @@ export default function KundliDownload({ data, input }) {
   const md   = dasha.current_mahadasha
   const ad   = dasha.current_antardasha
 
+  // The print stylesheet lives in index.css (@media print, keyed on
+  // #kundli-print-area), so the browser's own Print menu gives the same page.
   function handleDownload() {
-    const style = document.createElement('style')
-    style.id = '_kp_print_style'
-    style.textContent = `
-      @media print {
-        @page { margin: 10mm; size: A4 portrait; }
-        html, body {
-          height: auto !important;
-          overflow: visible !important;
-        }
-        body > * { visibility: hidden !important; }
-        #kundli-print-area,
-        #kundli-print-area * { visibility: visible !important; }
-        #kundli-print-area {
-          position: absolute; top: 0; left: 0;
-          width: 100%; background: white;
-          height: auto !important;
-          overflow: visible !important;
-        }
-        .no-print { display: none !important; }
-      }
-    `
-    document.head.appendChild(style)
     window.print()
-    setTimeout(() => {
-      document.getElementById('_kp_print_style')?.remove()
-    }, 500)
   }
 
   return (
@@ -73,11 +50,11 @@ export default function KundliDownload({ data, input }) {
       </div>
 
       {/* ── Printable area ── */}
-      <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 space-y-5">
+      <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 print:p-0 print:border-0 space-y-5">
 
         {/* Header */}
         <div className="text-center border-b border-line pb-4 print:break-inside-avoid-page">
-          <div className="text-lg font-bold text-primary-dark tracking-wide">{t('download_heading')}</div>
+          <div className="text-lg font-bold text-primary-ink tracking-wide">{t('download_heading')}</div>
           {input.name && (
             <div className="text-2xl font-semibold text-ink mt-1">{input.name}</div>
           )}
@@ -85,7 +62,7 @@ export default function KundliDownload({ data, input }) {
             {fmtDate(input.date)} &nbsp;·&nbsp; {fmtTime(input.time)} &nbsp;·&nbsp; {input.place}
           </div>
           <div className="flex flex-wrap gap-2 justify-center mt-2">
-            <span className="bg-primary-light text-primary-dark text-xs font-semibold px-3 py-1 rounded-full">
+            <span className="bg-primary-light text-primary-ink text-xs font-semibold px-3 py-1 rounded-full">
               {t('kundli_chip_lagna', { sign: signName(t, ascendant.sign) })}
             </span>
             {moon && (
@@ -105,22 +82,24 @@ export default function KundliDownload({ data, input }) {
         {/* Charts — Lagna + Navamsa */}
         <div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
+            <div className="flex-1 max-w-[380px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 {t('download_lagna_chart_d1')}
               </p>
               <KundliChart
+                detail="full"
                 planets={planets}
                 ascendant={ascendant}
                 navamsaPlanets={navamsa_planets}
                 title={t('chart_lagna_title')}
               />
             </div>
-            <div className="flex-1 max-w-[320px] mx-auto sm:mx-0 print:break-inside-avoid-page">
+            <div className="flex-1 max-w-[380px] mx-auto sm:mx-0 print:break-inside-avoid-page">
               <p className="text-center text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1">
                 {t('download_navamsa_chart_d9')}
               </p>
               <KundliChart
+                detail="full"
                 planets={navamsa_planets}
                 ascendant={navamsa_ascendant}
                 title={t('tab_navamsa')}
@@ -137,7 +116,7 @@ export default function KundliDownload({ data, input }) {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead className="print:table-header-group">
-                <tr className="bg-primary-light text-primary-dark">
+                <tr className="bg-primary-light text-primary-ink">
                   {[['planet', t('col_planet')], ['sign', t('col_sign')], ['deg', t('download_col_deg')], ['house', t('col_house')], ['nakshatra', t('col_nakshatra')], ['pada', t('col_pada')], ['dignity', t('kundli_planets_col_dignity')], ['r', t('col_retrograde')]].map(([id, h]) => (
                     <th key={id} className={`p-1.5 border border-primary/30 ${id==='r'||id==='pada'||id==='house'?'text-center':'text-left'}`}>
                       {h}
@@ -180,8 +159,8 @@ export default function KundliDownload({ data, input }) {
           {/* Current dasha chain */}
           <div className="flex flex-wrap gap-2 mb-3">
             <div className="bg-primary-light border border-primary/30 rounded-lg px-3 py-2 print:break-inside-avoid-page">
-              <div className="text-xs text-primary-dark/70 uppercase font-medium">{t('dasha_mahadasha')}</div>
-              <div className="text-sm font-bold text-primary-dark">{planetName(t, md.planet)}</div>
+              <div className="text-xs text-primary-ink uppercase font-medium">{t('dasha_mahadasha')}</div>
+              <div className="text-sm font-bold text-primary-ink">{planetName(t, md.planet)}</div>
               <div className="text-xs text-ink-muted">{fmtDate(md.start)} – {fmtDate(md.end)} ({t('dasha_years_short', { n: md.years })})</div>
             </div>
             {ad && (
@@ -230,7 +209,7 @@ export default function KundliDownload({ data, input }) {
           <div className="space-y-3">
 
             <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3 print:break-inside-avoid-page">
-              <div className="text-xs font-bold text-primary-dark uppercase mb-1">
+              <div className="text-xs font-bold text-primary-ink uppercase mb-1">
                 {t('download_lagna_heading', { sign: signName(t, ascendant.sign) })}
               </div>
               <p className="text-sm text-ink leading-relaxed">
@@ -250,7 +229,7 @@ export default function KundliDownload({ data, input }) {
             )}
 
             <div className="bg-primary-light border-l-4 border-primary rounded-r-lg p-3 print:break-inside-avoid-page">
-              <div className="text-xs font-bold text-primary-dark uppercase mb-1">
+              <div className="text-xs font-bold text-primary-ink uppercase mb-1">
                 {t('download_dasha_current_heading', { planet: planetName(t, md.planet) })}
               </div>
               <p className="text-sm text-ink leading-relaxed">
@@ -262,7 +241,7 @@ export default function KundliDownload({ data, input }) {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-line pt-3 text-center text-xs text-ink-faint">
+        <div className="border-t border-line pt-3 text-center text-xs text-ink-muted">
           {t('download_footer')} &nbsp;·&nbsp; {fmtDate(new Date(), {
             day: 'numeric', month: 'long', year: 'numeric',
           })}

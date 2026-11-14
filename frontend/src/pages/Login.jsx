@@ -74,7 +74,7 @@ export default function Login() {
           obvious without breaking the focused card layout. */}
       <button
         onClick={e => { e.stopPropagation(); goBackOrHome() }}
-        className="absolute top-4 left-4 text-ink-onnight/60 hover:text-primary text-xs font-medium flex items-center gap-1 transition z-10"
+        className="absolute top-4 left-4 min-h-11 min-w-11 px-2 text-ink-onnight/60 hover:text-primary text-xs font-medium flex items-center gap-1 transition z-10"
         aria-label={t('nav_back', '← Back')}
       >
         ← {t('nav_back', 'Back')}
@@ -95,13 +95,13 @@ export default function Login() {
 
         <div className="flex items-center gap-3 my-6">
           <div className="flex-1 h-px bg-line" />
-          <span className="text-ink-faint text-xs uppercase tracking-wide">{t('login_or')}</span>
+          <span className="text-ink-muted text-xs uppercase tracking-wide">{t('login_or')}</span>
           <div className="flex-1 h-px bg-line" />
         </div>
 
         <GoogleLoginButton onSuccess={handleSuccess} />
 
-        <p className="text-ink-faint text-xs text-center mt-6">{t('login_disclaimer')}</p>
+        <p className="text-ink-muted text-xs text-center mt-6">{t('login_disclaimer')}</p>
       </div>
       </main>
     </div>

@@ -1,7 +1,13 @@
 // frontend/src/components/KundliChart.jsx
+import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetAbbr } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
+import { chartPalette as P } from '../theme/chartPalette'
+import { useRenderedScale, legibleSize, COMPACT_SCALE } from '../hooks/useRenderedScale'
+import {
+  NORTH_HOUSE_POLYGONS, estimateTextWidth, layoutNorthHouse, textBox,
+} from '../utils/chartLabelLayout'
 
 // ── 500×500 chart geometry ───────────────────────────────────────────────────
 // Outer square : (10,10)→(490,490)   Centre : (250,250)
@@ -84,16 +90,15 @@ function getPlanetStatus(p, sun, navamsaPlanets) {
   return sym.join('')
 }
 
-const LINE_H = 21   // vertical spacing — single column
-const ROW_H  = 22   // vertical spacing — 2-column grid
-const OFFSET = 22   // horizontal offset from centre in 2-col mode
-
 export default function KundliChart({
   planets = [],
   ascendant = null,
   navamsaPlanets = null,
   title,
   transitPlanets = null,
+  // 'full' keeps degrees and desktop sizes whatever the rendered width
+  // (printed / downloaded charts); 'auto' adapts to phones.
+  detail = 'auto',
 }) {
   const { t } = useTranslation()
   const abbr = name => planetAbbr(t, name)
@@ -124,122 +129,176 @@ export default function KundliChart({
 
   const sun = planets.find(p => p.name === 'Sun')
 
+  // Phones render the 500-unit chart at ~0.6×: grow the labels so they stay
+  // legible, and below COMPACT_SCALE drop the degree superscripts (the Planets
+  // table has them) and show status markers as a full-size suffix.
+  const svgRef = useRef(null)
+  const measured = useRenderedScale(svgRef, 500)
+  const scale = detail === 'full' ? 1 : measured
+  const compact = scale < COMPACT_SCALE
+  const planetFs = legibleSize(15, scale, 11)
+  const transitFs = legibleSize(13, scale, 11)
+  const statusFs = compact ? legibleSize(11, scale, 10) : 11
+  // Without the degree in front, a small gap separates name and status glyphs.
+  const statusGap = compact ? 0.2 * statusFs : 0
+  const rashiFs = legibleSize(14, scale, 10)
+  const grow = planetFs / 15
+  const rashiBox = (i, n) => {
+    const [rx, ry] = RASHI_POS[i]
+    return textBox(rx, ry, estimateTextWidth(String(n), rashiFs), rashiFs)
+  }
+
+  // The per-house label layout is the expensive part (collision search in
+  // layoutNorthHouse); recompute it only when the chart or the rendered
+  // scale changes, not on every parent render.
+  const houseLayouts = useMemo(() => HOUSE_CENTERS.map(([cx, cy], hIdx) => {
+    const hNum   = hIdx + 1
+    const ps     = byHouse[hNum] ?? []
+    const hasLag = hIdx === 0 && ascendant
+
+    // Build a flat list of all items to render in this house
+    const allItems = []
+    if (hasLag) {
+      allItems.push({ type: 'lag', deg: Math.floor(ascendant.degree) })
+    }
+    ps.forEach(p => {
+      allItems.push({
+        type:   'planet',
+        color:  PLANET_COLORS[p.name] ?? P.text,
+        name:   abbr(p.name),
+        deg:    Math.floor(p.degree),
+        status: getPlanetStatus(p, sun, navamsaPlanets),
+      })
+    })
+    // Transit planets (italic, lighter)
+    const tps = byHouseTransit?.[hNum] ?? []
+    tps.forEach(p => {
+      allItems.push({
+        type:  'transit',
+        color: PLANET_COLORS[p.name] ?? P.muted,
+        name:  abbr(p.name),
+        deg:   Math.floor(p.degree),
+      })
+    })
+
+    if (allItems.length === 0) return null
+
+    // Desktop: one column for 1–2 items, a 2-column grid for 3+.
+    // Grown labels fall back to tighter rows / an extra column.
+    const widthOf = item => item.type === 'planet'
+      ? estimateTextWidth(item.name, planetFs)
+        + (item.status ? estimateTextWidth(item.status, statusFs) + statusGap : 0)
+      : item.type === 'transit'
+        ? estimateTextWidth(t('chart_transit_marker') + item.name, transitFs)
+        : estimateTextWidth(abbr('Ascendant'), planetFs)
+    const positions = layoutNorthHouse({
+      center: [cx, cy],
+      poly: NORTH_HOUSE_POLYGONS[hIdx],
+      widths: allItems.map(widthOf),
+      fontSize: Math.max(planetFs, transitFs),
+      grow,
+      obstacles: [rashiBox(hIdx, houses[hIdx].sign_index + 1)],
+    })
+    return { allItems, positions }
+    // Everything else it reads is derived from these.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [planets, transitPlanets, navamsaPlanets, ascendant, scale, detail, t])
+
   return (
     <div className="bg-parchment-card rounded-xl shadow-sm border border-line p-2 w-full">
     <div className="flex flex-col items-center gap-3 w-full">
-      <div className="text-sm font-semibold text-primary-dark">{title ?? t('chart_lagna_title')}</div>
+      <div className="text-sm font-semibold text-primary-ink">{title ?? t('chart_lagna_title')}</div>
 
       <svg
+        ref={svgRef}
         width="100%"
         viewBox="0 0 500 500"
         style={{ maxWidth: 480 }}
         className="font-sans"
       >
         {/* Outer square */}
-        <rect x="10" y="10" width="480" height="480" fill="#fff8f0" stroke="#b5451b" strokeWidth="2"/>
+        <rect x="10" y="10" width="480" height="480" fill={P.paper} stroke={P.line} strokeWidth="2"/>
 
         {/* Full diagonals */}
-        <line x1="10"  y1="10"  x2="490" y2="490" stroke="#b5451b" strokeWidth="1.5"/>
-        <line x1="490" y1="10"  x2="10"  y2="490" stroke="#b5451b" strokeWidth="1.5"/>
+        <line x1="10"  y1="10"  x2="490" y2="490" stroke={P.line} strokeWidth="1.5"/>
+        <line x1="490" y1="10"  x2="10"  y2="490" stroke={P.line} strokeWidth="1.5"/>
 
         {/* Inner diamond */}
         <polygon
           points="250,10 490,250 250,490 10,250"
-          fill="none" stroke="#b5451b" strokeWidth="1.5"
+          fill="none" stroke={P.line} strokeWidth="1.5"
         />
 
         {/* ── Rashi numbers (sign_index + 1) ── */}
         {houses.map((h, i) => {
           const [rx, ry] = RASHI_POS[i]
           return (
-            <text key={`r${i}`} x={rx} y={ry}
-                textAnchor="middle" fontSize="14"
-                  fill="#b5451b" fontWeight="bold">
+            <text key={`r${i}`} x={rx} y={ry} data-label="sign"
+                textAnchor="middle" fontSize={rashiFs}
+                  fill={P.signText} fontWeight="bold">
               {h.sign_index + 1}
             </text>
           )
         })}
 
         {/* ── House contents (Lagna marker + planets) ── */}
-        {HOUSE_CENTERS.map(([cx, cy], hIdx) => {
-          const hNum   = hIdx + 1
-          const ps     = byHouse[hNum] ?? []
-          const isH1   = hIdx === 0
-          const hasLag = isH1 && ascendant
-
-          // Build a flat list of all items to render in this house
-          const allItems = []
-          if (hasLag) {
-            allItems.push({ type: 'lag', deg: Math.floor(ascendant.degree) })
-          }
-          ps.forEach(p => {
-            allItems.push({
-              type:   'planet',
-              color:  PLANET_COLORS[p.name] ?? '#333',
-              name:   abbr(p.name),
-              deg:    Math.floor(p.degree),
-              status: getPlanetStatus(p, sun, navamsaPlanets),
-            })
-          })
-          // Transit planets (italic, lighter)
-          const tps = byHouseTransit?.[hNum] ?? []
-          tps.forEach(p => {
-            allItems.push({
-              type:  'transit',
-              color: PLANET_COLORS[p.name] ?? '#888',
-              name:  abbr(p.name),
-              deg:   Math.floor(p.degree),
-            })
-          })
-
-          if (allItems.length === 0) return null
-
-          // 2-column grid for 3+ items to use horizontal space
-          const useGrid = allItems.length >= 3
-          const rh      = useGrid ? ROW_H : LINE_H
-          const rows    = useGrid ? Math.ceil(allItems.length / 2) : allItems.length
-          const startY  = cy - ((rows - 1) * rh) / 2
+        {houseLayouts.map((layout, hIdx) => {
+          if (!layout) return null
+          const hNum = hIdx + 1
+          const { allItems, positions } = layout
 
           const rendered = allItems.map((item, idx) => {
-            const row = useGrid ? Math.floor(idx / 2) : idx
-            const col = useGrid ? idx % 2 : 0
-            // Last item in an odd-count grid → centre it
-            const isLoneLastRow = useGrid && allItems.length % 2 !== 0 && idx === allItems.length - 1
-            const xPos = isLoneLastRow ? cx : useGrid ? cx + (col === 0 ? -OFFSET : OFFSET) : cx
-            const yPos = startY + row * rh
+            const { x: xPos, y: yPos } = positions[idx]
 
             if (item.type === 'lag') {
               return (
-                <text key="La" x={xPos} y={yPos}
-                      textAnchor="middle" fontSize="15"
-                      fill="#FF6B00" fontWeight="bold">
-                  <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                  <tspan dy="3">{abbr('Ascendant')}</tspan>
+                <text key="La" x={xPos} y={yPos} data-label="lagna"
+                      textAnchor="middle" fontSize={planetFs}
+                      fill={P.asc} fontWeight="bold">
+                  {compact ? abbr('Ascendant') : (
+                    <>
+                      <tspan data-deg fontSize="11" dy="-3">{item.deg}</tspan>
+                      <tspan dy="3">{abbr('Ascendant')}</tspan>
+                    </>
+                  )}
                 </text>
               )
             }
             if (item.type === 'transit') {
               return (
-                <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos}
-                      textAnchor="middle" fontSize="13"
+                <text key={`tr_${item.name}_${idx}`} x={xPos} y={yPos} data-label="transit"
+                      textAnchor="middle" fontSize={transitFs}
                       fill={item.color} opacity="0.65" fontStyle="italic">
-                  <tspan fontSize="9" dy="-2">{item.deg}</tspan>
-                  <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
+                  {compact ? <>{t('chart_transit_marker')}{item.name}</> : (
+                    <>
+                      <tspan data-deg fontSize="9" dy="-2">{item.deg}</tspan>
+                      <tspan dy="2">{t('chart_transit_marker')}{item.name}</tspan>
+                    </>
+                  )}
                 </text>
               )
             }
             return (
-              <text key={item.name} x={xPos} y={yPos}
-                    textAnchor="middle" fontSize="15"
+              <text key={item.name} x={xPos} y={yPos} data-label="planet"
+                    textAnchor="middle" fontSize={planetFs}
                     fill={item.color} fontWeight="500">
-                <tspan fontSize="11" dy="-3">{item.deg}</tspan>
-                <tspan dy="3">{item.name}</tspan>
-                {item.status && <tspan fontSize="11" dy="-3">{item.status}</tspan>}
+                {compact ? (
+                  <>
+                    <tspan>{item.name}</tspan>
+                    {item.status && <tspan data-status dx={statusGap} fontSize={statusFs}>{item.status}</tspan>}
+                  </>
+                ) : (
+                  <>
+                    <tspan data-deg fontSize="11" dy="-3">{item.deg}</tspan>
+                    <tspan dy="3">{item.name}</tspan>
+                    {item.status && <tspan data-status fontSize="11" dy="-3">{item.status}</tspan>}
+                  </>
+                )}
               </text>
             )
           })
 
-          return <g key={`h${hNum}`}>{rendered}</g>
+          return <g key={`h${hNum}`} data-house={hNum}>{rendered}</g>
         })}
       </svg>
 

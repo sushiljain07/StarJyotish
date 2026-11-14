@@ -27,7 +27,7 @@ function CheckIcon() {
 
 const STEP_CLASSES = {
   current:   'bg-primary text-night font-semibold',
-  completed: 'bg-primary-light text-primary-dark font-medium border border-primary/30',
+  completed: 'bg-primary-light text-primary-ink font-medium border border-primary/30',
   available: 'bg-parchment-card text-ink-muted border border-line hover:border-primary/40 hover:text-ink transition',
   locked:    'bg-parchment-card/60 text-ink-faint border border-line/60 cursor-default',
 }
@@ -37,12 +37,13 @@ export default function LearningPath({ title = 'Your learning path', steps }) {
 
   return (
     <nav aria-label={title}>
-      {title && <p className="text-xs font-bold tracking-widest uppercase text-primary-dark mb-4">{title}</p>}
+      {title && <p className="text-xs font-bold tracking-widest uppercase text-primary-ink mb-4">{title}</p>}
       <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-3">
         {steps.map((step, i) => {
           const isLast = i === steps.length - 1
           const tone = STEP_CLASSES[step.status] ?? STEP_CLASSES.locked
           const classes = `flex items-center gap-1.5 text-xs px-3.5 py-2 rounded-full whitespace-nowrap ${tone}`
+          const linkClasses = `${classes} min-h-11 md:min-h-0`
           const canLink = step.href && (step.status === 'available' || step.status === 'completed')
 
           const content = (
@@ -56,7 +57,7 @@ export default function LearningPath({ title = 'Your learning path', steps }) {
           return (
             <li key={step.id} className="flex items-center gap-1.5">
               {canLink ? (
-                <Link to={step.href} className={classes}>{content}</Link>
+                <Link to={step.href} className={linkClasses}>{content}</Link>
               ) : (
                 <span className={classes} aria-current={step.status === 'current' ? 'step' : undefined}>
                   {content}

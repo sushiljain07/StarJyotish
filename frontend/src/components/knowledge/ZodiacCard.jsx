@@ -19,9 +19,9 @@ export default function ZodiacCard({ sanskrit, english, archetype, tagline, icon
   const inner = (
     <>
       <div className="flex items-start justify-between mb-4">
-        <span className="text-primary-dark">{icon}</span>
+        <span className="text-primary-ink">{icon}</span>
         {comingSoon && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-faint border border-line">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
             Coming soon
           </span>
         )}
@@ -29,7 +29,7 @@ export default function ZodiacCard({ sanskrit, english, archetype, tagline, icon
       <h3 className="font-serif font-semibold text-lg text-ink leading-snug">
         {sanskrit} <span className="text-ink-muted font-sans font-normal text-sm">({english})</span>
       </h3>
-      <p className="text-primary-dark text-xs font-semibold tracking-wide uppercase mt-1.5 mb-3">{archetype}</p>
+      <p className="text-primary-ink text-xs font-semibold tracking-wide uppercase mt-1.5 mb-3">{archetype}</p>
       <p className="text-ink-muted text-sm leading-relaxed italic">&ldquo;{tagline}&rdquo;</p>
     </>
   )

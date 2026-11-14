@@ -118,7 +118,7 @@ export default function AnimatedTabRow({
           className={
             isUnderline
               ? `relative z-10 whitespace-nowrap px-4 min-h-11 rounded-t-lg text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1.5 ${
-                  active === tab.id ? 'text-primary-dark' : 'text-ink-muted hover:text-ink'
+                  active === tab.id ? 'text-primary-ink' : 'text-ink-muted hover:text-ink'
                 }`
               : `relative z-10 shrink-0 whitespace-nowrap text-xs px-3 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border transition-colors duration-200 ${
                   active === tab.id

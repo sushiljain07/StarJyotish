@@ -110,7 +110,7 @@ export default function AquariusGuide() {
       {isHindi && (
         <div className="mb-8 bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
           <span className="text-lg shrink-0">🌐</span>
-          <p className="text-sm text-primary-dark leading-relaxed">
+          <p className="text-sm text-primary-ink leading-relaxed">
             यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है। हिंदी अनुवाद जल्द आएगा।
             <span className="font-medium"> (This guide is currently available in English only.)</span>
           </p>
@@ -124,7 +124,7 @@ export default function AquariusGuide() {
 
       {/* ── Sign icon + quick facts ───────────────────────────────────── */}
       <Reveal className="flex flex-col sm:flex-row items-start gap-6 mb-2">
-        <div className="shrink-0 w-16 h-16 rounded-2xl bg-primary-light flex items-center justify-center text-primary-dark">
+        <div className="shrink-0 w-16 h-16 rounded-2xl bg-primary-light flex items-center justify-center text-primary-ink">
           <ZodiacSignIcon id="aquarius" className="w-9 h-9" />
         </div>
         <div className="flex-1">
@@ -135,7 +135,7 @@ export default function AquariusGuide() {
       {/* ── The Spirit ────────────────────────────────────────────────── */}
       <section className="mt-12" aria-labelledby="spirit-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{SPIRIT_OF_KUMBHA.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{SPIRIT_OF_KUMBHA.eyebrow}</p>
           <h2 id="spirit-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {SPIRIT_OF_KUMBHA.title}
           </h2>
@@ -146,7 +146,7 @@ export default function AquariusGuide() {
       {/* ── The Symbol ────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="symbol-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{SYMBOL_OF_WATERBEAR.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{SYMBOL_OF_WATERBEAR.eyebrow}</p>
           <h2 id="symbol-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {SYMBOL_OF_WATERBEAR.title}
           </h2>
@@ -157,7 +157,7 @@ export default function AquariusGuide() {
       {/* ── Strengths ─────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="strengths-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{STRENGTHS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{STRENGTHS.eyebrow}</p>
           <h2 id="strengths-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-2">
             {STRENGTHS.title}
           </h2>
@@ -171,7 +171,7 @@ export default function AquariusGuide() {
       {/* ── Growth areas ──────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="growth-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{GROWTH_AREAS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{GROWTH_AREAS.eyebrow}</p>
           <h2 id="growth-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-2">
             {GROWTH_AREAS.title}
           </h2>
@@ -185,7 +185,7 @@ export default function AquariusGuide() {
       {/* ── Relationships ─────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="relationships-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{RELATIONSHIPS.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{RELATIONSHIPS.eyebrow}</p>
           <h2 id="relationships-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {RELATIONSHIPS.title}
           </h2>
@@ -196,7 +196,7 @@ export default function AquariusGuide() {
       {/* ── Career ────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="career-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{CAREER.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{CAREER.eyebrow}</p>
           <h2 id="career-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {CAREER.title}
           </h2>
@@ -207,7 +207,7 @@ export default function AquariusGuide() {
       {/* ── Spiritual lesson ──────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="spiritual-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{SPIRITUAL_LESSON.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{SPIRITUAL_LESSON.eyebrow}</p>
           <h2 id="spiritual-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {SPIRITUAL_LESSON.title}
           </h2>
@@ -219,7 +219,7 @@ export default function AquariusGuide() {
       {/* ── Beyond the Sun sign ───────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="beyond-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{BEYOND_SUN_SIGN.eyebrow}</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{BEYOND_SUN_SIGN.eyebrow}</p>
           <h2 id="beyond-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             {BEYOND_SUN_SIGN.title}
           </h2>
@@ -247,7 +247,7 @@ export default function AquariusGuide() {
       {/* ── Common misconceptions ─────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="myths-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Setting the Record Straight</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Setting the Record Straight</p>
           <h2 id="myths-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Common misconceptions
           </h2>
@@ -265,7 +265,7 @@ export default function AquariusGuide() {
       {/* ── FAQ ───────────────────────────────────────────────────────── */}
       <section className="mt-14" aria-labelledby="faq-heading">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 id="faq-heading" className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">
             Frequently asked questions
           </h2>

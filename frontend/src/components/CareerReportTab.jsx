@@ -102,8 +102,8 @@ function reorderSections(careerContext, t) {
 }
 
 const EFFORT_COLOR = {
-  low:    'text-emerald-600 bg-emerald-50',
-  medium: 'text-primary-dark bg-primary-light',
+  low:    'text-good bg-good-light',
+  medium: 'text-primary-ink bg-primary-light',
   high:   'text-vermillion bg-vermillion-light',
 }
 
@@ -214,7 +214,7 @@ function CareerContextForm({ initial, onDone }) {
 
       <div>
         <p className="text-sm font-semibold text-ink mb-2">
-          {t('career_form_concerns_q')} <span className="text-ink-faint font-normal">{t('career_form_concerns_hint', { count: MAX_CONCERNS })}</span>
+          {t('career_form_concerns_q')} <span className="text-ink-muted font-normal">{t('career_form_concerns_hint', { count: MAX_CONCERNS })}</span>
         </p>
         <div className="flex flex-wrap gap-2">
           {CAREER_CONCERNS.map(c => (
@@ -246,7 +246,7 @@ function CareerContextForm({ initial, onDone }) {
 }
 
 function SectionContent({ content, light = false }) {
-  if (!content) return <span className="text-ink-faint italic">—</span>
+  if (!content) return <span className="text-ink-muted italic">—</span>
   const bullets = content
     .split('\n')
     .map(l => l.replace(/^[-•]\s*/, '').trim())
@@ -319,7 +319,7 @@ function SectionCard({ icon, section, style }) {
     <div className="bg-primary-light rounded-xl p-5 shadow-sm border border-primary/30">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-primary-dark text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
@@ -329,7 +329,7 @@ function SectionCard({ icon, section, style }) {
     <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
-        <h3 className="font-bold text-primary text-base">{section.title}</h3>
+        <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
     </div>
@@ -358,7 +358,7 @@ function CareerOptionCard({ opt }) {
             </span>
           </div>
           {opt.timeline && (
-            <p className="text-xs text-ink-faint mt-0.5">{opt.timeline}</p>
+            <p className="text-xs text-ink-muted mt-0.5">{opt.timeline}</p>
           )}
         </div>
         <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
@@ -368,7 +368,7 @@ function CareerOptionCard({ opt }) {
         <div className="px-4 pb-4 pt-0 border-t border-line space-y-3">
           {opt.reason && (
             <div>
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">{t('career_why_this')}</p>
+              <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('career_why_this')}</p>
               <p className="text-xs text-ink-muted leading-relaxed">{opt.reason}</p>
             </div>
           )}
@@ -378,7 +378,7 @@ function CareerOptionCard({ opt }) {
                 <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_key_planets')}</p>
                 <div className="flex gap-1 flex-wrap">
                   {opt.key_planets.map(p => (
-                    <span key={p} className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
+                    <span key={p} className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
                   ))}
                 </div>
               </div>
@@ -386,7 +386,7 @@ function CareerOptionCard({ opt }) {
             {opt.favorable_dasha && (
               <div>
                 <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_best_dasha')}</p>
-                <span className="text-xs bg-primary-light text-primary-dark px-2 py-0.5 rounded-full">{planetName(t, opt.favorable_dasha)}</span>
+                <span className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, opt.favorable_dasha)}</span>
               </div>
             )}
           </div>
@@ -426,7 +426,7 @@ function AstrologicalEvidenceCard({ evidence }) {
     <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">🔬</span>
-        <h3 className="font-bold text-primary text-base">{t('career_evidence_title')}</h3>
+        <h3 className="font-bold text-primary-ink text-base">{t('career_evidence_title')}</h3>
       </div>
       <div className="divide-y divide-line">
         {rows.map(([label, value]) => (
@@ -439,7 +439,7 @@ function AstrologicalEvidenceCard({ evidence }) {
       {evidence.all_planets?.length > 0 && (
         <div className="mt-3 pt-3 border-t border-line">
           <button onClick={() => setShowAllPlanets(o => !o)}
-            className="text-xs font-semibold text-primary-dark hover:underline">
+            className="text-xs font-semibold text-primary-ink hover:underline">
             {t(showAllPlanets ? 'career_evidence_hide_planets' : 'career_evidence_show_planets')}
           </button>
           {showAllPlanets && (
@@ -461,8 +461,8 @@ function AstrologicalEvidenceCard({ evidence }) {
 // The backend's label is a stable English id; its explanation text comes
 // from the server.
 const ALIGNMENT = {
-  'Strong Alignment':        { key: 'strong',        cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  'Partial Alignment':       { key: 'partial',       cls: 'bg-primary-light text-primary-dark border-primary/30' },
+  'Strong Alignment':        { key: 'strong',        cls: 'bg-good-light text-good border-good/30' },
+  'Partial Alignment':       { key: 'partial',       cls: 'bg-primary-light text-primary-ink border-primary/30' },
   'Underutilized Potential': { key: 'underutilized', cls: 'bg-mauve/10 text-mauve border-mauve/30' },
 }
 
@@ -502,7 +502,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
           <div className="divide-y divide-line">
             {horizons.map(([label, text]) => (
               <div key={label} className="px-5 py-3">
-                <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{label}</p>
+                <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{label}</p>
                 <p className="text-sm text-ink leading-relaxed max-w-prose">{text}</p>
               </div>
             ))}
@@ -512,12 +512,12 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
       {(roadmap.top_actions?.length > 0 || roadmap.top_avoid?.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {roadmap.top_actions?.length > 0 && (
-            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">{t('career_roadmap_actions')}</p>
+            <div className="bg-good-light rounded-xl p-4 border border-good/30">
+              <p className="text-xs font-semibold text-good uppercase tracking-wide mb-2">{t('career_roadmap_actions')}</p>
               <ul className="space-y-1.5">
                 {roadmap.top_actions.map((a, i) => (
                   <li key={i} className="text-sm text-ink flex gap-2">
-                    <span className="text-emerald-600 shrink-0">✓</span><span>{a}</span>
+                    <span className="text-good shrink-0">✓</span><span>{a}</span>
                   </li>
                 ))}
               </ul>
@@ -525,11 +525,11 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
           )}
           {roadmap.top_avoid?.length > 0 && (
             <div className="bg-primary-light rounded-xl p-4 border border-primary/30">
-              <p className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-2">{t('career_roadmap_avoid')}</p>
+              <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-2">{t('career_roadmap_avoid')}</p>
               <ul className="space-y-1.5">
                 {roadmap.top_avoid.map((a, i) => (
                   <li key={i} className="text-sm text-ink flex gap-2">
-                    <span className="text-primary-dark shrink-0">•</span><span>{a}</span>
+                    <span className="text-primary-ink shrink-0">•</span><span>{a}</span>
                   </li>
                 ))}
               </ul>
@@ -540,8 +540,8 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
       {roadmap.next_question && (
         <button onClick={() => onAskQuestion(roadmap.next_question)}
           className="w-full text-left bg-parchment-card rounded-xl p-4 border border-line hover:border-primary/50 transition">
-          <p className="text-xs text-ink-faint mb-1">{t('career_roadmap_next_question')}</p>
-          <p className="text-sm font-medium text-primary-dark">"{roadmap.next_question}" →</p>
+          <p className="text-xs text-ink-muted mb-1">{t('career_roadmap_next_question')}</p>
+          <p className="text-sm font-medium text-primary-ink">"{roadmap.next_question}" →</p>
         </button>
       )}
     </div>
@@ -724,7 +724,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       >
         {t('career_generate_btn')}
       </button>
-      <p className="text-xs text-ink-faint mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
+      <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
     </div>
   )
 
@@ -733,8 +733,8 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
   if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
     <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
-      <p className="text-primary-dark font-semibold">{t('career_loading_text')}</p>
-      <p className="text-xs text-ink-faint mt-1">{t('career_loading_sub')}</p>
+      <p className="text-primary-ink font-semibold">{t('career_loading_text')}</p>
+      <p className="text-xs text-ink-muted mt-1">{t('career_loading_sub')}</p>
       <div className="mt-5 w-52 h-1.5 bg-night/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary rounded-full motion-safe:animate-pulse w-3/4" />
       </div>
@@ -785,7 +785,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       <div className="text-center mt-6 pb-2 space-x-4">
         <button
           onClick={() => generate(undefined, { force: true })}
-          className="text-sm text-primary hover:text-primary-dark transition font-medium"
+          className="text-sm text-primary-ink hover:text-ink transition font-medium"
         >
           {t('career_regenerate')}
         </button>
@@ -799,11 +799,11 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {report?.llm_provider && (
-        <p className="text-center text-[11px] text-ink-faint pb-1">
+        <p className="text-center text-[11px] text-ink-muted pb-1">
           {t('reading_powered_by', { provider: report.llm_provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-faint leading-relaxed px-4 pb-4">
+      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-4">
         {t('disclaimer')}
       </p>
     </>
@@ -819,13 +819,13 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {report.current_phase?.content && (
           <div className="bg-parchment-card rounded-xl p-4 border border-line">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{t('career_quick_current_phase')}</p>
+            <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('career_quick_current_phase')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.current_phase.content}</p>
           </div>
         )}
         {report.peak_career_window?.content && (
           <div className="bg-parchment-card rounded-xl p-4 border border-line">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">{t('career_quick_peak_window')}</p>
+            <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('career_quick_peak_window')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.peak_career_window.content}</p>
           </div>
         )}
@@ -843,7 +843,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
     <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-primary/30">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">👑</span>
-        <h3 className="font-bold text-primary text-base">
+        <h3 className="font-bold text-primary-ink text-base">
           {t('reading_yogas_title', { count: report.active_yogas.length })}
         </h3>
       </div>
@@ -852,7 +852,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
           { names: report.active_yogas.slice(0, 2).map(y => y.name).join(t('reading_list_and')) })}
       </p>
       <button onClick={onOpenRajyogas}
-        className="text-sm font-semibold text-primary-dark hover:underline">
+        className="text-sm font-semibold text-primary-ink hover:underline">
         {t('reading_see_yogas')}
       </button>
     </div>
@@ -863,7 +863,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xl">🎯</span>
         <h3 className="font-bold text-ink text-base">{t('career_options_heading')}</h3>
-        <span className="text-xs text-ink-faint ml-1">· {t('topic_report_tap_to_expand')}</span>
+        <span className="text-xs text-ink-muted ml-1">· {t('topic_report_tap_to_expand')}</span>
       </div>
       <div className="space-y-2">
         {report.career_options.map(opt => (

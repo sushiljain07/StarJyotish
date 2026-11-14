@@ -28,9 +28,9 @@ export default function ProfileTypeSelector({ t, value, onChange }) {
               : 'border-line bg-parchment hover:border-primary/40'
           }`}
         >
-          <HomeIcon id={opt.icon} className={`w-7 h-7 mx-auto mb-2 ${value === opt.id ? 'text-primary-dark' : 'text-ink-muted'}`} />
+          <HomeIcon id={opt.icon} className={`w-7 h-7 mx-auto mb-2 ${value === opt.id ? 'text-primary-ink' : 'text-ink-muted'}`} />
           <span className="block font-semibold text-ink text-sm">{t(opt.labelKey)}</span>
-          <span className="block text-ink-faint text-xs mt-1">{t(opt.descKey)}</span>
+          <span className="block text-ink-muted text-xs mt-1">{t(opt.descKey)}</span>
         </button>
       ))}
     </div>

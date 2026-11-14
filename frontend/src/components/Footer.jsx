@@ -48,7 +48,7 @@ function FooterColumn({ heading, children, isMobile }) {
 
   return (
     <details key={String(isMobile)} className="group">
-      <summary className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3 cursor-pointer select-none flex items-center justify-between">
+      <summary className="text-xs font-semibold tracking-wide uppercase text-primary-light mb-3 min-h-11 cursor-pointer select-none flex items-center justify-between">
         {heading}
         <span className="text-primary-light/60 transition-transform group-open:rotate-180">⌄</span>
       </summary>
@@ -168,10 +168,10 @@ export default function Footer() {
       {/* ── Bottom bar ── */}
       <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 text-ink-onnight/60">
-          <Link to="/privacy" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_privacy')}</Link>
-          <Link to="/terms" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_terms')}</Link>
-          <Link to="/refund-policy" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_refund')}</Link>
-          <Link to="/disclaimer" className="hover:text-primary transition inline-flex items-center min-h-11">{t('footer_bottom_disclaimer')}</Link>
+          <Link to="/privacy" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_privacy')}</Link>
+          <Link to="/terms" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_terms')}</Link>
+          <Link to="/refund-policy" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_refund')}</Link>
+          <Link to="/disclaimer" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_disclaimer')}</Link>
         </div>
         <p className="text-ink-onnight/50 text-center">
           {t('footer_copyright', { year: FOOTER_YEAR })} · {t('footer_powered_by')}

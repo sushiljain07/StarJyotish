@@ -1,20 +1,20 @@
 // frontend/src/components/ScrollToTop.jsx
 //
 // Floating "back to top" button. On mobile it floats just above the fixed
-// bottom bars (the same height BottomChromeSpacer reserves), and above the
-// AskPersonaPanel FAB on routes that show it, so it never covers footer links.
+// bottom bars (the same height BottomChromeSpacer reserves) so it never covers
+// footer links. It is not rendered at all on routes that show the Ask FAB:
+// the FAB takes priority.
 import { useTranslation } from 'react-i18next'
-import { useBottomChrome, FAB_HEIGHT } from './layout/useBottomChrome'
+import { useBottomChrome } from './layout/useBottomChrome'
 
 export default function ScrollToTop({ visible }) {
   const { t } = useTranslation()
   const { spacerHeight, hasFab } = useBottomChrome()
-  const bottom = hasFab
-    ? `calc(${spacerHeight} + 0.75rem + var(--fab-h) + 0.75rem)`
-    : `calc(${spacerHeight} + 0.75rem)`
+  if (hasFab) return null
+  const bottom = `calc(${spacerHeight} + 0.75rem)`
   return (
     <button
-      style={{ '--fab-h': FAB_HEIGHT, '--stt-bottom': bottom }}
+      style={{ '--stt-bottom': bottom }}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label={t('scroll_to_top_label')}
       className={`fixed bottom-[var(--stt-bottom)] md:bottom-5 right-[max(1.25rem,var(--safe-right))] z-40 w-11 h-11 rounded-full bg-primary hover:bg-primary-dark text-night shadow-lg flex items-center justify-center transition-all duration-300 ${

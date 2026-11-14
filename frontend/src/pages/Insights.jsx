@@ -143,7 +143,7 @@ export default function Insights() {
 
   const selectSub = id => updateParams({ sub: id })
   const openRajyogas = () => updateParams({ sub: 'reports', topic: 'career', view: 'rajyogas' })
-  const panelClass = id => (activePanel === id ? 'tab-fade' : 'hidden')
+  const panelClass = id => (activePanel === id ? 'animate-fade-in-fast' : 'hidden')
 
   return (
     <div className="flex-1 flex flex-col">

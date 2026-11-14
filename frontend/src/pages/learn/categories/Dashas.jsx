@@ -38,12 +38,12 @@ function DashaRow({ dasha, index }) {
     <Reveal delay={index * 40}>
       <div className="flex items-start gap-4 p-4 rounded-xl bg-parchment-card border border-line hover:border-primary/40 transition-colors">
         <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex flex-col items-center justify-center">
-          <span className="text-primary-dark font-bold text-sm leading-none">{dasha.years}</span>
-          <span className="text-primary-dark text-[9px] font-medium leading-none mt-0.5">yrs</span>
+          <span className="text-primary-ink font-bold text-sm leading-none">{dasha.years}</span>
+          <span className="text-primary-ink text-[9px] font-medium leading-none mt-0.5">yrs</span>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm text-ink mb-0.5">{dasha.planet}</h3>
-          <p className="text-xs text-ink-faint mb-1.5">{dasha.nakshatra}</p>
+          <p className="text-xs text-ink-muted mb-1.5">{dasha.nakshatra}</p>
           <p className="text-sm text-ink-muted leading-snug">{dasha.quality}</p>
         </div>
       </div>
@@ -105,7 +105,7 @@ export default function DashasGuide() {
         <div className="max-w-4xl mx-auto px-4 pt-4">
           <div className="bg-primary-light border border-primary/30 rounded-xl px-4 py-3 flex items-start gap-3">
             <span className="text-lg shrink-0">🌐</span>
-            <p className="text-sm text-primary-dark leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
+            <p className="text-sm text-primary-ink leading-relaxed">यह लेख अभी केवल अंग्रेज़ी में उपलब्ध है।</p>
           </div>
         </div>
       )}
@@ -152,7 +152,7 @@ export default function DashasGuide() {
             <Reveal key={level.name} delay={i * 60}>
               <div className="rounded-2xl border border-line bg-parchment p-6 h-full">
                 <h3 className="font-serif font-semibold text-lg text-ink mb-1">{level.name}</h3>
-                <p className="text-primary-dark text-xs font-bold tracking-wide uppercase mb-3">{level.duration}</p>
+                <p className="text-primary-ink text-xs font-bold tracking-wide uppercase mb-3">{level.duration}</p>
                 <p className="text-ink-muted text-sm leading-relaxed">{level.description}</p>
               </div>
             </Reveal>

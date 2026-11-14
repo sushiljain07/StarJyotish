@@ -54,7 +54,7 @@ export default function SynastryGuide() {
       {sections.map(([key, val]) => val && (
         <section key={key} className="mt-14">
           <Reveal>
-            {val.eyebrow && <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">{val.eyebrow}</p>}
+            {val.eyebrow && <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">{val.eyebrow}</p>}
             {val.title && <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">{val.title}</h2>}
             {val.description && <p className="text-ink-muted text-sm leading-relaxed mb-6">{val.description}</p>}
             {val.paragraphs && <P paragraphs={val.paragraphs} />}
@@ -65,7 +65,7 @@ export default function SynastryGuide() {
 
       <section className="mt-14">
         <Reveal>
-          <p className="text-primary-dark text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
+          <p className="text-primary-ink text-xs font-bold tracking-widest uppercase mb-2">Common Questions</p>
           <h2 className="font-serif font-semibold text-2xl sm:text-3xl text-ink leading-snug mb-6">Frequently asked questions</h2>
         </Reveal>
         <FAQ items={C.FAQ} title={null} />

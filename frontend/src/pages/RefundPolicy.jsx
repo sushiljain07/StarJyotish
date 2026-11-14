@@ -26,7 +26,7 @@ export default function RefundPolicy() {
       />
       <StaticPageLayout title={t('legal_refund_title')} maxWidth="max-w-3xl">
         <LegalLanguageNote />
-        <p className="text-ink-faint text-xs">Last updated: 29 June 2026</p>
+        <p className="text-ink-muted text-xs">Last updated: 29 June 2026</p>
 
         <p className="bg-sage-light border border-sage/30 rounded-xl px-4 py-3 text-ink text-xs leading-relaxed">
           ℹ️ At the time of writing, the free Kundli, AI reading, and topic reports on Star Jyotish are available
@@ -93,7 +93,7 @@ export default function RefundPolicy() {
           gateway fees, in line with RBI guidelines applicable to prepaid instruments at that time.</p>
 
         <h2 className={h2}>5. How to request a refund</h2>
-        <p>Email <a href="mailto:contact@starjyotish.com" className="text-primary-dark hover:underline">contact@starjyotish.com</a>{' '}
+        <p>Email <a href="mailto:contact@starjyotish.com" className="text-primary-ink hover:underline">contact@starjyotish.com</a>{' '}
           with your payment receipt/transaction ID and a short description of the issue. We aim to:</p>
         <ul className={ul}>
           <li>Acknowledge your request within <strong className="text-ink">2 business days</strong></li>
@@ -106,8 +106,8 @@ export default function RefundPolicy() {
 
         <h2 className={h2}>6. Grievance redressal</h2>
         <p>If you're unsatisfied with how a refund request was handled, you can escalate it to our Grievance
-          Officer at the same email above. See our <Link to="/terms" className="text-primary-dark hover:underline">Terms
-          of Use</Link> and <Link to="/privacy" className="text-primary-dark hover:underline">Privacy Policy</Link> for
+          Officer at the same email above. See our <Link to="/terms" className="text-primary-ink hover:underline">Terms
+          of Use</Link> and <Link to="/privacy" className="text-primary-ink hover:underline">Privacy Policy</Link> for
           related terms.</p>
 
         <h2 className={h2}>7. Changes to this policy</h2>

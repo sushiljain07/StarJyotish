@@ -107,12 +107,12 @@ export default function AvatarUpload({ value, onChange }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={processing}
-            className="bg-parchment hover:bg-line/40 disabled:opacity-60 border border-line text-ink text-sm font-medium px-3.5 py-1.5 rounded-lg transition"
+            className="bg-parchment hover:bg-line/40 disabled:opacity-60 border border-line text-ink text-sm font-medium px-3.5 py-1.5 min-h-11 rounded-lg transition"
           >
             {processing ? t('profile_photo_processing') : t('profile_photo_upload')}
           </button>
           {value && (
-            <button type="button" onClick={() => onChange('')} className="text-vermillion hover:underline text-sm">
+            <button type="button" onClick={() => onChange('')} className="inline-flex items-center min-h-11 text-vermillion hover:underline text-sm">
               {t('profile_photo_remove')}
             </button>
           )}
@@ -127,7 +127,7 @@ export default function AvatarUpload({ value, onChange }) {
         {error ? (
           <p className="text-vermillion text-xs mt-1">{error}</p>
         ) : (
-          <p className="text-ink-faint text-xs mt-1">{t('profile_photo_hint')}</p>
+          <p className="text-ink-muted text-xs mt-1">{t('profile_photo_hint')}</p>
         )}
       </div>
     </div>

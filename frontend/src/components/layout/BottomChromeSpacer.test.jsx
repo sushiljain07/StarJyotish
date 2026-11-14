@@ -7,6 +7,8 @@ import indexHtml from '../../../index.html?raw'
 import { useBottomChrome, useChromeRegistration } from './useBottomChrome'
 import BottomChromeSpacer from './BottomChromeSpacer'
 import BottomNav from '../home/BottomNav'
+import NavBar from '../NavBar'
+import ScrollToTop from '../ScrollToTop'
 
 let mockAuthed = true
 vi.mock('../../contexts/AuthContext', () => ({
@@ -53,7 +55,7 @@ describe('useBottomChrome', () => {
   it('footer clearance adds the ScrollToTop reach (and the FAB) to the bars', () => {
     expect(chrome([]).footerClearance).toBe('calc(3.5rem)')
     expect(chrome(['bottomNav']).footerClearance).toContain('+ 3.5rem)')
-    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('4rem + 4.25rem')
+    expect(chrome(['bottomNav', 'fab']).footerClearance).toContain('3.25rem + 0.75rem')
   })
 })
 
@@ -67,6 +69,7 @@ describe('BottomChromeSpacer', () => {
     expect(spacer.className).toContain('xl:hidden')
     // Desktop ScrollToTop reaches md:bottom-5 (20px) + h-11 (44px) = 64px.
     expect(spacer.className).toContain('md:h-16')
+    expect(spacer.className).not.toContain('md:h-[5.5rem]')
   })
   it('signed in with a mounted BottomNav: reserves the nav height', () => {
     mockAuthed = true
@@ -85,6 +88,54 @@ describe('BottomChromeSpacer', () => {
     )
     expect(container.querySelector('nav')).toBeNull()
     expect(container.querySelector('div[aria-hidden="true"]').getAttribute('style')).not.toContain('--bottom-nav-h')
+  })
+})
+
+// Mobile /kundli shows one bottom bar: the Kundli section bar (NavBar) at the
+// true bottom edge. The app BottomNav steps aside there.
+describe('/kundli: one bottom bar', () => {
+  const tabs = [{ id: 'a', label: 'Alpha', icon: 'kundli' }]
+  function renderKundli(extra = null) {
+    mockAuthed = true
+    return render(
+      <MemoryRouter initialEntries={['/kundli']}>
+        <BottomNav />
+        <NavBar tabs={tabs} activeTab="a" onTabChange={() => {}} raised={false} />
+        <BottomChromeSpacer />
+        {extra}
+      </MemoryRouter>,
+    )
+  }
+
+  it('BottomNav renders nothing at /kundli when signed in', () => {
+    mockAuthed = true
+    const { container } = render(<MemoryRouter initialEntries={['/kundli']}><BottomNav /></MemoryRouter>)
+    expect(container.querySelector('nav')).toBeNull()
+  })
+  it('BottomNav still renders on /home', () => {
+    mockAuthed = true
+    const { container } = render(<MemoryRouter initialEntries={['/home']}><BottomNav /></MemoryRouter>)
+    expect(container.querySelector('nav')).not.toBeNull()
+  })
+  it('the spacer reserves exactly the sub-nav plus the safe area, not the nav as well', () => {
+    const { container } = renderKundli()
+    const style = container.querySelector('div[aria-hidden="true"]').getAttribute('style')
+    expect(style).toContain('calc(var(--sub-nav-h) + var(--safe-bottom))')
+    expect(style).not.toContain('--bottom-nav-h')
+    // Not double-counted: one sub-nav height only.
+    expect(style.match(/--sub-nav-h/g)).toHaveLength(1)
+  })
+  it('ScrollToTop floats just above the section bar', () => {
+    renderKundli(<ScrollToTop visible />)
+    const style = document.querySelector('button[aria-label]').getAttribute('style')
+    expect(style).toContain('calc(calc(var(--sub-nav-h) + var(--safe-bottom)) + 0.75rem)')
+    expect(style).not.toContain('--bottom-nav-h')
+  })
+  it('the section bar sits at the true bottom with the safe area', () => {
+    const { container } = renderKundli()
+    const nav = container.querySelector('nav')
+    expect(nav.className).toContain('bottom-0')
+    expect(nav.style.height).toBe('calc(var(--sub-nav-h) + var(--safe-bottom))')
   })
 })
 

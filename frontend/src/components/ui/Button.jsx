@@ -11,9 +11,9 @@
 import { Link } from 'react-router-dom'
 
 const SIZES = {
-  sm: 'px-3.5 py-1.5 text-xs',
-  md: 'px-5 py-2.5 text-sm',
-  lg: 'px-7 py-3 text-base',
+  sm: 'px-3.5 py-1.5 text-xs min-h-11 md:min-h-0',
+  md: 'px-5 py-2.5 text-sm min-h-11',
+  lg: 'px-7 py-3 text-base min-h-11',
 }
 
 const VARIANTS = {
@@ -35,7 +35,7 @@ const VARIANTS = {
   // Gold-outlined pill — section "view all" CTAs and low-emphasis actions
   // that still belong to the gold accent family.
   outline: {
-    light: 'border border-primary/50 text-primary-dark hover:bg-primary/10',
+    light: 'border border-primary/50 text-primary-ink hover:bg-primary/10',
     night: 'border border-primary/40 text-primary-glow hover:bg-primary/10',
   },
 }

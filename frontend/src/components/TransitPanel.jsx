@@ -1,34 +1,36 @@
 // Transit chart panel: shows current planet positions on natal chart
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
 import KundliChart from './KundliChart'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 
 export default function TransitPanel({ input, natalData }) {
   const { t } = useTranslation()
+  const { date, time, place } = input
   const [transitData, setTransitData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  async function loadTransit() {
+  const loadTransit = useCallback(async ({ signal, force = false } = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/transit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setTransitData(await res.json())
-    } catch {
+      const res = await fetchReport('/api/kundli/transit', { date, time, place }, { signal, force, retryOn429: true, cache: false })
+      if (signal?.aborted) return
+      setTransitData(res)
+    } catch (e) {
+      if (signal?.aborted || e?.name === 'AbortError') return
       setError('transit_error')
     }
     setLoading(false)
-  }
+  }, [date, time, place])
 
-  useEffect(() => { loadTransit() }, [])
+  useEffect(() => {
+    const ctrl = new AbortController()
+    loadTransit({ signal: ctrl.signal })
+    return () => ctrl.abort()
+  }, [loadTransit])
 
   const natalAsc = natalData?.ascendant
   const natalPlanets = natalData?.planets ?? []
@@ -38,18 +40,18 @@ export default function TransitPanel({ input, natalData }) {
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-primary-dark font-bold text-base">{t('transit_title')}</h2>
-            <p className="text-primary-dark text-xs mt-0.5">
+            <h2 className="text-primary-ink font-bold text-base">{t('transit_title')}</h2>
+            <p className="text-primary-ink text-xs mt-0.5">
               {t('transit_subtitle')}
             </p>
           </div>
-          <button onClick={loadTransit}
-                  className="text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
+          <button onClick={() => loadTransit({ force: true })}
+                  className="inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
             {t('transit_refresh')}
           </button>
         </div>
         {transitData && (
-          <p className="text-xs text-primary-dark mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
+          <p className="text-xs text-primary-ink mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
         )}
       </div>
 
@@ -84,7 +86,7 @@ export default function TransitPanel({ input, natalData }) {
           {/* Transit planet table */}
           <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
             <div className="px-4 py-3 bg-primary-light border-b border-primary/30">
-              <h3 className="font-semibold text-primary-dark text-sm">{t('transit_positions')}</h3>
+              <h3 className="font-semibold text-primary-ink text-sm">{t('transit_positions')}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -114,7 +116,7 @@ export default function TransitPanel({ input, natalData }) {
                           {tp.degree.toFixed(1)}°
                         </td>
                         <td className="p-2 border-b text-ink-muted">{nakshatraName(t, tp.nakshatra)}</td>
-                        <td className="p-2 border-b text-center text-primary-dark font-medium">
+                        <td className="p-2 border-b text-center text-primary-ink font-medium">
                           {tp.house}
                         </td>
                         <td className="p-2 border-b text-ink-muted">

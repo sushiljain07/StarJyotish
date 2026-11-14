@@ -119,7 +119,7 @@ export default function KnowledgeCapsule({ edition }) {
           </p>
           <Link
             to={`/learn/knowledge/${capsule.slug}`}
-            className="text-2xs font-bold text-primary hover:text-primary-glow transition"
+            className="inline-flex items-center min-h-11 text-2xs font-bold text-primary hover:text-primary-glow transition"
           >
             {t('capsule_read_guide', 'Read the guide →')}
           </Link>

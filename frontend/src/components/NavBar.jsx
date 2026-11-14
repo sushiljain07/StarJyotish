@@ -8,10 +8,11 @@ import { useTranslation } from 'react-i18next'
 import TabIcon from './TabIcon'
 import { useChromeRegistration } from './layout/useBottomChrome'
 
-// `raised` — set when the app shell's BottomNav occupies the true bottom
-// edge (authenticated mobile): this bar then stacks directly above it
-// instead of overlapping. The safe-area inset only applies at the real
-// screen bottom, so it's skipped when raised. The bar is box-border with an
+// `raised` — for a page where the app shell's BottomNav also shows: this bar
+// then stacks directly above it instead of overlapping. Result.jsx passes
+// false: on /kundli BottomNav steps aside and this is the one bottom bar.
+// The safe-area inset only applies at the real screen bottom, so it's
+// skipped when raised. The bar is box-border with an
 // explicit height so --sub-nav-h (index.css) is its real height, which the
 // spacers and ScrollToTop rely on. Side insets clear a landscape notch.
 export default function NavBar({ tabs, activeTab, onTabChange, raised = false }) {

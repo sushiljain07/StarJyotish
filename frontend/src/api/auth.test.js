@@ -47,6 +47,23 @@ describe('refreshSession', () => {
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 
+  it('treats a 409 that outlasts every retry as signed out (401)', async () => {
+    fetch.mockResolvedValue(jsonResponse(409, { detail: 'in progress' }))
+    const result = auth.refreshSession()
+    const assertion = expect(result).rejects.toMatchObject({ status: 401 })
+    await vi.advanceTimersByTimeAsync(10000)
+    await assertion
+    expect(fetch).toHaveBeenCalledTimes(6)
+  })
+
+  it('still rejects a persistent 5xx with its own status', async () => {
+    fetch.mockResolvedValue(jsonResponse(503, { detail: 'down' }))
+    const result = auth.refreshSession()
+    const assertion = expect(result).rejects.toMatchObject({ status: 503 })
+    await vi.advanceTimersByTimeAsync(10000)
+    await assertion
+  })
+
   it('does not retry a 401', async () => {
     fetch.mockResolvedValue(jsonResponse(401, { detail: 'expired' }))
     await expect(auth.refreshSession()).rejects.toMatchObject({ status: 401 })

@@ -10,10 +10,10 @@ function Row({ label, value, editLabel, onEdit }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-line last:border-0">
       <div>
-        <p className="text-ink-faint text-xs">{label}</p>
+        <p className="text-ink-muted text-xs">{label}</p>
         <p className="text-ink text-sm font-medium">{value}</p>
       </div>
-      <button onClick={onEdit} className="text-primary-dark text-xs font-semibold hover:underline shrink-0 ml-3">
+      <button onClick={onEdit} className="text-primary-ink text-xs font-semibold hover:underline shrink-0 ml-3">
         {editLabel}
       </button>
     </div>

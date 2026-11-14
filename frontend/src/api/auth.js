@@ -43,10 +43,25 @@ export function loginWithGoogle(idToken) {
 // 401 retries, StrictMode's double-mounted effect, two tabs) used to look
 // like a stolen-token replay and logged the user out everywhere. So:
 //   - every caller in this tab shares one in-flight refresh promise;
-//   - a 409 means another tab won the race moments ago and the browser now
-//     holds the new cookie, so retry once after a short pause.
+//   - the backend accepts a just-rotated token once more (reuse interval);
+//     a further replay inside that window (a third racing tab, a replay
+//     after sign-out) gets a soft 409, which is retried below.
 let refreshInFlight = null
 let sessionListener = null
+// Bumped by AuthContext.logout(). A refresh that started before a logout
+// must not hand its session to the app afterwards: it rejects with a 401
+// instead of calling the listener.
+let logoutGeneration = 0
+
+export function markLoggedOut() {
+  logoutGeneration += 1
+}
+
+// The refresh currently in flight, or a resolved promise. Logout waits on
+// this so it revokes the newest cookie, not one a racing refresh replaces.
+export function awaitRefreshSettled() {
+  return refreshInFlight ?? Promise.resolve()
+}
 
 // AuthContext registers here so a refresh triggered anywhere — including
 // fetchWithAuth below, outside React — updates the in-memory token/user.
@@ -55,20 +70,59 @@ export function onSessionRefreshed(listener) {
   return () => { if (sessionListener === listener) sessionListener = null }
 }
 
-async function refreshOnce() {
+// Transient failures (429, 5xx, a dropped connection) are retried twice with
+// these delays; a 401/403 means the session is really gone and rejects at
+// once. Total wait stays under 2.5 s, so a signed-out visitor still reaches
+// /login promptly.
+const REFRESH_RETRY_DELAYS_MS = [600, 1800]
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+const isAuthRejection = err => err.status === 401 || err.status === 403
+
+async function refreshAttempt() {
   try {
     return await authFetch('/api/auth/refresh', { body: undefined })
   } catch (err) {
     if (err.status !== 409) throw err
-    await new Promise(resolve => setTimeout(resolve, 250))
+    await wait(250)
     return authFetch('/api/auth/refresh', { body: undefined })
+  }
+}
+
+// A 409 that is still there after every retry is a stale tab replaying a
+// closed token (e.g. after sign-out elsewhere), not a race it can win: it
+// rejects as a 401 so the app goes to /login, not the reconnect screen.
+async function refreshOnce() {
+  for (let i = 0; ; i++) {
+    try {
+      return await refreshAttempt()
+    } catch (err) {
+      if (isAuthRejection(err)) throw err
+      if (i >= REFRESH_RETRY_DELAYS_MS.length) {
+        if (err.status === 409) {
+          const signedOut = new Error('Session expired. Please log in again.')
+          signedOut.status = 401
+          throw signedOut
+        }
+        throw err
+      }
+      await wait(REFRESH_RETRY_DELAYS_MS[i])
+    }
   }
 }
 
 export function refreshSession() {
   if (!refreshInFlight) {
+    const generation = logoutGeneration
     refreshInFlight = refreshOnce()
-      .then(data => { sessionListener?.(data); return data })
+      .then(data => {
+        if (generation !== logoutGeneration) {
+          const err = new Error('Signed out')
+          err.status = 401
+          throw err
+        }
+        sessionListener?.(data)
+        return data
+      })
       .finally(() => { refreshInFlight = null })
   }
   return refreshInFlight

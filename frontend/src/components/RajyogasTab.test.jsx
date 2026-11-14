@@ -53,3 +53,14 @@ describe('RajyogasTab language follow', () => {
     expect(screen.getByText(rajyogas.yogas.find(y => y.present).yoga)).toBeInTheDocument()
   })
 })
+
+describe('RajyogasTab status colours', () => {
+  it('styles the present badge with good tokens', async () => {
+    fetchMock.mockResolvedValue(reply(rajyogas))
+    render(<RajyogasTab input={INPUT} />)
+    await screen.findByText(i18n.t('rajyogas_title'))
+    const badge = screen.getAllByText(i18n.t('rajyogas_present'))[0]
+    expect(badge).toHaveClass('text-good')
+    expect(badge).toHaveClass('bg-good-light')
+  })
+})

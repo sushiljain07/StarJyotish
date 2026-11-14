@@ -1,20 +1,20 @@
 // Ashtakavarga table: Bhinnashtakavarga + Sarvashtakavarga
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { planetName, planetShort } from '../utils/astroNames'
-import { API_BASE } from '../api/config'
+import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import ScrollHint from './ui/ScrollHint'
+import { ASHTAKAVARGA_BANDS as BANDS } from '../config/ashtakavargaBands'
 
 const SIGN_KEYS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
 const PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn']
 
 function PointCell({ value, max = 8 }) {
   const pct = value / max
-  const bg = pct >= 0.75 ? '#d1fae5' : pct >= 0.5 ? '#fef9c3' : pct >= 0.375 ? '#fee2e2' : '#fecaca'
+  const bg = pct >= 0.75 ? BANDS.strong.cls : pct >= 0.5 ? BANDS.average.cls : pct >= 0.375 ? BANDS.weak.cls : BANDS.veryWeak.cls
   return (
-    <td style={{ backgroundColor: bg }}
-        className="p-1.5 text-center border border-line font-bold text-sm tabular-nums">
+    <td className={`p-1.5 text-center border border-line font-bold text-sm tabular-nums ${bg}`}>
       {value}
     </td>
   )
@@ -22,10 +22,9 @@ function PointCell({ value, max = 8 }) {
 
 function SarvaCell({ value }) {
   const pct = value / 56
-  const bg = pct >= 0.65 ? '#d1fae5' : pct >= 0.45 ? '#fef9c3' : '#fee2e2'
+  const bg = pct >= 0.65 ? BANDS.strong.cls : pct >= 0.45 ? BANDS.average.cls : BANDS.weak.cls
   return (
-    <td style={{ backgroundColor: bg }}
-        className="p-1.5 text-center border border-line font-bold text-sm tabular-nums">
+    <td className={`p-1.5 text-center border border-line font-bold text-sm tabular-nums ${bg}`}>
       {value}
     </td>
   )
@@ -33,42 +32,44 @@ function SarvaCell({ value }) {
 
 export default function AshtakavargaTable({ input }) {
   const { t } = useTranslation()
+  const { date, time, place } = input
   const SIGN_ABBR = SIGN_KEYS.map(k => t(`sign_abbr.${k}`))
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('sarva')
 
-  async function load() {
+  const load = useCallback(async ({ signal, force = false } = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/ashtakavarga`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setData(await res.json())
-    } catch {
+      const res = await fetchReport('/api/kundli/ashtakavarga', { date, time, place }, { signal, force, retryOn429: true })
+      if (signal?.aborted) return
+      setData(res)
+    } catch (e) {
+      if (signal?.aborted || e?.name === 'AbortError') return
       setError('ashtakavarga_error')
     }
     setLoading(false)
-  }
+  }, [date, time, place])
 
-  // Pure Swiss Ephemeris calculation, not an LLM call — auto-load like
-  // every other non-LLM tab, instead of gating behind a click.
-  useEffect(() => { load() }, [])
+  // Pure Swiss Ephemeris calculation, not an LLM call, so it loads on
+  // mount (Result mounts it when the tab is first opened). Cached.
+  useEffect(() => {
+    const ctrl = new AbortController()
+    load({ signal: ctrl.signal })
+    return () => ctrl.abort()
+  }, [load])
 
   return (
     <div className="space-y-4">
       <div className="bg-primary-light border border-primary/30 rounded-xl p-4">
-        <h2 className="text-primary-dark font-bold text-base">{t('ashtakavarga_title')}</h2>
-        <p className="text-primary-dark text-xs mt-1">
+        <h2 className="text-primary-ink font-bold text-base">{t('ashtakavarga_title')}</h2>
+        <p className="text-primary-ink text-xs mt-1">
           {t('ashtakavarga_intro')}
         </p>
-        <button onClick={load} disabled={loading}
-                className="mt-3 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
+        <button onClick={() => load({ force: true })} disabled={loading}
+                className="mt-3 inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
           {loading ? t('ashtakavarga_calculating') : t('transit_refresh')}
         </button>
       </div>
@@ -88,7 +89,7 @@ export default function AshtakavargaTable({ input }) {
           {/* Sub-tabs */}
           <div className="flex gap-1 flex-wrap">
             <button onClick={() => setActiveTab('sarva')}
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition ${
+                    className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                       activeTab === 'sarva'
                         ? 'bg-primary border-primary text-night'
                         : 'bg-parchment-card border-line text-ink-muted hover:border-primary/50'
@@ -97,7 +98,7 @@ export default function AshtakavargaTable({ input }) {
             </button>
             {PLANETS.map(p => (
               <button key={p} onClick={() => setActiveTab(p)}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition ${
+                      className={`inline-flex items-center justify-center min-h-11 min-w-11 md:min-h-0 md:min-w-0 text-xs px-3 py-1.5 rounded-lg border transition ${
                         activeTab === p
                           ? 'text-white border-transparent'
                           : 'bg-parchment-card border-line text-ink-muted hover:border-ink-faint'
@@ -112,7 +113,7 @@ export default function AshtakavargaTable({ input }) {
           {activeTab === 'sarva' && (
             <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-3 bg-primary-light border-b">
-                <h3 className="font-semibold text-primary-dark text-sm">
+                <h3 className="font-semibold text-primary-ink text-sm">
                   {t('ashtakavarga_sarva_title')}
                 </h3>
               </div>
@@ -136,9 +137,9 @@ export default function AshtakavargaTable({ input }) {
                 </table>
                 </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_strong')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_average')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-100 mr-1 align-middle"></span>{t('ashtakavarga_sarva_weak')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.strong.cls} mr-1 align-middle`}></span>{t('ashtakavarga_sarva_strong')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.average.cls} mr-1 align-middle`}></span>{t('ashtakavarga_sarva_average')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.weak.cls} mr-1 align-middle`}></span>{t('ashtakavarga_sarva_weak')}</span>
                 </div>
               </div>
             </div>
@@ -174,10 +175,10 @@ export default function AshtakavargaTable({ input }) {
                 </table>
                 </ScrollHint>
                 <div className="flex gap-4 mt-3 text-xs text-ink-muted">
-                  <span><span className="inline-block w-3 h-3 rounded bg-green-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_strong')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-yellow-100 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_average')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-200 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_weak')}</span>
-                  <span><span className="inline-block w-3 h-3 rounded bg-red-300 mr-1 align-middle"></span>{t('ashtakavarga_bhinna_very_weak')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.strong.cls} mr-1 align-middle`}></span>{t('ashtakavarga_bhinna_strong')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.average.cls} mr-1 align-middle`}></span>{t('ashtakavarga_bhinna_average')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.weak.cls} mr-1 align-middle`}></span>{t('ashtakavarga_bhinna_weak')}</span>
+                  <span><span className={`inline-block w-3 h-3 rounded ${BANDS.veryWeak.cls} mr-1 align-middle`}></span>{t('ashtakavarga_bhinna_very_weak')}</span>
                 </div>
               </div>
             </div>
@@ -222,11 +223,11 @@ export default function AshtakavargaTable({ input }) {
                     })}
                     {/* Sarva total row */}
                     <tr className="bg-primary-light font-bold">
-                      <td className="p-2 border border-primary/40 text-primary-dark">{t('ashtakavarga_total')}</td>
+                      <td className="p-2 border border-primary/40 text-primary-ink">{t('ashtakavarga_total')}</td>
                       {data.sarvashtakavarga.map((cell, i) => (
                         <SarvaCell key={i} value={cell.points} />
                       ))}
-                      <td className="p-2 text-center border border-primary/40 text-primary-dark">
+                      <td className="p-2 text-center border border-primary/40 text-primary-ink">
                         {data.sarvashtakavarga.reduce((s, c) => s + c.points, 0)}
                       </td>
                     </tr>

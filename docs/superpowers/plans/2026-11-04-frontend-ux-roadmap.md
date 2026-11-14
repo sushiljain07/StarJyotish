@@ -198,6 +198,24 @@ Phase 4 leftovers:
 - Build `chartPalette` from the Tailwind config for the chart SVGs.
 - Keep the keyframes in one place, and have the focus ring use the token.
 
+*5a status (14 Nov 2026): done on `feat/phase5a-contrast-tokens`, plan `2026-11-14-phase5a-contrast-tokens.md`.*
+- `primary.ink` shipped as `#86621E`. `#8F6A22` measured just under 4.5:1 on parchment.
+- Bare gold text went from 502 uses to 57, and `ink-faint` text from 208 to 21. What remains is on night surfaces or decorative, and a per-file ratchet test (`src/theme/tokenUsage.test.js`) keeps it from growing.
+- Ad-hoc green, amber and red are gone; a test enforces it.
+- `src/theme/chartPalette.js` replaces the hex colours in the four chart SVGs, ChartReading, ChartHighlight and MobileTimelineCard. The chart ascendant is now vermillion instead of orange.
+- The focus ring is a `primary.ink` outline with a `primary.glow` halo, so it shows on both light and night backgrounds.
+
+*Left for a follow-up slice:*
+- `sage`/`mauve` text is 4.0–4.5:1 on light surfaces across about 57 uses; they need `-ink` variants.
+- Low-alpha `ink-onnight` text on night in PanchangDetail, Login and WeekAhead.
+- Move the colours into a `src/theme/tokens.js`, shared by the Tailwind config and `chartPalette`.
+- Add a reverse guard against `primary-ink` on `bg-night`.
+- Widen the `adHocStatus` regex to cover `via-`/`ring-`/`fill-` prefixes and the slate palette.
+- Add a hex ratchet beyond the 7 chart files.
+- Sarvatobhadra uses status tokens for natal and transit highlights; give those their own tokens.
+- Delete the unused `home/LocationBar`, `ProfileSelector` and `TabsBar`.
+- Elements with `shadow-*` or `focus:ring` utilities lose the night halo.
+
 **5b. Component adoption** (D-6, D-7):
 - Move the 37 hand-built CTAs onto `<Button>` and the cards onto `<Card>`.
 - Add `Pill`/`Badge` components.
@@ -240,4 +258,5 @@ Phase 4 leftovers:
 | 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — merged |
 | 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — merged (#164); the glossary rows were settled by the owner on 10 Nov 2026 and applied on `feat/hindi-owner-decisions` |
 | 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — merged (#165); leftovers listed in the Phase 4 section |
-| 5a–g | `feat/phase5-*` | to write per slice | — |
+| 5a | `feat/phase5a-contrast-tokens` | `2026-11-14-phase5a-contrast-tokens.md` | Done; PR open. Follow-ups are listed in the 5a status above |
+| 5b–g | `feat/phase5-*` | to write per slice | — |

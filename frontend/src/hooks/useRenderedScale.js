@@ -5,7 +5,11 @@ import { useLayoutEffect, useState } from 'react'
 // 15-unit label shows at ~9px. This hook reports that scale: rendered width
 // divided by the viewBox width. It is 1 until the first measurement, and
 // stays 1 where ResizeObserver does not exist (jsdom).
-export function useRenderedScale(ref, viewBoxWidth) {
+// `ready` must be false while the observed element is not rendered yet (a
+// component that returns null until its data loads): the effect then re-runs
+// once the element exists, instead of finding ref.current null and never
+// measuring.
+export function useRenderedScale(ref, viewBoxWidth, ready = true) {
   const [scale, setScale] = useState(1)
 
   useLayoutEffect(() => {
@@ -21,7 +25,7 @@ export function useRenderedScale(ref, viewBoxWidth) {
     })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [ref, viewBoxWidth])
+  }, [ref, viewBoxWidth, ready])
 
   return scale
 }

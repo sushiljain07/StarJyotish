@@ -42,9 +42,10 @@ export default function WeekStrip({ location }) {
   const [week, setWeek] = useState(null)
   const [hover, setHover] = useState(null)
   const [reducedMotion, setReducedMotion] = useState(false)
-  // The 400-unit viewBox renders at ~296px on a phone; keep day labels >= 11px.
+  // The 400-unit viewBox renders at ~274px on a 360 phone; keep day labels >= 11px.
+  // The svg only mounts once `week` loads, so tell the hook when it is there.
   const svgRef = useRef(null)
-  const scale = useRenderedScale(svgRef, 400)
+  const scale = useRenderedScale(svgRef, 400, week != null)
 
   useEffect(() => {
     setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)

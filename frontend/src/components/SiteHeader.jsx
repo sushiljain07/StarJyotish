@@ -4,6 +4,10 @@
 // Desktop (md+): Logo + nav links (from config/nav.js) + avatar/CTA
 // Mobile, signed in:  Logo + avatar only — page nav lives in BottomNav
 // Mobile, signed out: Logo + hamburger menu (public links) + Sign in
+// Mobile /kundli: slides up out of view on scroll-down (the chart gets the
+// screen) and back on scroll-up or near the top. While it is hidden,
+// <html data-header-hidden> drops --header-offset (index.css) to 0 so
+// sticky bands below it (Result.jsx) move up to the screen top with it.
 //
 // Active/hover states use design tokens (text-primary-glow etc.) — this
 // component previously hand-rolled them with inline styles and JS
@@ -17,6 +21,7 @@ import AccountMenu from './AccountMenu'
 import LanguageSwitcher from './LanguageSwitcher'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
+import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
 
 // The 16px gutter, widened to the landscape notch inset when there is one
 // (index.html sets viewport-fit=cover). The header itself is fixed, so the
@@ -64,6 +69,16 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
   // Close the mobile menu on any navigation.
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
+  const belowMd = useBelowMd()
+  const hideOnScroll = belowMd && location.pathname === '/kundli'
+  const hidden = useHideOnScroll({ enabled: hideOnScroll })
+  useEffect(() => {
+    if (!hidden) return undefined
+    const root = document.documentElement
+    root.setAttribute('data-header-hidden', '')
+    return () => root.removeAttribute('data-header-hidden')
+  }, [hidden])
+
   const p = Math.min(1, Math.max(0, scrollProgress))
   const blurPx      = 6 + p * 6
   const borderAlpha = 0.06 + p * 0.08
@@ -81,7 +96,9 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
 
   return (
     <header
-      className="fixed top-0 inset-x-0 z-40 bg-night border-b transition-[backdrop-filter,border-color] duration-150 ease-out"
+      className={`fixed top-0 inset-x-0 z-40 bg-night border-b transition-[backdrop-filter,border-color] duration-150 ease-out${
+        hideOnScroll ? ' motion-safe:transition-transform' : ''
+      }${hidden ? ' -translate-y-full focus-within:translate-y-0' : ''}`}
       style={{
         backdropFilter:       `blur(${blurPx}px)`,
         WebkitBackdropFilter: `blur(${blurPx}px)`,

@@ -1,12 +1,16 @@
 // Signing in from a page must come back to that page (with its chart),
 // not drop the user on /home.
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
 import en from '../i18n/en.json'
 
-vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }))
+let mockAuthed = false
+vi.mock('../contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: mockAuthed, user: mockAuthed ? { id: 1 } : null }),
+}))
+vi.mock('./AccountMenu', () => ({ default: () => null }))
 
 import SiteHeader from './SiteHeader'
 
@@ -76,5 +80,103 @@ describe('SiteHeader signed-out links', () => {
     const desktop = screen.getAllByRole('navigation')[0]
     expect([...desktop.querySelectorAll('button')].map(b => b.textContent))
       .toEqual([en.nav_panchang_tab, en.nav_explore])
+  })
+})
+
+// Mobile /kundli: the header slides away on scroll-down so the chart gets
+// the screen, and comes back on scroll-up and at the top.
+describe('SiteHeader hide on scroll', () => {
+  function mockWidth(mobile) {
+    window.matchMedia = q => ({
+      matches: mobile && q === '(max-width: 767px)', media: q,
+      addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
+    })
+  }
+  function scrollTo(y) {
+    act(() => {
+      window.scrollY = y
+      window.dispatchEvent(new Event('scroll'))
+    })
+  }
+  function renderHeaderAt(path) {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/home" element={<><SiteHeader /><PathProbe label="AT" /></>} />
+          <Route path="*" element={<SiteHeader />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    return screen.getByRole('banner')
+  }
+  afterEach(() => {
+    delete window.matchMedia
+    window.scrollY = 0
+    mockAuthed = false
+  })
+
+  it('hides on scroll-down on mobile /kundli and comes back on scroll-up', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/kundli')
+    expect(header.className).toContain('motion-safe:transition-transform')
+    expect(header.className).not.toContain('-translate-y-full')
+    scrollTo(300)
+    expect(header.className).toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(true)
+    scrollTo(250)
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
+  })
+
+  it('comes back at the top of the page', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/kundli')
+    scrollTo(300)
+    expect(header.className).toContain('-translate-y-full')
+    scrollTo(40)
+    expect(header.className).not.toContain('-translate-y-full')
+  })
+
+  it('a keyboard user tabbing into the hidden header sees it', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/kundli')
+    scrollTo(300)
+    expect(header.className).toContain('focus-within:translate-y-0')
+  })
+
+  it('never hides on desktop', () => {
+    mockWidth(false)
+    const header = renderHeaderAt('/kundli')
+    scrollTo(300)
+    scrollTo(900)
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(header.className).not.toContain('motion-safe:transition-transform')
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
+  })
+
+  it('never hides on other mobile pages', () => {
+    mockWidth(true)
+    const header = renderHeaderAt('/panchang')
+    scrollTo(300)
+    expect(header.className).not.toContain('-translate-y-full')
+  })
+
+  it('clears the hidden flag when it unmounts', () => {
+    mockWidth(true)
+    const { unmount } = render(
+      <MemoryRouter initialEntries={['/kundli']}><SiteHeader /></MemoryRouter>,
+    )
+    scrollTo(300)
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(true)
+    unmount()
+    expect(document.documentElement.hasAttribute('data-header-hidden')).toBe(false)
+  })
+
+  it('signed in on /kundli, the logo leads home (the way out without the app bar)', async () => {
+    mockAuthed = true
+    mockWidth(true)
+    renderHeaderAt('/kundli')
+    fireEvent.click(screen.getByRole('button', { name: en.app_title }))
+    expect(await screen.findByText('AT /home')).toBeInTheDocument()
   })
 })

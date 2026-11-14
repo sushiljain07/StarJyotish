@@ -1,8 +1,10 @@
 // frontend/src/components/layout/useBottomChrome.js
 //
 // One source of truth for the fixed bars at the bottom of a phone screen:
-// the app BottomNav (signed in), Result.jsx's NavBar on /kundli (raised above
-// BottomNav when it is mounted) and AskPersonaPanel's floating button.
+// the app BottomNav (signed in, every page but /kundli), Result.jsx's NavBar
+// on /kundli (the one bottom bar there, at the true bottom edge) and
+// AskPersonaPanel's floating button. NavBar's `raised` mode (stacked above
+// BottomNav) is still supported here but no page uses it now.
 // Each of those components registers itself while it actually renders
 // (useChromeRegistration), so pages that have a Footer but no BottomNav get no
 // phantom clearance. Heights come from CSS variables in index.css

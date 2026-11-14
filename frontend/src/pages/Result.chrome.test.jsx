@@ -3,7 +3,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
 
-vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }))
+let mockAuthed = false
+vi.mock('../contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: mockAuthed, user: mockAuthed ? { id: 1 } : null }),
+}))
 vi.mock('../components/Seo', () => ({ default: () => null }))
 const { marker } = vi.hoisted(() => ({ marker: name => ({ default: () => name }) }))
 vi.mock('../components/KundliChart', () => marker('KUNDLI_CHART'))
@@ -47,7 +50,7 @@ beforeEach(() => {
   vi.spyOn(performance, 'now').mockImplementation(() => now)
   Object.defineProperty(document.documentElement, 'scrollHeight', { configurable: true, value: 5000 })
 })
-afterEach(() => { vi.restoreAllMocks(); delete document.documentElement.scrollHeight; window.scrollY = 0; sessionStorage.clear() })
+afterEach(() => { mockAuthed = false; vi.restoreAllMocks(); delete document.documentElement.scrollHeight; window.scrollY = 0; sessionStorage.clear() })
 
 describe('Kundli sticky chrome', () => {
   it('shows the main-tab row from md up only', () => {
@@ -73,5 +76,22 @@ describe('Kundli sticky chrome', () => {
     now += 300
     scrollTo(380)
     expect(chips.className).not.toContain('max-h-0')
+  })
+
+  it('the band sits under the header and follows it up when the header hides', () => {
+    renderPage()
+    const band = screen.getByTestId('summary-chips').closest('.sticky')
+    expect(band.className).toContain('top-[var(--header-offset)]')
+    expect(band.className).not.toContain('top-[60px]')
+    expect(band.className).toContain('motion-safe:transition-[top]')
+  })
+
+  it('signed in, the section bar owns the true bottom edge (not raised)', () => {
+    mockAuthed = true
+    renderPage()
+    const nav = screen.getAllByRole('navigation').find(n => n.className.includes('fixed'))
+    expect(nav.className).toContain('bottom-0')
+    expect(nav.style.bottom).toBe('')
+    expect(nav.style.paddingBottom).toBe('var(--safe-bottom)')
   })
 })

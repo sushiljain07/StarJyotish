@@ -62,16 +62,20 @@ const ICONS = {
 
 // Self-gating: renders nothing for signed-out users and derives the primary
 // profile itself, so any page (workspace shell, Knowledge Center, guides)
-// can mount <BottomNav /> without auth plumbing. It registers itself with
+// can mount <BottomNav /> without auth plumbing. Hidden on /kundli, whose
+// section NavBar is the one bottom bar there. It registers itself with
 // useBottomChrome while rendered, so BottomChromeSpacer knows to reserve room.
 export default function BottomNav({ profile = null }) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuth()
-  useChromeRegistration('bottomNav', !!isAuthenticated)
+  // Mobile /kundli shows one bottom bar, its own section NavBar; the app
+  // nav steps aside there (the header logo still leads home).
+  const shown = !!isAuthenticated && pathname !== '/kundli'
+  useChromeRegistration('bottomNav', shown)
 
-  if (!isAuthenticated) return null
+  if (!shown) return null
   const navProfile = profile ?? getPrimaryProfile(user)
 
   function handleClick(e, item) {

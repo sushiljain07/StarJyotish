@@ -257,7 +257,9 @@ export default function Result() {
       <Seo title={t('kundli_seo_title')} description={t('kundli_seo_description')} path="/kundli" noindex />
 
       {/* ── Sticky context bar ──────────────────────────────────────────── */}
-      <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30 [overflow-anchor:none]">
+      {/* top follows SiteHeader: it drops to 0 while the header is slid
+          away on mobile (--header-offset, index.css). */}
+      <div className="bg-parchment-card border-b border-line sticky top-[var(--header-offset)] motion-safe:transition-[top] motion-safe:duration-150 motion-safe:ease-out z-30 [overflow-anchor:none]">
         <div className="max-w-5xl mx-auto px-4">
 
           {/* chips */}
@@ -359,7 +361,9 @@ export default function Result() {
 
       </div>
 
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={isAuthenticated} />
+      {/* The one bottom bar on mobile /kundli: BottomNav steps aside here, so
+          NavBar owns the true bottom edge (with the safe-area inset). */}
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={false} />
     </div>
   )
 }

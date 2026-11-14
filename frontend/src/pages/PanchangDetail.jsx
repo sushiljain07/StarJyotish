@@ -220,7 +220,7 @@ function LocationPrompt({ onSetLocation }) {
 
 // ─── Compact multi-day table (used by Week and Hindu Month tabs) ──────────────
 
-const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-ink-faint/40' }
+const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-ink-faint' }
 
 function PanchangTable({ days, highlightToday = true }) {
   const { t } = useTranslation()
@@ -539,7 +539,7 @@ export default function PanchangDetail() {
             <LocationPicker location={location} onSetLocation={handleSetLocation} />
             {tab === 'today' && (
               <>
-                <span className="text-white/10 hidden sm:block select-none">|</span>
+                <span aria-hidden="true" className="text-white/10 hidden sm:block select-none">|</span>
                 <DatePicker value={date} onChange={setDate} />
               </>
             )}

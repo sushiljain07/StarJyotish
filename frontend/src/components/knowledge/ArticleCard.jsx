@@ -77,7 +77,7 @@ export default function ArticleCard({
 
   if (!isInteractive) {
     return (
-      <div className={`${baseClasses} ${comingSoon ? 'opacity-70' : ''}`}>
+      <div className={`${baseClasses} ${comingSoon ? 'border-dashed' : ''}`}>
         {inner}
       </div>
     )

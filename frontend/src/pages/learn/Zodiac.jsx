@@ -63,15 +63,15 @@ function SystemCard({ system, accent = false }) {
       </h3>
       <dl className="space-y-4">
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-muted'}`}>Anchored to</dt>
+          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Anchored to</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.anchor}</dd>
         </div>
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-muted'}`}>Origin</dt>
+          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Origin</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.origin}</dd>
         </div>
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-muted'}`}>Emphasis</dt>
+          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Emphasis</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.focus}</dd>
         </div>
       </dl>

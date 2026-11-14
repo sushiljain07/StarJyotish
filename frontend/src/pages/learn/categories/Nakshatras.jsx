@@ -48,7 +48,7 @@ function SystemCard({ system, accent = false }) {
       <dl className="space-y-4">
         {[['Anchored to', system.anchor], ['Origin', system.origin], ['Emphasis', system.focus]].map(([label, val]) => (
           <div key={label}>
-            <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnight/60' : 'text-ink-muted'}`}>{label}</dt>
+            <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>{label}</dt>
             <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{val}</dd>
           </div>
         ))}
@@ -201,7 +201,7 @@ export default function NakshatrasGuide() {
               <div className="bg-white/5 rounded-2xl p-6 h-full">
                 <p className="text-primary font-bold text-lg mb-1">{item.emoji}</p>
                 <h3 className="font-serif font-semibold text-lg text-primary-light mb-3">{item.gana}</h3>
-                <p className="text-xs text-ink-onnight/60 font-medium mb-3">{item.nakshatras}</p>
+                <p className="text-xs text-ink-onnightMuted font-medium mb-3">{item.nakshatras}</p>
                 <p className="text-ink-onnight text-sm leading-relaxed">{item.description}</p>
               </div>
             </Reveal>

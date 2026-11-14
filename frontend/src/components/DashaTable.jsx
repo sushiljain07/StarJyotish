@@ -109,8 +109,8 @@ export default function DashaTable({ dasha }) {
       {/* Current chain banner */}
       <div className="bg-primary-light border border-primary/30 rounded-lg p-3 flex flex-wrap gap-2 items-center text-sm">
         <span className="font-bold text-primary-ink">{planetName(t, md.planet)} {t('dasha_md')}</span>
-        {ad && <><span className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
-        {pd && <><span className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
+        {ad && <><span aria-hidden="true" className="text-ink-faint">›</span><span className="font-semibold text-mauve">{planetName(t, ad.planet)} {t('dasha_ad')}</span></>}
+        {pd && <><span aria-hidden="true" className="text-ink-faint">›</span><span className="font-semibold text-vermillion">{planetName(t, pd.planet)} {t('dasha_pd')}</span></>}
         <span className="ml-auto text-xs text-ink-muted">{t('dasha_left_in_md', { years: yrsLeft })}</span>
       </div>
 

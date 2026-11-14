@@ -67,6 +67,7 @@ import DisclaimerBlock from '../components/home/DisclaimerBlock'
 import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
 import WeekStrip from '../components/home/WeekStrip'
+import LocationPrompt from '../components/home/LocationPrompt'
 import ChartsStrip from '../components/home/ChartsStrip'
 import SkyRemembers from '../components/home/SkyRemembers'
 import ClosingBeat from '../components/home/ClosingBeat'
@@ -122,7 +123,7 @@ export default function PersonalHome() {
   const profile = activeProfile ?? getPrimaryProfile(user)
   const allProfiles = listProfiles(user)
 
-  const { location } = useCurrentLocation()
+  const { location, status: locationStatus, retryGeolocation, setManualLocation } = useCurrentLocation()
   const panchang = usePanchang(location)
   const { transit, outlook } = useChartExtras(profile)
   const editorLang = currentLanguage()
@@ -250,7 +251,16 @@ export default function PersonalHome() {
             </Beat>
 
             <Beat id="sj-week" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
-              <WeekStrip location={location} />
+              {location ? (
+                <WeekStrip location={location} />
+              ) : (
+                <LocationPrompt
+                  status={locationStatus}
+                  birthPlace={profile?.place}
+                  onRetryGeolocation={retryGeolocation}
+                  onSetManualLocation={setManualLocation}
+                />
+              )}
             </Beat>
 
             <Beat id="sj-charts" title={t('home_charts_strip_label')} cta={t('home_charts_strip_cta')} onCta={() => openChart('divisional', 'kundli')}>

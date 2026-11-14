@@ -12,6 +12,9 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import Seo from '../components/Seo'
+import LocationPrompt from '../components/home/LocationPrompt'
+import { getPrimaryProfile } from '../services/astrologyProfiles'
+import { useAuth } from '../contexts/AuthContext'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { fetchPanchangWeek } from '../api/astro'
@@ -33,7 +36,9 @@ function dayNumber(dateStr) {
 export default function WeekAhead() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { location } = useCurrentLocation()
+  const { user } = useAuth()
+  const birthPlace = getPrimaryProfile(user)?.place
+  const { location, status, retryGeolocation, setManualLocation } = useCurrentLocation()
 
   const [week, setWeek] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -79,6 +84,14 @@ export default function WeekAhead() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 pt-4">
+        {!location && (
+          <LocationPrompt
+            status={status}
+            birthPlace={birthPlace}
+            onRetryGeolocation={retryGeolocation}
+            onSetManualLocation={setManualLocation}
+          />
+        )}
         {loading && <p className="text-sm text-ink-onnight/60 py-6">{t('week_page_loading')}</p>}
         {error && (
           <p className="text-sm text-vermillion py-6">

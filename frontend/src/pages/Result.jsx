@@ -281,10 +281,8 @@ export default function Result() {
           </div>
 
           <div className={activeBirthSub === 'planets' ? 'animate-fade-in-fast' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_planets_intro_title')}</p>
+            <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_planets_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
                 {t('kundli_planets_intro_body')}
               </p>
@@ -293,10 +291,8 @@ export default function Result() {
           </div>
 
           <div className={activeBirthSub === 'dasha' ? 'animate-fade-in-fast' : 'hidden'}>
-            <div className="mb-4 rounded-xl px-4 py-3"
-                 style={{ background: '#171B33', border: '1px solid rgba(212,175,55,0.2)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5"
-                 style={{ color: 'rgba(212,175,55,0.55)' }}>{t('kundli_dasha_intro_title')}</p>
+            <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_dasha_intro_title')}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
                 {t('kundli_dasha_intro_body')}
               </p>

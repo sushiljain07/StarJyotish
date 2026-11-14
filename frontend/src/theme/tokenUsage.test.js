@@ -27,6 +27,8 @@ const files = walk(SRC)
   .map(f => path.relative(SRC, f).split(path.sep).join('/'))
   .sort()
 
+it('finds the source files (guards against a broken walk)', () => expect(files.length).toBeGreaterThan(50))
+
 const count = (re, text) => (text.match(re) || []).length
 const sources = new Map(files.map(rel => [rel, fs.readFileSync(path.join(SRC, rel), 'utf8')]))
 const current = {}

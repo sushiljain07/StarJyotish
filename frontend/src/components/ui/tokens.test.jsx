@@ -34,7 +34,7 @@ describe('ui surface tokens (AA)', () => {
   })
 
   it('InlineNotice dismiss is an icon-only decorative ink-faint button with an aria-label', () => {
-    render(<InlineNotice onDismiss={() => {}}>hi</InlineNotice>)
+    render(<InlineNotice onDismiss={() => {}}>label</InlineNotice>)
     const btn = screen.getByRole('button')
     expect(btn.className).toContain('text-ink-faint')
     expect(btn.getAttribute('aria-label')).toBeTruthy()

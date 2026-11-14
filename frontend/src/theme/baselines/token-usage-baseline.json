@@ -99,9 +99,6 @@
   "components/knowledge/Section.jsx": {
     "goldText": 1
   },
-  "components/landing/CareerReportPreview.jsx": {
-    "goldText": 1
-  },
   "components/onboarding/OnboardingLayout.jsx": {
     "goldText": 1
   },

@@ -34,7 +34,7 @@ function PanchangCell({ label, value }) {
   if (!value) return null
   return (
     <div className="min-w-0">
-      <p className="text-3xs uppercase tracking-wider text-ink-onnight/60">{label}</p>
+      <p className="text-3xs uppercase tracking-wider text-ink-onnight/75">{label}</p>
       <p className="text-xs text-ink-onnight truncate">{value}</p>
     </div>
   )
@@ -115,12 +115,12 @@ export default function TodayWindow({ panchang }) {
       </div>
 
       {/* Axis labels: sunrise and sunset times */}
-      <div className="flex justify-between text-3xs text-ink-onnight/60 px-1">
+      <div className="flex justify-between text-3xs text-ink-onnight/75 px-1">
         <span>☀ {sunriseLabel}</span>
         <span>{sunsetLabel} ☀</span>
       </div>
 
-      <div className="flex gap-5 mt-3 text-2xs text-ink-onnight/60 flex-wrap">
+      <div className="flex gap-5 mt-3 text-2xs text-ink-onnight/75 flex-wrap">
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-primary-glow shrink-0" style={{ boxShadow: '0 0 6px rgba(240,203,128,0.6)' }} />
           {t('home_window_abhijit', 'Abhijit muhurta — favorable')}
@@ -145,12 +145,12 @@ export default function TodayWindow({ panchang }) {
           )}
         </p>
       ) : (
-        <p className="text-sm text-ink-onnight/60 mt-3">
+        <p className="text-sm text-ink-onnight/75 mt-3">
           {t('window_abhijit_in_rahu_note')}
         </p>
       )}
 
-      <p className="text-sm text-ink-onnight/60 mt-1.5">
+      <p className="text-sm text-ink-onnight/75 mt-1.5">
         {t('home_window_avoid', {
           defaultValue: 'Avoid: {{start}} – {{end}}',
           start: minutesToLabel(rahuStart),

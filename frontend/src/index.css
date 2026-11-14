@@ -61,8 +61,8 @@
   }
 }
 
-/* fadeSlideIn / fadeSlideInFast live in tailwind.config.js (animate-fade-in-up,
-   animate-fade-in-fast). Every other @keyframes lives below, in this file. */
+/* routeFade, fadeSlideIn and fadeSlideInFast live in tailwind.config.js. The other
+   @keyframes live below, in this file. */
 
 @media (prefers-reduced-motion: no-preference) {
   @keyframes wheelSpin {

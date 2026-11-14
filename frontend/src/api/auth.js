@@ -43,8 +43,8 @@ export function loginWithGoogle(idToken) {
 // 401 retries, StrictMode's double-mounted effect, two tabs) used to look
 // like a stolen-token replay and logged the user out everywhere. So:
 //   - every caller in this tab shares one in-flight refresh promise;
-//   - a 409 means another tab won the race moments ago and the browser now
-//     holds the new cookie, so retry once after a short pause.
+//   - the backend now accepts a just-rotated token again (reuse interval), so
+//     it no longer returns 409; the 409 retry below is legacy and harmless.
 let refreshInFlight = null
 let sessionListener = null
 

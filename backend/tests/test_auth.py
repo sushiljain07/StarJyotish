@@ -125,12 +125,18 @@ def test_refresh_rotates_token_and_old_token_then_fails(client):
     new_cookie = client.cookies.get("sj_refresh")
     assert new_cookie != old_cookie
 
-    # Replaying the just-rotated token inside the grace window is treated
-    # as a lost concurrent-refresh race: 409, and the winner's new session
-    # must stay valid (no mass revocation).
+    # Replaying the just-rotated token inside the grace window means the
+    # first response was lost: accept it once more with a NEW session, and
+    # leave every other session alone.
     client.cookies.clear()
-    raced = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
-    assert raced.status_code == 409
+    replay = client.post("/api/auth/refresh", cookies={"sj_refresh": old_cookie})
+    assert replay.status_code == 200
+    assert replay.json()["access_token"]
+    replay_cookie = client.cookies.get("sj_refresh")
+    assert replay_cookie and replay_cookie not in (old_cookie, new_cookie)
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": replay_cookie}).status_code == 200
+    # The session from the first (delivered) refresh was not revoked.
     client.cookies.clear()
     assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 200
 
@@ -152,6 +158,16 @@ def test_refresh_token_reuse_after_grace_window_revokes_everything(client, monke
     # Treated as theft: the legitimate new session is revoked too.
     client.cookies.clear()
     assert client.post("/api/auth/refresh", cookies={"sj_refresh": new_cookie}).status_code == 401
+
+
+def test_refresh_reuse_of_non_rotated_revoked_token_is_rejected(client):
+    phone = _unique_phone()
+    sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+    client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+    cookie = client.cookies.get("sj_refresh")
+    assert client.post("/api/auth/logout").status_code == 200  # revoked: "logout"
+    client.cookies.clear()
+    assert client.post("/api/auth/refresh", cookies={"sj_refresh": cookie}).status_code == 401
 
 
 def test_cannot_revoke_another_users_session(client):

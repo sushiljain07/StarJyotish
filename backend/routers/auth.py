@@ -20,13 +20,16 @@ raw token leaked (e.g. it was copied off a stolen device, then both the
 thief and the legitimate device tried to use their respective copies),
 and every session for that user is revoked as a precaution.
 
-Exception — the rotation race: two tabs (or two parallel requests) that
-refresh at the same moment both send the same cookie. The session row is
-locked during rotation so only one wins; the loser then sees a token
-revoked moments ago. Within REFRESH_REUSE_GRACE_SECONDS of revocation
-that's treated as benign: 409, no mass revocation, and the cookie is left
-alone (the winner's response has already set the new one, which the
-client picks up by retrying). Outside the window it's treated as theft.
+Exception — the reuse interval: a rotated token is accepted once more
+for REFRESH_REUSE_GRACE_SECONDS after it was revoked. This covers a
+refresh whose response never reached the browser (page reload or
+navigation mid-request, a dropped mobile connection) and two tabs that
+refresh at the same moment with the same cookie. A "rotated" token
+presented inside the window gets a NEW session (new cookie, new access
+token); nothing else is revoked, so each racing tab simply ends up with
+its own valid session. Outside the window, or for a token revoked for any
+other reason, the replay is treated as theft: every session for the user
+is revoked and the response is 401.
 """
 import os
 import uuid
@@ -192,9 +195,12 @@ def refresh_session(
         if stale is not None and stale.revoked_at is not None:
             revoked_ago = (datetime.now(timezone.utc) - stale.revoked_at).total_seconds()
             if stale.revoked_reason == "rotated" and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
-                # Lost a concurrent-refresh race (see module docstring).
-                # Don't clear the cookie: it now holds the winner's token.
-                raise HTTPException(status_code=409, detail="Session refresh already in progress. Retry.")
+                # Reuse interval (see module docstring): the response that
+                # carried the replacement token was lost, or another tab
+                # raced us. Hand out a fresh session; revoke nothing.
+                user = UserRepository(db).get(stale.user_id)
+                if user is not None and user.is_active:
+                    return _issue_session_and_response(db, response, user, request)
             session_repo.revoke_all_for_user(stale.user_id, reason="reuse")
             # Commit now, not just flush: this branch always ends in an
             # HTTPException below, and get_db rolls back the transaction

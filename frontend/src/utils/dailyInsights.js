@@ -7,6 +7,7 @@
 
 import { signName, localizeBackendDate } from './astroNames'
 import { houseOrdinal } from './format'
+import { dayScoreBand } from './dayScoreBand'
 
 const CHANDRA_BALA_FAVORABLE = new Set([3, 6, 7, 10, 11])
 
@@ -80,12 +81,7 @@ export function computeDayScore(chart, transitPlanets, t) {
   score = Math.max(1, Math.min(10, score))
   score = Math.round(score * 10) / 10
 
-  let labelKey = 'dial_label_mixed'
-  if (score >= 8) labelKey = 'dial_label_excellent'
-  else if (score >= 6.5) labelKey = 'dial_label_steady'
-  else if (score >= 5) labelKey = 'dial_label_mixed'
-  else if (score >= 3.5) labelKey = 'dial_label_cautious'
-  else labelKey = 'dial_label_challenging'
+  const { labelKey } = dayScoreBand(score)
 
   return { score, label: t ? t(labelKey) : labelKey }
 }
@@ -208,7 +204,9 @@ export function computeOneAction(chart, transitPlanets, dayScore, panchang, t) {
   const mdPlanet     = chart.dasha.current_mahadasha.planet
   const score        = dayScore?.score ?? 5
 
-  if (score < 4.5) {
+  // Same band as the ring: a caution-toned day gets the protect action.
+  const band = dayScoreBand(score)
+  if (band.tone === 'caution') {
     return {
       verb:    t('action_protect_verb'),
       context: t('action_protect_context', { planet: t(`planet_${mdPlanet}`, mdPlanet) }),
@@ -245,7 +243,7 @@ export function computeOneAction(chart, transitPlanets, dayScore, panchang, t) {
     why:     abhijit?.start
       ? t('action_why_window', { start: abhijit.start, end: abhijit.end })
       : t('action_why_md', { planet: t(`planet_${mdPlanet}`, mdPlanet) }),
-    tone: score >= 7 ? 'opportunity' : 'steady',
+    tone: band.tone,
   }
 }
 

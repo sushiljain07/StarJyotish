@@ -90,7 +90,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
     >
       <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-serif font-semibold text-sm bg-white/10 ${accent.text}`}>
+          <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-serif font-semibold text-sm border border-current ${accent.text}`}>
             {report.houseGlyph}
           </span>
           <div className="flex items-center gap-2.5">
@@ -132,7 +132,7 @@ function SmallReport({ report, area, onOpen, t }) {
     >
       <div className="px-2.5 py-3 sm:px-3.5 sm:py-3.5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-1 mb-2">
-          <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-serif font-semibold text-2xs bg-white/10 ${accent.text} shrink-0`}>
+          <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center font-serif font-semibold text-2xs border border-current ${accent.text} shrink-0`}>
             {report.houseGlyph}
           </span>
           <TrendChip trend={area?.trend} accent={accent} t={t} />

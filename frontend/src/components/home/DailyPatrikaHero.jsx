@@ -26,7 +26,7 @@ import { formatDate, houseOrdinal } from '../../utils/format'
 import { planetName } from '../../utils/astroNames'
 import { colors } from '../../theme/tokens'
 import { withAlpha } from '../../theme/chartPalette'
-import { dayScoreBand } from './dayScoreBand'
+import { dayScoreBand } from '../../utils/dayScoreBand'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
 const ICON_BY_TYPE = {
@@ -68,6 +68,8 @@ function CosmicRing({ score, tone, mdPlanet, label, pulse }) {
               fontSize="18" fontWeight="700" fill={colors.parchment.DEFAULT} fontFamily="Georgia,serif">
           {score ?? "—"}
         </text>
+        {/* Label size: the svg renders at 120px for a 100-unit viewBox (x1.2),
+            so fontSize 9.2 draws at ~11px. Change both together. */}
         <text x={cx} y={cy + 12} textAnchor="middle"
               fontSize="9.2" fontWeight="600" fill={colors.ink.onnightMuted}
               fontFamily="system-ui,sans-serif" letterSpacing="0.4">

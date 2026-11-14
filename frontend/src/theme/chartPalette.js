@@ -1,9 +1,7 @@
 // Colours for chart SVGs and inline styles, derived from the Tailwind tokens so
 // there is one palette. Where a colour sits in a className, use the Tailwind
-// class instead. Planet colours live in config/planetColors.js (separate).
-import config from '../../tailwind.config.js'
-
-const c = config.theme.extend.colors
+// class instead. Planet colours live in config/planetColors.js, built from the same tokens.
+import { colors as c } from './tokens.js'
 
 export const chartPalette = Object.freeze({
   paper:      c.parchment.card,

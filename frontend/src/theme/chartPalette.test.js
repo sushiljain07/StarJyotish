@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import config from '../../tailwind.config.js'
+import { colors } from './tokens.js'
 import { chartPalette as P, withAlpha } from './chartPalette.js'
 import { ratio, composite } from './contrastUtil.js'
 
-const c = config.theme.extend.colors
+const c = colors
 
 describe('chartPalette', () => {
   it('takes its values from the Tailwind tokens', () => {
@@ -22,6 +23,13 @@ describe('chartPalette', () => {
     expect(P.caution).toBe(c.caution.DEFAULT)
     expect(P.night).toBe(c.night.DEFAULT)
     expect(P.onNight).toBe(c.ink.onnight)
+  })
+  it('Tailwind config uses the same colour object as tokens.js', () => {
+    expect(config.theme.extend.colors).toBe(colors)
+  })
+  it('chartPalette does not import tailwind.config.js', () => {
+    const src = readFileSync(resolve(import.meta.dirname, './chartPalette.js'), 'utf8')
+    expect(src).not.toMatch(/tailwind\.config/)
   })
   it('cream is the parchment token', () => expect(P.cream).toBe(c.parchment.DEFAULT))
   it('readable cream text on night (alpha 0.5) is at least 4.5:1', () => {

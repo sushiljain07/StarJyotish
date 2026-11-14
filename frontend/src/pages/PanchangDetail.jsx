@@ -220,7 +220,7 @@ function LocationPrompt({ onSetLocation }) {
 
 // ─── Compact multi-day table (used by Week and Hindu Month tabs) ──────────────
 
-const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-ink-onnightFaint' }
+const PAKSHA_DOT = { Shukla: 'bg-primary/80', Krishna: 'bg-ink-faint/40' }
 
 function PanchangTable({ days, highlightToday = true }) {
   const { t } = useTranslation()
@@ -470,7 +470,7 @@ function PanchangTableLegend() {
         <span className="inline-block w-2 h-2 rounded-full bg-primary/80" /> {t('panchang_legend_shukla')}
       </span>
       <span className="inline-flex items-center gap-1">
-        <span className="inline-block w-2 h-2 rounded-full bg-ink-onnightFaint border border-line" /> {t('panchang_legend_krishna')}
+        <span className="inline-block w-2 h-2 rounded-full bg-ink-faint/40 border border-line" /> {t('panchang_legend_krishna')}
       </span>
     </p>
   )

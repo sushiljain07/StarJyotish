@@ -44,11 +44,13 @@ describe('night text on pages, footers and download', () => {
     expect(read('pages/WeekAhead.jsx')).toMatch(/text-bad-onnight/)
   })
 
-  it('PanchangDetail: night chevrons, reset link and Krishna dot use night tokens', () => {
+  it('PanchangDetail: night chevrons and reset link use night tokens; the Krishna dot (on a light table) uses the light faint token', () => {
     const s = read('pages/PanchangDetail.jsx')
     expect(s).not.toMatch(/text-ink-onnight\/\d+/)
     expect(s).not.toMatch(/bg-slate-400\/40/)
-    expect(s).toMatch(/bg-ink-onnightFaint/)
+    // The paksha dot sits on parchment-card rows and the parchment legend, so it uses the light token.
+    expect(s).toMatch(/Krishna: 'bg-ink-faint\/40'/)
+    expect(s).not.toMatch(/bg-ink-onnightFaint/)
   })
 
   it('KundliDownload: dasha labels are ink-muted, not tinted /70', () => {

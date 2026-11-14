@@ -29,6 +29,10 @@ export const chartPalette = Object.freeze({
   nightDeep:  c.night.deep,
   onNight:    c.ink.onnight,
   cream:      c.parchment.DEFAULT, // text on night (was rgba(248,242,228,a))
+  transit:    c.planet.saturn,     // Sarvatobhadra transit marker and nakshatra
+  transitFill: withAlpha(c.planet.saturn, 0.14),
+  natal:      c.mauve.DEFAULT,     // Sarvatobhadra natal marker and nakshatra
+  natalFill:  withAlpha(c.mauve.DEFAULT, 0.16),
 })
 
 export function withAlpha(hex, alpha) {

@@ -144,9 +144,9 @@ const chartStyles = t => [
   { id: 'kp',    label: 'KP' },
 ]
 
-function SubTabBar({ subtabs, active, onChange, accent = 'primary' }) {
+function SubTabBar({ subtabs, active, onChange }) {
   const { t } = useTranslation()
-  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" accent={accent} label={t('kundli_subsections_aria')} />
+  return <AnimatedTabRow tabs={subtabs} active={active} onChange={onChange} variant="pill" label={t('kundli_subsections_aria')} />
 }
 
 export default function Result() {
@@ -295,11 +295,10 @@ export default function Result() {
 
   function InsightsAskEntry() {
     return (
-      <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t pt-6" style={{ borderColor: '#EAE1CC' }}>
+      <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t border-line pt-6">
         <button
           onClick={() => navigate('/insights', { state: { data, input } })}
-          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
-          style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
+          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">✨</span>
@@ -308,12 +307,11 @@ export default function Result() {
               <p className="text-xs text-ink-muted">{t('kundli_insights_sub')}</p>
             </div>
           </div>
-          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_open')}</span>
+          <span className="text-xs font-semibold shrink-0 ml-2 text-primary-ink">{t('kundli_open')}</span>
         </button>
         <button
           onClick={openAsk}
-          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-primary/60"
-          style={{ borderColor: '#EAE1CC', background: '#FFFDF8' }}
+          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">💬</span>
@@ -322,7 +320,7 @@ export default function Result() {
               <p className="text-xs text-ink-muted">{t('kundli_ask_sub')}</p>
             </div>
           </div>
-          <span className="text-xs font-semibold shrink-0 ml-2" style={{ color: '#D9A441' }}>{t('kundli_ask_cta')}</span>
+          <span className="text-xs font-semibold shrink-0 ml-2 text-primary-ink">{t('kundli_ask_cta')}</span>
         </button>
       </div>
     )
@@ -369,7 +367,7 @@ export default function Result() {
                   <SubTabBar subtabs={birthSubtabs(t)} active={activeBirthSub} onChange={selectSub} />
                 )}
                 {activeMain === 'analysis' && (
-                  <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} accent="sage" />
+                  <SubTabBar subtabs={analysisSubtabs(t)} active={activeAnalysisSub} onChange={selectSub} />
                 )}
               </div>
               {belowMd && <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />}
@@ -394,7 +392,7 @@ export default function Result() {
           <div className={activeBirthSub === 'planets' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_planets_intro_title')}</p>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
+              <p className="text-xs leading-relaxed text-ink-onnightMuted">
                 {t('kundli_planets_intro_body')}
               </p>
             </div>
@@ -404,7 +402,7 @@ export default function Result() {
           <div className={activeBirthSub === 'dasha' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_dasha_intro_title')}</p>
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(232,220,200,0.65)' }}>
+              <p className="text-xs leading-relaxed text-ink-onnightMuted">
                 {t('kundli_dasha_intro_body')}
               </p>
             </div>

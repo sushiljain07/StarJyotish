@@ -193,8 +193,8 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
               }
 
               if (cell.type === 'nak') {
-                const bg = cell.highlighted ? P.goodFill : cell.natalHighlighted ? P.cautionFill : P.paper
-                const border = cell.highlighted ? P.good : cell.natalHighlighted ? P.caution : P.hairline
+                const bg = cell.highlighted ? P.transitFill : cell.natalHighlighted ? P.natalFill : P.paper
+                const border = cell.highlighted ? P.transit : cell.natalHighlighted ? P.natal : P.hairline
                 const bw = cell.highlighted || cell.natalHighlighted ? 1.5 : 0.5
                 return (
                   <g key={`${ri}-${ci}`}>
@@ -206,16 +206,26 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
                     </text>
                     {/* Transit planet dots */}
                     {cell.transitPlanets.slice(0, 3).map((p, pi) => (
-                      <circle key={pi}
-                              cx={x + 6 + pi * 11} cy={y + CELL - 7}
-                              r={4} fill={PLANET_COLORS[p.name] ?? P.muted} />
+                      <g key={pi}>
+                        <circle cx={x + 6 + pi * 11} cy={y + CELL - 7}
+                                r={4} fill={PLANET_COLORS[p.name] ?? P.muted}
+                                stroke={P.transit} strokeWidth={1.5} />
+                        {/* paper inner stroke keeps the dot visible on a same-hue fill */}
+                        <circle cx={x + 6 + pi * 11} cy={y + CELL - 7}
+                                r={2.6} fill="none" stroke={P.paper} strokeWidth={1} />
+                      </g>
                     ))}
                     {/* Natal planet dots */}
                     {cell.natalPlanets.slice(0, 2).map((p, pi) => (
-                      <rect key={`n${pi}`}
-                            x={x + 6 + pi * 11} y={y + CELL - 16}
-                            width={8} height={8}
-                            rx={1} fill={PLANET_COLORS[p.name] ?? P.muted} opacity="0.6" />
+                      <g key={`n${pi}`}>
+                        <rect x={x + 6 + pi * 11} y={y + CELL - 16}
+                              width={8} height={8}
+                              rx={1} fill={PLANET_COLORS[p.name] ?? P.muted}
+                              stroke={P.natal} strokeWidth={1.5} />
+                        <rect x={x + 8 + pi * 11} y={y + CELL - 14}
+                              width={4} height={4}
+                              fill="none" stroke={P.paper} strokeWidth={1} />
+                      </g>
                     ))}
                   </g>
                 )
@@ -270,16 +280,16 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-xs text-ink-muted px-1">
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-primary"></span> {t('chart_sarvato_legend_transit')}
+          <span className="inline-block w-3 h-3 rounded-full bg-parchment-card border-2" style={{ borderColor: P.transit }}></span> {t('chart_sarvato_legend_transit')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded bg-caution opacity-70"></span> {t('chart_sarvato_legend_natal')}
+          <span className="inline-block w-3 h-3 rounded-sm bg-parchment-card border-2" style={{ borderColor: P.natal }}></span> {t('chart_sarvato_legend_natal')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-good-light border border-good"></span> {t('chart_sarvato_legend_transit_nak')}
+          <span className="inline-block w-4 h-3 rounded border" style={{ background: P.transitFill, borderColor: P.transit }}></span> {t('chart_sarvato_legend_transit_nak')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-4 h-3 rounded bg-caution-light border border-caution"></span> {t('chart_sarvato_legend_natal_nak')}
+          <span className="inline-block w-4 h-3 rounded border" style={{ background: P.natalFill, borderColor: P.natal }}></span> {t('chart_sarvato_legend_natal_nak')}
         </span>
       </div>
 

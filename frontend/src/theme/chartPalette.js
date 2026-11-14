@@ -27,6 +27,7 @@ export const chartPalette = Object.freeze({
   nightLight: c.night.light,
   nightDeep:  c.night.deep,
   onNight:    c.ink.onnight,
+  cream:      c.parchment.DEFAULT, // text on night (was rgba(248,242,228,a))
 })
 
 export function withAlpha(hex, alpha) {

@@ -96,7 +96,7 @@ export default function WesternChart({
             return (
               <g key={`sign${s}`}>
                 <path d={sectorPath(R_OUTER, R_ZODIAC, startAngle, endAngle)}
-                      fill={s % 3 === 0 ? P.paperAlt : s % 3 === 1 ? P.goodFill : P.ascFill}
+                      fill={s % 3 === 0 ? P.paperAlt : s % 3 === 1 ? P.goodFill : P.paper}
                       stroke={P.line} strokeWidth="0.8" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
                       fontSize="12" fill={P.signText} fontWeight="bold">
@@ -115,7 +115,7 @@ export default function WesternChart({
             return (
               <g key={`house${h}`}>
                 <path d={sectorPath(R_ZODIAC, R_HOUSE, startAngle, endAngle)}
-                      fill={h === 0 ? P.paperAlt : P.paper}
+                      fill={h === 0 ? P.ascFill : P.paper}
                       stroke={P.muted} strokeWidth="0.6" />
                 <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
                       fontSize="11" fill={h === 0 ? P.asc : P.muted} fontWeight="500">

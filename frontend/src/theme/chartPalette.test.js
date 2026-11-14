@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import config from '../../tailwind.config.js'
 import { chartPalette as P, withAlpha } from './chartPalette.js'
-import { ratio } from './contrastUtil.js'
+import { ratio, composite } from './contrastUtil.js'
 
 const c = config.theme.extend.colors
 
@@ -22,6 +22,10 @@ describe('chartPalette', () => {
     expect(P.caution).toBe(c.caution.DEFAULT)
     expect(P.night).toBe(c.night.DEFAULT)
     expect(P.onNight).toBe(c.ink.onnight)
+  })
+  it('cream is the parchment token', () => expect(P.cream).toBe(c.parchment.DEFAULT))
+  it('readable cream text on night (alpha 0.5) is at least 4.5:1', () => {
+    expect(ratio(composite(P.cream, 0.5, P.night), P.night)).toBeGreaterThanOrEqual(4.5)
   })
   it('is frozen', () => expect(Object.isFrozen(P)).toBe(true))
   it('withAlpha returns rgba', () => {

@@ -111,7 +111,7 @@ function StatusCard({ slot, nowMin, slots, t }) {
             {t(theme.labelKey)}
           </p>
           {slot && (
-            <p style={{ fontSize: 12, color: withAlpha(P.onNight, 0.55), marginTop: 2 }}>
+            <p style={{ fontSize: 12, color: withAlpha(P.cream, 0.55), marginTop: 2 }}>
               {t(slot.labelKey)}{slot.kind !== 'anchor' && slot.end != null ? ` · ${t('timeline_until', { time: fmt(slot.end) })}` : ''}
             </p>
           )}
@@ -126,17 +126,17 @@ function StatusCard({ slot, nowMin, slots, t }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: next.kind === 'good' ? P.sage : next.kind === 'avoid' ? P.bad : P.gold, flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <p style={{ fontSize: 10, color: withAlpha(P.cream, 0.5), fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {t('status_card_next_event')}
               </p>
-              <p style={{ fontSize: 12, fontWeight: 600, color: withAlpha(P.onNight, 0.85) }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: withAlpha(P.cream, 0.85) }}>
                 {t(next.labelKey)}
               </p>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: withAlpha(P.onNight, 0.7) }}>{fmt(next.start)}</p>
-            <p style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4) }}>{nextTimeStr}</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: withAlpha(P.cream, 0.7) }}>{fmt(next.start)}</p>
+            <p style={{ fontSize: 10, color: withAlpha(P.cream, 0.5) }}>{nextTimeStr}</p>
           </div>
         </div>
       )}
@@ -198,13 +198,13 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin, t }) {
 
       {/* Axis labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5, position: 'relative' }}>
-        <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>🌅 {t('slot_sunrise_label')}</span>
+        <span style={{ fontSize: 10, color: withAlpha(P.cream, 0.5), fontWeight: 600 }}>🌅 {t('slot_sunrise_label')}</span>
         {showNow && (
           <span style={{ fontSize: 9, fontWeight: 800, color: P.paperAlt, background: P.nightLight, borderRadius: 6, padding: '1px 6px', position: 'absolute', left: `${nowPct}%`, transform: 'translateX(-50%)', top: 0, whiteSpace: 'nowrap' }}>
             {t('sky_now')}
           </span>
         )}
-        <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>🌇 {t('slot_sunset_label')}</span>
+        <span style={{ fontSize: 10, color: withAlpha(P.cream, 0.5), fontWeight: 600 }}>🌇 {t('slot_sunset_label')}</span>
       </div>
 
       {/* Legend */}
@@ -212,7 +212,7 @@ function BarTimeline({ slots, nowMin, sunriseMin, sunsetMin, t }) {
         {[[P.bad, t('slot_badge_avoid')], [P.sage, t('status_favorable')], [P.nightLight, t('status_neutral')]].map(([color, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
-            <span style={{ fontSize: 9, color: withAlpha(P.onNight, 0.4), fontWeight: 600 }}>{label}</span>
+            <span style={{ fontSize: 9, color: withAlpha(P.cream, 0.5), fontWeight: 600 }}>{label}</span>
           </div>
         ))}
       </div>
@@ -243,20 +243,20 @@ function WindowRow({ slot, isNow, t }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: withAlpha(P.onNight, 0.9) }}>{t(slot.labelKey)}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: withAlpha(P.cream, 0.9) }}>{t(slot.labelKey)}</span>
             {isNow && (
               <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: P.gold, background: withAlpha(P.gold, 0.15), borderRadius: 4, padding: '1px 5px', textTransform: 'uppercase' }}>
                 {t('sky_now')}
               </span>
             )}
           </div>
-          <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.4) }}>{timeStr}</span>
+          <span style={{ fontSize: 11, color: withAlpha(P.cream, 0.5) }}>{timeStr}</span>
         </div>
         <span style={{ fontSize: 10, fontWeight: 700, background: badgeBg, color: badgeColor, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
           {t(slot.badgeKey)}
         </span>
         {details && (
-          <span style={{ fontSize: 10, color: withAlpha(P.onNight, 0.3), transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>▾</span>
+          <span style={{ fontSize: 10, color: withAlpha(P.cream, 0.3), transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>▾</span>
         )}
       </button>
 
@@ -267,7 +267,7 @@ function WindowRow({ slot, isNow, t }) {
             {details.do.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
                 <span style={{ color: P.sage, fontSize: 11, flexShrink: 0, marginTop: 1 }}>✓</span>
-                <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
+                <span style={{ fontSize: 11, color: withAlpha(P.cream, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
               </div>
             ))}
           </div>
@@ -277,10 +277,10 @@ function WindowRow({ slot, isNow, t }) {
               ? details.avoid.map((item, i) => (
                   <div key={i} style={{ display: 'flex', gap: 5, marginBottom: 4 }}>
                     <span style={{ color: P.bad, fontSize: 11, flexShrink: 0, marginTop: 1 }}>✗</span>
-                    <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
+                    <span style={{ fontSize: 11, color: withAlpha(P.cream, 0.55), lineHeight: 1.4 }}>{t(item)}</span>
                   </div>
                 ))
-              : <span style={{ fontSize: 11, color: withAlpha(P.onNight, 0.3) }}>{t('timeline_no_restrictions')}</span>
+              : <span style={{ fontSize: 11, color: withAlpha(P.cream, 0.5) }}>{t('timeline_no_restrictions')}</span>
             }
           </div>
         </div>
@@ -312,7 +312,7 @@ function AiInsight({ slot, nextGood, t }) {
         <p style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: P.gold, marginBottom: 3 }}>
           {t('ai_insight_label')}
         </p>
-        <p style={{ fontSize: 12, color: withAlpha(P.onNight, 0.65), lineHeight: 1.55 }}>{msg}</p>
+        <p style={{ fontSize: 12, color: withAlpha(P.cream, 0.65), lineHeight: 1.55 }}>{msg}</p>
       </div>
     </div>
   )
@@ -347,7 +347,7 @@ export default function MobileTimelineCard({ panchang }) {
       <StatusCard slot={active} nowMin={nowMin} slots={slots} t={t} />
       <BarTimeline slots={slots} nowMin={nowMin} sunriseMin={sunriseMin} sunsetMin={sunsetMin} t={t} />
 
-      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: withAlpha(P.onNight, 0.35), margin: '12px 0 4px 4px' }}>
+      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: withAlpha(P.cream, 0.5), margin: '12px 0 4px 4px' }}>
         {t('timeline_windows_heading')}
       </p>
       <div>

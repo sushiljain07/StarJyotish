@@ -8,3 +8,9 @@ export const ratio = (a, b) => {
   const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
+
+// Composite fg at `alpha` over an opaque bg; returns an opaque hex.
+export const composite = (fg, alpha, bg) => {
+  const ch = i => Math.round(parseInt(fg.slice(i, i + 2), 16) * alpha + parseInt(bg.slice(i, i + 2), 16) * (1 - alpha))
+  return '#' + [1, 3, 5].map(i => ch(i).toString(16).padStart(2, '0')).join('')
+}

@@ -5,6 +5,7 @@ import KundliChart from './KundliChart'
 import SouthIndiaChart from './SouthIndiaChart'
 import WesternChart from './WesternChart'
 import SarvatobhadraChakra from './SarvatobhadraChakra'
+import KundliDownload from './KundliDownload'
 import { estimateTextWidth, NORTH_HOUSE_POLYGONS, pointInPolygon } from '../utils/chartLabelLayout'
 import kundli from '../test/fixtures/kundli.json'
 import transit from '../test/fixtures/transit.json'
@@ -120,6 +121,49 @@ describe('KundliChart on a 360px phone (scale 0.59)', () => {
       const ys = [...new Set(h6.map(l => Number(l.getAttribute('y'))))].sort((a, b) => a - b)
       for (let i = 1; i < ys.length; i++) expect(ys[i] - ys[i - 1]).toBeGreaterThanOrEqual(fs(h6[0]))
     })
+  })
+})
+
+describe('KundliChart: synthetic crowded kite (Lagna + 6 planets in H1)', () => {
+  const crowded = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus'].map((name, i) => ({
+    name, house: 1, sign_index: 0, degree: 3 + i * 4, retrograde: i % 2 === 0,
+  }))
+  it.each(['en', 'hi'])('wraps without overlap inside the kite at 360px (%s)', async lng => {
+    await i18n.changeLanguage(lng)
+    const { container } = renderAtWidth(<KundliChart planets={crowded} ascendant={{ sign_index: 0, degree: 1 }} />, 295)
+    const labels = [...container.querySelectorAll('g[data-house="1"] text')]
+    expect(labels).toHaveLength(7)
+    expectNoOverlap(labels)
+    for (const l of labels) {
+      const b = labelBox(l)
+      for (const [x, y] of [[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1]]) {
+        expect(pointInPolygon(x, y, NORTH_HOUSE_POLYGONS[0]), l.textContent).toBe(true)
+      }
+    }
+  })
+
+  it('separates the status suffix from the name by a small gap', () => {
+    const { container } = renderAtWidth(<KundliChart planets={crowded} ascendant={null} />, 295)
+    const s = container.querySelector('[data-status]')
+    expect(Number(s.getAttribute('dx'))).toBeCloseTo(0.2 * fs(s), 5)
+  })
+})
+
+describe('KundliDownload charts keep full detail', () => {
+  it('renders degree superscripts at desktop sizes even at scale 0.64', () => {
+    const { container } = renderAtWidth(
+      <KundliDownload data={kundli} input={{ name: 'A', date: '1990-05-15', time: '10:30', place: 'Delhi' }} />, 320)
+    const charts = container.querySelectorAll('svg[viewBox="0 0 500 500"]')
+    expect(charts).toHaveLength(2)
+    for (const svg of charts) {
+      expect(svg.querySelectorAll('[data-deg]').length).toBeGreaterThan(0)
+      svg.querySelectorAll('text[data-label="planet"]').forEach(p => expect(fs(p)).toBe(15))
+    }
+  })
+
+  it('the same chart without detail="full" goes compact at 0.64', () => {
+    const { container } = renderAtWidth(<KundliChart planets={kundli.planets} ascendant={kundli.ascendant} />, 320)
+    expect(container.querySelectorAll('[data-deg]')).toHaveLength(0)
   })
 })
 

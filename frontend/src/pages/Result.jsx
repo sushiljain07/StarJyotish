@@ -347,7 +347,7 @@ export default function Result() {
               {mounted('ashtakavarga') && <AshtakavargaTable key={chartKey} input={input} />}
             </div>
             <div className={activeAnalysisSub === 'sarvatobhadra' ? 'animate-fade-in-fast' : 'hidden'}>
-              <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />
+              {mounted('sarvatobhadra') && <SarvatobhadraChakra natalPlanets={data.planets} transitPlanets={[]} />}
             </div>
           </Suspense>
         </div>

@@ -110,6 +110,7 @@ export default function KundliDownload({ data, input }) {
                 {t('download_lagna_chart_d1')}
               </p>
               <KundliChart
+                detail="full"
                 planets={planets}
                 ascendant={ascendant}
                 navamsaPlanets={navamsa_planets}
@@ -121,6 +122,7 @@ export default function KundliDownload({ data, input }) {
                 {t('download_navamsa_chart_d9')}
               </p>
               <KundliChart
+                detail="full"
                 planets={navamsa_planets}
                 ascendant={navamsa_ascendant}
                 title={t('tab_navamsa')}

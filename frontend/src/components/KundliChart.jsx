@@ -96,6 +96,9 @@ export default function KundliChart({
   navamsaPlanets = null,
   title,
   transitPlanets = null,
+  // 'full' keeps degrees and desktop sizes whatever the rendered width
+  // (printed / downloaded charts); 'auto' adapts to phones.
+  detail = 'auto',
 }) {
   const { t } = useTranslation()
   const abbr = name => planetAbbr(t, name)
@@ -130,11 +133,14 @@ export default function KundliChart({
   // legible, and below COMPACT_SCALE drop the degree superscripts (the Planets
   // table has them) and show status markers as a full-size suffix.
   const svgRef = useRef(null)
-  const scale = useRenderedScale(svgRef, 500)
+  const measured = useRenderedScale(svgRef, 500)
+  const scale = detail === 'full' ? 1 : measured
   const compact = scale < COMPACT_SCALE
   const planetFs = legibleSize(15, scale, 11)
   const transitFs = legibleSize(13, scale, 11)
   const statusFs = compact ? legibleSize(11, scale, 10) : 11
+  // Without the degree in front, a small gap separates name and status glyphs.
+  const statusGap = compact ? 0.2 * statusFs : 0
   const rashiFs = legibleSize(14, scale, 10)
   const grow = planetFs / 15
   const rashiBox = (i, n) => {
@@ -216,7 +222,8 @@ export default function KundliChart({
           // Desktop: one column for 1–2 items, a 2-column grid for 3+.
           // Grown labels fall back to tighter rows / an extra column.
           const widthOf = item => item.type === 'planet'
-            ? estimateTextWidth(item.name, planetFs) + estimateTextWidth(item.status, statusFs)
+            ? estimateTextWidth(item.name, planetFs)
+              + (item.status ? estimateTextWidth(item.status, statusFs) + statusGap : 0)
             : item.type === 'transit'
               ? estimateTextWidth(t('chart_transit_marker') + item.name, transitFs)
               : estimateTextWidth(abbr('Ascendant'), planetFs)
@@ -267,7 +274,7 @@ export default function KundliChart({
                 {compact ? (
                   <>
                     <tspan>{item.name}</tspan>
-                    {item.status && <tspan data-status fontSize={statusFs}>{item.status}</tspan>}
+                    {item.status && <tspan data-status dx={statusGap} fontSize={statusFs}>{item.status}</tspan>}
                   </>
                 ) : (
                   <>

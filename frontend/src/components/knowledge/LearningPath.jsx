@@ -50,7 +50,7 @@ export default function LearningPath({ title = 'Your learning path', steps }) {
             <>
               {step.status === 'completed' && <CheckIcon />}
               <span>{step.label}</span>
-              {step.status === 'locked' && <span className="text-[10px] opacity-70">Soon</span>}
+              {step.status === 'locked' && <span className="text-[10px]">Soon</span>}
             </>
           )
 

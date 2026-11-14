@@ -75,7 +75,7 @@ function YogaCard({ yoga, defaultOpen }) {
             {yoga.description}
           </p>
         </div>
-        <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>
+        <span aria-hidden="true" className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>
           ▼
         </span>
       </button>

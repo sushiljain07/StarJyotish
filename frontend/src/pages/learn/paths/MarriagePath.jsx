@@ -69,7 +69,7 @@ function PathStep({ step }) {
     )
   }
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl p-6 opacity-70">
+    <div className="bg-parchment-card border border-line border-dashed rounded-2xl p-6">
       {inner}
     </div>
   )

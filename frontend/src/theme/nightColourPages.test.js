@@ -3,6 +3,8 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { colors } from './tokens.js'
+import { ratio } from './contrastUtil.js'
 
 const SRC = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (f) => readFileSync(resolve(SRC, f), 'utf8')
@@ -49,7 +51,10 @@ describe('night text on pages, footers and download', () => {
     expect(s).not.toMatch(/text-ink-onnight\/\d+/)
     expect(s).not.toMatch(/bg-slate-400\/40/)
     // The paksha dot sits on parchment-card rows and the parchment legend, so it uses the light token.
-    expect(s).toMatch(/Krishna: 'bg-ink-faint\/40'/)
+    // It is the only paksha cue, so it is opaque (non-text 3:1, WCAG 1.4.11).
+    expect(s).toMatch(/Krishna: 'bg-ink-faint'/)
+    expect(ratio(colors.ink.faint, colors.parchment.card)).toBeGreaterThanOrEqual(3)
+    expect(ratio(colors.ink.faint, colors.parchment.DEFAULT)).toBeGreaterThanOrEqual(3)
     expect(s).not.toMatch(/bg-ink-onnightFaint/)
   })
 

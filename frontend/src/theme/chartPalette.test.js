@@ -44,6 +44,15 @@ describe('chartPalette', () => {
       it(`${key} is at least 4.5:1 on ${bg}`, () => expect(ratio(P[key], P[bg])).toBeGreaterThanOrEqual(4.5))
     }
   }
+  it('groups each family of keys together (dignity*, then bad + badFill)', () => {
+    const keys = Object.keys(P)
+    for (const prefix of ['dignity', 'transit', 'natal']) {
+      const at = keys.map((k, i) => (k.startsWith(prefix) ? i : -1)).filter(i => i >= 0)
+      expect(at.length, prefix).toBeGreaterThan(1)
+      expect(at[at.length - 1] - at[0], prefix).toBe(at.length - 1)
+    }
+    expect(keys.indexOf('badFill') - keys.indexOf('bad')).toBe(1)
+  })
   it('has no hex or rgba literals in the chart components', () => {
     const files = ['KundliChart', 'SarvatobhadraChakra',
       'ChartReading', 'ChartHighlight']

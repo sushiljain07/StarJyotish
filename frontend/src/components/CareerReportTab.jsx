@@ -361,7 +361,7 @@ function CareerOptionCard({ opt }) {
             <p className="text-xs text-ink-muted mt-0.5">{opt.timeline}</p>
           )}
         </div>
-        <span className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+        <span aria-hidden="true" className={`text-ink-faint text-xs mt-1 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
 
       {open && (

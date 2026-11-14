@@ -266,7 +266,7 @@ describe('SiteHeader signed-in tablet row', () => {
   }
   afterEach(() => { mockAuthed = false })
 
-  it('keeps every link on one line with tighter spacing at md', () => {
+  it('nav links and row carry the one-line classes (class assertion only; layout is measured in a browser)', () => {
     const nav = renderSignedIn()
     const links = [...nav.querySelectorAll('button')]
     expect(links).toHaveLength(5)
@@ -275,6 +275,7 @@ describe('SiteHeader signed-in tablet row', () => {
       expect(b.className).toContain('md:px-2')
       expect(b.className).toContain('lg:px-4')
       expect(b.className).toContain('min-h-11')
+      expect(b.className).toContain('min-w-11')
     }
     expect(nav.className).toContain('md:gap-0.5')
     expect(nav.className).toContain('lg:gap-1')

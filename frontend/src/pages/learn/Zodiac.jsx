@@ -214,7 +214,7 @@ export default function ZodiacGuide() {
           {BEYOND_ZODIAC.items.map((item, i) => (
             <Reveal key={item.label} delay={i * 50}>
               <p className="font-semibold text-sm text-primary-light mb-1.5">
-                <ConceptLink id={item.conceptId}>{item.label}</ConceptLink>
+                <ConceptLink id={item.conceptId} tone="dark">{item.label}</ConceptLink>
               </p>
               <p className="text-ink-onnight text-sm leading-relaxed">{item.description}</p>
             </Reveal>

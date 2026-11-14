@@ -15,7 +15,13 @@
 import { Link } from 'react-router-dom'
 import { getConcept } from '../../config/concepts'
 
-export default function ConceptLink({ id, children }) {
+// `tone="dark"` is for links on a night surface (gold text must stay light).
+const LINK_TONES = {
+  light: 'text-primary-ink hover:text-ink',
+  dark: 'text-primary-light hover:text-primary-glow',
+}
+
+export default function ConceptLink({ id, children, tone = 'light' }) {
   const concept = getConcept(id)
   const label = children ?? concept?.label ?? id
 
@@ -23,7 +29,7 @@ export default function ConceptLink({ id, children }) {
     return (
       <Link
         to={concept.href}
-        className="text-primary-ink border-b border-dotted border-primary/50 hover:border-primary transition"
+        className={`${LINK_TONES[tone] ?? LINK_TONES.light} border-b border-dotted border-primary/50 hover:border-primary transition`}
       >
         {label}
       </Link>

@@ -475,3 +475,87 @@ def test_refresh_reuse_by_disabled_user_is_rejected(client):
     _, t2 = _refresh(client, t1)
     _db_edit(t1, disable_user=True)
     assert _refresh(client, t1)[0].status_code == 401
+
+
+# ---- device revoke / logout replays are not theft; 401s clear the cookie ----
+
+def _assert_clears_refresh_cookie(resp):
+    set_cookie = resp.headers.get("set-cookie", "")
+    assert "sj_refresh=" in set_cookie, set_cookie
+    assert "max-age=0" in set_cookie.lower(), set_cookie
+
+
+def _two_devices(client, monkeypatch):
+    """Two independent sessions (device A, device B) for the same user."""
+    import db.repositories.otp_repository as otp_repo
+    monkeypatch.setattr(otp_repo, "OTP_RESEND_COOLDOWN_SECONDS", 0)
+    phone = _unique_phone()
+
+    def login():
+        client.cookies.clear()
+        sent = client.post("/api/auth/otp/send", json={"phone_number": phone})
+        resp = client.post("/api/auth/otp/verify", json={"phone_number": phone, "code": sent.json()["debug_code"]})
+        return resp.json()["access_token"], client.cookies.get("sj_refresh")
+
+    access_a, token_a = login()
+    access_b, token_b = login()
+    return access_a, token_a, access_b, token_b
+
+
+def test_revoked_device_refresh_is_401_and_leaves_other_devices_alive(client, monkeypatch):
+    access_a, token_a, _, token_b = _two_devices(client, monkeypatch)
+    sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {access_a}"},
+                          cookies={"sj_refresh": token_a}).json()
+    other = [s for s in sessions if not s["is_current"]]
+    assert len(other) == 1
+    client.cookies.clear()
+    assert client.delete(f"/api/auth/sessions/{other[0]['id']}",
+                         headers={"Authorization": f"Bearer {access_a}"}).status_code == 200
+    resp_b, _ = _refresh(client, token_b)  # device B's next refresh
+    assert resp_b.status_code == 401
+    _assert_clears_refresh_cookie(resp_b)
+    assert _refresh(client, token_a)[0].status_code == 200  # the laptop is not signed out
+
+
+def test_logout_replay_outside_window_is_401_and_not_theft(client, monkeypatch):
+    _, token_a, _, token_b = _two_devices(client, monkeypatch)
+    client.cookies.clear()
+    assert client.post("/api/auth/logout", cookies={"sj_refresh": token_b}).status_code == 200
+    _db_edit(token_b, age_seconds=1000)
+    resp_b, _ = _refresh(client, token_b)
+    assert resp_b.status_code == 401
+    _assert_clears_refresh_cookie(resp_b)
+    assert _refresh(client, token_a)[0].status_code == 200
+
+
+def test_rotated_replay_outside_window_revokes_every_device(client, monkeypatch):
+    _, token_a, _, token_b = _two_devices(client, monkeypatch)
+    _, token_b2 = _refresh(client, token_b)
+    _db_edit(token_b, age_seconds=1000)
+    resp, _ = _refresh(client, token_b)
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+    assert _refresh(client, token_a)[0].status_code == 401
+    assert _refresh(client, token_b2)[0].status_code == 401
+
+
+def test_refresh_401_without_cookie_clears_cookie(client):
+    client.cookies.clear()
+    resp = client.post("/api/auth/refresh")
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+
+
+def test_refresh_401_for_disabled_user_clears_cookie(client):
+    _, t1 = _login(client)
+    _, t2 = _refresh(client, t1)
+    _db_edit(t1, disable_user=True)
+    resp, _ = _refresh(client, t2)  # active-session path
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)
+
+
+def test_refresh_401_for_unknown_token_clears_cookie(client):
+    resp, _ = _refresh(client, "not-a-real-token")
+    assert resp.status_code == 401
+    _assert_clears_refresh_cookie(resp)

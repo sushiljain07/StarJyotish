@@ -15,7 +15,7 @@ Token model:
 
 Rotation: every successful /refresh revokes the session it was called
 with and creates a brand new one — a refresh token is single-use. If a
-*revoked* token is ever presented again, that's treated as a signal the
+*rotated* token is ever presented again, that's treated as a signal the
 raw token leaked (e.g. it was copied off a stolen device, then both the
 thief and the legitimate device tried to use their respective copies),
 and every session for that user is revoked as a precaution.
@@ -40,8 +40,21 @@ fails softly with 409 for that one request: no session is minted, nothing
 is revoked and the cookie is left alone. Three tabs refreshing the same
 token at once must not kill the sessions the first two were handed.
 
-Outside the window, or for a token revoked for any other reason, a replay
-is theft: every session for the user is revoked and the response is 401.
+Outside the window, a replay of a "rotated", "rotated-reused" or
+"rotated-closed" token is theft: every session for the user is revoked and
+the response is 401.
+
+A token revoked for any other reason ("user" — the device was signed out
+from another device, "logout", "disabled", or "reuse" from an earlier theft
+response) was never handed a successor, so replaying it says nothing about
+theft. It gets a plain 401 and nothing else is revoked: signing an old phone
+out from the laptop must not sign the laptop out on the phone's next
+refresh.
+
+Every 401 from /refresh also deletes the sj_refresh cookie. That deletion
+travels on the HTTPException's own headers (_unauthorized_clearing_cookie):
+FastAPI drops headers set on the injected Response when the route raises.
+The soft 409 never touches the cookie.
 """
 import os
 import uuid
@@ -120,6 +133,18 @@ def _clear_refresh_cookie(response: Response) -> None:
     response.delete_cookie(key=REFRESH_COOKIE_NAME, path=REFRESH_COOKIE_PATH)
 
 
+def _unauthorized_clearing_cookie(detail: str) -> HTTPException:
+    """A 401 that also deletes the refresh cookie. Raised, so the deletion
+    must ride on the exception's headers: FastAPI discards headers set on
+    the injected Response when the route raises."""
+    scratch = Response()
+    _clear_refresh_cookie(scratch)
+    return HTTPException(
+        status_code=401, detail=detail,
+        headers={"set-cookie": scratch.headers["set-cookie"]},
+    )
+
+
 def _issue_session_and_response(db: Session, response: Response, user: User, request: Request) -> AuthResponse:
     raw_refresh = uuid.uuid4().hex + uuid.uuid4().hex  # 64 hex chars, cryptographically random (uuid4)
     expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_TTL_DAYS)
@@ -195,18 +220,22 @@ def refresh_session(
     db: Session = Depends(get_db),
 ):
     if not sj_refresh:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise _unauthorized_clearing_cookie("Not authenticated")
 
     session_repo = SessionRepository(db)
     session = session_repo.get_active_by_raw_token(sj_refresh, for_update=True)
     if session is None:
         # Distinguish "never existed / already expired" (normal) from
-        # "exists but was already revoked" (possible token-theft replay —
-        # see module docstring) before giving up.
+        # "exists but was already revoked" (a rotated token's replay may be
+        # theft — see module docstring) before giving up.
         stale = session_repo.get_by_raw_token_any_state(sj_refresh, for_update=True)
-        if stale is not None and stale.revoked_at is not None:
+        rotated = stale is not None and stale.revoked_at is not None and stale.revoked_reason in (
+            "rotated", "rotated-reused", "rotated-closed",
+        )
+        if rotated:
             revoked_ago = (datetime.now(timezone.utc) - stale.revoked_at).total_seconds()
-            if stale.revoked_reason == "rotated" and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
+            in_window = revoked_ago < REFRESH_REUSE_GRACE_SECONDS
+            if stale.revoked_reason == "rotated" and in_window:
                 # Reuse interval (see module docstring): the response that
                 # carried the replacement token was lost, or another tab
                 # raced us. Hand out a fresh session; revoke nothing.
@@ -214,16 +243,17 @@ def refresh_session(
                 if user is None or not user.is_active:
                     session_repo.revoke_all_for_user(stale.user_id, reason="disabled")
                     db.commit()
-                    _clear_refresh_cookie(response)
-                    raise HTTPException(status_code=401, detail="Account not found or disabled")
+                    raise _unauthorized_clearing_cookie("Account not found or disabled")
                 stale.revoked_reason = "rotated-reused"  # accepted once; never mints again
                 return _issue_session_and_response(db, response, user, request)
-            if stale.revoked_reason in ("rotated-reused", "rotated-closed") and revoked_ago < REFRESH_REUSE_GRACE_SECONDS:
-                # A further replay inside the window (three racing tabs, or a
-                # replay after sign-out). Fail softly for this one request:
-                # no new session, nothing revoked, cookie left alone — the
-                # browser may already hold a newer cookie from a sibling call.
+            if in_window:
+                # "rotated-reused"/"rotated-closed" replayed inside the window
+                # (three racing tabs, or a replay after sign-out). Fail softly
+                # for this one request: no new session, nothing revoked,
+                # cookie left alone — the browser may already hold a newer
+                # cookie from a sibling call.
                 raise HTTPException(status_code=409, detail="Refresh already in progress. Please retry.")
+            # A rotated token replayed outside the window: theft.
             session_repo.revoke_all_for_user(stale.user_id, reason="reuse")
             session_repo.close_recent_rotations(stale.user_id, REFRESH_REUSE_GRACE_SECONDS)
             # Commit now, not just flush: this branch always ends in an
@@ -232,15 +262,15 @@ def refresh_session(
             # the one mutation that matters most here (revoking every
             # session as a theft response) would be silently discarded.
             db.commit()
-        _clear_refresh_cookie(response)
-        raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
+        # Unknown, expired, or revoked for a non-rotation reason ("user",
+        # "logout", "disabled", "reuse"): a plain 401, nothing else revoked.
+        raise _unauthorized_clearing_cookie("Session expired. Please log in again.")
 
     user = UserRepository(db).get(session.user_id)
     if user is None or not user.is_active:
         session_repo.revoke(session, reason="disabled")
         db.commit()  # same reasoning as above — this path also ends in a raise
-        _clear_refresh_cookie(response)
-        raise HTTPException(status_code=401, detail="Account not found or disabled")
+        raise _unauthorized_clearing_cookie("Account not found or disabled")
 
     session_repo.revoke(session, reason="rotated")  # single-use: this token is now spent
     return _issue_session_and_response(db, response, user, request)

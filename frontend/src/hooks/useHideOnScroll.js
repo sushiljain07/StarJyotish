@@ -70,3 +70,22 @@ export function useBelowMd() {
   }, [])
   return below
 }
+
+// Viewport at or above Tailwind's lg breakpoint. Same jsdom guard as
+// useBelowMd: a missing matchMedia reports false.
+const MIN_LG = '(min-width: 1024px)'
+
+export function useMinLg() {
+  const [lg, setLg] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.(MIN_LG).matches,
+  )
+  useEffect(() => {
+    const mql = window.matchMedia?.(MIN_LG)
+    if (!mql) return undefined
+    const handler = e => setLg(e.matches)
+    setLg(mql.matches)
+    mql.addEventListener?.('change', handler)
+    return () => mql.removeEventListener?.('change', handler)
+  }, [])
+  return lg
+}

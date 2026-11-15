@@ -7,7 +7,7 @@ import en from '../i18n/en.json'
 import Testimonials from './Testimonials'
 
 function mockFetch(data) {
-  global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(data) }))
+  globalThis.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(data) }))
 }
 const wrap = () => render(<MemoryRouter><Testimonials /></MemoryRouter>)
 

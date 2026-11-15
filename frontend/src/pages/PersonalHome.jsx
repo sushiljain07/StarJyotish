@@ -162,6 +162,8 @@ export default function PersonalHome() {
     })
   }
 
+  const isLg = useMinLg()
+
   const loading = !profilesLoaded && !profile
 
   if (loading) {
@@ -201,8 +203,6 @@ export default function PersonalHome() {
   const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
 
   const patrikaHeadline = edition?.headline ?? edition?.cards?.[0]?.text ?? null
-
-  const isLg = useMinLg()
 
   const beats = {
     day: (

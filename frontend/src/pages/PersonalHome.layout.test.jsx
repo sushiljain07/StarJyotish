@@ -10,6 +10,7 @@ import panchang from '../test/fixtures/panchang.json'
 import ChartsStrip from '../components/home/ChartsStrip'
 
 const mq = vi.hoisted(() => ({ lg: false }))
+const gate = vi.hoisted(() => ({ ready: true }))
 vi.mock('../hooks/useCurrentLocation', () => ({
   useCurrentLocation: () => ({ location: null, status: 'denied', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }),
 }))
@@ -25,7 +26,7 @@ vi.mock('../services/astrologyProfiles', async importOriginal => {
     id: 'p1', label: 'Asha Verma', birth_date: '1990-08-16', birth_time: '19:05',
     place: 'New Delhi, India', is_primary: true, chart: kundli,
   }
-  return { ...actual, loadProfiles: async () => [profile], getPrimaryProfile: () => profile, listProfiles: () => [profile] }
+  return { ...actual, loadProfiles: async () => { gate.ready = true; return [profile] }, getPrimaryProfile: () => (gate.ready ? profile : null), listProfiles: () => [profile] }
 })
 vi.mock('../hooks/useDailyEditor', () => ({
   useDailyEditor: () => ({ edition: { headline: 'x', variation: 0, cards: [] }, requestRefresh: () => {} }),
@@ -36,6 +37,7 @@ import PersonalHome from './PersonalHome'
 beforeEach(async () => {
   const ctx = new Proxy({}, { get: (_t, k) => (k === 'canvas' ? {} : () => ({ addColorStop() {} })), set: () => true })
   mq.lg = false
+  gate.ready = true
   vi.stubGlobal('matchMedia', q => ({
     matches: String(q).includes('min-width: 1024px') ? mq.lg : false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
   }))
@@ -145,5 +147,18 @@ describe('ChartsStrip arrows', () => {
     fireEvent.scroll(scroller)
     expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(false)
     expect(screen.getByRole('button', { name: i18n.t('carousel_next') }).disabled).toBe(false)
+  })
+})
+
+describe('PersonalHome loading to loaded', () => {
+  it('keeps the same hooks across the loading and loaded renders', async () => {
+    gate.ready = false
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const r = render(
+      <MemoryRouter initialEntries={['/home']}><Routes><Route path="*" element={<PersonalHome />} /></Routes></MemoryRouter>,
+    )
+    await waitFor(() => expect(r.container.querySelector('#sj-week')).toBeTruthy())
+    const hookErrors = err.mock.calls.filter(c => String(c[0]).includes('more hooks'))
+    expect(hookErrors).toEqual([])
   })
 })

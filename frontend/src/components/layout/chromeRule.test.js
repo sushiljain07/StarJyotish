@@ -1,8 +1,9 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-const SRC = resolve(__dirname, '../..')
+const SRC = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 function walk(dir) {
   return readdirSync(dir).flatMap(f => {

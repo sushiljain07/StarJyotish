@@ -1213,6 +1213,7 @@
   "chart_highlight_retry": "↺ AI इनसाइट पुनः प्रयास करें",
   "chart_highlight_title": "AI इनसाइट · {{label}}",
   "chart_highlight_powered": "{{provider}} द्वारा संचालित",
+  "insights_back_to_chart": "कुंडली पर वापस",
   "insights_header": "AI इनसाइट्स",
   "insights_seo_title": "AI इनसाइट्स",
   "insights_seo_description": "आपकी वैदिक जन्म कुंडली का AI-आधारित फलादेश।",

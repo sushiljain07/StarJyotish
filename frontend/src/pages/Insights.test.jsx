@@ -34,6 +34,8 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: t
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Insights from './Insights'
+import insightsSrc from './Insights.jsx?raw'
+import resultSrc from './Result.jsx?raw'
 import i18n from '../i18n'
 import en from '../i18n/en.json'
 import hi from '../i18n/hi.json'
@@ -52,6 +54,8 @@ function renderInsights(topic, search = '', extraState = {}) {
 }
 
 function params() { return new URLSearchParams(lastSearch) }
+
+afterEach(() => sessionStorage.clear())
 
 beforeEach(() => {
   for (const o of [mounts, unmounts, props]) for (const k of Object.keys(o)) delete o[k]
@@ -224,5 +228,76 @@ describe('Insights in Hindi', () => {
       expect(screen.getByRole('tab', { name: label })).toBeInTheDocument()
     }
     expectNoEnglish(container, ['RAJYOGAS'])
+  })
+})
+
+describe('Insights ↔ Kundli', () => {
+  it('passes autostart to the reading once, then clears it from the history entry', async () => {
+    const seen = []
+    function StateProbe() { seen.push(useLocation().state); return null }
+    const input = { date: '1990-01-01', time: '12:00', place: 'Delhi' }
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/insights', search: '?sub=reading', state: { data: { x: 1 }, input, autostart: true } }]}>
+        <Routes><Route path="/insights" element={<><Insights /><StateProbe /></>} /></Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByText('READING')
+    expect(props.ChartReading.autostart).toBe(true)
+    await waitFor(() => expect(seen.at(-1).autostart).toBeUndefined())
+    expect(seen.at(-1).input).toEqual(input)
+    expect(seen.at(-1).data).toEqual({ x: 1 })
+  })
+
+  it('reload without router state does not autostart', async () => {
+    sessionStorage.setItem('sj_last_chart', JSON.stringify({ data: { x: 1 }, input: { date: '1990-01-01', time: '12:00', place: 'Delhi' } }))
+    render(
+      <MemoryRouter initialEntries={['/insights']}>
+        <Routes><Route path="/insights" element={<Insights />} /></Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByText('READING')
+    expect(props.ChartReading.autostart).toBe(false)
+  })
+
+  it('back link returns to /kundli with the chart (router state)', async () => {
+    const input = { date: '1990-01-01', time: '12:00', place: 'Delhi' }
+    let kundliState
+    function Kundli() { kundliState = useLocation().state; return <div>KUNDLI PAGE</div> }
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/insights', state: { data: { x: 1 }, input } }]}>
+        <Routes>
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/kundli" element={<Kundli />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    const link = await screen.findByRole('link', { name: /Back to chart/ })
+    expect(link.getAttribute('href')).toBe('/kundli')
+    fireEvent.click(link)
+    await screen.findByText('KUNDLI PAGE')
+    expect(kundliState).toEqual({ data: { x: 1 }, input })
+  })
+
+  it('back link carries the chart from sessionStorage too', async () => {
+    const chart = { data: { x: 2 }, input: { date: '1990-01-01', time: '12:00', place: 'Delhi' } }
+    sessionStorage.setItem('sj_last_chart', JSON.stringify(chart))
+    let kundliState
+    function Kundli() { kundliState = useLocation().state; return <div>KUNDLI PAGE</div> }
+    render(
+      <MemoryRouter initialEntries={['/insights']}>
+        <Routes>
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/kundli" element={<Kundli />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    fireEvent.click(await screen.findByRole('link', { name: /Back to chart/ }))
+    await screen.findByText('KUNDLI PAGE')
+    expect(kundliState).toEqual(chart)
+  })
+
+  it('has no 10px headings', () => {
+    expect(insightsSrc).not.toContain('text-[10px]')
+    expect(resultSrc).not.toContain('text-[10px]')
   })
 })

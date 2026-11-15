@@ -61,7 +61,7 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllGlobals(); sessionStorage.clear() })
 
 describe('presetQuestion is sent once', () => {
-  it('the AI Insights card and the reading teaser pass only the chart', () => {
+  it('the AI Insights card passes only the chart; the reading teaser adds autostart, no question', () => {
     renderApp()
     fireEvent.click(screen.getByRole('button', { name: new RegExp(en.kundli_insights_title) }))
     expect(loc.pathname).toBe('/insights')
@@ -69,7 +69,7 @@ describe('presetQuestion is sent once', () => {
     act(() => nav(-1))
     fireEvent.click(screen.getByRole('button', { name: new RegExp(en.teaser_reveal) }))
     expect(loc.pathname).toBe('/insights')
-    expect(Object.keys(loc.state).sort()).toEqual(['data', 'input'])
+    expect(Object.keys(loc.state).sort()).toEqual(['autostart', 'data', 'input'])
     expect(askCalls()).toBe(0)
   })
 

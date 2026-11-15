@@ -1213,6 +1213,7 @@
   "chart_highlight_retry": "↺ Retry AI insight",
   "chart_highlight_title": "AI Insight · {{label}}",
   "chart_highlight_powered": "Powered by {{provider}}",
+  "insights_back_to_chart": "Back to chart",
   "insights_header": "AI Insights",
   "insights_seo_title": "AI Insights",
   "insights_seo_description": "AI-powered reading of your Vedic birth chart.",

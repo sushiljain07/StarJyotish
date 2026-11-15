@@ -11,7 +11,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { API_BASE } from '../api/config'
-import { subscribeNewsletter } from '../api/newsletter'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
@@ -87,8 +86,6 @@ export default function Blog() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('All')
-  const [email, setEmail] = useState('')
-  const [notifyStatus, setNotifyStatus] = useState('idle')  // 'idle' | 'sending' | 'sent' | 'error'
   const scrollProgress = useScrollProgress(80)
 
   useEffect(() => {
@@ -185,45 +182,6 @@ export default function Blog() {
             </div>
           </>
         )}
-
-        {/* Newsletter */}
-        <Reveal className="mt-12">
-          <div className="bg-night rounded-2xl px-6 py-8 text-center">
-            <div className="font-serif font-semibold text-xl text-primary-light mb-2">{t('blog_newsletter_heading')}</div>
-            <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">{t('blog_newsletter_body')}</p>
-            {notifyStatus === 'sent' ? (
-              <p className="text-sage text-sm font-medium">✓ {t('footer_newsletter_success', "You're on the list — we'll be in touch!")}</p>
-            ) : (
-              <form
-                onSubmit={async e => {
-                  e.preventDefault()
-                  if (!email.trim()) return
-                  setNotifyStatus('sending')
-                  try {
-                    await subscribeNewsletter(email)
-                    setNotifyStatus('sent')
-                    setEmail('')
-                  } catch {
-                    setNotifyStatus('error')
-                  }
-                }}
-                className="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto"
-              >
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder={t('blog_email_placeholder')}
-                  className="flex-1 min-h-11 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-primary-light placeholder:text-ink-onnight focus:outline-none focus:border-primary/60" />
-                <button type="submit" disabled={notifyStatus === 'sending'}
-                  className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2.5 min-h-11 rounded-full transition sm:whitespace-nowrap">
-                  {notifyStatus === 'sending' ? '…' : t('blog_notify_cta')}
-                </button>
-              </form>
-            )}
-            {notifyStatus === 'error' && (
-              <p role="alert" className="text-vermillion text-sm mt-2">{t('footer_newsletter_error')}</p>
-            )}
-            <p className="text-ink-onnight text-xs mt-2">{t('blog_no_spam')}</p>
-          </div>
-        </Reveal>
       </div>
       </main>
       <Footer />

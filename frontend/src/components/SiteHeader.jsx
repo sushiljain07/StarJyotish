@@ -20,6 +20,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { chartPalette, withAlpha } from '../theme/chartPalette'
 import AccountMenu from './AccountMenu'
 import LanguageSwitcher from './LanguageSwitcher'
+import { FRAME, GUTTER } from './layout/frame'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
 import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
@@ -27,7 +28,6 @@ import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
 // The 16px gutter, widened to the landscape notch inset when there is one
 // (index.html sets viewport-fit=cover). The header itself is fixed, so the
 // body's safe-area padding doesn't reach it.
-const SAFE_GUTTER = 'pl-[max(1rem,var(--safe-left))] pr-[max(1rem,var(--safe-right))]'
 
 function NavButton({ item, active, onClick }) {
   const { t } = useTranslation()
@@ -50,7 +50,7 @@ function NavButton({ item, active, onClick }) {
   )
 }
 
-export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6xl' }) {
+export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -116,7 +116,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
         borderColor: `${withAlpha(chartPalette.cream, borderAlpha)}`,
       }}
     >
-      <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto ${SAFE_GUTTER} py-0 flex items-center justify-between gap-4 h-[60px]`}>
+      <div className={`${FRAME} ${GUTTER} py-0 flex items-center justify-between gap-4 h-[60px]`}>
         {/* Logo */}
         <button
           onClick={() => navigate(isAuthenticated ? '/home' : '/')}
@@ -189,7 +189,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick, width = '6x
           className="md:hidden border-t border-white/10 bg-night animate-fade-in-fast motion-reduce:animate-none"
           aria-label={t('nav_bottom_aria', 'Main navigation')}
         >
-          <div className={`${width === '5xl' ? 'max-w-5xl' : 'max-w-6xl'} mx-auto ${SAFE_GUTTER} py-2`}>
+          <div className={`${FRAME} ${GUTTER} py-2`}>
             {PUBLIC_NAV_ITEMS.map(item => {
               const active = isNavActive(location.pathname, item.to)
               return (

@@ -516,9 +516,9 @@ export default function PanchangDetail() {
       .then(({ lat, lon, timezone }) => {
         const loc = { lat, lon, label: null, timezone, source: 'geolocation' }
         setCurrentLocation(null, loc)
-        setAnonLocation(loc)
+        setAnonLocation(cur => cur ?? loc)
       })
-      .catch(() => { if (saved) setAnonLocation(saved) })
+      .catch(() => { if (saved) setAnonLocation(cur => cur ?? saved) })
   }, [user])
 
   const heroTitle =

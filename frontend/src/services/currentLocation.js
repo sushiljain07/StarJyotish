@@ -24,12 +24,14 @@ export function getCurrentLocation(userId) {
     const raw = localStorage.getItem(storageKey(userId))
     if (raw) return JSON.parse(raw)
     if (userId == null) return null
-    // A city chosen while signed out carries over on the first read after
-    // sign-in. The anon entry stays. Never the birth city (see
-    // hooks/useCurrentLocation.js).
+    // A city chosen while signed out MOVES to the user key on the first read
+    // after sign-in. It is removed from :anon because a manual city never
+    // expires, so a different account on a shared device would otherwise
+    // inherit it. Never the birth city (see hooks/useCurrentLocation.js).
     const anonRaw = localStorage.getItem(storageKey(null))
     if (!anonRaw) return null
     localStorage.setItem(storageKey(userId), anonRaw)
+    localStorage.removeItem(storageKey(null))
     return JSON.parse(anonRaw)
   } catch {
     return null

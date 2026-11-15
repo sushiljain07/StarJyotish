@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import '../i18n'
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: null }) }))
 vi.mock('../components/Seo', () => ({ default: () => null }))
 vi.mock('../hooks/useCurrentLocation', () => ({ useCurrentLocation: () => ({ location: null }) }))
-vi.mock('../hooks/usePlaceMatches', () => ({ usePlaceMatches: () => [] }))
+vi.mock('../hooks/usePlaceMatches', () => ({ usePlaceMatches: q => (q ? [{ display_name: 'Pune, India', lat: 18.5, lon: 73.8, timezone: 'Asia/Kolkata' }] : []) }))
 vi.mock('../hooks/usePanchang', () => ({
   usePanchang: () => ({
     loading: false, error: false,
@@ -39,6 +39,13 @@ describe('PanchangDetail layout and location', () => {
     })
   })
 
+  const seed = extra => localStorage.setItem('sj_current_location_v1:anon', JSON.stringify({
+    lat: 18.5, lon: 73.8, label: 'Pune', timezone: 'Asia/Kolkata', ...extra,
+  }))
+  const geo = fn => Object.defineProperty(navigator, 'geolocation', {
+    configurable: true, value: { getCurrentPosition: fn },
+  })
+
   async function renderIt() {
     const utils = render(<MemoryRouter><PanchangDetail /></MemoryRouter>)
     await waitFor(() => expect(screen.getByText('Siddhi')).toBeTruthy())
@@ -48,6 +55,25 @@ describe('PanchangDetail layout and location', () => {
   it('falls back to a stale saved city when geolocation fails, instead of the prompt', async () => {
     await renderIt()
     expect(screen.queryByPlaceholderText(/search city/i)).toBeNull()
+  })
+
+  it('falls back to a stale geolocation fix when geolocation fails, instead of the prompt', async () => {
+    seed({ source: 'geolocation', savedAt: Date.now() - 48 * 3600e3 })
+    await renderIt()
+    expect(screen.queryByPlaceholderText(/search city/i)).toBeNull()
+  })
+
+  it('a city picked while geolocation is pending is not overwritten when it later fails', async () => {
+    seed({ label: 'Old Town', source: 'geolocation', savedAt: Date.now() - 48 * 3600e3 })
+    let reject
+    geo((_ok, fail) => { reject = fail })
+    const { container } = render(<MemoryRouter><PanchangDetail /></MemoryRouter>)
+    fireEvent.change(screen.getByPlaceholderText(/search city/i), { target: { value: 'Pun' } })
+    fireEvent.click(screen.getByText('Pune, India'))
+    await waitFor(() => expect(screen.getByText('Siddhi')).toBeTruthy())
+    await act(async () => { reject(new Error('denied')) })
+    expect(container.textContent).toContain('Pune, India')
+    expect(container.textContent).not.toContain('Old Town')
   })
 
   it('hero and content use the frame, not the narrow column', async () => {

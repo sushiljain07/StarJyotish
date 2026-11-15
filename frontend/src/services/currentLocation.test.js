@@ -8,7 +8,7 @@ describe('isLocationStale', () => {
     expect(isLocationStale({ source: 'manual', savedAt: Date.now() - H13 })).toBe(false)
   })
   it('expires a geolocation fix after 12 hours', () => {
-    expect(isLocationStale({ source: 'geo', savedAt: Date.now() - H13 })).toBe(true)
+    expect(isLocationStale({ source: 'geolocation', savedAt: Date.now() - H13 })).toBe(true)
   })
 })
 
@@ -20,7 +20,7 @@ describe('getCurrentLocation', () => {
     localStorage.setItem('sj_current_location_v1:anon', JSON.stringify(manual))
     expect(getCurrentLocation('u1')).toEqual(manual)
     expect(JSON.parse(localStorage.getItem('sj_current_location_v1:u1'))).toEqual(manual)
-    expect(localStorage.getItem('sj_current_location_v1:anon')).not.toBeNull()
+    expect(localStorage.getItem('sj_current_location_v1:anon')).toBeNull()
   })
 
   it('does not overwrite an existing user entry with the anon one', () => {

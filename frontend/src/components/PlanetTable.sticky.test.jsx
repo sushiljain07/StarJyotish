@@ -31,6 +31,17 @@ describe('PlanetTable sticky first column', () => {
   })
 })
 
+describe('PlanetTable column order', () => {
+  it('reads Planet, House, Sign, Degree and the body follows', () => {
+    const { container } = render(<PlanetTable planets={planets} />)
+    const heads = [...container.querySelectorAll('thead th')].slice(0, 4).map(th => th.textContent)
+    expect(heads).toEqual(['Planet', 'House', 'Sign', 'Degree'])
+    const cells = [...container.querySelector('tbody tr').querySelectorAll('td')].slice(0, 4).map(td => td.textContent)
+    expect(cells[1]).toBe('1')
+    expect(cells[2]).toContain('Aries')
+  })
+})
+
 describe('PlanetTable tokens', () => {
   it('zebra token keeps its old value', () => {
     expect(colors.parchment.alt).toBe('#F1ECE1')

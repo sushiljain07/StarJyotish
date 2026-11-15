@@ -64,6 +64,19 @@ function expectNoOverlap(labels) {
   }
 }
 
+describe('KundliChart small render (scale 0.5)', () => {
+  it('rashi numerals and status labels render at >= 11px', () => {
+    const { container } = renderAtWidth(
+      <KundliChart planets={kundli.planets} ascendant={kundli.ascendant} />, 250)
+    const signs = container.querySelectorAll('text[data-label="sign"]')
+    const status = container.querySelectorAll('[data-status]')
+    expect(signs.length).toBe(12)
+    expect(status.length).toBeGreaterThan(0)
+    signs.forEach(s => expect(fs(s) * 0.5).toBeGreaterThanOrEqual(11))
+    status.forEach(s => expect(fs(s) * 0.5).toBeGreaterThanOrEqual(11))
+  })
+})
+
 describe('KundliChart on a 360px phone (scale 0.59)', () => {
   const W = 295 // 0.59 × 500
 

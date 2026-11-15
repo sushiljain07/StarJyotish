@@ -79,6 +79,7 @@ import {
 } from '../utils/dailyInsights'
 import { formatDate } from '../utils/format'
 import { currentLanguage } from '../i18n/languages'
+import { useMinLg } from '../hooks/useHideOnScroll'
 import { FRAME, GUTTER } from '../components/layout/frame'
 
 // One "beat" on the home thread: gold dot on the hairline, serif gold
@@ -201,6 +202,101 @@ export default function PersonalHome() {
 
   const patrikaHeadline = edition?.headline ?? edition?.cards?.[0]?.text ?? null
 
+  const isLg = useMinLg()
+
+  const beats = {
+    day: (
+      <Beat id="sj-your-day" title={t('home_right_now_label')} delay={0}>
+        <DailyPatrikaHero
+          firstName={profile.label?.split(' ')[0]}
+          edition={edition}
+          dayScore={dayScore}
+          panchang={panchang.data}
+          chapterLabelFn={withHindiPlanet}
+          oneAction={oneAction}
+          onRefresh={requestRefresh}
+          onReaction={(cardType, reaction, event) =>
+            recordReaction(cardType, reaction, {
+              planet: event?.planet, house: event?.house, variation: edition?.variation,
+            })
+          }
+          cardReactions={cardReactions}
+        />
+        {doAvoid && <div className="mt-4"><DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} /></div>}
+        {spotlight && (
+          <div className="mt-4">
+            <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
+          </div>
+        )}
+      </Beat>
+    ),
+    charts: (
+      <Beat id="sj-charts" title={t('home_charts_strip_label')} cta={t('home_charts_strip_cta')} onCta={() => openChart('divisional', 'kundli')}>
+        <ChartsStrip profile={profile} />
+      </Beat>
+    ),
+    reports: (
+      <Beat
+        title={t('home_your_reports_label')}
+        cta={t('home_generate_for_others_cta', 'For someone else')}
+        onCta={() => navigate('/generate')}
+      >
+        <ReportsStrip onOpenReport={openReport} featuredId={lifeAreas?.[0]?.topicId ?? 'career'} lifeAreas={lifeAreas} />
+      </Beat>
+    ),
+    sky: (
+      <Beat title={t('home_sky_remembers_label', 'The sky remembers')}>
+        <Card
+          as="button"
+          surface="night"
+          padding="none"
+          interactive
+          onClick={() => window.dispatchEvent(new Event('sj:open-jyoti'))}
+          className="w-full text-left px-5 py-4 mb-4 hover:bg-white/[0.07] flex items-center justify-between gap-3"
+        >
+          <div>
+            <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
+            <p className="text-sm text-ink-onnight">{t('home_ask_jyoti_body')}</p>
+          </div>
+          <span className="text-primary-light text-lg shrink-0">↗</span>
+        </Card>
+        <SkyRemembers profile={profile} lang={editorLang} journeySummary={journeySummary} />
+      </Beat>
+    ),
+    idea: (
+      <Beat title={t('home_one_idea_label', 'One idea before you go')}>
+        <KnowledgeCapsule edition={edition} />
+      </Beat>
+    ),
+    window: (
+      <Beat id="sj-window" title={t('home_window_label', 'Your window today')}>
+        <TodayWindow panchang={panchang.data} />
+      </Beat>
+    ),
+    week: (
+      <Beat id="sj-week" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
+        {location ? (
+          <WeekStrip location={location} />
+        ) : (
+          <LocationPrompt
+            status={locationStatus}
+            birthPlace={profile?.place}
+            onRetryGeolocation={retryGeolocation}
+            onSetManualLocation={setManualLocation}
+          />
+        )}
+      </Beat>
+    ),
+    coming: (
+      <Beat title={t('home_coming_up_label')}>
+        {comingUpEvents.length > 0
+          ? <ComingUpStrip events={comingUpEvents} />
+          : <p className="text-sm text-ink-onnightMuted">{t('home_coming_up_loading')}</p>
+        }
+      </Beat>
+    ),
+  }
+
   return (
     <div className="relative">
       <Seo title={t('home_seo_title')} description={t('home_seo_description')} path="/home" noindex />
@@ -220,94 +316,23 @@ export default function PersonalHome() {
         <div className={`${FRAME} ${GUTTER} pb-28 md:pb-12`}>
           <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
 
-          {/* The thread: a fading gold hairline the beats hang off. */}
-          <div className="relative mt-5 flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-x-8 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40 lg:before:hidden">
-            <div className="contents lg:block lg:relative lg:before:content-[''] lg:before:absolute lg:before:left-[3px] lg:before:top-1 lg:before:bottom-6 lg:before:w-px lg:before:bg-gradient-to-b lg:before:from-primary lg:before:to-primary/10 lg:before:opacity-40" data-main>
-            <Beat id="sj-your-day" className="order-1 lg:order-none" title={t('home_right_now_label')} delay={0}>
-              <DailyPatrikaHero
-                firstName={profile.label?.split(' ')[0]}
-                edition={edition}
-                dayScore={dayScore}
-                panchang={panchang.data}
-                chapterLabelFn={withHindiPlanet}
-                oneAction={oneAction}
-                onRefresh={requestRefresh}
-                onReaction={(cardType, reaction, event) =>
-                  recordReaction(cardType, reaction, {
-                    planet: event?.planet, house: event?.house, variation: edition?.variation,
-                  })
-                }
-                cardReactions={cardReactions}
-              />
-              {doAvoid && <div className="mt-4"><DoAvoidCards doItems={doAvoid.doItems} avoidItems={doAvoid.avoidItems} /></div>}
-              {spotlight && (
-                <div className="mt-4">
-                  <ChartSpotlight moonSpotlight={spotlight.moonSpotlight} dashaSpotlight={spotlight.dashaSpotlight} />
-                </div>
-              )}
-            </Beat>
-
-
-            <Beat className="order-4 lg:order-none" id="sj-charts" title={t('home_charts_strip_label')} cta={t('home_charts_strip_cta')} onCta={() => openChart('divisional', 'kundli')}>
-              <ChartsStrip profile={profile} />
-            </Beat>
-
-            <Beat className="order-5 lg:order-none"
-              title={t('home_your_reports_label')}
-              cta={t('home_generate_for_others_cta', 'For someone else')}
-              onCta={() => navigate('/generate')}
-            >
-              <ReportsStrip onOpenReport={openReport} featuredId={lifeAreas?.[0]?.topicId ?? 'career'} lifeAreas={lifeAreas} />
-            </Beat>
-
-            <Beat className="order-7 lg:order-none" title={t('home_sky_remembers_label', 'The sky remembers')}>
-              <Card
-                as="button"
-                surface="night"
-                padding="none"
-                interactive
-                onClick={() => window.dispatchEvent(new Event('sj:open-jyoti'))}
-                className="w-full text-left px-5 py-4 mb-4 hover:bg-white/[0.07] flex items-center justify-between gap-3"
-              >
-                <div>
-                  <p className="text-2xs uppercase tracking-wider text-primary font-semibold mb-1">{t('home_ask_jyoti_label')}</p>
-                  <p className="text-sm text-ink-onnight">{t('home_ask_jyoti_body')}</p>
-                </div>
-                <span className="text-primary-light text-lg shrink-0">↗</span>
-              </Card>
-              <SkyRemembers profile={profile} lang={editorLang} journeySummary={journeySummary} />
-            </Beat>
-
-            <Beat className="order-8 lg:order-none" title={t('home_one_idea_label', 'One idea before you go')}>
-              <KnowledgeCapsule edition={edition} />
-            </Beat>
+          {/* The thread: a fading gold hairline the beats hang off. Below lg
+              it is one flat list (DOM order = reading order); from lg the
+              beats split into a main column and a sticky rail. */}
+          {isLg ? (
+            <div className="relative mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-x-8">
+              <div data-main className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+                {beats.day}{beats.charts}{beats.reports}{beats.sky}{beats.idea}
+              </div>
+              <div data-rail className="lg:sticky lg:top-[76px] lg:self-start before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+                {beats.window}{beats.week}{beats.coming}
+              </div>
             </div>
-            <div data-rail className="contents lg:block lg:sticky lg:top-[76px] lg:self-start lg:before:content-[''] lg:before:absolute lg:before:left-[3px] lg:before:top-1 lg:before:bottom-6 lg:before:w-px lg:before:bg-gradient-to-b lg:before:from-primary lg:before:to-primary/10 lg:before:opacity-40">
-            <Beat id="sj-window" className="order-2 lg:order-none" title={t('home_window_label', 'Your window today')}>
-              <TodayWindow panchang={panchang.data} />
-            </Beat>
-
-            <Beat id="sj-week" className="order-3 lg:order-none" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
-              {location ? (
-                <WeekStrip location={location} />
-              ) : (
-                <LocationPrompt
-                  status={locationStatus}
-                  birthPlace={profile?.place}
-                  onRetryGeolocation={retryGeolocation}
-                  onSetManualLocation={setManualLocation}
-                />
-              )}
-            </Beat>
-
-            <Beat className="order-6 lg:order-none" title={t('home_coming_up_label')}>
-              {comingUpEvents.length > 0
-                ? <ComingUpStrip events={comingUpEvents} />
-                : <p className="text-sm text-ink-onnightMuted">{t('home_coming_up_loading')}</p>
-              }
-            </Beat>
+          ) : (
+            <div className="relative mt-5 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+              {beats.day}{beats.window}{beats.week}{beats.charts}{beats.reports}{beats.coming}{beats.sky}{beats.idea}
             </div>
-          </div>
+          )}
 
           <ClosingBeat headline={patrikaHeadline} comingUpEvents={comingUpEvents} />
           <DisclaimerBlock />

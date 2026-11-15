@@ -9,6 +9,7 @@ import outlook from '../test/fixtures/outlook.json'
 import panchang from '../test/fixtures/panchang.json'
 import ChartsStrip from '../components/home/ChartsStrip'
 
+const mq = vi.hoisted(() => ({ lg: false }))
 vi.mock('../hooks/useCurrentLocation', () => ({
   useCurrentLocation: () => ({ location: null, status: 'denied', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }),
 }))
@@ -34,8 +35,9 @@ import PersonalHome from './PersonalHome'
 
 beforeEach(async () => {
   const ctx = new Proxy({}, { get: (_t, k) => (k === 'canvas' ? {} : () => ({ addColorStop() {} })), set: () => true })
-  vi.stubGlobal('matchMedia', () => ({
-    matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
+  mq.lg = false
+  vi.stubGlobal('matchMedia', q => ({
+    matches: String(q).includes('min-width: 1024px') ? mq.lg : false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
   }))
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(ctx)
   Element.prototype.scrollIntoView = () => {}
@@ -57,42 +59,53 @@ async function renderHome() {
   return r.container
 }
 
-describe('PersonalHome two-column layout', () => {
-  it('uses the 5xl frame for the page and the masthead', async () => {
+const BEAT_TITLES = [
+  'home_right_now_label', 'home_window_label', 'home_week_strip_label', 'home_charts_strip_label',
+  'home_your_reports_label', 'home_coming_up_label', 'home_sky_remembers_label', 'home_one_idea_label',
+]
+
+describe('PersonalHome below lg', () => {
+  it('renders one flat list of beats in the original order, with no rail', async () => {
     const c = await renderHome()
-    const body = c.querySelector('[data-main]').parentElement.parentElement
-    expect(body.className).toContain('max-w-5xl')
-    const masthead = c.querySelector('.relative.max-w-5xl:not(:has([data-main]))')
-    expect(masthead).toBeTruthy()
+    expect(c.querySelector('[data-rail]')).toBeNull()
+    expect(c.querySelector('[data-main]')).toBeNull()
+    const titles = [...c.querySelectorAll('h2')].map(h => h.textContent)
+    const expected = BEAT_TITLES.map(k => i18n.t(k))
+    const idx = expected.map(e => titles.indexOf(e))
+    expect(idx.every(i => i >= 0)).toBe(true)
+    expect([...idx].sort((x, y) => x - y)).toEqual(idx)
+    expect(c.querySelector('.lg\\:grid')).toBeNull()
   })
 
-  it('is a grid with a 20rem rail from lg', async () => {
+  it('uses the 5xl frame', async () => {
+    const c = await renderHome()
+    expect(c.querySelector('#sj-week').closest('.max-w-5xl')).toBeTruthy()
+  })
+})
+
+describe('PersonalHome from lg', () => {
+  it('is a grid with a 20rem rail', async () => {
+    mq.lg = true
     const c = await renderHome()
     const grid = c.querySelector('[data-main]').parentElement
     expect(grid.className).toContain('lg:grid')
     expect(grid.className).toContain('lg:grid-cols-[minmax(0,1fr)_20rem]')
   })
 
-  it('puts window, week and coming-up in the sticky rail', async () => {
+  it('puts window, week and coming-up in the sticky rail, the rest in the main column', async () => {
+    mq.lg = true
     const c = await renderHome()
     const rail = c.querySelector('[data-rail]')
+    const main = c.querySelector('[data-main]')
     expect(rail.className).toContain('lg:sticky')
+    expect(rail.className).toContain('lg:top-[76px]')
     expect(rail.querySelector('#sj-window')).toBeTruthy()
     expect(rail.querySelector('#sj-week')).toBeTruthy()
     expect(rail.textContent).toContain(i18n.t('home_coming_up_label'))
-    expect(c.querySelector('[data-main] #sj-window')).toBeNull()
-    expect(rail.children.length).toBeGreaterThan(0)
-  })
-
-  it('keeps the phone order through order-N classes', async () => {
-    const c = await renderHome()
-    const beats = [...c.querySelectorAll('[data-main] > div, [data-rail] > div')]
-    const ordered = beats
-      .map(b => ({ b, n: Number((/order-(\d+)/.exec(b.className) || [])[1]) }))
-      .sort((x, y) => x.n - y.n)
-    expect(ordered.map(o => o.n)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
-    expect(ordered.slice(0, 4).map(o => o.b.id)).toEqual(['sj-your-day', 'sj-window', 'sj-week', 'sj-charts'])
-    for (const { b } of ordered) expect(b.className).toContain('lg:order-none')
+    expect(main.querySelector('#sj-your-day')).toBeTruthy()
+    expect(main.querySelector('#sj-charts')).toBeTruthy()
+    expect(main.querySelector('#sj-window')).toBeNull()
+    expect([...rail.children].every(ch => ch.children.length > 0)).toBe(true)
   })
 })
 

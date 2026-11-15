@@ -100,6 +100,8 @@ describe('PersonalHome from lg', () => {
     const rail = c.querySelector('[data-rail]')
     const main = c.querySelector('[data-main]')
     expect(rail.className).not.toContain('sticky')
+    expect(rail.className).toMatch(/(^|\s)relative(\s|$)/)
+    expect(rail.className).toContain('before:absolute')
     expect(rail.querySelector('#sj-window')).toBeTruthy()
     expect(rail.querySelector('#sj-week')).toBeTruthy()
     expect(rail.textContent).toContain(i18n.t('home_coming_up_label'))

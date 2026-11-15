@@ -324,7 +324,7 @@ export default function PersonalHome() {
               <div data-main className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
                 {beats.day}{beats.charts}{beats.reports}{beats.sky}{beats.idea}
               </div>
-              <div data-rail className="before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+              <div data-rail className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
                 {beats.window}{beats.week}{beats.coming}
               </div>
             </div>

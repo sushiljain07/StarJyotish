@@ -17,7 +17,10 @@ import Login from './Login'
 
 const renderLogin = () => render(<HelmetProvider><MemoryRouter><Login /></MemoryRouter></HelmetProvider>)
 
-beforeEach(async () => { await i18n.changeLanguage('en') })
+beforeEach(async () => {
+  google.GOOGLE_ENABLED = false
+  await i18n.changeLanguage('en')
+})
 
 describe('Login', () => {
   it('shows the privacy line exactly once', () => {

@@ -145,7 +145,7 @@ export default function BhavaChalit({ input }) {
           {showFull && (
             <div className="rounded-xl border border-line overflow-hidden">
               <div className="px-4 py-2.5 bg-parchment-card border-b border-line">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-ink">
+                <p className="text-2xs font-semibold uppercase tracking-widest text-primary-ink">
                   {t('bhava_table_title')}
                 </p>
               </div>

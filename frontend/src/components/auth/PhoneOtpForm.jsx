@@ -17,7 +17,7 @@ import { useAuth } from '../../contexts/AuthContext'
 const PHONE_LOGIN_ENABLED = false
 
 const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
-const buttonCls = 'w-full bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold py-2.5 rounded-full transition'
+const buttonCls = 'w-full bg-primary hover:bg-primary-dark disabled:bg-line disabled:text-ink-muted text-night font-semibold py-2.5 rounded-full transition'
 
 const RESEND_COOLDOWN_SECONDS = 30
 

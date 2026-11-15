@@ -5,6 +5,7 @@
   "form_date": "जन्म तिथि",
   "form_time": "जन्म समय",
   "form_place": "जन्म स्थान",
+  "form_error_required": "कृपया अपना नाम, जन्म तिथि और जन्म स्थान भरें।",
   "form_error_invalid_date": "यह तारीख मौजूद नहीं है। कृपया दिन और महीना जाँचें।",
   "form_error_future_date": "जन्म तिथि भविष्य की नहीं हो सकती।",
   "form_error_pick_place": "कृपया सूची से अपना जन्म स्थान चुनें।",

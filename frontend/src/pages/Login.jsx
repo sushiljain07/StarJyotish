@@ -5,6 +5,7 @@ import Seo from '../components/Seo'
 import CelestialBackdrop from '../components/CelestialBackdrop'
 import PhoneOtpForm from '../components/auth/PhoneOtpForm'
 import GoogleLoginButton from '../components/auth/GoogleLoginButton'
+import { GOOGLE_ENABLED } from '../config/google'
 import { useAuth } from '../contexts/AuthContext'
 
 // Decides where a signed-in visitor lands. An explicit `next` (set by
@@ -93,15 +94,17 @@ export default function Login() {
 
         <PhoneOtpForm onSuccess={handleSuccess} />
 
-        <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-px bg-line" />
-          <span className="text-ink-muted text-xs uppercase tracking-wide">{t('login_or')}</span>
-          <div className="flex-1 h-px bg-line" />
-        </div>
+        {GOOGLE_ENABLED && (
+          <>
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-line" />
+              <span className="text-ink-muted text-xs uppercase tracking-wide">{t('login_or')}</span>
+              <div className="flex-1 h-px bg-line" />
+            </div>
 
-        <GoogleLoginButton onSuccess={handleSuccess} />
-
-        <p className="text-ink-muted text-xs text-center mt-6">{t('login_disclaimer')}</p>
+            <GoogleLoginButton onSuccess={handleSuccess} />
+          </>
+        )}
       </div>
       </main>
     </div>

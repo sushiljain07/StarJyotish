@@ -30,4 +30,13 @@ describe('PhoneOtpForm accessibility', () => {
     expect(alert).toHaveTextContent('Bad code')
     expect(otp).toHaveAttribute('aria-describedby', alert.id)
   })
+
+  it('styles the disabled submit button with solid tokens, not a translucent fill', () => {
+    render(<PhoneOtpForm />)
+    const btn = screen.getAllByRole('button').find(b => b.type === 'submit')
+    expect(btn).toBeDisabled()
+    expect(btn.className).not.toContain('bg-primary/40')
+    expect(btn.className).toContain('disabled:bg-line')
+    expect(btn.className).toContain('disabled:text-ink-muted')
+  })
 })

@@ -75,7 +75,7 @@ export default function Home() {
       </div>
 
       {/* Form card */}
-      <div className="flex-1 px-4 -mt-4">
+      <div className="relative z-10 flex-1 px-4 -mt-4 pb-8">
         <div className="max-w-lg mx-auto bg-parchment-card rounded-2xl shadow-md p-6 sm:p-8">
           {topic && (
             <div className="mb-4 flex items-center justify-between bg-primary-light border border-primary/30 rounded-lg px-3 py-2 text-xs">

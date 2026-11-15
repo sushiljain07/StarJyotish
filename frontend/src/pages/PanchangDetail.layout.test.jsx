@@ -76,6 +76,21 @@ describe('PanchangDetail layout and location', () => {
     expect(container.textContent).not.toContain('Old Town')
   })
 
+  it('a late geolocation success never replaces a picked city, in state or storage', async () => {
+    seed({ label: 'Old Town', source: 'geolocation', savedAt: Date.now() - 48 * 3600e3 })
+    let resolve
+    geo(ok => { resolve = ok })
+    const { container } = render(<MemoryRouter><PanchangDetail /></MemoryRouter>)
+    fireEvent.change(screen.getByPlaceholderText(/search city/i), { target: { value: 'Pun' } })
+    fireEvent.click(screen.getByText('Pune, India'))
+    await waitFor(() => expect(screen.getByText('Siddhi')).toBeTruthy())
+    await act(async () => { resolve({ coords: { latitude: 1, longitude: 2 } }) })
+    expect(container.textContent).toContain('Pune, India')
+    const stored = JSON.parse(localStorage.getItem('sj_current_location_v1:anon'))
+    expect(stored.label).toBe('Pune, India')
+    expect(stored.source).toBe('manual')
+  })
+
   it('hero and content use the frame, not the narrow column', async () => {
     const { container } = await renderIt()
     expect(container.querySelector('.bg-night .max-w-5xl')).toBeTruthy()

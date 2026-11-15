@@ -494,6 +494,7 @@ export default function PanchangDetail() {
   const { user } = useAuth()
   const locationHook = useCurrentLocation()
   const [anonLocation, setAnonLocation] = useState(null)
+  const pickedRef = useRef(false) // a city chosen while geolocation was pending wins
   const location = user ? locationHook.location : anonLocation
 
   const [tab, setTab] = useState('today')
@@ -503,6 +504,7 @@ export default function PanchangDetail() {
   function handleSetLocation(loc) {
     if (user) locationHook.setManualLocation(loc)
     else {
+      pickedRef.current = true
       setAnonLocation(loc)
       setCurrentLocation(null, { ...loc, source: 'manual' })
     }
@@ -514,11 +516,12 @@ export default function PanchangDetail() {
     if (saved && !isLocationStale(saved)) { setAnonLocation(saved); return }
     requestBrowserLocation()
       .then(({ lat, lon, timezone }) => {
+        if (pickedRef.current) return
         const loc = { lat, lon, label: null, timezone, source: 'geolocation' }
         setCurrentLocation(null, loc)
-        setAnonLocation(cur => cur ?? loc)
+        setAnonLocation(loc)
       })
-      .catch(() => { if (saved) setAnonLocation(cur => cur ?? saved) })
+      .catch(() => { if (saved && !pickedRef.current) setAnonLocation(saved) })
   }, [user])
 
   const heroTitle =

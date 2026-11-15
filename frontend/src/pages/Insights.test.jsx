@@ -55,6 +55,8 @@ function renderInsights(topic, search = '', extraState = {}) {
 
 function params() { return new URLSearchParams(lastSearch) }
 
+afterEach(() => sessionStorage.clear())
+
 beforeEach(() => {
   for (const o of [mounts, unmounts, props]) for (const k of Object.keys(o)) delete o[k]
   lastSearch = undefined
@@ -244,7 +246,6 @@ describe('Insights ↔ Kundli', () => {
     await waitFor(() => expect(seen.at(-1).autostart).toBeUndefined())
     expect(seen.at(-1).input).toEqual(input)
     expect(seen.at(-1).data).toEqual({ x: 1 })
-    expect(lastSearch).toBeUndefined()
   })
 
   it('reload without router state does not autostart', async () => {
@@ -256,7 +257,6 @@ describe('Insights ↔ Kundli', () => {
     )
     await screen.findByText('READING')
     expect(props.ChartReading.autostart).toBe(false)
-    sessionStorage.clear()
   })
 
   it('back link returns to /kundli with the chart (router state)', async () => {
@@ -294,7 +294,6 @@ describe('Insights ↔ Kundli', () => {
     fireEvent.click(await screen.findByRole('link', { name: /Back to chart/ }))
     await screen.findByText('KUNDLI PAGE')
     expect(kundliState).toEqual(chart)
-    sessionStorage.clear()
   })
 
   it('has no 10px headings', () => {

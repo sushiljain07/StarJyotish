@@ -374,7 +374,7 @@ export default function Result() {
             </div>
           ) : belowMd && (
             // Life Areas and Download have no sub-tabs: the toggle gets a row.
-            <div className="flex justify-end">
+            <div className="py-2 flex justify-end">
               <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />
             </div>
           )}

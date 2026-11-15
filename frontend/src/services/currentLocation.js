@@ -22,7 +22,17 @@ function storageKey(userId) {
 export function getCurrentLocation(userId) {
   try {
     const raw = localStorage.getItem(storageKey(userId))
-    return raw ? JSON.parse(raw) : null
+    if (raw) return JSON.parse(raw)
+    if (userId == null) return null
+    // A city chosen while signed out MOVES to the user key on the first read
+    // after sign-in. It is removed from :anon because a manual city never
+    // expires, so a different account on a shared device would otherwise
+    // inherit it. Never the birth city (see hooks/useCurrentLocation.js).
+    const anonRaw = localStorage.getItem(storageKey(null))
+    if (!anonRaw) return null
+    localStorage.setItem(storageKey(userId), anonRaw)
+    localStorage.removeItem(storageKey(null))
+    return JSON.parse(anonRaw)
   } catch {
     return null
   }
@@ -40,6 +50,7 @@ export function setCurrentLocation(userId, { lat, lon, label, timezone, source }
 }
 
 export function isLocationStale(location) {
+  if (location?.source === 'manual') return false // a chosen city never expires
   if (!location?.savedAt) return true
   return Date.now() - location.savedAt > STALE_AFTER_MS
 }

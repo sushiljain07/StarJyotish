@@ -4,6 +4,7 @@
 // /kundli's divisional tab (components/DivisionalCharts.jsx), which renders
 // them in full — this strip is a teaser into that tab, not a second
 // implementation of it.
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -13,6 +14,28 @@ const FEATURED = ['D1', 'D10', 'D9', 'D60']
 export default function ChartsStrip({ profile }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  const scroller = useRef(null)
+  const [edge, setEdge] = useState({ start: true, end: true })
+
+  function measure() {
+    const el = scroller.current
+    if (!el) return
+    setEdge({
+      start: el.scrollLeft <= 1,
+      end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 1,
+    })
+  }
+  useEffect(() => {
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  function scrollByPage(dir) {
+    const el = scroller.current
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
+  }
 
   function openDivisional() {
     if (!profile) { navigate('/generate'); return }
@@ -26,8 +49,17 @@ export default function ChartsStrip({ profile }) {
     })
   }
 
+  const arrow = 'hidden md:flex absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full border border-white/[0.15] bg-night-deep/90 text-primary-light hover:bg-white/[0.12] transition'
+
   return (
-    <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+    <div className="relative">
+      {!edge.start && (
+        <button type="button" aria-label={t('carousel_prev')} onClick={() => scrollByPage(-1)} className={`${arrow} left-0`}>‹</button>
+      )}
+      {!edge.end && (
+        <button type="button" aria-label={t('carousel_next')} onClick={() => scrollByPage(1)} className={`${arrow} right-0`}>›</button>
+      )}
+    <div ref={scroller} onScroll={measure} className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
       {FEATURED.map(code => (
         <button
           key={code}
@@ -39,6 +71,7 @@ export default function ChartsStrip({ profile }) {
           <p className="text-2xs text-ink-onnightMuted leading-snug">{t(`home_charts_${code}_blurb`)}</p>
         </button>
       ))}
+    </div>
     </div>
   )
 }

@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
+import PageContainer from '../components/ui/PageContainer'
 import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { usePanchang } from '../hooks/usePanchang'
 import { usePlaceMatches } from '../hooks/usePlaceMatches'
@@ -43,7 +44,7 @@ function formatShort(iso) {
 function Anga({ label, value, sub }) {
   return (
     <div className="rounded-xl border border-line bg-parchment-card px-4 py-3.5">
-      <p className="text-[10px] uppercase tracking-wider text-ink-muted mb-1.5">{label}</p>
+      <p className="text-2xs uppercase tracking-wider text-ink-muted mb-1.5">{label}</p>
       <p className="font-serif text-[15px] font-semibold text-ink">{value ?? '—'}</p>
       {sub && <p className="text-[11px] text-ink-muted mt-0.5">{sub}</p>}
     </div>
@@ -230,7 +231,7 @@ function PanchangTable({ days, highlightToday = true }) {
       {/* Column headers */}
       <div className="grid grid-cols-[3rem_1fr_1fr_auto] sm:grid-cols-[3rem_1fr_1fr_1fr_auto] gap-0 px-4 py-2 bg-parchment border-b border-line">
         {[t('panchang_col_date'), t('panchang_tithi'), t('panchang_nakshatra'), t('panchang_yoga'), t('panchang_sunrise')].map((h, i) => (
-          <span key={i} className={`text-[10px] font-bold uppercase tracking-wider text-ink-muted ${i === 3 ? 'hidden sm:block' : ''}`}>{h}</span>
+          <span key={i} className={`text-2xs font-bold uppercase tracking-wider text-ink-muted ${i === 3 ? 'hidden sm:block' : ''}`}>{h}</span>
         ))}
       </div>
 
@@ -254,7 +255,7 @@ function PanchangTable({ days, highlightToday = true }) {
             {/* Date */}
             <div className="flex flex-col justify-center">
               <span className={`text-sm font-bold tabular-nums leading-tight ${isToday ? 'text-primary-ink' : 'text-ink'}`}>{dd}</span>
-              <span className="text-[10px] text-ink-muted leading-tight">{iso ? formatDate(iso, { weekday: 'short' }) : day.weekday?.slice(0, 3)}</span>
+              <span className="text-2xs text-ink-muted leading-tight">{iso ? formatDate(iso, { weekday: 'short' }) : day.weekday?.slice(0, 3)}</span>
             </div>
 
             {/* Tithi */}
@@ -263,13 +264,13 @@ function PanchangTable({ days, highlightToday = true }) {
                 {paksha && <span className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 ${PAKSHA_DOT[paksha] ?? 'bg-ink-faint'}`} />}
                 <span className="font-serif text-[12px] font-medium text-ink truncate">{tithiName}</span>
               </div>
-              {tithiEnd && <span className="text-[10px] text-ink-muted truncate">{t('panchang_ends', { time: tithiEnd })}</span>}
+              {tithiEnd && <span className="text-2xs text-ink-muted truncate">{t('panchang_ends', { time: tithiEnd })}</span>}
             </div>
 
             {/* Nakshatra */}
             <div className="flex flex-col justify-center min-w-0 pr-2">
               <span className="text-[12px] text-ink truncate">{nakName}</span>
-              {nakEnd && <span className="text-[10px] text-ink-muted truncate">{t('panchang_ends', { time: nakEnd })}</span>}
+              {nakEnd && <span className="text-2xs text-ink-muted truncate">{t('panchang_ends', { time: nakEnd })}</span>}
             </div>
 
             {/* Yoga — hidden on mobile */}
@@ -313,6 +314,7 @@ function TodayTab({ location, date, onSetLocation }) {
             </div>
           )}
 
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           <section>
             <h2 className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_pancha_anga')}</h2>
             <div className="grid grid-cols-2 gap-2.5">
@@ -331,6 +333,7 @@ function TodayTab({ location, date, onSetLocation }) {
             </div>
           </section>
 
+          <div className="space-y-6">
           <section>
             <h2 className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_sky_timings')}</h2>
             <div className="rounded-xl border border-line bg-parchment-card px-4">
@@ -368,6 +371,8 @@ function TodayTab({ location, date, onSetLocation }) {
               </p>
             </section>
           )}
+          </div>
+          </div>
 
           {data.upcoming_eclipse && (
             <div className="rounded-xl border border-primary/25 bg-primary-light px-4 py-3.5">
@@ -513,7 +518,7 @@ export default function PanchangDetail() {
         setCurrentLocation(null, loc)
         setAnonLocation(loc)
       })
-      .catch(() => {})
+      .catch(() => { if (saved) setAnonLocation(saved) })
   }, [user])
 
   const heroTitle =
@@ -526,8 +531,8 @@ export default function PanchangDetail() {
       <Seo title="Panchang — Tithi, Nakshatra & Muhurta" path="/panchang" />
 
       {/* Dark hero */}
-      <div className="bg-night pt-8 pb-8 px-4">
-        <div className="max-w-2xl mx-auto">
+      <div className="bg-night pt-8 pb-8">
+        <PageContainer>
           <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">{t('panchang_eyebrow')}</p>
           <h1 className="font-serif text-3xl font-medium text-primary-light leading-snug">{heroTitle}</h1>
           {tab === 'today' && isToday && (
@@ -556,15 +561,15 @@ export default function PanchangDetail() {
               </button>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Content */}
-      <div className="flex-1 max-w-2xl mx-auto w-full px-4 pt-8 pb-14">
+      <PageContainer className="flex-1 pt-8 pb-14">
         {tab === 'today' && <TodayTab location={location} date={date} onSetLocation={handleSetLocation} />}
         {tab === 'week'  && <WeekTab  location={location} onSetLocation={handleSetLocation} />}
         {tab === 'month' && <HinduMonthTab location={location} onSetLocation={handleSetLocation} />}
-      </div>
+      </PageContainer>
     </div>
   )
 }

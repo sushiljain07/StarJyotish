@@ -114,7 +114,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
           ))}
         </div>
         <span className={`text-[13px] font-bold ${accent.text}`}>
-          {t('report_open')} →
+          {t('report_open')}
         </span>
       </div>
     </button>
@@ -140,7 +140,7 @@ function SmallReport({ report, area, onOpen, t }) {
         </h4>
         <ScoreBar pct={area?.pct} accent={accent} />
         <p className={`text-2xs mt-auto pt-2 font-semibold ${accent.text}`}>
-          {t('report_open')} →
+          {t('report_open')}
         </p>
       </div>
     </button>

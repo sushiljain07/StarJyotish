@@ -46,7 +46,7 @@ describe('AstrologerDashboard load failures', () => {
     api.astrologerGetProfile.mockRejectedValue(new Error('Server error'))
     api.astrologerGetEarnings.mockResolvedValue({})
     renderDashboard()
-    fireEvent.click(screen.getByRole('button', { name: 'My Profile' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'My Profile' }))
     expect(await screen.findByRole('alert')).toHaveTextContent(/couldn't load/i)
   })
 
@@ -55,7 +55,7 @@ describe('AstrologerDashboard load failures', () => {
     api.astrologerGetEarnings.mockResolvedValue({})
     api.astrologerGetBookings.mockRejectedValue(new Error('Server error'))
     renderDashboard()
-    fireEvent.click(screen.getByRole('button', { name: 'Bookings' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Bookings' }))
     expect(await screen.findByRole('alert')).toHaveTextContent(/couldn't load/i)
   })
 

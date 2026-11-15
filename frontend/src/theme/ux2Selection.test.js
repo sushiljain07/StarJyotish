@@ -95,3 +95,13 @@ describe('selection is always gold', () => {
     expect(read('components/DashaTable.jsx').match(/active: 'bg-primary'/g)).toHaveLength(3)
   })
 })
+
+describe('Admin and Astrologer dashboard tabs are gold pills', () => {
+  for (const f of ['pages/AdminDashboard.jsx', 'pages/AstrologerDashboard.jsx']) {
+    it(f, () => {
+      const src = read(f)
+      expect(src).toContain('<AnimatedTabRow variant="pill"')
+      expect(src).not.toContain('bg-parchment-card text-primary-ink')
+    })
+  }
+})

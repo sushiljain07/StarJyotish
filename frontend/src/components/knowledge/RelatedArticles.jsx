@@ -59,7 +59,7 @@ function GridCard({ item }) {
           </span>
         )}
         {item.comingSoon && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
+          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
             Soon
           </span>
         )}

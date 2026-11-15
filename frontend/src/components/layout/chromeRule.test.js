@@ -21,7 +21,7 @@ describe('header/footer rule', () => {
     const marketing = files.filter(f => f.src.includes('<SiteHeader') && !f.p.endsWith('WorkspaceLayout.jsx'))
     expect(marketing.length).toBeGreaterThan(0)
     for (const f of marketing) {
-      expect(f.src, rel(f.p)).toContain('<Footer')
+      expect(f.src, rel(f.p)).toMatch(/<Footer[\s/>]/)
       expect(f.src, rel(f.p)).not.toContain('<CompactFooter')
     }
   })

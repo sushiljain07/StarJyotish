@@ -17,11 +17,11 @@ const MARKS       = ['✦','✧','✦','✧']
 // Default testimonials — shown while loading or when DB returns nothing.
 // These are also seeded into the DB via migration 0007 with status=featured,
 // so once the DB is running they'll come from the API instead.
-const DEFAULTS = [
-  { id: '1', display_name: 'Priya Mehta',  location: 'Bengaluru', text: "I've consulted astrologers for years but never understood the reasoning. Seeing the actual chart and having the AI explain each placement changed everything. The career report nailed a tension I've been feeling for months.", detail: 'Career report + full Kundli' },
-  { id: '2', display_name: 'Rahul Sharma', location: 'Delhi',     text: 'The Dasha timeline finally made sense to me. I knew I was in a Jupiter period but Star Jyotish showed me exactly how it was interacting with my natal chart. The Ask feature let me go deeper than any static report could.', detail: 'Dasha analysis + Ask Your Chart' },
-  { id: '3', display_name: 'Kavitha Nair', location: 'Kochi',     text: 'I was skeptical about AI and astrology together. But the reading was specific — it mentioned my Moon-Saturn square without me asking and connected it directly to patterns in my relationships.', detail: 'Relationship report' },
-  { id: '4', display_name: 'Arjun Bose',   location: 'Kolkata',   text: 'The Navamsa chart reading for my marriage question was impressively detailed. It picked up on the Venus placement and explained why it matters in D9 — in plain language, not jargon.', detail: 'Navamsa + Relationship report' },
+const DEFAULT_PEOPLE = [
+  { id: '1', display_name: 'Priya Mehta',  location: 'Bengaluru' },
+  { id: '2', display_name: 'Rahul Sharma', location: 'Delhi' },
+  { id: '3', display_name: 'Kavitha Nair', location: 'Kochi' },
+  { id: '4', display_name: 'Arjun Bose',   location: 'Kolkata' },
 ]
 
 function TestimonialCard({ t, i }) {
@@ -53,12 +53,18 @@ function TestimonialCard({ t, i }) {
 // eslint-disable-next-line react/prop-types
 export default function Testimonials() {
   const { t } = useTranslation()
-  const [items, setItems] = useState(DEFAULTS)
+  const [fetched, setFetched] = useState(null)
+  // Defaults are translated at render time; names and cities stay as written.
+  const items = fetched || DEFAULT_PEOPLE.map(p => ({
+    ...p,
+    text: t(`testimonial_default_${p.id}_text`),
+    detail: t(`testimonial_default_${p.id}_detail`),
+  }))
 
   useEffect(() => {
     fetch(`${API_BASE}/api/testimonials/featured`)
       .then(r => r.ok ? r.json() : [])
-      .then(data => { if (Array.isArray(data) && data.length > 0) setItems(data) })
+      .then(data => { if (Array.isArray(data) && data.length > 0) setFetched(data) })
       .catch(() => {/* keep defaults */})
   }, [])
 

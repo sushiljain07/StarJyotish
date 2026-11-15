@@ -454,7 +454,7 @@ export default function Result() {
 
       {/* The one bottom bar on mobile /kundli: BottomNav steps aside here, so
           NavBar owns the true bottom edge (with the safe-area inset). */}
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={false} />
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} />
     </div>
   )
 }

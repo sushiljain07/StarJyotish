@@ -25,10 +25,6 @@ import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
 import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
 
-// The 16px gutter, widened to the landscape notch inset when there is one
-// (index.html sets viewport-fit=cover). The header itself is fixed, so the
-// body's safe-area padding doesn't reach it.
-
 function NavButton({ item, active, onClick }) {
   const { t } = useTranslation()
   return (

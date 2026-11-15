@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
+import AnimatedTabRow from '../components/AnimatedTabRow'
 import {
   astrologerGetProfile,
   astrologerUpdateProfile,
@@ -343,15 +344,9 @@ export default function AstrologerDashboard() {
           <AccountMenu />
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition ${
-                tab === t.id ? 'bg-parchment-card text-primary-ink' : 'text-ink-onnight hover:bg-white/10'
-              }`}>
-              {t.label}
-            </button>
-          ))}
+        <div className="max-w-2xl mx-auto px-4 pb-2">
+          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label="Sections"
+            className="[&_button[aria-selected=false]]:text-ink-onnight [&_button[aria-selected=false]]:border-white/[0.12]" />
         </div>
       </div>
 

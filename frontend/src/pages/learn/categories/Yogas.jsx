@@ -39,7 +39,7 @@ function YogaCard({ yoga }) {
     <div className="bg-parchment-card border border-line rounded-2xl p-6">
       <div className="flex items-start justify-between gap-3 mb-4">
         <h3 className="font-serif font-semibold text-xl text-ink">{yoga.name}</h3>
-        <span className={`shrink-0 text-[10px] font-bold tracking-wide uppercase px-2 py-1 rounded-full border ${typeColor}`}>
+        <span className={`shrink-0 text-2xs font-bold tracking-wide uppercase px-2 py-1 rounded-full border ${typeColor}`}>
           {yoga.type}
         </span>
       </div>

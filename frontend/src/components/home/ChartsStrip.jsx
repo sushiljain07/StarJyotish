@@ -53,25 +53,23 @@ export default function ChartsStrip({ profile }) {
 
   return (
     <div className="relative">
-      {!edge.start && (
-        <button type="button" aria-label={t('carousel_prev')} onClick={() => scrollByPage(-1)} className={`${arrow} left-0`}>‹</button>
-      )}
-      {!edge.end && (
-        <button type="button" aria-label={t('carousel_next')} onClick={() => scrollByPage(1)} className={`${arrow} right-0`}>›</button>
-      )}
-    <div ref={scroller} onScroll={measure} className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
-      {FEATURED.map(code => (
-        <button
-          key={code}
-          onClick={openDivisional}
-          className="flex-shrink-0 w-[148px] text-left rounded-xl border border-white/[0.09] bg-white/[0.045] p-3.5 hover:bg-white/[0.07] transition"
-        >
-          <p className="text-2xs font-mono text-ink-onnightMuted mb-1.5">{code}</p>
-          <p className="font-serif text-sm font-medium text-primary-light mb-1 leading-tight">{t(`home_charts_${code}_name`)}</p>
-          <p className="text-2xs text-ink-onnightMuted leading-snug">{t(`home_charts_${code}_blurb`)}</p>
-        </button>
-      ))}
-    </div>
+      <button type="button" aria-label={t('carousel_prev')} onClick={() => scrollByPage(-1)}
+        disabled={edge.start} className={`${arrow} left-0 disabled:invisible`}>‹</button>
+      <button type="button" aria-label={t('carousel_next')} onClick={() => scrollByPage(1)}
+        disabled={edge.end} className={`${arrow} right-0 disabled:invisible`}>›</button>
+      <div ref={scroller} onScroll={measure} className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+        {FEATURED.map(code => (
+          <button
+            key={code}
+            onClick={openDivisional}
+            className="flex-shrink-0 w-[148px] text-left rounded-xl border border-white/[0.09] bg-white/[0.045] p-3.5 hover:bg-white/[0.07] transition"
+          >
+            <p className="text-2xs font-mono text-ink-onnightMuted mb-1.5">{code}</p>
+            <p className="font-serif text-sm font-medium text-primary-light mb-1 leading-tight">{t(`home_charts_${code}_name`)}</p>
+            <p className="text-2xs text-ink-onnightMuted leading-snug">{t(`home_charts_${code}_blurb`)}</p>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

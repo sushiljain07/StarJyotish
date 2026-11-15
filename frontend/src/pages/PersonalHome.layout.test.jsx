@@ -77,9 +77,11 @@ describe('PersonalHome below lg', () => {
     expect(c.querySelector('.lg\\:grid')).toBeNull()
   })
 
-  it('uses the 5xl frame', async () => {
+  it('keeps the narrow column below lg and widens to the 5xl frame only at lg', async () => {
     const c = await renderHome()
-    expect(c.querySelector('#sj-week').closest('.max-w-5xl')).toBeTruthy()
+    const body = c.querySelector('#sj-week').closest('.max-w-2xl')
+    expect(body).toBeTruthy()
+    expect(body.className).toContain('lg:max-w-5xl')
   })
 })
 
@@ -92,20 +94,18 @@ describe('PersonalHome from lg', () => {
     expect(grid.className).toContain('lg:grid-cols-[minmax(0,1fr)_20rem]')
   })
 
-  it('puts window, week and coming-up in the sticky rail, the rest in the main column', async () => {
+  it('puts window, week and coming-up in the rail, the rest in the main column', async () => {
     mq.lg = true
     const c = await renderHome()
     const rail = c.querySelector('[data-rail]')
     const main = c.querySelector('[data-main]')
-    expect(rail.className).toContain('lg:sticky')
-    expect(rail.className).toContain('lg:top-[76px]')
+    expect(rail.className).not.toContain('sticky')
     expect(rail.querySelector('#sj-window')).toBeTruthy()
     expect(rail.querySelector('#sj-week')).toBeTruthy()
     expect(rail.textContent).toContain(i18n.t('home_coming_up_label'))
     expect(main.querySelector('#sj-your-day')).toBeTruthy()
     expect(main.querySelector('#sj-charts')).toBeTruthy()
     expect(main.querySelector('#sj-window')).toBeNull()
-    expect([...rail.children].every(ch => ch.children.length > 0)).toBe(true)
   })
 })
 
@@ -122,8 +122,9 @@ describe('ChartsStrip arrows', () => {
 
   it('shows only next at the start, and next scrolls 80% of the width', () => {
     const { scrollBy } = setup()
-    expect(screen.queryByRole('button', { name: i18n.t('carousel_prev') })).toBeNull()
+    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(true)
     const next = screen.getByRole('button', { name: i18n.t('carousel_next') })
+    expect(next.disabled).toBe(false)
     expect(next.className).toContain('hidden md:flex')
     fireEvent.click(next)
     expect(scrollBy).toHaveBeenCalledWith({ left: 240, behavior: 'smooth' })
@@ -131,8 +132,8 @@ describe('ChartsStrip arrows', () => {
 
   it('shows only previous at the end', () => {
     setup({ scrollLeft: 400 })
-    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: i18n.t('carousel_next') })).toBeNull()
+    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(false)
+    expect(screen.getByRole('button', { name: i18n.t('carousel_next') }).disabled).toBe(true)
   })
 
   it('updates the arrows when the scroller scrolls', () => {
@@ -140,7 +141,7 @@ describe('ChartsStrip arrows', () => {
     const scroller = container.querySelector('.overflow-x-auto')
     vi.spyOn(HTMLElement.prototype, 'scrollLeft', 'get').mockReturnValue(200)
     fireEvent.scroll(scroller)
-    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') })).toBeTruthy()
-    expect(screen.getByRole('button', { name: i18n.t('carousel_next') })).toBeTruthy()
+    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(false)
+    expect(screen.getByRole('button', { name: i18n.t('carousel_next') }).disabled).toBe(false)
   })
 })

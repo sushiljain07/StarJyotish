@@ -80,7 +80,7 @@ import {
 import { formatDate } from '../utils/format'
 import { currentLanguage } from '../i18n/languages'
 import { useMinLg } from '../hooks/useHideOnScroll'
-import { FRAME, GUTTER } from '../components/layout/frame'
+import { GUTTER } from '../components/layout/frame'
 
 // One "beat" on the home thread: gold dot on the hairline, serif gold
 // heading, optional sub + view-full CTA. Pure design tokens
@@ -313,7 +313,7 @@ export default function PersonalHome() {
             dashaTags={spotlight?.dashaSpotlight}
         />
 
-        <div className={`${FRAME} ${GUTTER} pb-28 md:pb-12`}>
+        <div className={`max-w-2xl lg:max-w-5xl mx-auto w-full ${GUTTER} pb-28 md:pb-12`}>
           <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
 
           {/* The thread: a fading gold hairline the beats hang off. Below lg
@@ -324,7 +324,7 @@ export default function PersonalHome() {
               <div data-main className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
                 {beats.day}{beats.charts}{beats.reports}{beats.sky}{beats.idea}
               </div>
-              <div data-rail className="lg:sticky lg:top-[76px] lg:self-start before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+              <div data-rail className="before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
                 {beats.window}{beats.week}{beats.coming}
               </div>
             </div>

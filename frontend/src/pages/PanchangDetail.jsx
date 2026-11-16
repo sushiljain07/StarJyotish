@@ -86,8 +86,7 @@ function LocationPicker({ location, onSetLocation }) {
     setGeoStatus('requesting')
     try {
       const { lat, lon, timezone } = await requestBrowserLocation()
-      onSetLocation({ lat, lon, label: null, timezone })
-      setCurrentLocation(null, { lat, lon, label: null, timezone, source: 'geolocation' })
+      onSetLocation({ lat, lon, label: null, timezone, source: 'geolocation' })
       setOpen(false)
     } catch { setGeoStatus('denied') }
   }
@@ -183,8 +182,7 @@ function LocationPrompt({ onSetLocation }) {
     setGeoStatus('requesting')
     try {
       const { lat, lon, timezone } = await requestBrowserLocation()
-      onSetLocation({ lat, lon, label: null, timezone })
-      setCurrentLocation(null, { lat, lon, label: null, timezone, source: 'geolocation' })
+      onSetLocation({ lat, lon, label: null, timezone, source: 'geolocation' })
     } catch { setGeoStatus('denied') }
   }
 
@@ -501,12 +499,16 @@ export default function PanchangDetail() {
   const [date, setDate] = useState(todayISO)
   const isToday = date === todayISO()
 
+  // `loc.source` is 'geolocation' for "Use my location" (a device fix that
+  // expires) and absent for a picked city ('manual', never expires). A
+  // signed-in person's location goes to their own key only, never :anon.
   function handleSetLocation(loc) {
-    if (user) locationHook.setManualLocation(loc)
+    const withSource = { ...loc, source: loc.source ?? 'manual' }
+    if (user) locationHook.setManualLocation(withSource)
     else {
       pickedRef.current = true
-      setAnonLocation(loc)
-      setCurrentLocation(null, { ...loc, source: 'manual' })
+      setAnonLocation(withSource)
+      setCurrentLocation(null, withSource)
     }
   }
 

@@ -6,7 +6,7 @@
 // with two layout variants instead of a third copy:
 //   - "full"   — full-bleed page-level band (Learn.jsx's closing CTA)
 //   - "inline" — rounded card meant to sit inside a Section/article body
-import { Link } from 'react-router-dom'
+import Button from '../ui/Button'
 
 export default function CTA({
   eyebrow,
@@ -29,12 +29,7 @@ export default function CTA({
       {description && (
         <p className="text-ink-onnight text-sm mb-6 max-w-sm mx-auto">{description}</p>
       )}
-      <Link
-        to={to}
-        className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-      >
-        {buttonLabel}
-      </Link>
+      <Button size="lg" surface="night" to={to} className="whitespace-normal text-center">{buttonLabel}</Button>
     </div>
   )
 }

@@ -217,23 +217,15 @@
   },
   "components/knowledge/ArticleCard.jsx": {
     "lightCard": 1,
-    "arbitraryText": 3,
     "roundedXl": 2,
     "shadowSml": 1
   },
   "components/knowledge/CTA.jsx": {
-    "goldCta": 1,
-    "roundedXl": 1,
-    "shadowSml": 2
+    "roundedXl": 1
   },
   "components/knowledge/LearningPath.jsx": {
     "lightCard": 2,
     "chip": 1
-  },
-  "components/knowledge/QuickFacts.jsx": {
-    "lightCard": 1,
-    "arbitraryText": 1,
-    "roundedXl": 1
   },
   "components/knowledge/Reflection.jsx": {
     "lightCard": 1,
@@ -241,17 +233,11 @@
   },
   "components/knowledge/RelatedArticles.jsx": {
     "lightCard": 2,
-    "chip": 1,
-    "arbitraryText": 2,
     "roundedXl": 2,
     "shadowSml": 2
   },
-  "components/knowledge/SignNav.jsx": {
-    "chip": 1
-  },
   "components/knowledge/ZodiacCard.jsx": {
     "lightCard": 1,
-    "chip": 1,
     "roundedXl": 1,
     "shadowSml": 1
   },
@@ -378,11 +364,8 @@
     "roundedXl": 5
   },
   "pages/learn/Zodiac.jsx": {
-    "goldCta": 1,
     "lightCard": 1,
-    "arbitraryText": 3,
-    "roundedXl": 2,
-    "shadowSml": 2
+    "roundedXl": 2
   },
   "pages/learn/basics/LagnaGuide.jsx": {
     "lightCard": 1,
@@ -390,12 +373,10 @@
   },
   "pages/learn/basics/MoonSignGuide.jsx": {
     "lightCard": 1,
-    "arbitraryText": 1,
     "roundedXl": 1
   },
   "pages/learn/basics/PlanetsGuide.jsx": {
     "lightCard": 1,
-    "arbitraryText": 1,
     "roundedXl": 2
   },
   "pages/learn/basics/WhatIsKundli.jsx": {
@@ -415,100 +396,48 @@
     "roundedXl": 1
   },
   "pages/learn/career/TenthHouse.jsx": {
-    "lightCard": 2,
-    "roundedXl": 2
+    "lightCard": 1,
+    "roundedXl": 1
   },
   "pages/learn/career/TenthLord.jsx": {
     "lightCard": 1,
     "roundedXl": 1
   },
   "pages/learn/categories/Dashas.jsx": {
-    "goldCta": 1,
     "lightCard": 1,
-    "arbitraryText": 1,
-    "roundedXl": 3,
-    "shadowSml": 2
+    "roundedXl": 3
   },
   "pages/learn/categories/Doshas.jsx": {
-    "goldCta": 1,
-    "lightCard": 1,
-    "arbitraryText": 4,
-    "roundedXl": 2,
-    "shadowSml": 2
+    "roundedXl": 1
   },
   "pages/learn/categories/Houses.jsx": {
-    "goldCta": 1,
     "lightCard": 1,
-    "arbitraryText": 1,
-    "roundedXl": 3,
-    "shadowSml": 2
+    "roundedXl": 3
   },
   "pages/learn/categories/Nakshatras.jsx": {
-    "goldCta": 1,
     "lightCard": 2,
-    "arbitraryText": 1,
-    "roundedXl": 4,
-    "shadowSml": 2
+    "roundedXl": 4
   },
   "pages/learn/categories/Planets.jsx": {
-    "goldCta": 1,
     "lightCard": 1,
-    "chip": 1,
-    "arbitraryText": 4,
-    "roundedXl": 2,
-    "shadowSml": 2
+    "roundedXl": 2
   },
   "pages/learn/categories/Yogas.jsx": {
-    "goldCta": 1,
-    "lightCard": 1,
     "chip": 1,
-    "arbitraryText": 4,
-    "roundedXl": 2,
-    "shadowSml": 2
-  },
-  "pages/learn/marriage/D9Navamsa.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/GunaMilan.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/MangalDosha.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/MarriageTiming.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/SeventhHouse.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/Synastry.jsx": {
-    "lightCard": 1,
-    "roundedXl": 1
-  },
-  "pages/learn/marriage/VenusJupiter.jsx": {
-    "lightCard": 1,
     "roundedXl": 1
   },
   "pages/learn/paths/CareerPath.jsx": {
     "lightCard": 2,
-    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },
   "pages/learn/paths/MarriagePath.jsx": {
     "lightCard": 2,
-    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },
   "pages/learn/paths/NewToVedic.jsx": {
     "lightCard": 2,
-    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },

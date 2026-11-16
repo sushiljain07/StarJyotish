@@ -18,6 +18,7 @@ import {
   PLANETARY_STRENGTH,
   PLANETS_FAQ,
 } from '../../../config/planetsContent'
+import Badge from '../../../components/ui/Badge'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -47,7 +48,7 @@ function GrahaAccordion({ grahas }) {
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="font-semibold text-ink text-sm">{g.name}</span>
                   <span className="text-ink-muted text-xs">{g.skt}</span>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">{g.keyword}</span>
+                  <Badge tone="gold">{g.keyword}</Badge>
                 </div>
                 <p className="text-ink-muted text-xs mt-0.5 truncate">{g.governs}</p>
               </div>

@@ -18,6 +18,7 @@ import {
   CAREER_PATH_FAQ,
   CAREER_PATH_CTA,
 } from '../../../config/careerPathContent'
+import Badge from '../../../components/ui/Badge'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -42,14 +43,14 @@ function PathStep({ step }) {
             {step.title}
           </h3>
           {step.comingSoon && (
-            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
+            <Badge>
               Coming soon
-            </span>
+            </Badge>
           )}
           {!step.comingSoon && (
-            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-sage-light text-sage">
+            <Badge tone="sage">
               Available
-            </span>
+            </Badge>
           )}
         </div>
         <p className="text-ink-muted text-sm leading-relaxed mb-2">{step.teaser}</p>

@@ -6,6 +6,7 @@ import KundliChart from './KundliChart'
 import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import { chartPalette } from '../theme/chartPalette'
+import { Button, Card } from './ui'
 
 export default function TransitPanel({ input, natalData }) {
   const { t } = useTranslation()
@@ -46,10 +47,9 @@ export default function TransitPanel({ input, natalData }) {
               {t('transit_subtitle')}
             </p>
           </div>
-          <button onClick={() => loadTransit({ force: true })}
-                  className="inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark">
+          <Button size="sm" onClick={() => loadTransit({ force: true })}>
             {t('transit_refresh')}
-          </button>
+          </Button>
         </div>
         {transitData && (
           <p className="text-xs text-primary-ink mt-2">{t('transit_as_of', { date: transitData.transit_date.replace(/ IST$/, ` ${t('transit_ist')}`) })}</p>
@@ -85,7 +85,7 @@ export default function TransitPanel({ input, natalData }) {
           </div>
 
           {/* Transit planet table */}
-          <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+          <Card padding="none" className="overflow-hidden">
             <div className="px-4 py-3 bg-primary-light border-b border-primary/30">
               <h3 className="font-semibold text-primary-ink text-sm">{t('transit_positions')}</h3>
             </div>
@@ -129,7 +129,7 @@ export default function TransitPanel({ input, natalData }) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </Card>
         </>
       )}
     </div>

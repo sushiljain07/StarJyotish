@@ -6,6 +6,7 @@ import { planetName, signName, nakshatraName, planetShort } from '../utils/astro
 import { API_BASE } from '../api/config'
 import { PLANET_COLORS, LORD_COLORS } from '../config/planetColors'
 import { chartPalette } from '../theme/chartPalette'
+import { Button, Card } from './ui'
 
 function LordChip({ lord }) {
   const { t } = useTranslation()
@@ -52,10 +53,9 @@ export default function KPChart({ input }) {
         <p className="text-primary-ink text-xs mt-1">
           {t('kp_subtitle')}
         </p>
-        <button onClick={loadKP} disabled={loading}
-                className="mt-3 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
+        <Button size="sm" onClick={loadKP} disabled={loading} className="mt-3">
           {loading ? t('kp_loading') : t('transit_refresh')}
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -87,7 +87,7 @@ export default function KPChart({ input }) {
           </div>
 
           {/* KP Planet table */}
-          <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+          <Card padding="none" className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -126,7 +126,7 @@ export default function KPChart({ input }) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </Card>
 
           {/* KP Legend */}
           <div className="bg-night/[0.03] rounded-xl p-4 text-xs text-ink-muted space-y-1">

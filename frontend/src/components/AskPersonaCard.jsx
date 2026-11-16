@@ -21,6 +21,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AI_QUESTIONS } from '../config/aiQuestions'
+import { Button, Card } from './ui'
 
 export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
   const { t } = useTranslation()
@@ -33,7 +34,7 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
   return (
     <div className="max-w-lg mx-auto">
       {/* Chat demo bubble */}
-      <div className="bg-parchment-card rounded-2xl shadow-md border border-line p-5">
+      <Card padding="none" className="p-5">
         <div className="flex items-center gap-2 mb-4">
           <img src="/starjyotish.svg" alt="" className="w-6 h-6" />
           <span className="text-xs font-semibold text-ink-muted">{t('app_title')}</span>
@@ -61,8 +62,8 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
           </>
         )}
 
-        <p className="text-[11px] text-ink-muted text-center mt-4">{t('landing_ai_example_label')}</p>
-      </div>
+        <p className="text-2xs text-ink-muted text-center mt-4">{t('landing_ai_example_label')}</p>
+      </Card>
 
       {/* Question chips — tap to preview, not to commit */}
       <p className="text-center text-xs text-ink-muted mt-5 mb-2">{t('landing_ai_tap_hint')}</p>
@@ -87,12 +88,9 @@ export default function AskPersonaCard({ onAskQuestion, onAskOwn }) {
           picked — before that there's nothing yet to "begin with". */}
       {active && (
         <div className="flex justify-center mt-4">
-          <button
-            onClick={() => onAskQuestion(t(`landing_ai_q_${active.id}_question`))}
-            className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-5 py-2.5 min-h-11 rounded-full shadow-sm hover:shadow-md transition"
-          >
+          <Button onClick={() => onAskQuestion(t(`landing_ai_q_${active.id}_question`))}>
             {t('landing_ai_cta_start')} →
-          </button>
+          </Button>
         </div>
       )}
       <div className="flex justify-center mt-2">

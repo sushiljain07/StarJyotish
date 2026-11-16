@@ -5,6 +5,7 @@ import { askKundli } from '../api/astro'
 import { useAuth } from '../contexts/AuthContext'
 import { errorMessage } from '../api/errors'
 import { currentLanguage } from '../i18n/languages'
+import { Badge, Button, Card } from './ui'
 
 // Matches AskPersonaPanel.jsx's home-page persona limit — previously this
 // was 10 while the home page's "Ask Jyoti" was 5, an inconsistency with no
@@ -101,22 +102,19 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
   }
 
   return (
-    <div className="flex flex-col h-[calc(60vh-4rem)] sm:h-[60vh] min-h-[360px] bg-parchment-card rounded-xl shadow-sm border border-line overflow-hidden">
+    <Card padding="none" className="flex flex-col h-[calc(60vh-4rem)] sm:h-[60vh] min-h-[360px] overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-line flex items-center justify-between bg-night/[0.03]">
         <div>
           <div className="text-sm font-semibold text-ink">💬 {t('tab_ask')}</div>
           <div className="text-xs text-ink-muted">{t('ask_subtitle')}</div>
         </div>
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-          limitReached
-            ? 'bg-vermillion-light text-vermillion'
-            : remaining === 1
-            ? 'bg-vermillion-light text-vermillion'
-            : 'bg-primary-light text-primary-ink'
-        }`}>
+        <Badge
+          tone={limitReached || remaining === 1 ? 'vermillion' : 'gold'}
+          size="md"
+        >
           {limitReached ? t('ask_zero_left') : t('ask_questions_remaining', { count: remaining })}
-        </span>
+        </Badge>
       </div>
 
       {/* Messages */}
@@ -173,18 +171,18 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
             rows={1}
             className="flex-1 resize-none border border-line rounded-xl px-3 py-2 text-sm bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-night/5 disabled:text-ink-faint"
           />
-          <button
+          <Button
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || limitReached || loading}
-            className="bg-primary hover:bg-primary-dark disabled:bg-night/10 text-night disabled:text-ink-faint rounded-xl px-4 py-2 text-sm font-semibold transition flex-shrink-0"
+            className="flex-shrink-0"
           >
             {t('ask_send')}
-          </button>
+          </Button>
         </div>
-        <p className="text-[11px] text-ink-muted text-center mt-2">
+        <p className="text-2xs text-ink-muted text-center mt-2">
           {provider ? t('reading_powered_by', { provider }) : t('reading_powered_by_generic')}
         </p>
       </div>
-    </div>
+    </Card>
   )
 }

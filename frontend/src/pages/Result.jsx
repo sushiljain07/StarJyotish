@@ -8,7 +8,7 @@ import { loadProfiles } from '../services/astrologyProfiles'
 import { chartStateFromProfile } from '../config/nav'
 import { chartBody } from '../api/reportCache'
 
-import { StateBlock } from '../components/ui'
+import { Badge, Card, StateBlock } from '../components/ui'
 import KundliChart     from '../components/KundliChart'
 import DashaTable      from '../components/DashaTable'
 import PlanetTable     from '../components/PlanetTable'
@@ -55,17 +55,17 @@ function SummaryChips({ data, collapsed, hidden, id }) {
           : 'max-h-16 opacity-100 py-2'
       }`}
     >
-      <span className="bg-primary-light text-primary-ink text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+      <Badge tone="gold" size="md">
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
-      </span>
+      </Badge>
       {moon && (
-        <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+        <Badge tone="mauve" size="md">
           {t('kundli_chip_rashi', { sign: signName(t, moon.sign) })}
-        </span>
+        </Badge>
       )}
-      <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+      <Badge tone="vermillion" size="md">
         {t('kundli_chip_mahadasha', { planet: planetName(t, md.planet) })}
-      </span>
+      </Badge>
     </div>
   )
 }
@@ -296,9 +296,11 @@ export default function Result() {
   function InsightsAskEntry() {
     return (
       <div className="mt-6 flex flex-col sm:flex-row gap-3 border-t border-line pt-6">
-        <button
+        <Card
+          as="button"
+          padding="none"
           onClick={() => navigate('/insights', { state: { data, input } })}
-          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
+          className="flex-1 flex items-center justify-between px-4 py-3 transition-all hover:border-primary/60"
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">✨</span>
@@ -308,10 +310,12 @@ export default function Result() {
             </div>
           </div>
           <span className="text-xs font-semibold shrink-0 ml-2 text-primary-ink">{t('kundli_open')}</span>
-        </button>
-        <button
+        </Card>
+        <Card
+          as="button"
+          padding="none"
           onClick={openAsk}
-          className="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border border-line bg-parchment-card transition-all hover:border-primary/60"
+          className="flex-1 flex items-center justify-between px-4 py-3 transition-all hover:border-primary/60"
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">💬</span>
@@ -321,7 +325,7 @@ export default function Result() {
             </div>
           </div>
           <span className="text-xs font-semibold shrink-0 ml-2 text-primary-ink">{t('kundli_ask_cta')}</span>
-        </button>
+        </Card>
       </div>
     )
   }

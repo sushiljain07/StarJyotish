@@ -1936,6 +1936,7 @@
   "skip_to_content": "Skip to content",
   "kundli_subsections_aria": "Kundli views",
   "insights_subtabs_aria": "AI Insights sections",
+  "dashboard_sections_aria": "Sections",
   "session_reconnect_title": "Can't reach Star Jyotish right now",
   "session_reconnect_body": "Your connection or our server hiccuped, so we couldn't confirm your sign-in. You are not signed out. Please try again.",
   "session_reconnect_retry": "Try again"

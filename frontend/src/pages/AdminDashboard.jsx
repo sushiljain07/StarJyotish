@@ -1,6 +1,7 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
@@ -890,6 +891,7 @@ function AuditTab({ token }) {
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
+  const { t } = useTranslation()
   const { user, accessToken } = useAuth()
   const [tab, setTab] = useState('users')
 
@@ -915,7 +917,7 @@ export default function AdminDashboard() {
 
         {/* Tab bar */}
         <div className="max-w-4xl mx-auto px-4 pb-2">
-          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label="Sections"
+          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label={t('dashboard_sections_aria')}
             className="[&_button[aria-selected=false]]:text-ink-onnight [&_button[aria-selected=false]]:border-white/[0.12]" />
         </div>
       </div>

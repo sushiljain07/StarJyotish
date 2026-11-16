@@ -51,10 +51,10 @@ function YogaCard({ yoga, defaultOpen }) {
   const isPresent = yoga.present
 
   return (
-    <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
+    <Card padding="none" className={`overflow-hidden transition-all ${
       isPresent
-        ? 'bg-parchment-card border-good/30 border-l-4 border-l-good'
-        : 'bg-night/[0.03] border-line'
+        ? '!border-good/30 !border-l-4 !border-l-good'
+        : '!bg-night/[0.03]'
     }`}>
       {/* Header row */}
       <button
@@ -127,7 +127,7 @@ function YogaCard({ yoga, defaultOpen }) {
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 

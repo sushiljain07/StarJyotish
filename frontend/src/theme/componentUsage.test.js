@@ -91,6 +91,20 @@ describe('component usage (ratchet)', () => {
     expect(over, 'Use Button / Card / Badge from components/ui and the text scale').toEqual([])
   })
 
+  it('goldCta and arbitraryText are zero outside ui/', () => {
+    // The one allowed exception: ScrollToTop's 44px icon-only floating button (goldCta 1).
+    const allowed = { 'components/ScrollToTop.jsx': { goldCta: 1 } }
+    const leaks = []
+    for (const rel of files) {
+      for (const name of ['goldCta', 'arbitraryText']) {
+        const found = current[rel]?.[name] ?? 0
+        const ok = allowed[rel]?.[name] ?? 0
+        if (found > ok) leaks.push(`${rel}: ${name} ${found} (allowed ${ok})`)
+      }
+    }
+    expect(leaks).toEqual([])
+  })
+
   it('the baseline has no stale entries', () => {
     const stale = []
     for (const [rel, entry] of Object.entries(baseline)) {

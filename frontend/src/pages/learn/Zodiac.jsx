@@ -12,7 +12,7 @@
 //
 // All copy lives in config/zodiacContent.js — this file only composes
 // layout, exactly per the "future proofing" requirement for this page.
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import Seo from '../../components/Seo'
@@ -120,12 +120,9 @@ export default function ZodiacGuide() {
           <Button size="lg" href="#rashis" target="_self">
             Explore the Zodiac Signs
           </Button>
-          <Link
-            to="/generate"
-            className="inline-block bg-white/10 hover:bg-white/20 text-primary-light font-semibold text-sm px-7 py-3 rounded-full transition"
-          >
+          <Button variant="secondary" surface="night" size="lg" to="/generate">
             Generate Free Kundli
-          </Link>
+          </Button>
         </div>
       </Hero>
 

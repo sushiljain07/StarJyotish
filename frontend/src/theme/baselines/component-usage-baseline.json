@@ -30,7 +30,6 @@
     "shadowSml": 1
   },
   "components/ChartHighlight.jsx": {
-    "arbitraryText": 1,
     "roundedXl": 2
   },
   "components/ChartReading.jsx": {
@@ -59,9 +58,6 @@
   "components/KundliDownload.jsx": {
     "lightCard": 1
   },
-  "components/LanguageSwitcher.jsx": {
-    "arbitraryText": 1
-  },
   "components/LegalLanguageNote.jsx": {
     "roundedXl": 1
   },
@@ -74,8 +70,8 @@
     "roundedXl": 1
   },
   "components/RajyogasTab.jsx": {
-    "roundedXl": 3,
-    "shadowSml": 2
+    "roundedXl": 2,
+    "shadowSml": 1
   },
   "components/SarvatobhadraChakra.jsx": {
     "roundedXl": 1

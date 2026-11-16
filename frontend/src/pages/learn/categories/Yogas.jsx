@@ -18,6 +18,7 @@ import CTA from '../../../components/knowledge/CTA'
 import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import { getGuide, getLearningPathSteps } from '../../../config/knowledgeGraph'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   YOGAS_HERO,
@@ -29,6 +30,7 @@ import {
   YOGAS_CTA,
 } from '../../../config/yogasContent'
 import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
+import Card from '../../../components/ui/Card'
 
 function YogaCard({ yoga }) {
   const typeColor = yoga.type === 'Auspicious' ? 'bg-good-light text-good border-good/30'
@@ -36,7 +38,7 @@ function YogaCard({ yoga }) {
     : 'bg-caution-light text-caution border-caution/30'
 
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl p-6">
+    <Card padding="none" className="p-6">
       <div className="flex items-start justify-between gap-3 mb-4">
         <h3 className="font-serif font-semibold text-xl text-ink">{yoga.name}</h3>
         <span className={`shrink-0 text-2xs font-bold tracking-wide uppercase px-2 py-1 rounded-full border ${typeColor}`}>
@@ -45,23 +47,23 @@ function YogaCard({ yoga }) {
       </div>
       <dl className="space-y-4">
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{yoga.formation}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Effect</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Effect</dt>
           <dd className="text-sm text-ink leading-relaxed">{yoga.effect}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Example</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Example</dt>
           <dd className="text-sm text-ink-muted leading-relaxed italic">{yoga.example}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Important note</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Important note</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{yoga.notes}</dd>
         </div>
       </dl>
-    </div>
+    </Card>
   )
 }
 
@@ -106,12 +108,9 @@ export default function YogasGuide() {
           ) : null
         }
       >
-        <a
-          href="#yogas"
-          className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-        >
+        <Button size="lg" href="#yogas" target="_self">
           Explore Key Yogas
-        </a>
+        </Button>
       </Hero>
 
       {isHindi && (

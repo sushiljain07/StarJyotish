@@ -12,6 +12,7 @@
 // reference "Aries" as a sign (a future compatibility page, a chart
 // summary) can reuse this instead of re-deriving the same card.
 import { Link } from 'react-router-dom'
+import Badge from '../ui/Badge'
 
 export default function ZodiacCard({ sanskrit, english, archetype, tagline, icon, href, comingSoon = true }) {
   const isInteractive = Boolean(href) && !comingSoon
@@ -21,9 +22,9 @@ export default function ZodiacCard({ sanskrit, english, archetype, tagline, icon
       <div className="flex items-start justify-between mb-4">
         <span className="text-primary-ink">{icon}</span>
         {comingSoon && (
-          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
+          <Badge>
             Coming soon
-          </span>
+          </Badge>
         )}
       </div>
       <h3 className="font-serif font-semibold text-lg text-ink leading-snug">

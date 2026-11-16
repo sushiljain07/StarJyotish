@@ -23,7 +23,8 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { FRAME, GUTTER } from './layout/frame'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import { NAV_ITEMS, PUBLIC_NAV_ITEMS, isNavActive, navTarget } from '../config/nav'
-import { useBelowMd, useHideOnScroll } from '../hooks/useHideOnScroll'
+import { useHideOnScroll } from '../hooks/useHideOnScroll'
+import { BELOW_MD, useMediaQuery } from '../hooks/useMediaQuery'
 
 function NavButton({ item, active, onClick }) {
   const { t } = useTranslation()
@@ -66,7 +67,7 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
   // Close the mobile menu on any navigation.
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
-  const belowMd = useBelowMd()
+  const belowMd = useMediaQuery(BELOW_MD)
   const hideOnScroll = belowMd && location.pathname === '/kundli'
   const scrolledAway = useHideOnScroll({ enabled: hideOnScroll })
   // Focus moving into the header while it is hidden (a keyboard user tabbing

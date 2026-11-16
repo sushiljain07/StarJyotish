@@ -80,7 +80,7 @@ import {
 } from '../utils/dailyInsights'
 import { formatDate } from '../utils/format'
 import { currentLanguage } from '../i18n/languages'
-import { useMinLg } from '../hooks/useHideOnScroll'
+import { MIN_LG, useMediaQuery } from '../hooks/useMediaQuery'
 import { APP_FRAME, GUTTER } from '../components/layout/frame'
 
 // One "beat" on the home thread: gold dot on the hairline, serif gold
@@ -164,7 +164,7 @@ export default function PersonalHome() {
     })
   }
 
-  const isLg = useMinLg()
+  const isLg = useMediaQuery(MIN_LG)
 
   const loading = !profilesLoaded && !profile
 

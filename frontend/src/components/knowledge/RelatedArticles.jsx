@@ -14,6 +14,7 @@
 // "Coming soon" / "Soon" pill instead of a dead or broken link — same
 // rule ArticleCard.jsx and ConceptLink.jsx already follow.
 import { Link } from 'react-router-dom'
+import Badge from '../ui/Badge'
 
 function NextGuideCard({ title, item }) {
   const isInteractive = Boolean(item.href) && !item.comingSoon
@@ -30,9 +31,9 @@ function NextGuideCard({ title, item }) {
         {isInteractive ? (
           <span className="shrink-0 text-primary-ink text-sm font-medium">Continue →</span>
         ) : (
-          <span className="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-parchment text-ink-muted border border-line">
+          <Badge size="md" className="shrink-0">
             Coming soon
-          </span>
+          </Badge>
         )}
       </div>
     </>
@@ -54,14 +55,14 @@ function GridCard({ item }) {
     <>
       <div className="flex items-center gap-2 mb-2">
         {item.badge && (
-          <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
+          <Badge tone="gold">
             {item.badge}
-          </span>
+          </Badge>
         )}
         {item.comingSoon && (
-          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
+          <Badge className="ml-auto">
             Soon
-          </span>
+          </Badge>
         )}
       </div>
       <p className={`font-semibold text-sm text-ink leading-snug ${isInteractive ? 'group-hover:text-primary-ink transition' : ''}`}>

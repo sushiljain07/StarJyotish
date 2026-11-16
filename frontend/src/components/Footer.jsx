@@ -12,6 +12,7 @@ import React from 'react'
 //     naturally alongside Contact Us rather than as a separate heading
 //   — Grid is now 3 columns instead of 4 at md+
 import { Link } from 'react-router-dom'
+import { Button, Badge } from './ui'
 import { useTranslation } from 'react-i18next'
 import SocialButtons from './SocialButtons'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -140,13 +141,13 @@ export default function Footer() {
                 placeholder={t('footer_newsletter_placeholder')}
                 className="flex-1 md:w-64 rounded-lg px-3 py-2 text-sm text-ink bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary"
               />
-              <button
+              <Button
                 type="submit"
                 disabled={newsletterStatus === 'sending'}
-                className="bg-primary hover:bg-primary-dark disabled:opacity-60 text-night font-semibold text-sm px-4 py-2 min-h-11 rounded-lg transition shrink-0"
+                className="shrink-0"
               >
                 {newsletterStatus === 'sending' ? '…' : t('footer_newsletter_cta')}
-              </button>
+              </Button>
             </form>
           )}
         </div>
@@ -161,9 +162,9 @@ export default function Footer() {
       {/* ── Trust badges ── */}
       <div className={`${FRAME} ${GUTTER} py-6 flex flex-wrap items-center gap-2 border-t border-white/10`}>
         {TRUST_BADGE_KEYS.map(key => (
-          <span key={key} className="bg-primary/10 text-primary text-[11px] font-medium px-3 py-1 rounded-full border border-primary/30">
+          <Badge key={key} tone="gold" surface="night" size="md">
             {t(key)}
-          </span>
+          </Badge>
         ))}
       </div>
 

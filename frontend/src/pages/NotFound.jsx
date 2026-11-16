@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
+import { Button } from '../components/ui'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function NotFound() {
@@ -35,12 +36,9 @@ export default function NotFound() {
           )}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            to={isAuthenticated ? '/home' : '/'}
-            className="inline-block px-5 py-2.5 rounded-full bg-primary-dark text-night text-sm font-semibold hover:opacity-90 transition"
-          >
+          <Button to={isAuthenticated ? '/home' : '/'}>
             {t('not_found_cta', 'Go to homepage')}
-          </Link>
+          </Button>
           <Link
             to="/generate"
             className="inline-block px-5 py-2.5 rounded-full border border-primary/40 text-primary-ink text-sm font-semibold hover:bg-primary-light transition"

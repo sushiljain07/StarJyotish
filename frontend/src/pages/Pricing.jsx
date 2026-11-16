@@ -6,14 +6,14 @@
 // The URL stays /pricing so existing links and the sitemap keep working.
 // The admin "Pricing Plans" setting is deliberately not read here; it
 // returns when billing is built.
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import FAQAccordion from '../components/FAQAccordion'
 import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
-import { Card } from '../components/ui'
+import { Card, Button } from '../components/ui'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
 const INCLUDED = ['kundli', 'reading', 'ask', 'panchang']
@@ -63,12 +63,9 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <Link
-              to="/generate"
-              className="mt-6 flex items-center justify-center min-h-[44px] px-6 py-3 rounded-full bg-primary hover:bg-primary-dark text-night font-semibold transition"
-            >
+            <Button to="/generate" size="lg" className="mt-6 w-full">
               {t('early_access_cta')}
-            </Link>
+            </Button>
           </Card>
         </Reveal>
       </section>

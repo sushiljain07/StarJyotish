@@ -15,6 +15,7 @@
 // footer link.
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import Badge from '../ui/Badge'
 
 export default function ArticleCard({
   title,
@@ -36,16 +37,14 @@ export default function ArticleCard({
           <span className={`shrink-0 ${featured ? 'text-primary' : 'text-primary-ink'}`}>{icon}</span>
         )}
         {badge && (
-          <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-            featured ? 'bg-white/10 text-primary-light' : 'bg-primary-light text-primary-ink'
-          }`}>
+          <Badge tone="gold" size="md" surface={featured ? 'night' : 'light'}>
             {badge}
-          </span>
+          </Badge>
         )}
         {comingSoon && (
-          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-parchment text-ink-muted border border-line ml-auto">
+          <Badge size="md" className="ml-auto">
             {t('knowledge_coming_soon')}
-          </span>
+          </Badge>
         )}
       </div>
       <h3 className={`font-semibold leading-snug mb-2 ${
@@ -60,7 +59,7 @@ export default function ArticleCard({
       )}
       {meta && (
         <div className={`flex items-center justify-between mt-4 pt-3 border-t ${featured ? 'border-white/10' : 'border-line'}`}>
-          <span className={`text-[11px] ${featured ? 'text-ink-onnight' : 'text-ink-muted'}`}>{meta}</span>
+          <span className={`text-2xs ${featured ? 'text-ink-onnight' : 'text-ink-muted'}`}>{meta}</span>
           {isInteractive && (
             <span className={`text-xs font-medium transition-transform group-hover:translate-x-0.5 ${featured ? 'text-primary' : 'text-primary-ink'}`}>
               {t('knowledge_read')}

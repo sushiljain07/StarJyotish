@@ -19,6 +19,7 @@ import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import RelatedArticles from '../../../components/knowledge/RelatedArticles'
 import { getGuide, getLearningPathSteps, getNextGuide } from '../../../config/knowledgeGraph'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   HOUSES_HERO,
@@ -43,7 +44,7 @@ function HouseCard({ house }) {
           <p className="text-xs text-ink-muted">{house.sanskrit}</p>
         </div>
       </div>
-      <p className="text-[11px] font-semibold text-primary-ink tracking-wide uppercase mb-2">{house.keywords}</p>
+      <p className="text-2xs font-semibold text-primary-ink tracking-wide uppercase mb-2">{house.keywords}</p>
       <p className="text-sm text-ink-muted leading-relaxed">{house.description}</p>
     </div>
   )
@@ -91,12 +92,9 @@ export default function HousesGuide() {
           ) : null
         }
       >
-        <a
-          href="#houses"
-          className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-        >
+        <Button size="lg" href="#houses">
           Explore the 12 Houses
-        </a>
+        </Button>
       </Hero>
 
       {isHindi && (

@@ -16,6 +16,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Button } from './ui'
 import { useAuth } from '../contexts/AuthContext'
 import { chartPalette, withAlpha } from '../theme/chartPalette'
 import AccountMenu from './AccountMenu'
@@ -142,21 +143,15 @@ export default function SiteHeader({ scrollProgress = 1, onCtaClick }) {
         <div className="flex items-center gap-2 shrink-0">
           <div className="hidden sm:block"><LanguageSwitcher size="sm" /></div>
           {!isAuthenticated && (
-            <button
-              onClick={signIn}
-              className="bg-white/10 hover:bg-white/20 text-ink-onnight hover:text-primary-light text-xs font-semibold px-3 min-h-11 rounded-full transition"
-            >
+            <Button variant="secondary" surface="night" size="sm" onClick={signIn}>
               {t('nav_sign_in')}
-            </button>
+            </Button>
           )}
           {onCtaClick && (
-            <button
-              onClick={onCtaClick}
-              className="bg-primary hover:bg-primary-dark text-night text-xs font-semibold px-3.5 min-h-11 rounded-full transition whitespace-nowrap"
-            >
+            <Button size="sm" onClick={onCtaClick}>
               <span className="md:hidden">{t('nav_cta_mobile')}</span>
               <span className="hidden md:inline">{t('nav_cta_compact')}</span>
-            </button>
+            </Button>
           )}
           {isAuthenticated && <AccountMenu />}
           {/* Signed-out mobile: hamburger for the public links (signed-in

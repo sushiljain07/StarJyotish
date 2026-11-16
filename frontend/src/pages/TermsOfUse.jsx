@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import LegalLanguageNote from '../components/LegalLanguageNote'
+import { Card } from '../components/ui'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2'
 const ul = 'list-disc pl-5 space-y-1.5'
@@ -44,7 +45,7 @@ export default function TermsOfUse() {
           📝 Published in English; the English text governs in case of any conflict with a future Hindi version.
         </p>
 
-        <nav aria-label="Table of contents" className="bg-parchment-card border border-line rounded-xl p-4 text-sm">
+        <Card as="nav" aria-label="Table of contents" className="text-sm">
           <p className="font-semibold text-ink mb-2">On this page</p>
           <ol className="list-decimal pl-5 space-y-1 text-primary-ink">
             <li><a href="#eligibility" className="hover:underline">Eligibility</a></li>
@@ -64,7 +65,7 @@ export default function TermsOfUse() {
             <li><a href="#changes" className="hover:underline">Changes to these Terms</a></li>
             <li><a href="#contact" className="hover:underline">Contact</a></li>
           </ol>
-        </nav>
+        </Card>
 
         <h2 id="eligibility" className={h2}>1. Eligibility</h2>
         <p>You must be at least 18 years old to create an account or make a purchase on the Platform. If you are

@@ -12,7 +12,7 @@
 //
 // All copy lives in config/zodiacContent.js — this file only composes
 // layout, exactly per the "future proofing" requirement for this page.
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import Seo from '../../components/Seo'
@@ -33,6 +33,7 @@ import LearningMetadata from '../../components/knowledge/LearningMetadata'
 import ConceptLink from '../../components/knowledge/ConceptLink'
 import RelatedArticles from '../../components/knowledge/RelatedArticles'
 import { getGuide, getLearningPathSteps, getNextGuide } from '../../config/knowledgeGraph'
+import Button from '../../components/ui/Button'
 import { getCategoryLabel } from '../../config/learningTaxonomy'
 import {
   ZODIAC_HERO,
@@ -63,15 +64,15 @@ function SystemCard({ system, accent = false }) {
       </h3>
       <dl className="space-y-4">
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Anchored to</dt>
+          <dt className={`text-2xs font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Anchored to</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.anchor}</dd>
         </div>
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Origin</dt>
+          <dt className={`text-2xs font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Origin</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.origin}</dd>
         </div>
         <div>
-          <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Emphasis</dt>
+          <dt className={`text-2xs font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>Emphasis</dt>
           <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{system.focus}</dd>
         </div>
       </dl>
@@ -116,18 +117,12 @@ export default function ZodiacGuide() {
         }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href="#rashis"
-            className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-          >
+          <Button size="lg" href="#rashis">
             Explore the Zodiac Signs
-          </a>
-          <Link
-            to="/generate"
-            className="inline-block bg-white/10 hover:bg-white/20 text-primary-light font-semibold text-sm px-7 py-3 rounded-full transition"
-          >
+          </Button>
+          <Button variant="secondary" surface="night" size="lg" to="/generate">
             Generate Free Kundli
-          </Link>
+          </Button>
         </div>
       </Hero>
 

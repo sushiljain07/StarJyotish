@@ -5,6 +5,7 @@ import { chartBody, fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import { hasPremiumAccess } from '../config/entitlements'
 import PaywallCard from './PaywallCard'
+import { Badge, Card } from './ui'
 import { errorMessage } from '../api/errors'
 
 // Icons by stable backend id. The reference text (meaning, characteristics,
@@ -50,10 +51,10 @@ function YogaCard({ yoga, defaultOpen }) {
   const isPresent = yoga.present
 
   return (
-    <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
+    <Card padding="none" className={`overflow-hidden transition-all ${
       isPresent
-        ? 'bg-parchment-card border-good/30 border-l-4 border-l-good'
-        : 'bg-night/[0.03] border-line'
+        ? '!border-good/30 !border-l-4 !border-l-good'
+        : '!bg-night/[0.03]'
     }`}>
       {/* Header row */}
       <button
@@ -67,8 +68,8 @@ function YogaCard({ yoga, defaultOpen }) {
               {yoga.yoga}
             </h3>
             {isPresent
-              ? <span className="text-xs font-semibold bg-good-light text-good px-2 py-0.5 rounded-full">{t('rajyogas_present')}</span>
-              : <span className="text-xs font-medium bg-ink-faint/25 text-ink-muted px-2 py-0.5 rounded-full">{t('rajyogas_absent')}</span>
+              ? <Badge tone="good">{t('rajyogas_present')}</Badge>
+              : <Badge tone="muted">{t('rajyogas_absent')}</Badge>
             }
           </div>
           <p className={`text-xs mt-1 leading-relaxed text-ink-muted`}>
@@ -126,7 +127,7 @@ function YogaCard({ yoga, defaultOpen }) {
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -245,11 +246,11 @@ export default function RajyogasTab({ input, active = true }) {
           </div>
         </div>
       ) : (
-        <div className="bg-parchment-card rounded-xl p-6 text-center border border-line shadow-sm">
+        <Card padding="none" className="p-6 text-center">
           <div className="text-3xl mb-2">🌱</div>
           <p className="text-ink-muted text-sm">{t('rajyogas_none')}</p>
           <p className="text-ink-muted text-xs mt-1">{t('rajyogas_none_note')}</p>
-        </div>
+        </Card>
       )}
     </div>
   )

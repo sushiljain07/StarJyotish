@@ -18,6 +18,7 @@ import CTA from '../../../components/knowledge/CTA'
 import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import { getGuide, getLearningPathSteps } from '../../../config/knowledgeGraph'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   DOSHAS_HERO,
@@ -29,23 +30,24 @@ import {
   DOSHAS_CTA,
 } from '../../../config/doshasContent'
 import { DEFAULT_LANGUAGE, currentLanguage } from '../../../i18n/languages'
+import Card from '../../../components/ui/Card'
 
 function DoshaCard({ dosha }) {
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl p-6">
+    <Card padding="none" className="p-6">
       <h3 className="font-serif font-semibold text-xl text-ink mb-1">{dosha.name}</h3>
       <p className="text-xs text-ink-muted font-medium mb-4">{dosha.altName}</p>
       <dl className="space-y-4">
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Formation</dt>
           <dd className="text-sm text-ink-muted leading-relaxed">{dosha.formation}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-1">Traditional effects</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-1">Traditional effects</dt>
           <dd className="text-sm text-ink leading-relaxed">{dosha.effects}</dd>
         </div>
         <div>
-          <dt className="text-[11px] font-bold text-ink-muted tracking-widest uppercase mb-2">Cancellations (Bhanga)</dt>
+          <dt className="text-2xs font-bold text-ink-muted tracking-widest uppercase mb-2">Cancellations (Bhanga)</dt>
           <dd>
             <ul className="space-y-1.5">
               {dosha.cancellations.map((c, i) => (
@@ -58,11 +60,11 @@ function DoshaCard({ dosha }) {
           </dd>
         </div>
         <div className="pt-3 border-t border-line">
-          <dt className="text-[11px] font-bold text-primary-ink tracking-widest uppercase mb-1">What popular accounts miss</dt>
+          <dt className="text-2xs font-bold text-primary-ink tracking-widest uppercase mb-1">What popular accounts miss</dt>
           <dd className="text-sm text-ink-muted leading-relaxed italic">{dosha.overstatement}</dd>
         </div>
       </dl>
-    </div>
+    </Card>
   )
 }
 
@@ -107,12 +109,9 @@ export default function DoshasGuide() {
           ) : null
         }
       >
-        <a
-          href="#doshas"
-          className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-        >
+        <Button size="lg" href="#doshas">
           Understand the Major Doshas
-        </a>
+        </Button>
       </Hero>
 
       {isHindi && (

@@ -21,6 +21,7 @@ import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import RelatedArticles from '../../../components/knowledge/RelatedArticles'
 import { getGuide, getLearningPathSteps, getNextGuide } from '../../../config/knowledgeGraph'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   NAKSHATRA_HERO,
@@ -48,7 +49,7 @@ function SystemCard({ system, accent = false }) {
       <dl className="space-y-4">
         {[['Anchored to', system.anchor], ['Origin', system.origin], ['Emphasis', system.focus]].map(([label, val]) => (
           <div key={label}>
-            <dt className={`text-[11px] font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>{label}</dt>
+            <dt className={`text-2xs font-semibold tracking-wide uppercase mb-1 ${accent ? 'text-ink-onnightMuted' : 'text-ink-muted'}`}>{label}</dt>
             <dd className={`text-sm leading-relaxed ${accent ? 'text-ink-onnight' : 'text-ink-muted'}`}>{val}</dd>
           </div>
         ))}
@@ -117,12 +118,9 @@ export default function NakshatrasGuide() {
         }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href="#nakshatras"
-            className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-          >
+          <Button size="lg" href="#nakshatras">
             Explore All 27 Nakshatras
-          </a>
+          </Button>
         </div>
       </Hero>
 

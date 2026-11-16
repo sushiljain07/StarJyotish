@@ -158,7 +158,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
                style={{ color: withAlpha(P.gold, 0.6) }}>
               {t('chart_highlight_title', { label: meta.label })}
             </p>
-            <p className="text-[11px]" style={{ color: withAlpha(P.gold, 0.4) }}>{meta.life}</p>
+            <p className="text-2xs" style={{ color: withAlpha(P.gold, 0.4) }}>{meta.life}</p>
           </div>
 
         </div>

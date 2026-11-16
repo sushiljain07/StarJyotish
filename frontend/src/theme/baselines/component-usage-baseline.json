@@ -1,0 +1,342 @@
+{
+  "components/AccountMenu.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "components/AnimatedTabRow.jsx": {
+    "shadowSml": 1
+  },
+  "components/AshtakavargaTable.jsx": {
+    "lightCard": 2,
+    "roundedXl": 1
+  },
+  "components/AskChart.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "components/AskPersonaCard.jsx": {
+    "lightCard": 1,
+    "chip": 1,
+    "roundedXl": 3
+  },
+  "components/BhavaChalit.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "components/CareerReportTab.jsx": {
+    "lightCard": 2,
+    "chip": 1,
+    "roundedXl": 4,
+    "shadowSml": 1
+  },
+  "components/ChartHighlight.jsx": {
+    "roundedXl": 2
+  },
+  "components/ChartReading.jsx": {
+    "roundedXl": 1
+  },
+  "components/DashaTable.jsx": {
+    "lightCard": 1,
+    "shadowSml": 1
+  },
+  "components/DivisionalCharts.jsx": {
+    "roundedXl": 2
+  },
+  "components/FAQAccordion.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "components/KPChart.jsx": {
+    "roundedXl": 3
+  },
+  "components/KundliChart.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "components/KundliDownload.jsx": {
+    "lightCard": 1
+  },
+  "components/LegalLanguageNote.jsx": {
+    "roundedXl": 1
+  },
+  "components/PlaceCombobox.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "components/PlanetTable.jsx": {
+    "roundedXl": 1
+  },
+  "components/RajyogasTab.jsx": {
+    "roundedXl": 2,
+    "shadowSml": 1
+  },
+  "components/SarvatobhadraChakra.jsx": {
+    "roundedXl": 1
+  },
+  "components/ScrollToTop.jsx": {
+    "goldCta": 1,
+    "shadowSml": 1
+  },
+  "components/SectionJumpNav.jsx": {
+    "lightCard": 1,
+    "shadowSml": 1
+  },
+  "components/SegmentedToggle.jsx": {
+    "lightCard": 1
+  },
+  "components/SocialButtons.jsx": {
+    "lightCard": 1
+  },
+  "components/TopicReportTab.jsx": {
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "components/TransitPanel.jsx": {
+    "roundedXl": 1
+  },
+  "components/home/AskPersonaPanel.jsx": {
+    "lightCard": 5,
+    "roundedXl": 5
+  },
+  "components/home/DailyPatrikaHero.jsx": {
+    "chip": 1
+  },
+  "components/home/GoDeeperCta.jsx": {
+    "chip": 2
+  },
+  "components/home/HomeMasthead.jsx": {
+    "nightCard": 1
+  },
+  "components/home/KnowledgeCapsule.jsx": {
+    "roundedXl": 1
+  },
+  "components/home/SkyRemembers.jsx": {
+    "nightCard": 1,
+    "roundedXl": 2
+  },
+  "components/knowledge/ArticleCard.jsx": {
+    "lightCard": 1,
+    "roundedXl": 2,
+    "shadowSml": 1
+  },
+  "components/knowledge/CTA.jsx": {
+    "roundedXl": 1
+  },
+  "components/knowledge/LearningPath.jsx": {
+    "lightCard": 2,
+    "chip": 1
+  },
+  "components/knowledge/Reflection.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "components/knowledge/RelatedArticles.jsx": {
+    "lightCard": 2,
+    "roundedXl": 2,
+    "shadowSml": 2
+  },
+  "components/knowledge/ZodiacCard.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "components/landing/CareerReportPreview.jsx": {
+    "lightCard": 1,
+    "roundedXl": 4,
+    "shadowSml": 1
+  },
+  "components/layout/SkipLink.jsx": {
+    "shadowSml": 1
+  },
+  "components/onboarding/BirthTimeSelector.jsx": {
+    "roundedXl": 1
+  },
+  "components/onboarding/ProfileTypeSelector.jsx": {
+    "roundedXl": 1
+  },
+  "pages/AdminDashboard.jsx": {
+    "lightCard": 4,
+    "chip": 1
+  },
+  "pages/AstrologerDashboard.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "pages/Blog.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "pages/ContactUs.jsx": {
+    "chip": 1
+  },
+  "pages/Disclaimer.jsx": {
+    "roundedXl": 1
+  },
+  "pages/Home.jsx": {
+    "roundedXl": 1,
+    "shadowSml": 1
+  },
+  "pages/Insights.jsx": {
+    "lightCard": 1
+  },
+  "pages/Learn.jsx": {
+    "roundedXl": 1
+  },
+  "pages/NotFound.jsx": {
+    "lightCard": 1
+  },
+  "pages/Onboarding.jsx": {
+    "roundedXl": 5
+  },
+  "pages/PanchangDetail.jsx": {
+    "lightCard": 2,
+    "roundedXl": 12
+  },
+  "pages/PrivacyPolicy.jsx": {
+    "roundedXl": 2
+  },
+  "pages/RefundPolicy.jsx": {
+    "roundedXl": 1
+  },
+  "pages/Result.jsx": {
+    "lightCard": 1,
+    "roundedXl": 2
+  },
+  "pages/TermsOfUse.jsx": {
+    "roundedXl": 2
+  },
+  "pages/TestimonialsPage.jsx": {
+    "lightCard": 1
+  },
+  "pages/learn/Zodiac.jsx": {
+    "lightCard": 1,
+    "roundedXl": 2
+  },
+  "pages/learn/basics/LagnaGuide.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/basics/MoonSignGuide.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/basics/PlanetsGuide.jsx": {
+    "lightCard": 1,
+    "roundedXl": 2
+  },
+  "pages/learn/basics/WhatIsKundli.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/career/D10Dashamsha.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/career/DashasTiming.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/career/Rajyogas.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/career/TenthHouse.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/career/TenthLord.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/categories/Dashas.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/categories/Doshas.jsx": {
+    "roundedXl": 1
+  },
+  "pages/learn/categories/Houses.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/categories/Nakshatras.jsx": {
+    "lightCard": 2,
+    "roundedXl": 4
+  },
+  "pages/learn/categories/Planets.jsx": {
+    "lightCard": 1,
+    "roundedXl": 2
+  },
+  "pages/learn/categories/Yogas.jsx": {
+    "chip": 1,
+    "roundedXl": 1
+  },
+  "pages/learn/paths/CareerPath.jsx": {
+    "lightCard": 2,
+    "roundedXl": 3,
+    "shadowSml": 1
+  },
+  "pages/learn/paths/MarriagePath.jsx": {
+    "lightCard": 2,
+    "roundedXl": 3,
+    "shadowSml": 1
+  },
+  "pages/learn/paths/NewToVedic.jsx": {
+    "lightCard": 2,
+    "roundedXl": 3,
+    "shadowSml": 1
+  },
+  "pages/learn/zodiac/Aquarius.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Aries.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Cancer.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Capricorn.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Gemini.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Leo.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Libra.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Pisces.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Sagittarius.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Scorpio.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Taurus.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  },
+  "pages/learn/zodiac/Virgo.jsx": {
+    "lightCard": 1,
+    "roundedXl": 3
+  }
+}

@@ -12,6 +12,6 @@ describe('ErrorFallback reload button', () => {
     expect(btn.className).toContain('text-night')
     expect(btn.className).toContain('hover:bg-primary-dark')
     expect(btn.className).not.toMatch(/\btext-white\b|(^|\s)bg-primary-dark/)
-    expect(btn.className).toContain('min-h-[44px]')
+    expect(btn.className).toContain('min-h-11')
   })
 })

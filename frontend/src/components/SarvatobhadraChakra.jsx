@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { planetName, nakshatraName } from '../utils/astroNames'
 import { PLANET_COLORS } from '../config/planetColors'
 import ScrollHint from './ui/ScrollHint'
+import { Card } from './ui'
 import { chartPalette as P, withAlpha } from '../theme/chartPalette'
 
 const NAKSHATRAS_27 = [
@@ -297,7 +298,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
 
       {/* Planet nakshatra positions */}
       {(transitPlanets.length > 0 || natalPlanets.length > 0) && (
-        <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+        <Card padding="none" className="overflow-hidden">
           <div className="px-4 py-3 bg-night/[0.03] border-b">
             <h3 className="font-semibold text-ink text-sm">{t('chart_sarvato_positions')}</h3>
           </div>
@@ -329,7 +330,7 @@ export default function SarvatobhadraChakra({ transitPlanets = [], natalPlanets 
               </tbody>
             </table>
           </ScrollHint>
-        </div>
+        </Card>
       )}
     </div>
   )

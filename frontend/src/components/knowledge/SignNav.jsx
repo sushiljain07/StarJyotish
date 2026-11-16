@@ -10,6 +10,7 @@
 // prev, a future Pisces will have no next). Coming-soon signs are shown
 // as inactive spans rather than links — same "no dead links" rule.
 import { Link } from 'react-router-dom'
+import Badge from '../ui/Badge'
 
 function NavItem({ guide, direction }) {
   const isLeft = direction === 'prev'
@@ -38,9 +39,9 @@ function NavItem({ guide, direction }) {
   return (
     <div className={classes} aria-label={`${guide.title} — coming soon`}>
       {label}
-      <span className="text-2xs font-semibold px-1.5 py-0.5 rounded-full bg-parchment border border-line text-ink-muted">
+      <Badge>
         Soon
-      </span>
+      </Badge>
     </div>
   )
 }

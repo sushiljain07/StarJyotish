@@ -19,6 +19,7 @@ import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import RelatedArticles from '../../../components/knowledge/RelatedArticles'
 import { getGuide, getLearningPathSteps, getNextGuide } from '../../../config/knowledgeGraph'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   DASHAS_HERO,
@@ -39,7 +40,7 @@ function DashaRow({ dasha, index }) {
       <div className="flex items-start gap-4 p-4 rounded-xl bg-parchment-card border border-line hover:border-primary/40 transition-colors">
         <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex flex-col items-center justify-center">
           <span className="text-primary-ink font-bold text-sm leading-none">{dasha.years}</span>
-          <span className="text-primary-ink text-[9px] font-medium leading-none mt-0.5">yrs</span>
+          <span className="text-primary-ink text-2xs font-medium leading-none mt-0.5">yrs</span>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm text-ink mb-0.5">{dasha.planet}</h3>
@@ -93,12 +94,9 @@ export default function DashasGuide() {
           ) : null
         }
       >
-        <a
-          href="#vimshottari"
-          className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-        >
+        <Button size="lg" href="#vimshottari">
           Explore the Dasha Sequence
-        </a>
+        </Button>
       </Hero>
 
       {isHindi && (

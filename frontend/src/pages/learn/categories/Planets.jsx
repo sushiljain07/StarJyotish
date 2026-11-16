@@ -19,6 +19,8 @@ import LearningPath from '../../../components/knowledge/LearningPath'
 import LearningMetadata from '../../../components/knowledge/LearningMetadata'
 import RelatedArticles from '../../../components/knowledge/RelatedArticles'
 import { getGuide, getLearningPathSteps, getNextGuide } from '../../../config/knowledgeGraph'
+import Badge from '../../../components/ui/Badge'
+import Button from '../../../components/ui/Button'
 import { getCategoryLabel } from '../../../config/learningTaxonomy'
 import {
   PLANETS_HUB_HERO,
@@ -36,19 +38,19 @@ function PlanetCard({ planet }) {
     <div className="bg-parchment-card border border-line rounded-2xl p-5 hover:border-primary/40 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <span className="text-2xl" style={{ color: planet.color }}>{planet.symbol}</span>
-        <span className="text-xs text-ink-muted font-medium bg-parchment px-2 py-0.5 rounded-full">{planet.dasha}</span>
+        <Badge>{planet.dasha}</Badge>
       </div>
       <h3 className="font-serif font-semibold text-base text-ink mb-0.5">{planet.english}</h3>
       <p className="text-xs font-medium text-primary-ink mb-2">{planet.sanskrit}</p>
       <p className="text-sm text-ink-muted leading-relaxed mb-3">{planet.tagline}</p>
       <dl className="space-y-1.5">
         <div className="flex gap-2">
-          <dt className="text-[11px] font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Rules</dt>
-          <dd className="text-[11px] text-ink-muted">{planet.ruler}</dd>
+          <dt className="text-2xs font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Rules</dt>
+          <dd className="text-2xs text-ink-muted">{planet.ruler}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-[11px] font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Exalted</dt>
-          <dd className="text-[11px] text-ink-muted">{planet.exaltation}</dd>
+          <dt className="text-2xs font-semibold text-ink-muted uppercase tracking-wide w-20 shrink-0">Exalted</dt>
+          <dd className="text-2xs text-ink-muted">{planet.exaltation}</dd>
         </div>
       </dl>
     </div>
@@ -98,12 +100,9 @@ export default function PlanetsGuideHub() {
         }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href="#planets"
-            className="inline-block bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition"
-          >
+          <Button size="lg" href="#planets">
             Meet the Nine Grahas
-          </a>
+          </Button>
         </div>
       </Hero>
 

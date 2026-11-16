@@ -8,6 +8,7 @@
 // This codebase doesn't use prop-types (450+ pre-existing instances of
 // this same lint warning elsewhere), so match that convention here too.
 import { useTranslation } from 'react-i18next'
+import { Button } from './ui'
 
 // eslint-disable-next-line react/prop-types
 export default function ErrorFallback({ resetError }) {
@@ -25,22 +26,17 @@ export default function ErrorFallback({ resetError }) {
           {t('error_fallback_body')}
         </p>
         <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
+          <Button
             onClick={() => {
               resetError()
               window.location.reload()
             }}
-            className="min-h-[44px] px-5 py-2.5 rounded-lg bg-primary text-night text-sm font-semibold hover:bg-primary-dark transition"
           >
             {t('error_fallback_reload')}
-          </button>
-          <a
-            href="/"
-            className="px-5 py-2.5 rounded-lg border border-primary-dark/30 text-primary-ink text-sm font-semibold hover:bg-primary-dark/5 transition"
-          >
+          </Button>
+          <Button variant="outline" href="/">
             {t('error_fallback_home')}
-          </a>
+          </Button>
         </div>
       </div>
     </div>

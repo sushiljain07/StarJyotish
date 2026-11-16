@@ -14,6 +14,7 @@
 // marriage, 6th = wellbeing) — the same bhava numbers DoAvoidCards and
 // ChartSpotlight already teach elsewhere on this page.
 import { useTranslation } from 'react-i18next'
+import { Badge } from '../ui'
 
 const REPORTS = [
   {
@@ -93,9 +94,9 @@ function FeaturedReport({ report, area, onOpen, t }) {
           </span>
           <div className="flex items-center gap-2.5">
             <TrendChip trend={area?.trend} accent={accent} t={t} />
-            <span className="text-2xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/[0.1] text-ink-onnight">
+            <Badge surface="night" size="md" className="uppercase tracking-widest">
               {t('report_full_tag')}
-            </span>
+            </Badge>
           </div>
         </div>
         <h4 className="font-serif font-semibold text-lg text-primary-light mb-1 leading-snug group-hover:opacity-90">
@@ -113,7 +114,7 @@ function FeaturedReport({ report, area, onOpen, t }) {
             </span>
           ))}
         </div>
-        <span className={`text-[13px] font-bold ${accent.text}`}>
+        <span className={`text-sm font-bold ${accent.text}`}>
           {t('report_open')}
         </span>
       </div>
@@ -135,7 +136,7 @@ function SmallReport({ report, area, onOpen, t }) {
           </span>
           <TrendChip trend={area?.trend} accent={accent} t={t} />
         </div>
-        <h4 className={`font-serif font-semibold text-2xs sm:text-[13px] text-primary-light mb-0.5 leading-snug group-hover:opacity-90 line-clamp-2`}>
+        <h4 className={`font-serif font-semibold text-2xs sm:text-sm text-primary-light mb-0.5 leading-snug group-hover:opacity-90 line-clamp-2`}>
           {t(report.labelKey)}
         </h4>
         <ScoreBar pct={area?.pct} accent={accent} />

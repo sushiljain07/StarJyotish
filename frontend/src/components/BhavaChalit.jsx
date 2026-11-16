@@ -9,6 +9,7 @@ import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import { chartPalette } from '../theme/chartPalette'
 import ScrollHint from './ui/ScrollHint'
+import { Badge, Card } from './ui'
 
 // Hand-written notes exist for these shifts; any other shift gets a generic line.
 const KNOWN_SHIFTS = new Set([
@@ -63,7 +64,7 @@ export default function BhavaChalit({ input }) {
 
       {/* Intro */}
       <div className="pb-4 border-b-2 border-line">
-        <p className="text-[11px] font-semibold uppercase tracking-widest mb-1 text-primary-ink">
+        <p className="text-2xs font-semibold uppercase tracking-widest mb-1 text-primary-ink">
           {t('bhava_header')}
         </p>
         <h2 className="font-serif font-bold text-xl text-ink mb-2">
@@ -102,7 +103,7 @@ export default function BhavaChalit({ input }) {
           </div>
 
           {/* Summary */}
-          <div className="rounded-xl px-4 py-4 bg-parchment-card border border-line">
+          <Card padding="none" className="px-4 py-4">
             <p className="text-sm font-bold text-ink mb-3">
               {shifted.length === 0
                 ? t('bhava_all_same')
@@ -121,9 +122,9 @@ export default function BhavaChalit({ input }) {
                   <span className="text-sm font-bold" style={{ color: PLANET_COLORS[p.name] ?? chartPalette.signText }}>
                     {planetName(t, p.name)}
                   </span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
+                  <Badge tone="gold">
                     H{p.rashi_house} → H{p.bhava_house}
-                  </span>
+                  </Badge>
                 </div>
                 {shiftNote(t, p.name, p.rashi_house, p.bhava_house) && (
                   <p className="text-xs leading-relaxed text-ink-muted">
@@ -132,7 +133,7 @@ export default function BhavaChalit({ input }) {
                 )}
               </div>
             ))}
-          </div>
+          </Card>
 
           {/* Detailed table toggle */}
           <button
@@ -143,7 +144,7 @@ export default function BhavaChalit({ input }) {
           </button>
 
           {showFull && (
-            <div className="rounded-xl border border-line overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               <div className="px-4 py-2.5 bg-parchment-card border-b border-line">
                 <p className="text-2xs font-semibold uppercase tracking-widest text-primary-ink">
                   {t('bhava_table_title')}
@@ -194,7 +195,7 @@ export default function BhavaChalit({ input }) {
                   </tbody>
                 </table>
               </ScrollHint>
-            </div>
+            </Card>
           )}
         </>
       )}

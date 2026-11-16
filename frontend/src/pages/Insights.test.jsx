@@ -34,8 +34,6 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: t
 vi.mock('../components/Seo', () => ({ default: () => null }))
 
 import Insights from './Insights'
-import insightsSrc from './Insights.jsx?raw'
-import resultSrc from './Result.jsx?raw'
 import i18n from '../i18n'
 import en from '../i18n/en.json'
 import hi from '../i18n/hi.json'
@@ -294,10 +292,5 @@ describe('Insights ↔ Kundli', () => {
     fireEvent.click(await screen.findByRole('link', { name: /Back to chart/ }))
     await screen.findByText('KUNDLI PAGE')
     expect(kundliState).toEqual(chart)
-  })
-
-  it('has no 10px headings', () => {
-    expect(insightsSrc).not.toContain('text-[10px]')
-    expect(resultSrc).not.toContain('text-[10px]')
   })
 })

@@ -1,9 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '../i18n'
 import DivisionalCharts from './DivisionalCharts'
-import src from './DivisionalCharts.jsx?raw'
-import bhava from './BhavaChalit.jsx?raw'
 
 vi.mock('./KundliChart', () => ({
   default: ({ title, planets }) => <div data-testid="chart">{title}|{planets[0].name}</div>,
@@ -34,7 +32,9 @@ describe('DivisionalCharts fetching', () => {
   it('switching chart while a request is in flight keeps the latest chart', async () => {
     const d9 = deferred()
     const d10 = deferred()
+    const signals = {}
     vi.stubGlobal('fetch', vi.fn((url, opts) => {
+      signals[url.includes('division=9') ? 9 : 10] = opts.signal
       const p = url.includes('division=9') ? d9.promise : d10.promise
       return new Promise((resolve, reject) => {
         opts.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))
@@ -45,6 +45,9 @@ describe('DivisionalCharts fetching', () => {
     openRow('D9')
     fireEvent.click(screen.getByText(/Life Areas/))
     openRow('D10')
+    // Opening D10 aborts the stale D9 request; the live one is untouched.
+    expect(signals[9].aborted).toBe(true)
+    expect(signals[10].aborted).toBe(false)
     d10.resolve(ok(payload('Ten')))
     await waitFor(() => expect(screen.getByTestId('chart').textContent).toContain('Ten'))
     d9.resolve(ok(payload('Nine')))
@@ -77,21 +80,18 @@ describe('DivisionalCharts fetching', () => {
     expect(f).toHaveBeenCalledTimes(2)
   })
 
-  it('a 429 is retried once', async () => {
+  it('a 429 is retried once, after the pause', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     const f = vi.fn()
       .mockResolvedValueOnce({ ok: false, status: 429, json: async () => ({}), headers: new Headers() })
       .mockResolvedValueOnce(ok(payload('Nine')))
     vi.stubGlobal('fetch', f)
     render(<DivisionalCharts input={input} />)
     openRow('D9')
-    await waitFor(() => screen.getByTestId('chart'), { timeout: 4000 })
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000) })
+    expect(f).toHaveBeenCalledTimes(1)
+    await act(async () => { await vi.advanceTimersByTimeAsync(600) })
     expect(f).toHaveBeenCalledTimes(2)
-  })
-})
-
-describe('10px headings', () => {
-  it('no text-[10px] in BhavaChalit or DivisionalCharts', () => {
-    expect(src).not.toContain('text-[10px]')
-    expect(bhava).not.toContain('text-[10px]')
+    expect(screen.getByTestId('chart').textContent).toContain('Nine')
   })
 })

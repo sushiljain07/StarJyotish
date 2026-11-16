@@ -139,7 +139,7 @@ export default function Footer() {
                 value={newsletterEmail}
                 onChange={e => setNewsletterEmail(e.target.value)}
                 placeholder={t('footer_newsletter_placeholder')}
-                className="flex-1 md:w-64 rounded-lg px-3 py-2 text-sm text-ink bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 min-w-0 md:w-64 rounded-lg px-3 py-2 text-sm text-ink bg-parchment-card focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <Button
                 type="submit"

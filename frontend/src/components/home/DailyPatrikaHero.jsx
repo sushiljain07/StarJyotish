@@ -171,7 +171,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
         className="cursor-pointer select-none rounded-card border border-primary/20 bg-gradient-to-br from-night-light via-night to-night-deep p-5 animate-fade-in-up motion-reduce:animate-none"
       >
         <span className="text-lg text-primary" aria-hidden="true">{glyph}</span>
-        <p className="font-serif font-medium text-lg sm:text-lg leading-snug text-primary-light mt-2.5">
+        <p className="font-serif font-medium text-lg leading-snug text-primary-light mt-2.5">
           {card.text}
         </p>
         {why && <p className="text-2xs text-primary mt-3">{why}</p>}
@@ -200,15 +200,11 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
       />
 
       {onRefresh && (
-        <Button
-          variant="secondary"
-          size="sm"
-          surface="night"
-          onClick={onRefresh}
-          className="flex mx-auto mt-3"
-        >
-          {t('patrika_refresh')}
-        </Button>
+        <div className="flex justify-center mt-3">
+          <Button variant="ghost" size="sm" surface="night" onClick={onRefresh}>
+            {t('patrika_refresh')}
+          </Button>
+        </div>
       )}
     </div>
   )

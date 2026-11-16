@@ -5,7 +5,7 @@
 // UI can prompt for a manual city instead. Deliberately never falls back
 // to the person's BIRTH place — showing Rahu Kaal for a city they were
 // born in but don't live in is the exact bug this hook exists to avoid.
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import {
@@ -26,10 +26,17 @@ export function useCurrentLocation() {
   const [location, setLocation] = useState(() => profileLocation ?? getCurrentLocation(user?.id))
   const [status, setStatus] = useState(profileLocation ? 'ready' : 'idle') // idle | requesting | denied | ready
 
+  // Bumped by every setManualLocation. A geolocation request started before
+  // the latest pick must not overwrite it — the browser's permission prompt
+  // can stay open while the person picks a city.
+  const pickRef = useRef(0)
+
   const tryGeolocation = useCallback(async () => {
+    const pickAtStart = pickRef.current
     setStatus('requesting')
     try {
       const { lat, lon } = await requestBrowserLocation()
+      if (pickRef.current !== pickAtStart) return
       const saved = setCurrentLocation(user?.id, { lat, lon, label: null, source: 'geolocation' })
       setLocation(saved)
       setStatus('ready')
@@ -37,6 +44,7 @@ export function useCurrentLocation() {
       // Permission denied, timeout, or unsupported — all treated the same:
       // fall through to manual entry rather than showing an error state.
       // A denied browser prompt is routine, not exceptional.
+      if (pickRef.current !== pickAtStart) return
       setStatus('denied')
     }
   }, [user?.id])
@@ -62,8 +70,12 @@ export function useCurrentLocation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile?.current_lat, profile?.current_lon])
 
-  const setManualLocation = useCallback(({ lat, lon, label }) => {
-    const saved = setCurrentLocation(user?.id, { lat, lon, label, source: 'manual' })
+  // `source` defaults to 'manual' (a chosen city, which never expires). Pass
+  // 'geolocation' for a device fix the person asked for, so it expires like
+  // any other fix.
+  const setManualLocation = useCallback(({ lat, lon, label, timezone, source = 'manual' }) => {
+    pickRef.current += 1
+    const saved = setCurrentLocation(user?.id, { lat, lon, label, timezone, source })
     setLocation(saved)
     setStatus('ready')
   }, [user?.id])

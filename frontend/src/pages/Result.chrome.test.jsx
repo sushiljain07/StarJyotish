@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
 import { preloadKundliChunks, PRELOAD_TIMEOUT_MS } from '../test/preloadKundliChunks'
@@ -174,5 +174,55 @@ describe('Kundli sticky chrome', () => {
     expect(nav.className).toContain('bottom-0')
     expect(nav.style.bottom).toBe('')
     expect(nav.style.paddingBottom).toBe('var(--safe-bottom)')
+  })
+
+  it.each(['divisional', 'download'])('on phones the chips toggle also shows on ?tab=%s', tab => {
+    phone()
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/kundli', search: `?tab=${tab}`, state: CHART }]}>
+        <Routes><Route path="/kundli" element={<Result />} /></Routes>
+      </MemoryRouter>,
+    )
+    const chips = screen.getByTestId('summary-chips')
+    const toggle = screen.getByRole('button', { name: 'Chart summary' })
+    expect(chips.className).toContain('max-h-0')
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(chips.className).not.toContain('max-h-0')
+    fireEvent.click(toggle)
+    expect(chips.className).toContain('max-h-0')
+  })
+
+  it('"Reveal my reading" opens Insights with autostart', () => {
+    let seen
+    function Probe() { seen = useLocation(); return <div>INSIGHTS PAGE</div> }
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/kundli', state: CHART }]}>
+        <Routes>
+          <Route path="/kundli" element={<Result />} />
+          <Route path="/insights" element={<Probe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Reveal my reading/i }))
+    expect(screen.getByText('INSIGHTS PAGE')).toBeInTheDocument()
+    expect(seen.search).toBe('?sub=reading')
+    expect(seen.state.autostart).toBe(true)
+    expect(seen.state.input).toEqual(CHART.input)
+  })
+
+  it('the Insights card does not autostart', () => {
+    let seen
+    function Probe() { seen = useLocation(); return <div>INSIGHTS PAGE</div> }
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/kundli', state: CHART }]}>
+        <Routes>
+          <Route path="/kundli" element={<Result />} />
+          <Route path="/insights" element={<Probe />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getAllByText('Open →')[0].closest('button'))
+    expect(seen.state.autostart).toBeUndefined()
   })
 })

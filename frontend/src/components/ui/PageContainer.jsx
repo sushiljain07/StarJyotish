@@ -1,23 +1,19 @@
 // components/ui/PageContainer.jsx
 //
-// The one content container. Page widths had drifted across max-w-2xl /
-// 3xl / 5xl / 6xl with per-page padding; this fixes the vocabulary at
-// three intentional widths:
-//   narrow  — single-column reading / forms (account, week-ahead)
-//   default — standard workspace pages (kundli, ask, insights)
-//   wide    — dense dashboards and marketing (landing, admin)
+// The one content container. Two widths:
+//   frame  (default) — the shared page frame (see layout/frame.js): same
+//                      max width and side gutter as the header and footer.
+//   app              — app pages (/panchang, /week-ahead, /account): the
+//                      narrow column below lg, the frame from lg.
 // Header clearance is the app shell's job (see layouts/), NOT this
 // component's — never add pt-* for the fixed header here or in pages.
+import { APP_FRAME, FRAME, GUTTER } from '../layout/frame'
+
 const WIDTHS = {
-  narrow: 'max-w-2xl',
-  default: 'max-w-5xl',
-  wide: 'max-w-6xl',
+  frame: `${FRAME} ${GUTTER}`,
+  app: `${APP_FRAME} ${GUTTER}`,
 }
 
-export default function PageContainer({ width = 'default', className = '', children }) {
-  return (
-    <div className={`${WIDTHS[width] ?? WIDTHS.default} mx-auto w-full px-4 ${className}`}>
-      {children}
-    </div>
-  )
+export default function PageContainer({ width = 'frame', className = '', children }) {
+  return <div className={`${WIDTHS[width] ?? WIDTHS.frame} ${className}`}>{children}</div>
 }

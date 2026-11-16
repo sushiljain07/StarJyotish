@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n'
 import en from '../i18n/en.json'
+import hi from '../i18n/hi.json'
 
 let suggestions = []
 vi.mock('../hooks/usePlaceSuggestions', () => ({ usePlaceSuggestions: () => suggestions }))
@@ -30,6 +31,12 @@ describe('BirthForm', () => {
   it('links its labels to the name and place inputs', () => {
     expect(screen.getByLabelText(en.form_name).tagName).toBe('INPUT')
     expect(screen.getByLabelText(en.form_place).tagName).toBe('INPUT')
+  })
+
+  it('marks the place as required the same way as the other fields', () => {
+    const place = screen.getByLabelText(en.form_place)
+    expect(place.getAttribute('aria-required')).toBe('true')
+    expect(place.hasAttribute('required')).toBe(false)
   })
 
   it('rejects a date that does not exist', () => {
@@ -68,6 +75,27 @@ describe('BirthForm', () => {
     select(en.form_hour, '07'); select(en.form_minute, '05')
     submit()
     expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_time)
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('is noValidate so native bubbles never replace the translated error', () => {
+    expect(screen.getByRole('button', { name: en.form_submit }).closest('form')).toHaveAttribute('novalidate')
+  })
+
+  it.each([
+    ['name', () => fireEvent.change(screen.getByLabelText(en.form_name), { target: { value: '' } }), () => fillDate('16', '8', '1990')],
+    ['date', () => {}, () => {}],
+    ['place', () => fireEvent.change(screen.getByLabelText(en.form_place), { target: { value: '' } }), () => fillDate('16', '8', '1990')],
+  ])('shows the translated required error for a missing %s', async (_n, blank, fill) => {
+    blank(); fill()
+    fireEvent.click(screen.getByRole('button', { name: en.onboarding_time_unknown }))
+    submit()
+    expect(screen.getByRole('alert')).toHaveTextContent(en.form_error_required)
+    expect(spy).not.toHaveBeenCalled()
+    await i18n.changeLanguage('hi')
+    expect(hi.form_error_required).not.toBe(en.form_error_required)
+    fireEvent.click(screen.getByRole('button', { name: hi.form_submit }))
+    expect(screen.getByRole('alert')).toHaveTextContent(hi.form_error_required)
     expect(spy).not.toHaveBeenCalled()
   })
 })

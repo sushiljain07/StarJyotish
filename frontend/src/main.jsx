@@ -8,16 +8,10 @@ import App from './App.jsx'
 import { initSentry, SentryErrorBoundary } from './monitoring.js'
 import ErrorFallback from './components/ErrorFallback.jsx'
 import { removeLegacyStorage } from './legacyCleanup.js'
+import { GOOGLE_CLIENT_ID, GOOGLE_ENABLED } from './config/google.js'
 
 initSentry()
 removeLegacyStorage()
-
-// Empty string rather than throwing when unset, so the app still boots
-// for local dev before Google Cloud credentials exist — the Google
-// button itself just won't render a usable client until this is set
-// (see frontend/.env.example), same "degrade gracefully without optional
-// config" pattern as VITE_PAYWALL_ENABLED/config/auth.js elsewhere here.
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -27,9 +21,13 @@ createRoot(document.getElementById('root')).render(
         previous behavior (uncaught error -> blank white page). */}
     <SentryErrorBoundary fallback={({ resetError }) => <ErrorFallback resetError={resetError} />}>
       <HelmetProvider>
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        {GOOGLE_ENABLED ? (
+          <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <App />
+          </GoogleOAuthProvider>
+        ) : (
           <App />
-        </GoogleOAuthProvider>
+        )}
       </HelmetProvider>
     </SentryErrorBoundary>
   </StrictMode>

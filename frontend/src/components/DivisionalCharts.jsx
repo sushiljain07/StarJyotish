@@ -8,11 +8,11 @@
 // D40 and D45 only in Spiritual.
 // Every division the backend computes is reachable from at least one group.
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
 import ChartHighlight from './ChartHighlight'
-import { API_BASE } from '../api/config'
+import { fetchReport, chartBody } from '../api/reportCache'
 
 // Backend supports: D1 D2 D3 D4 D6 D7 D8 D9 D10 D12 D16 D20 D24 D27 D30 D40 D45 D60
 // Coverage check below — every D must appear at least once across all groups.
@@ -91,6 +91,9 @@ export default function DivisionalCharts({ input, defaultDivision }) {
   const [chartData, setChartData] = useState(null)
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState(null)
+  const abortRef = useRef(null)
+
+  useEffect(() => () => abortRef.current?.abort(), [])
 
   useEffect(() => {
     if (!defaultDivision) return
@@ -100,25 +103,32 @@ export default function DivisionalCharts({ input, defaultDivision }) {
   }, [])
 
   async function openChart(chart) {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
     setSelected(chart)
     setChartData(null)
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/api/kundli/divisional?division=${chart.d}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: input.date, time: input.time, place: input.place }),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setChartData(await res.json())
-    } catch {
+      const data = await fetchReport(
+        `/api/kundli/divisional?division=${chart.d}`, chartBody(input),
+        { signal: controller.signal, retryOn429: true },
+      )
+      if (abortRef.current !== controller) return
+      setChartData(data)
+    } catch (e) {
+      // A superseded or abandoned request is not an error for the reader.
+      if (e?.name === 'AbortError' || abortRef.current !== controller) return
       setError('kundli_div_error')
     }
-    setLoading(false)
+    if (abortRef.current === controller) setLoading(false)
   }
 
   function back() {
+    abortRef.current?.abort()
+    abortRef.current = null
+    setLoading(false)
     setSelected(null)
     setChartData(null)
     setError(null)
@@ -196,7 +206,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       </div>
 
       <div className="rounded-xl px-4 py-3.5 bg-parchment-card border border-line">
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-2 text-primary-ink">
+        <p className="text-2xs font-bold uppercase tracking-widest mb-2 text-primary-ink">
           {t('kundli_div_governs_label')}
         </p>
         <p className="text-sm leading-relaxed text-ink">{t(`kundli_div_${selected.code}_governs`)}</p>

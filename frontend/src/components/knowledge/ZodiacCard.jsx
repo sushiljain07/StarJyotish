@@ -21,7 +21,7 @@ export default function ZodiacCard({ sanskrit, english, archetype, tagline, icon
       <div className="flex items-start justify-between mb-4">
         <span className="text-primary-ink">{icon}</span>
         {comingSoon && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
+          <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
             Coming soon
           </span>
         )}

@@ -35,12 +35,6 @@ describe('useBottomChrome', () => {
     expect(c.spacerHeight).toContain('--bottom-nav-h')
     expect(c.spacerHeight).not.toContain('--sub-nav-h')
   })
-  it('bottom nav plus raised sub nav', () => {
-    const c = chrome(['bottomNav', 'subNav', 'raisedSubNav'])
-    expect(c.raisedSubNav).toBe(true)
-    expect(c.spacerHeight).toContain('--bottom-nav-h')
-    expect(c.spacerHeight).toContain('--sub-nav-h')
-  })
   it('sub nav alone (signed out)', () => {
     const c = chrome(['subNav'])
     expect(c.subNav).toBe(true)
@@ -100,7 +94,7 @@ describe('/kundli: one bottom bar', () => {
     return render(
       <MemoryRouter initialEntries={['/kundli']}>
         <BottomNav />
-        <NavBar tabs={tabs} activeTab="a" onTabChange={() => {}} raised={false} />
+        <NavBar tabs={tabs} activeTab="a" onTabChange={() => {}} />
         <BottomChromeSpacer />
         {extra}
       </MemoryRouter>,

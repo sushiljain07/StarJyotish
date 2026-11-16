@@ -170,7 +170,7 @@ export default function ChartHighlight({ input, chartType = 'D1', autoLoad = fal
 
         {/* Footer */}
         {provider && (
-          <p className="text-[10px] mt-3 text-right" style={{ color: withAlpha(P.gold, 0.3) }}>
+          <p className="text-2xs mt-3 text-right" style={{ color: withAlpha(P.gold, 0.3) }}>
             {t('chart_highlight_powered', { provider })}
           </p>
         )}

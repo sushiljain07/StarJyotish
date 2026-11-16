@@ -23,6 +23,7 @@ import { computeWindow, minutesToLabel } from '../utils/muhurtaWindow'
 import { localDateStr } from '../utils/localDate'
 import { formatDate } from '../utils/format'
 import { nakshatraName, panchangName } from '../utils/astroNames'
+import PageContainer from '../components/ui/PageContainer'
 import { colors } from '../theme/tokens'
 import { withAlpha } from '../theme/chartPalette'
 
@@ -64,9 +65,9 @@ export default function WeekAhead() {
     <div className="pb-8 md:pb-12">
       <Seo title={t('week_page_title')} path="/week-ahead" noindex />
 
-      <div className="relative overflow-hidden bg-night px-4 pt-6 pb-8">
+      <div className="relative overflow-hidden bg-night pt-6 pb-8">
         <CelestialBackdrop className="text-primary opacity-40" />
-        <div className="relative max-w-2xl mx-auto">
+        <PageContainer width="app" className="relative">
           <button
             onClick={() => navigate('/home')}
             className="inline-flex items-center min-h-11 gap-2 text-sm text-ink-onnightMuted hover:text-primary-light transition mb-4"
@@ -82,10 +83,10 @@ export default function WeekAhead() {
               {location?.label ? ` · ${location.label}` : ''}
             </p>
           )}
-        </div>
+        </PageContainer>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4">
+      <PageContainer width="app" className="pt-4">
         {!location && (
           <LocationPrompt
             status={status}
@@ -101,6 +102,9 @@ export default function WeekAhead() {
           </p>
         )}
 
+        {/* Two columns at lg: dividers move to the top of each card from the
+            second row on, so no card in the last row keeps one underneath. */}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
         {week && week.map((day, i) => {
           const isToday = day.date === todayStr
           const score = weekDayScore(day, i)
@@ -112,7 +116,7 @@ export default function WeekAhead() {
           return (
             <div
               key={day.date}
-              className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
+              className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 lg:border-b-0 ${i >= 2 ? 'lg:border-t' : ''} ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
             >
               <div className="flex-shrink-0 w-12 text-center">
                 <p className="text-2xs font-mono text-ink-onnightMuted">
@@ -150,7 +154,8 @@ export default function WeekAhead() {
             </div>
           )
         })}
-      </div>
+        </div>
+      </PageContainer>
     </div>
   )
 }

@@ -1,9 +1,11 @@
 // frontend/src/pages/AstrologerDashboard.jsx
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
+import AnimatedTabRow from '../components/AnimatedTabRow'
 import {
   astrologerGetProfile,
   astrologerUpdateProfile,
@@ -321,6 +323,7 @@ function ProfileTab({ token }) {
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function AstrologerDashboard() {
+  const { t } = useTranslation()
   const { user, accessToken } = useAuth()
   const [tab, setTab] = useState('overview')
 
@@ -343,15 +346,9 @@ export default function AstrologerDashboard() {
           <AccountMenu />
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-t-lg text-sm font-medium transition ${
-                tab === t.id ? 'bg-parchment-card text-primary-ink' : 'text-ink-onnight hover:bg-white/10'
-              }`}>
-              {t.label}
-            </button>
-          ))}
+        <div className="max-w-2xl mx-auto px-4 pb-2">
+          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label={t('dashboard_sections_aria')}
+            className="[&_button[aria-selected=false]]:text-ink-onnight [&_button[aria-selected=false]]:border-white/[0.12]" />
         </div>
       </div>
 

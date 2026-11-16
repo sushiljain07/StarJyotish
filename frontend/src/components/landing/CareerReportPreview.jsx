@@ -49,11 +49,14 @@ export default function CareerReportPreview() {
           <div className="bg-night px-4 py-2.5">
             <span className="font-bold text-primary-light text-sm">{t('career_preview_roadmap_title')}</span>
           </div>
-          <div className="px-4 py-3 grid grid-cols-2 gap-2">
+          <div className="px-4 py-3 grid grid-cols-2 gap-3">
             {ROADMAP_HORIZONS.map(label => (
-              <p key={label} className="text-2xs font-semibold text-primary-ink uppercase tracking-wide">
-                {t(label)}
-              </p>
+              <div key={label}>
+                <p className="text-2xs font-semibold text-primary-ink uppercase tracking-wide">
+                  {t(label)}
+                </p>
+                <p className="text-xs text-ink-muted leading-snug mt-0.5">{t(`${label}_body`)}</p>
+              </div>
             ))}
           </div>
         </div>

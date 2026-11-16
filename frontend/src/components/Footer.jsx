@@ -19,6 +19,7 @@ import { TRUST_BADGE_KEYS } from '../config/trustBadges'
 import { subscribeNewsletter } from '../api/newsletter'
 import LanguageSwitcher from './LanguageSwitcher'
 import BottomChromeSpacer from './layout/BottomChromeSpacer'
+import { FRAME, GUTTER } from './layout/frame'
 
 const FOOTER_YEAR = new Date().getFullYear()
 
@@ -66,7 +67,7 @@ export default function Footer() {
   return (
     <footer className="bg-night border-t border-white/10 text-ink-onnight">
       {/* ── Brand + link columns ── */}
-      <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-10">
+      <div className={`${FRAME} ${GUTTER} py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-10`}>
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2">
@@ -103,7 +104,7 @@ export default function Footer() {
 
       {/* ── Newsletter ── */}
       <div className="bg-night-light border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className={`${FRAME} ${GUTTER} py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4`}>
           <div>
             <p className="font-serif font-semibold text-base text-primary-light">{t('footer_newsletter_heading')}</p>
             <p className="text-xs text-ink-onnightMuted mt-1 max-w-sm">{t('footer_newsletter_body')}</p>
@@ -150,15 +151,15 @@ export default function Footer() {
           )}
         </div>
         {newsletterStatus === 'error' && (
-          <p role="alert" className="max-w-6xl mx-auto px-6 pb-2 text-sm text-bad-onnight md:text-right">
+          <p role="alert" className={`${FRAME} ${GUTTER} pb-2 text-sm text-bad-onnight md:text-right`}>
             {t('footer_newsletter_error')}
           </p>
         )}
-        <p className="max-w-6xl mx-auto px-6 pb-4 text-xs text-ink-onnightMuted md:text-right">🔒 {t('footer_newsletter_note')}</p>
+        <p className={`${FRAME} ${GUTTER} pb-4 text-xs text-ink-onnightMuted md:text-right`}>🔒 {t('footer_newsletter_note')}</p>
       </div>
 
       {/* ── Trust badges ── */}
-      <div className="max-w-6xl mx-auto px-6 py-6 flex flex-wrap items-center gap-2 border-t border-white/10">
+      <div className={`${FRAME} ${GUTTER} py-6 flex flex-wrap items-center gap-2 border-t border-white/10`}>
         {TRUST_BADGE_KEYS.map(key => (
           <span key={key} className="bg-primary/10 text-primary text-[11px] font-medium px-3 py-1 rounded-full border border-primary/30">
             {t(key)}
@@ -167,7 +168,7 @@ export default function Footer() {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div className="max-w-6xl mx-auto px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+      <div className={`${FRAME} ${GUTTER} py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs`}>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-0 text-ink-onnightMuted">
           <Link to="/privacy" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_privacy')}</Link>
           <Link to="/terms" className="hover:text-primary transition inline-flex items-center justify-center min-h-11 min-w-11">{t('footer_bottom_terms')}</Link>

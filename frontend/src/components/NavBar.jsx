@@ -8,26 +8,22 @@ import { useTranslation } from 'react-i18next'
 import TabIcon from './TabIcon'
 import { useChromeRegistration } from './layout/useBottomChrome'
 
-// `raised` — for a page where the app shell's BottomNav also shows: this bar
-// then stacks directly above it instead of overlapping. Result.jsx passes
-// false: on /kundli BottomNav steps aside and this is the one bottom bar.
-// The safe-area inset only applies at the real screen bottom, so it's
-// skipped when raised. The bar is box-border with an
-// explicit height so --sub-nav-h (index.css) is its real height, which the
-// spacers and ScrollToTop rely on. Side insets clear a landscape notch.
-export default function NavBar({ tabs, activeTab, onTabChange, raised = false }) {
+// The bar is box-border with an explicit height so --sub-nav-h (index.css)
+// is its real height, which the spacers and ScrollToTop rely on. On /kundli
+// it is the one bottom bar, at the true screen bottom. Side insets clear a
+// landscape notch.
+export default function NavBar({ tabs, activeTab, onTabChange }) {
   const { t } = useTranslation()
-  useChromeRegistration(raised ? ['subNav', 'raisedSubNav'] : 'subNav')
+  useChromeRegistration('subNav')
   return (
     <nav
-      className={`md:hidden fixed left-0 right-0 z-50 border-t border-white/[0.12] bg-night/[0.97] box-border pl-[var(--safe-left)] pr-[var(--safe-right)] ${raised ? '' : 'bottom-0'}`}
+      className="md:hidden fixed left-0 right-0 z-50 border-t border-white/[0.12] bg-night/[0.97] box-border bottom-0 pl-[var(--safe-left)] pr-[var(--safe-right)]"
       aria-label={t('nav_kundli_sections_aria', 'Kundli sections')}
       style={{
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        ...(raised
-          ? { bottom: 'calc(var(--bottom-nav-h) + var(--safe-bottom))', height: 'var(--sub-nav-h)' }
-          : { paddingBottom: 'var(--safe-bottom)', height: 'calc(var(--sub-nav-h) + var(--safe-bottom))' }),
+        paddingBottom: 'var(--safe-bottom)',
+        height: 'calc(var(--sub-nav-h) + var(--safe-bottom))',
       }}
     >
       <div className="flex justify-around items-center py-2">

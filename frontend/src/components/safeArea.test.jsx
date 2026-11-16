@@ -35,14 +35,11 @@ describe('side safe areas on fixed bars', () => {
     const nav = screen.getByRole('navigation')
     expect(usesLeft(nav.className) && usesRight(nav.className)).toBe(true)
   })
-  it('NavBar pads by both insets, raised or not', () => {
+  it('NavBar pads by both insets', () => {
     const tabs = [{ id: 'a', label: 'Alpha', icon: 'kundli' }]
-    for (const raised of [false, true]) {
-      const { unmount } = render(<NavBar tabs={tabs} activeTab="a" onTabChange={vi.fn()} raised={raised} />)
-      const nav = screen.getByRole('navigation')
-      expect(usesLeft(nav.className) && usesRight(nav.className)).toBe(true)
-      unmount()
-    }
+    render(<NavBar tabs={tabs} activeTab="a" onTabChange={vi.fn()} />)
+    const nav = screen.getByRole('navigation')
+    expect(usesLeft(nav.className) && usesRight(nav.className)).toBe(true)
   })
   it('ScrollToTop keeps its 20px edge offset, widened to the right inset', () => {
     wrap(<ScrollToTop visible />)

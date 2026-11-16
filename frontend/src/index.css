@@ -300,11 +300,10 @@ html:not([data-script="latn"]) .leading-none { line-height: 1.25; }
 /* LocationSection */
 .sj-loc-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Columns follow the space the grid gets, not the viewport: two cards
+     side by side in a wide column, stacked in the /home rail or on phones. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 12px;
-}
-@media(max-width:479px){
-  .sj-loc-grid { grid-template-columns: 1fr; }
 }
 .sj-loc-card {
   background: theme('colors.night.DEFAULT');

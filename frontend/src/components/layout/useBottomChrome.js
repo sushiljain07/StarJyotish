@@ -3,8 +3,7 @@
 // One source of truth for the fixed bars at the bottom of a phone screen:
 // the app BottomNav (signed in, every page but /kundli), Result.jsx's NavBar
 // on /kundli (the one bottom bar there, at the true bottom edge) and
-// AskPersonaPanel's floating button. NavBar's `raised` mode (stacked above
-// BottomNav) is still supported here but no page uses it now.
+// AskPersonaPanel's floating button.
 // Each of those components registers itself while it actually renders
 // (useChromeRegistration), so pages that have a Footer but no BottomNav get no
 // phantom clearance. Heights come from CSS variables in index.css
@@ -16,7 +15,7 @@ import { useEffect, useSyncExternalStore } from 'react'
 // sm+ pill is about 3.25rem (the phone circle is 3rem). Keep in sync.
 export const FAB_HEIGHT = '3.25rem'
 
-const counts = { bottomNav: 0, fab: 0, subNav: 0, raisedSubNav: 0 }
+const counts = { bottomNav: 0, fab: 0, subNav: 0 }
 let snapshot = { ...counts }
 const listeners = new Set()
 
@@ -29,7 +28,7 @@ const subscribe = l => { listeners.add(l); return () => listeners.delete(l) }
 const getSnapshot = () => snapshot
 
 // Call from a component that renders a fixed bottom bar / FAB while `active`.
-// names: 'bottomNav' | 'fab' | 'subNav' | 'raisedSubNav'
+// names: 'bottomNav' | 'fab' | 'subNav'
 export function useChromeRegistration(names, active = true) {
   const key = [].concat(names).join(',')
   useEffect(() => {
@@ -44,13 +43,11 @@ export function useBottomChrome() {
   const s = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
   const bottomNav = s.bottomNav > 0
   const subNav = s.subNav > 0
-  const raisedSubNav = s.raisedSubNav > 0
   const hasFab = s.fab > 0
 
   let spacerHeight = '0px'
   if (bottomNav) {
-    spacerHeight = 'calc(var(--bottom-nav-h) + var(--safe-bottom) + 1rem'
-      + (raisedSubNav ? ' + var(--sub-nav-h))' : ')')
+    spacerHeight = 'calc(var(--bottom-nav-h) + var(--safe-bottom) + 1rem)'
   } else if (subNav) {
     spacerHeight = 'calc(var(--sub-nav-h) + var(--safe-bottom))'
   }
@@ -62,5 +59,5 @@ export function useBottomChrome() {
   const footerClearance = spacerHeight === '0px'
     ? `calc(${sttReach})`
     : `calc(${spacerHeight} + ${sttReach})`
-  return { bottomNav, subNav, raisedSubNav, hasFab, spacerHeight, footerClearance }
+  return { bottomNav, subNav, hasFab, spacerHeight, footerClearance }
 }

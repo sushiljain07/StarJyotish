@@ -12,20 +12,31 @@ if (!window.matchMedia) {
 
 import WorkspaceLayout from './WorkspaceLayout'
 import SiteHeader from '../SiteHeader'
+import Footer from '../Footer'
 import CompactFooter from '../CompactFooter'
 
-describe('page widths', () => {
-  it('workspace header inner and footer are max-w-5xl', () => {
+function expectFrame(container) {
+  const nodes = [...container.querySelectorAll('header > div'), ...container.querySelectorAll('footer div[class*="max-w-"]')]
+    .filter(n => !/max-w-(xs|sm|md)\b/.test(n.className))
+  expect(nodes.length).toBeGreaterThan(0)
+  for (const n of nodes) {
+    expect(n.className).toContain('max-w-5xl')
+    expect(n.className).not.toContain('max-w-6xl')
+  }
+}
+
+describe('one frame width', () => {
+  it('workspace header and footer', () => {
     const { container } = render(<MemoryRouter initialEntries={['/home']}><WorkspaceLayout /></MemoryRouter>)
-    expect(container.querySelector('header > div').className).toContain('max-w-5xl')
-    expect(container.querySelector('footer > div').className).toContain('max-w-5xl')
+    expectFrame(container)
   })
-  it('marketing header stays max-w-6xl', () => {
-    const { container } = render(<MemoryRouter><SiteHeader /></MemoryRouter>)
-    expect(container.querySelector('header > div').className).toContain('max-w-6xl')
+  it('marketing header', () => {
+    expectFrame(render(<MemoryRouter><SiteHeader /></MemoryRouter>).container)
   })
-  it('footer alone is 5xl', () => {
-    const { container } = render(<MemoryRouter><CompactFooter /></MemoryRouter>)
-    expect(container.querySelector('footer > div').className).toContain('max-w-5xl')
+  it('Footer', () => {
+    expectFrame(render(<MemoryRouter><Footer /></MemoryRouter>).container)
+  })
+  it('CompactFooter', () => {
+    expectFrame(render(<MemoryRouter><CompactFooter /></MemoryRouter>).container)
   })
 })

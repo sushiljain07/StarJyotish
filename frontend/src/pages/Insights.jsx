@@ -10,13 +10,14 @@
 // Old links (?sub=career|rajyogas|health|relationship|finance) are mapped
 // onto this scheme with a replace.
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveChartState } from '../services/lastChart'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import SegmentedToggle from '../components/SegmentedToggle'
 import Seo from '../components/Seo'
+import { FRAME, GUTTER } from '../components/layout/frame'
 import { getTopic } from '../config/topics'
 
 const ChartReading    = lazy(() => import('../components/ChartReading'))
@@ -87,6 +88,17 @@ export default function Insights() {
   // a panel mounts only once it has been opened, then stays mounted.
   // Hidden panels get active={false} so a language switch doesn't
   // regenerate them unseen; each catches up when shown again.
+  // One-tap reveal: the Kundli teaser sends autostart once. Captured at
+  // mount, then dropped from this history entry so Back/Forward/reload
+  // don't start a second reading.
+  const [autostart] = useState(() => !!location.state?.autostart)
+  useEffect(() => {
+    if (!location.state?.autostart) return
+    navigate({ pathname: location.pathname, search: location.search },
+      { replace: true, state: { ...location.state, autostart: undefined } })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [openedPanels, setOpenedPanels] = useState(() => new Set())
   useEffect(() => {
     if (!activePanel) return
@@ -150,9 +162,16 @@ export default function Insights() {
       <Seo title={t('insights_seo_title')} description={t('insights_seo_description')} path="/insights" noindex />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="pt-2 pb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-ink">
+        <div className={`${FRAME} ${GUTTER}`}>
+          <div className="pt-1 pb-1 flex items-center gap-3">
+            <Link
+              to="/kundli"
+              state={{ data: state.data, input: state.input }}
+              className="min-h-11 inline-flex items-center text-xs font-semibold text-primary-ink hover:underline"
+            >
+              <span aria-hidden="true" className="mr-1">←</span>{t('insights_back_to_chart')}
+            </Link>
+            <p className="text-2xs font-semibold uppercase tracking-widest text-primary-ink">
               {t('insights_header')}
             </p>
           </div>
@@ -186,7 +205,7 @@ export default function Insights() {
         <Suspense fallback={<TabLoader />}>
           {isOpened('reading') && (
             <div className={panelClass('reading')}>
-              <ChartReading input={input} topic={readingTopic} onOpenRajyogas={openRajyogas} active={activePanel === 'reading'} />
+              <ChartReading input={input} topic={readingTopic} autostart={autostart} onOpenRajyogas={openRajyogas} active={activePanel === 'reading'} />
             </div>
           )}
           {isOpened('ask') && (

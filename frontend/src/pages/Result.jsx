@@ -16,7 +16,7 @@ import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { useScrollDirection } from '../hooks/useScrollDirection'
-import { useBelowMd } from '../hooks/useHideOnScroll'
+import { BELOW_MD, useMediaQuery } from '../hooks/useMediaQuery'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -154,7 +154,7 @@ export default function Result() {
   const location  = useLocation()
   const navigate  = useNavigate()
   const scrollDir = useScrollDirection()
-  const belowMd   = useBelowMd()
+  const belowMd   = useMediaQuery(BELOW_MD)
   const [chipsOpen, toggleChips] = useTapToReveal()
   const { isAuthenticated, user, accessToken, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile
@@ -360,7 +360,7 @@ export default function Result() {
           </div>
 
           {/* Row 4 — sub-tabs (only when the active main tab has them) */}
-          {(activeMain === 'birth_chart' || activeMain === 'analysis') && (
+          {(activeMain === 'birth_chart' || activeMain === 'analysis') ? (
             <div data-testid="kundli-sub-tabs" className="md:border-t border-line/40 py-2 flex items-center gap-1">
               <div className="flex-1 min-w-0">
                 {activeMain === 'birth_chart' && (
@@ -371,6 +371,11 @@ export default function Result() {
                 )}
               </div>
               {belowMd && <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />}
+            </div>
+          ) : belowMd && (
+            // Life Areas and Download have no sub-tabs: the toggle gets a row.
+            <div className="py-2 flex justify-end">
+              <ChipsToggle open={chipsOpen} onToggle={toggleChips} controls="kundli-summary-chips" />
             </div>
           )}
         </div>
@@ -383,7 +388,7 @@ export default function Result() {
         <div className={activeMain === 'birth_chart' ? 'animate-fade-in-fast' : 'hidden'}>
 
           <div className={activeBirthSub === 'chart' ? 'animate-fade-in-fast' : 'hidden'}>
-            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input } })} />
+            <ReadingTeaser input={input} onOpen={() => navigate('/insights?sub=reading', { state: { data, input, autostart: true } })} />
             <SegmentedToggle label={t('kundli_style')} options={chartStyles(t)} active={chartStyle} onChange={setChartStyle} className="mb-4" />
             {renderBirthChart()}
             <InsightsAskEntry />
@@ -391,7 +396,7 @@ export default function Result() {
 
           <div className={activeBirthSub === 'planets' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_planets_intro_title')}</p>
+              <p className="text-2xs font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_planets_intro_title')}</p>
               <p className="text-xs leading-relaxed text-ink-onnightMuted">
                 {t('kundli_planets_intro_body')}
               </p>
@@ -401,7 +406,7 @@ export default function Result() {
 
           <div className={activeBirthSub === 'dasha' ? 'animate-fade-in-fast' : 'hidden'}>
             <div className="mb-4 rounded-xl px-4 py-3 bg-night border border-primary/20">
-              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_dasha_intro_title')}</p>
+              <p className="text-2xs font-semibold uppercase tracking-widest mb-0.5 text-primary-glow">{t('kundli_dasha_intro_title')}</p>
               <p className="text-xs leading-relaxed text-ink-onnightMuted">
                 {t('kundli_dasha_intro_body')}
               </p>
@@ -449,7 +454,7 @@ export default function Result() {
 
       {/* The one bottom bar on mobile /kundli: BottomNav steps aside here, so
           NavBar owns the true bottom edge (with the safe-area inset). */}
-      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} raised={false} />
+      <NavBar tabs={MAIN_TABS} activeTab={activeMain} onTabChange={selectMain} />
     </div>
   )
 }

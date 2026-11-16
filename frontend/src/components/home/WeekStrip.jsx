@@ -1,7 +1,8 @@
 // frontend/src/components/home/WeekStrip.jsx  v2 (Home reimagined)
 //
-// Same data source as v1 (POST /api/panchang/week via fetchPanchangWeek) —
-// only the visual changed, from a horizontal chip row to the approved
+// Same data source as v1 (POST /api/panchang/week), now fetched by the
+// caller through usePanchangWeek so it can leave the whole beat out while
+// there is no week to show. Only the visual changed, from a horizontal chip row to the approved
 // mock's "week as a constellation": seven stars on a dashed gold path,
 // star radius/brightness reading as the week's shape at a glance, today
 // lit white and gently pulsing. The backend's per-week panchang response
@@ -14,7 +15,6 @@
 // as decorative here rather than implied to be real.
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { fetchPanchangWeek } from '../../api/astro'
 import { weekDayScore } from '../../utils/weekScore'
 import { localDateStr } from '../../utils/localDate'
 import { formatDate } from '../../utils/format'
@@ -37,9 +37,9 @@ function scoreToY(score) {
   return Y_BOTTOM - (clamped / 100) * (Y_BOTTOM - Y_TOP)
 }
 
-export default function WeekStrip({ location }) {
+// `week` is the days array from usePanchangWeek; renders nothing without it.
+export default function WeekStrip({ week }) {
   const { t } = useTranslation()
-  const [week, setWeek] = useState(null)
   const [hover, setHover] = useState(null)
   const [reducedMotion, setReducedMotion] = useState(false)
   // The 400-unit viewBox renders at ~274px on a 360 phone; keep day labels >= 11px.
@@ -50,15 +50,6 @@ export default function WeekStrip({ location }) {
   useEffect(() => {
     setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
-
-  useEffect(() => {
-    if (!location) return
-    let cancelled = false
-    fetchPanchangWeek({ lat: location.lat, lon: location.lon, timezone: location.timezone, days: 7 })
-      .then(res => { if (!cancelled) setWeek(res.days) })
-      .catch(() => { /* strip just doesn't render — home page still works */ })
-    return () => { cancelled = true }
-  }, [location?.lat, location?.lon])
 
   if (!week) return null
 

@@ -77,9 +77,9 @@ export default function PlanetTable({ planets = [], ascendant }) {
           <thead>
             <tr className="bg-primary-light text-primary-ink">
               <th className="p-2.5 border-b text-left sticky left-0 z-10 bg-primary-light">{t('col_planet')}</th>
+              <th className="p-2.5 border-b text-center">{t('col_house')}</th>
               <th className="p-2.5 border-b text-left">{t('col_sign')}</th>
               <th className="p-2.5 border-b text-right">{t('col_degree')}</th>
-              <th className="p-2.5 border-b text-center">{t('col_house')}</th>
 
               {(mode === 'nakshatra' || mode === 'full') && (
                 <>
@@ -113,6 +113,7 @@ export default function PlanetTable({ planets = [], ascendant }) {
                       style={{ color: PLANET_COLORS[p.name] ?? chartPalette.text }}>
                     {planetName(t, p.name)}
                   </td>
+                  <td className="p-2.5 border-b text-center font-bold text-primary-ink">{p.house}</td>
                   <td className="p-2.5 border-b">
                     {signName(t, p.sign)}
                     {dignity && mode === 'basic' && (
@@ -124,7 +125,6 @@ export default function PlanetTable({ planets = [], ascendant }) {
                   <td className="p-2.5 border-b text-right tabular-nums font-mono text-xs">
                     {formatDeg(p.degree)}
                   </td>
-                  <td className="p-2.5 border-b text-center font-bold text-primary-ink">{p.house}</td>
 
                   {(mode === 'nakshatra' || mode === 'full') && (
                     <>

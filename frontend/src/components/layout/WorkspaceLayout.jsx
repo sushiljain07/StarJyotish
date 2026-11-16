@@ -59,7 +59,7 @@ export default function WorkspaceLayout() {
 
   return (
     <div className={`min-h-dvh flex flex-col ${dark ? 'bg-night-deep' : 'bg-parchment'}`}>
-      <SiteHeader width="5xl" />
+      <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 flex flex-col pt-[60px]">
         <Suspense fallback={<RouteSkeleton dark={dark} />}>
           {/* Keyed on pathname: each navigation remounts with a soft fade

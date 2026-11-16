@@ -42,12 +42,12 @@ function PathStep({ step }) {
             {step.title}
           </h3>
           {step.comingSoon && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
+            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-parchment text-ink-muted border border-line">
               Coming soon
             </span>
           )}
           {!step.comingSoon && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sage-light text-sage">
+            <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-sage-light text-sage">
               Available
             </span>
           )}

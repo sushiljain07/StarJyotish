@@ -43,7 +43,7 @@ const SECTION_CONFIG = [
   { key: 'relationships',  icon: '💫' },
 ]
 
-export default function ChartReading({ input, topic, onOpenRajyogas, active = true }) {
+export default function ChartReading({ input, topic, onOpenRajyogas, active = true, autostart = false }) {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
 
@@ -123,7 +123,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
   // per mount, not every time status happens to cycle back through idle.
   const autoRevealedRef = useRef(false)
   useEffect(() => {
-    if (isAuthenticated && status === 'idle' && !autoRevealedRef.current) {
+    if ((isAuthenticated || autostart) && status === 'idle' && !autoRevealedRef.current) {
       autoRevealedRef.current = true
       generate()
     }
@@ -132,7 +132,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
 
   // ── IDLE ──────────────────────────────────────────────────────────────────
-  if (status === 'idle' && !isAuthenticated) return (
+  if (status === 'idle' && !isAuthenticated && !autostart) return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-5xl mb-4">🔮</div>
       <h2 className="text-xl font-bold text-ink mb-2">{t('reading_idle_heading')}</h2>
@@ -147,11 +147,11 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
   )
 
   // ── LOADING ───────────────────────────────────────────────────────────────
-  // Also covers the one render where an authenticated visitor is still
+  // Also covers the one render where an authenticated (or autostarting) visitor is still
   // technically 'idle' before the auto-reveal effect above fires — without
   // this, that single frame would flash the "Reveal My Prediction" button
   // pointlessly before immediately replacing it with this same screen.
-  if (status === 'loading' || (status === 'idle' && isAuthenticated)) return (
+  if (status === 'loading' || (status === 'idle' && (isAuthenticated || autostart))) return (
     <div role="status" className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div aria-hidden="true" className="text-4xl mb-4 motion-safe:animate-spin">⏳</div>
       <p className="font-medium text-primary-ink">{t('reading_loading_text')}</p>

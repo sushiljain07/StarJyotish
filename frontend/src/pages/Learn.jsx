@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import SiteHeader from '../components/SiteHeader'
-import CompactFooter from '../components/CompactFooter'
+import Footer from '../components/Footer'
 import BottomNav from '../components/home/BottomNav'
 import Reveal from '../components/Reveal'
 import { useScrollProgress } from '../hooks/useScrollProgress'
@@ -191,7 +191,7 @@ export default function Learn() {
 
       </main>
 
-      <CompactFooter />
+      <Footer />
       <BottomNav />
     </div>
   )

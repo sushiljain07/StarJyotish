@@ -138,10 +138,10 @@ export default function KundliChart({
   const compact = scale < COMPACT_SCALE
   const planetFs = legibleSize(15, scale, 11)
   const transitFs = legibleSize(13, scale, 11)
-  const statusFs = compact ? legibleSize(11, scale, 10) : 11
+  const statusFs = compact ? legibleSize(11, scale, 11) : 11
   // Without the degree in front, a small gap separates name and status glyphs.
   const statusGap = compact ? 0.2 * statusFs : 0
-  const rashiFs = legibleSize(14, scale, 10)
+  const rashiFs = legibleSize(14, scale, 11)
   const grow = planetFs / 15
   const rashiBox = (i, n) => {
     const [rx, ry] = RASHI_POS[i]

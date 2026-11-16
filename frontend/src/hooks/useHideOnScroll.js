@@ -51,22 +51,3 @@ export function useHideOnScroll({ enabled, threshold = 8 }) {
 
   return enabled && hidden
 }
-
-// Viewport below Tailwind's md breakpoint. Guards a missing matchMedia
-// (jsdom), where it reports false.
-const BELOW_MD = '(max-width: 767px)'
-
-export function useBelowMd() {
-  const [below, setBelow] = useState(
-    () => typeof window !== 'undefined' && !!window.matchMedia?.(BELOW_MD).matches,
-  )
-  useEffect(() => {
-    const mql = window.matchMedia?.(BELOW_MD)
-    if (!mql) return undefined
-    const handler = e => setBelow(e.matches)
-    setBelow(mql.matches)
-    mql.addEventListener?.('change', handler)
-    return () => mql.removeEventListener?.('change', handler)
-  }, [])
-  return below
-}

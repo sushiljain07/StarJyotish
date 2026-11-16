@@ -47,7 +47,10 @@ export default function BirthForm({ onSubmit, loading }) {
     e.preventDefault()
     setError('')
     const needsTime = accuracy !== 'unknown'
-    if (!day || !month || !year || !place) return
+    if (!name.trim() || !day || !month || !year || !place) {
+      setError(t('form_error_required'))
+      return
+    }
     if (needsTime && (!time.hour || !time.minute || !time.ampm)) {
       setError(t('form_error_time'))
       return
@@ -77,7 +80,7 @@ export default function BirthForm({ onSubmit, loading }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
       {/* ── Name ── */}
       <div>
@@ -86,7 +89,7 @@ export default function BirthForm({ onSubmit, loading }) {
         </label>
         <input
           id={`${ids}-name`}
-          type="text" required value={name} placeholder={t('form_name_placeholder')}
+          type="text" aria-required="true" value={name} placeholder={t('form_name_placeholder')}
           onChange={e => setName(e.target.value)}
           className={inputCls}
         />
@@ -96,15 +99,15 @@ export default function BirthForm({ onSubmit, loading }) {
       <fieldset>
         <legend className={labelCls}>{t('form_date')}</legend>
         <div className="flex gap-2">
-          <select aria-label={t('form_day')} value={day} onChange={e => setDay(e.target.value)} required className={selCls}>
+          <select aria-label={t('form_day')} value={day} onChange={e => setDay(e.target.value)} aria-required="true" className={selCls}>
             <option value="">{t('form_day')}</option>
             {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select aria-label={t('form_month')} value={month} onChange={e => setMonth(e.target.value)} required className={`${selCls} flex-[2]`}>
+          <select aria-label={t('form_month')} value={month} onChange={e => setMonth(e.target.value)} aria-required="true" className={`${selCls} flex-[2]`}>
             <option value="">{t('form_month')}</option>
             {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
-          <select aria-label={t('form_year')} value={year} onChange={e => setYear(e.target.value)} required className={`${selCls} flex-[1.5]`}>
+          <select aria-label={t('form_year')} value={year} onChange={e => setYear(e.target.value)} aria-required="true" className={`${selCls} flex-[1.5]`}>
             <option value="">{t('form_year')}</option>
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
@@ -133,7 +136,7 @@ export default function BirthForm({ onSubmit, loading }) {
         </label>
         <PlaceCombobox
           id={`${ids}-place`}
-          required
+          inputProps={{ 'aria-required': 'true' }}
           value={place}
           items={suggestions}
           placeholder={t('form_place_placeholder')}

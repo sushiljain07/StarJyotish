@@ -4,9 +4,9 @@
 // Identity Services SDK (@react-oauth/google) — this backend never sees a
 // password or handles the Google OAuth dance itself; it only ever
 // receives the signed ID token Google's button hands back, and verifies
-// that server-side (backend/services/google_oauth.py). Needs
-// <GoogleOAuthProvider clientId="..."> somewhere above it in the tree —
-// see main.jsx.
+// that server-side (backend/services/google_oauth.py). Rendered only
+// when GOOGLE_ENABLED (config/google.js), which is exactly when main.jsx
+// mounts <GoogleOAuthProvider> above it.
 import { GoogleLogin } from '@react-oauth/google'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'

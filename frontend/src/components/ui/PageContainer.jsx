@@ -3,14 +3,15 @@
 // The one content container. Two widths:
 //   frame  (default) — the shared page frame (see layout/frame.js): same
 //                      max width and side gutter as the header and footer.
-//   narrow           — single-column forms and prose-width content.
+//   app              — app pages (/panchang, /week-ahead, /account): the
+//                      narrow column below lg, the frame from lg.
 // Header clearance is the app shell's job (see layouts/), NOT this
 // component's — never add pt-* for the fixed header here or in pages.
-import { FRAME, GUTTER } from '../layout/frame'
+import { APP_FRAME, FRAME, GUTTER } from '../layout/frame'
 
 const WIDTHS = {
   frame: `${FRAME} ${GUTTER}`,
-  narrow: 'max-w-2xl mx-auto w-full px-4',
+  app: `${APP_FRAME} ${GUTTER}`,
 }
 
 export default function PageContainer({ width = 'frame', className = '', children }) {

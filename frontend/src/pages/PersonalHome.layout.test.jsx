@@ -192,18 +192,20 @@ describe('ChartsStrip arrows', () => {
 
   it('shows only next at the start, and next scrolls 80% of the width', () => {
     const { scrollBy } = setup()
-    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(true)
-    const next = screen.getByRole('button', { name: i18n.t('carousel_next') })
+    expect(screen.getByRole('button', { name: i18n.t('home_charts_carousel_prev') }).disabled).toBe(true)
+    const next = screen.getByRole('button', { name: i18n.t('home_charts_carousel_next') })
     expect(next.disabled).toBe(false)
     expect(next.className).toContain('hidden md:flex')
+    expect(next.className).toMatch(/(^|\s)min-h-11(\s|$)/)
+    expect(next.className).toMatch(/(^|\s)min-w-11(\s|$)/)
     fireEvent.click(next)
     expect(scrollBy).toHaveBeenCalledWith({ left: 240, behavior: 'smooth' })
   })
 
   it('shows only previous at the end', () => {
     setup({ scrollLeft: 400 })
-    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(false)
-    expect(screen.getByRole('button', { name: i18n.t('carousel_next') }).disabled).toBe(true)
+    expect(screen.getByRole('button', { name: i18n.t('home_charts_carousel_prev') }).disabled).toBe(false)
+    expect(screen.getByRole('button', { name: i18n.t('home_charts_carousel_next') }).disabled).toBe(true)
   })
 
   it('updates the arrows when the scroller scrolls', () => {
@@ -211,8 +213,8 @@ describe('ChartsStrip arrows', () => {
     const scroller = container.querySelector('.overflow-x-auto')
     vi.spyOn(HTMLElement.prototype, 'scrollLeft', 'get').mockReturnValue(200)
     fireEvent.scroll(scroller)
-    expect(screen.getByRole('button', { name: i18n.t('carousel_prev') }).disabled).toBe(false)
-    expect(screen.getByRole('button', { name: i18n.t('carousel_next') }).disabled).toBe(false)
+    expect(screen.getByRole('button', { name: i18n.t('home_charts_carousel_prev') }).disabled).toBe(false)
+    expect(screen.getByRole('button', { name: i18n.t('home_charts_carousel_next') }).disabled).toBe(false)
   })
 })
 

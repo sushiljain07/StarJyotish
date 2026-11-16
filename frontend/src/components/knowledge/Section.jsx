@@ -13,7 +13,12 @@
 // structure, just swapped onto the primary-light/ink-onnight pairing
 // already used everywhere else on dark surfaces (SiteHeader, Hero,
 // CTA), instead of leaving dark-ink text on a night background.
+//
+// By default the section sits in the shared page frame (layout/frame.js), so
+// its edges line up with the header and footer. Pass `maxWidth` for a
+// centred prose column; that keeps its own side padding.
 import Reveal from '../Reveal'
+import { FRAME, GUTTER } from '../layout/frame'
 
 const TONES = {
   light: { eyebrow: 'text-primary-ink', title: 'text-ink', description: 'text-ink-muted' },
@@ -26,7 +31,7 @@ export default function Section({
   description,
   align = 'left',
   tone = 'light',
-  maxWidth = 'max-w-6xl',
+  maxWidth,
   id,
   className = '',
   children,
@@ -34,8 +39,8 @@ export default function Section({
   const colors = TONES[tone] ?? TONES.light
 
   return (
-    <section id={id} className={`px-4 sm:px-6 py-12 sm:py-16 ${className}`}>
-      <div className={`${maxWidth} mx-auto`}>
+    <section id={id} className={`${maxWidth ? 'px-4 sm:px-6 ' : ''}py-12 sm:py-16 ${className}`}>
+      <div className={maxWidth ? `${maxWidth} mx-auto` : `${FRAME} ${GUTTER}`}>
         {(eyebrow || title || description) && (
           <Reveal className={`mb-8 sm:mb-10 ${align === 'center' ? 'max-w-2xl mx-auto text-center' : 'max-w-2xl'}`}>
             {eyebrow && (

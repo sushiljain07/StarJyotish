@@ -23,6 +23,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Card } from '../ui'
 
 const CAPSULES = {
   Moon: [
@@ -103,7 +104,7 @@ export default function KnowledgeCapsule({ edition }) {
   const glyph = GLYPHS[planet] ?? '✦'
 
   return (
-    <div className="bg-white/[0.045] border border-white/[0.09] rounded-card overflow-hidden hover:border-primary/30 transition">
+    <Card surface="night" padding="none" className="overflow-hidden hover:border-primary/30 transition">
       <div className="px-5 py-4 flex items-start gap-3.5">
         {/* Glyph tile — gold-tinted square, not a circle badge, per the mock's learn-card */}
         <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-primary/10 border border-primary/25 font-serif text-lg text-primary-glow">
@@ -111,7 +112,7 @@ export default function KnowledgeCapsule({ edition }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-serif font-medium text-[15px] text-primary-light leading-snug mb-1">
+          <p className="font-serif font-medium text-base text-primary-light leading-snug mb-1">
             {capsule.title}
           </p>
           <p className="text-xs text-ink-onnightMuted leading-relaxed line-clamp-2 mb-2">
@@ -125,6 +126,6 @@ export default function KnowledgeCapsule({ edition }) {
           </Link>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }

@@ -24,6 +24,7 @@ import { chartPalette, withAlpha } from '../../theme/chartPalette'
 import { colors } from '../../theme/tokens'
 import { APP_FRAME, GUTTER } from '../layout/frame'
 import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
+import { Badge } from '../ui'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
 // 12-hour strings with an AM/PM suffix (see services/panchang.py's _fmt).
@@ -358,14 +359,14 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
             </p>
             <div className="flex gap-2 mt-1.5 flex-wrap">
               {currentCity && (
-                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <Badge surface="night" size="md" className="font-mono">
                   {t('home_masthead_current', { city: currentCity })}
-                </span>
+                </Badge>
               )}
               {birthCity && (
-                <span className="text-2xs font-mono text-ink-onnight bg-white/[0.08] px-2.5 py-1 rounded-full">
+                <Badge surface="night" size="md" className="font-mono">
                   {t('home_masthead_birth', { city: birthCity })}
-                </span>
+                </Badge>
               )}
             </div>
             <TithiLine panchang={panchang} t={t} />
@@ -378,14 +379,14 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
         {dashaTags && (dashaTags.mahadasha || dashaTags.antardasha) && (
           <div className="flex gap-2 flex-wrap mt-4">
             {dashaTags.mahadasha && (
-              <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
+              <Badge surface="night" size="md" tone="gold" className="font-mono">
                 {t('home_masthead_mahadasha', { planet: planetName(t, dashaTags.mahadasha) })}
-              </span>
+              </Badge>
             )}
             {dashaTags.antardasha && (
-              <span className="text-2xs font-mono text-primary-glow bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full">
+              <Badge surface="night" size="md" tone="gold" className="font-mono">
                 {t('home_masthead_antardasha', { planet: planetName(t, dashaTags.antardasha) })}
-              </span>
+              </Badge>
             )}
           </div>
         )}

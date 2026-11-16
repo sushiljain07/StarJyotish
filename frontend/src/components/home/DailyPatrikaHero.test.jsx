@@ -31,3 +31,13 @@ describe('DailyPatrikaHero why line', () => {
     expect(whyLine(11)).toContain('आपके 11वें भाव को')
   })
 })
+
+describe('DailyPatrikaHero refresh button', () => {
+  it('sits inside a justify-center wrapper and stays quiet (ghost)', async () => {
+    await i18n.changeLanguage('en')
+    render(<DailyPatrikaHero firstName="A" edition={edition(1)} onRefresh={() => {}} />)
+    const btn = screen.getByRole('button', { name: i18n.t('patrika_refresh') })
+    expect(btn.parentElement.className).toContain('justify-center')
+    expect(btn.className).not.toContain('bg-white/10')
+  })
+})

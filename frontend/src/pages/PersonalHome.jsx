@@ -95,7 +95,7 @@ function Beat({ id, title, subtitle, cta, onCta, delay = 0, className = '', chil
       />
       <div className="flex items-start justify-between gap-3 mb-3.5">
         <div>
-          <h2 className="font-serif font-medium text-base sm:text-[19px] leading-snug text-primary-glow">
+          <h2 className="font-serif font-medium text-base sm:text-xl leading-snug text-primary-glow">
             {title}
           </h2>
           {subtitle && <p className="text-xs text-primary-light/55 mt-1">{subtitle}</p>}

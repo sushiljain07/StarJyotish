@@ -22,17 +22,23 @@ function storageKey(userId) {
 export function getCurrentLocation(userId) {
   try {
     const raw = localStorage.getItem(storageKey(userId))
-    if (raw) return JSON.parse(raw)
-    if (userId == null) return null
+    if (userId == null) return raw ? JSON.parse(raw) : null
     // A city chosen while signed out MOVES to the user key on the first read
-    // after sign-in. It is removed from :anon because a manual city never
-    // expires, so a different account on a shared device would otherwise
-    // inherit it. Never the birth city (see hooks/useCurrentLocation.js).
+    // after sign-in, unless the user already has a manual city that is at
+    // least as recent. :anon is always removed after a signed-in read: a
+    // manual city never expires, so a different account on a shared device
+    // would otherwise inherit it. Never the birth city (see
+    // hooks/useCurrentLocation.js).
     const anonRaw = localStorage.getItem(storageKey(null))
-    if (!anonRaw) return null
-    localStorage.setItem(storageKey(userId), anonRaw)
+    if (!anonRaw) return raw ? JSON.parse(raw) : null
     localStorage.removeItem(storageKey(null))
-    return JSON.parse(anonRaw)
+    const mine = raw ? JSON.parse(raw) : null
+    const anon = JSON.parse(anonRaw)
+    const anonWins = mine == null || (anon?.source === 'manual' &&
+      (mine.source !== 'manual' || (anon.savedAt ?? 0) > (mine.savedAt ?? 0)))
+    if (!anonWins) return mine
+    localStorage.setItem(storageKey(userId), anonRaw)
+    return anon
   } catch {
     return null
   }

@@ -85,6 +85,21 @@ describe('PersonalHome below lg', () => {
     expect(body).toBeTruthy()
     expect(body.className).toContain('lg:max-w-5xl')
   })
+
+  it('gives the masthead content the same frame and gutter as the body', async () => {
+    const c = await renderHome()
+    const body = c.querySelector('#sj-week').closest('.max-w-2xl')
+    const greeting = screen.getByText(i18n.t('home_greeting', { name: 'Asha' }))
+    const masthead = greeting.closest('.max-w-2xl')
+    expect(masthead).toBeTruthy()
+    expect(masthead).not.toBe(body)
+    for (const cls of ['max-w-2xl', 'lg:max-w-5xl', 'mx-auto', 'pl-[max(1rem,var(--safe-left))]']) {
+      expect(masthead.classList.contains(cls)).toBe(true)
+      expect(body.classList.contains(cls)).toBe(true)
+    }
+    // The gutter is inside the frame, not around it.
+    expect(masthead.parentElement.className).not.toMatch(/\b(pl|px)-/)
+  })
 })
 
 describe('PersonalHome from lg', () => {

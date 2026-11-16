@@ -80,7 +80,7 @@ import {
 import { formatDate } from '../utils/format'
 import { currentLanguage } from '../i18n/languages'
 import { useMinLg } from '../hooks/useHideOnScroll'
-import { GUTTER } from '../components/layout/frame'
+import { APP_FRAME, GUTTER } from '../components/layout/frame'
 
 // One "beat" on the home thread: gold dot on the hairline, serif gold
 // heading, optional sub + view-full CTA. Pure design tokens
@@ -313,7 +313,7 @@ export default function PersonalHome() {
             dashaTags={spotlight?.dashaSpotlight}
         />
 
-        <div className={`max-w-2xl lg:max-w-5xl mx-auto w-full ${GUTTER} pb-28 md:pb-12`}>
+        <div className={`${APP_FRAME} ${GUTTER} pb-28 md:pb-12`}>
           <div className="pt-1"><ContinuityStrip summary={journeySummary} /></div>
 
           {/* The thread: a fading gold hairline the beats hang off. Below lg

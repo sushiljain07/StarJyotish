@@ -27,6 +27,7 @@ import { planetName } from '../../utils/astroNames'
 import { colors } from '../../theme/tokens'
 import { withAlpha } from '../../theme/chartPalette'
 import { dayScoreBand } from '../../utils/dayScoreBand'
+import { Button } from '../ui'
 
 // ── Card type -> fallback glyph (used only when the event has no planet) ──
 const ICON_BY_TYPE = {
@@ -170,7 +171,7 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
         className="cursor-pointer select-none rounded-card border border-primary/20 bg-gradient-to-br from-night-light via-night to-night-deep p-5 animate-fade-in-up motion-reduce:animate-none"
       >
         <span className="text-lg text-primary" aria-hidden="true">{glyph}</span>
-        <p className="font-serif font-medium text-[17px] sm:text-lg leading-snug text-primary-light mt-2.5">
+        <p className="font-serif font-medium text-lg leading-snug text-primary-light mt-2.5">
           {card.text}
         </p>
         {why && <p className="text-2xs text-primary mt-3">{why}</p>}
@@ -199,12 +200,11 @@ function PatrikaDeck({ cards, onReaction, reactions, onRefresh }) {
       />
 
       {onRefresh && (
-        <button
-          onClick={onRefresh}
-          className="block mx-auto mt-3 min-h-11 md:min-h-0 text-2xs font-semibold text-ink-onnightMuted border border-white/[0.1] rounded-full px-3.5 py-1.5 hover:text-ink-onnight hover:border-white/[0.2] transition"
-        >
-          {t('patrika_refresh')}
-        </button>
+        <div className="flex justify-center mt-3">
+          <Button variant="ghost" size="sm" surface="night" onClick={onRefresh}>
+            {t('patrika_refresh')}
+          </Button>
+        </div>
       )}
     </div>
   )

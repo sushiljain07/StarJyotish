@@ -7,6 +7,7 @@ import PageCTA from '../../../components/knowledge/CTA'
 import Reveal from '../../../components/Reveal'
 import { useAuth } from '../../../contexts/AuthContext'
 import * as C from '../../../config/marriageTimingContent'
+import Card from '../../../components/ui/Card'
 
 function P({ paragraphs }) {
   return <div className="space-y-4">{paragraphs.map((p,i)=><p key={i} className="text-ink text-sm sm:text-base leading-relaxed">{p}</p>)}</div>
@@ -18,10 +19,10 @@ function ItemList({ items }) {
     <dl className="space-y-4 mt-2">
       {items.map((item,i) => (
         <Reveal key={i} delay={i*50}>
-          <div className="bg-parchment-card border border-line rounded-2xl p-5">
+          <Card padding="none" className="p-5">
             <dt className="font-semibold text-sm text-ink mb-2">{item.label || item.condition || item.koot || item.question}</dt>
             <dd className="text-ink-muted text-sm leading-relaxed">{item.body || item.effect || item.measures || item.answer}</dd>
-          </div>
+          </Card>
         </Reveal>
       ))}
     </dl>

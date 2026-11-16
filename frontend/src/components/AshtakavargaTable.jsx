@@ -6,6 +6,7 @@ import { fetchReport } from '../api/reportCache'
 import { PLANET_COLORS } from '../config/planetColors'
 import { chartPalette } from '../theme/chartPalette'
 import ScrollHint from './ui/ScrollHint'
+import { Button, Card } from './ui'
 import { ASHTAKAVARGA_BANDS as BANDS } from '../config/ashtakavargaBands'
 
 const SIGN_KEYS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']
@@ -69,10 +70,9 @@ export default function AshtakavargaTable({ input }) {
         <p className="text-primary-ink text-xs mt-1">
           {t('ashtakavarga_intro')}
         </p>
-        <button onClick={() => load({ force: true })} disabled={loading}
-                className="mt-3 inline-flex items-center justify-center min-h-11 text-xs bg-primary text-night px-3 py-1.5 rounded-lg hover:bg-primary-dark disabled:opacity-50">
+        <Button size="sm" onClick={() => load({ force: true })} disabled={loading} className="mt-3">
           {loading ? t('ashtakavarga_calculating') : t('transit_refresh')}
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -114,7 +114,7 @@ export default function AshtakavargaTable({ input }) {
 
           {/* Sarvashtakavarga */}
           {activeTab === 'sarva' && (
-            <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               <div className="px-4 py-3 bg-primary-light border-b">
                 <h3 className="font-semibold text-primary-ink text-sm">
                   {t('ashtakavarga_sarva_title')}
@@ -145,12 +145,12 @@ export default function AshtakavargaTable({ input }) {
                   <span><span className={`inline-block w-3 h-3 rounded ${BANDS.weak.cls} mr-1 align-middle`}></span>{t('ashtakavarga_sarva_weak')}</span>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Bhinnashtakavarga for selected planet */}
           {PLANETS.includes(activeTab) && data.bhinnashtakavarga[activeTab] && (
-            <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               <div className="px-4 py-3 border-b"
                    style={{ backgroundColor: PLANET_COLORS[activeTab] + '18' }}>
                 <h3 className="font-semibold text-sm"
@@ -184,12 +184,12 @@ export default function AshtakavargaTable({ input }) {
                   <span><span className={`inline-block w-3 h-3 rounded ${BANDS.veryWeak.cls} mr-1 align-middle`}></span>{t('ashtakavarga_bhinna_very_weak')}</span>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Combined view - all 7 planets + total */}
           {activeTab === 'sarva' && (
-            <div className="bg-parchment-card rounded-xl border border-line overflow-hidden">
+            <Card padding="none" className="overflow-hidden">
               <div className="px-4 py-3 bg-night/[0.03] border-b">
                 <h3 className="font-semibold text-ink text-sm">{t('ashtakavarga_overview')}</h3>
               </div>
@@ -237,7 +237,7 @@ export default function AshtakavargaTable({ input }) {
                   </tbody>
                 </table>
               </ScrollHint>
-            </div>
+            </Card>
           )}
         </>
       )}

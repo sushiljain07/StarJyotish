@@ -16,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { fetchReport } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
 import SegmentedToggle from './SegmentedToggle'
+import { Badge, Button, Card } from './ui'
 import { errorMessage } from '../api/errors'
 import { currentLanguage } from '../i18n/languages'
 import { planetName } from '../utils/astroNames'
@@ -83,9 +84,9 @@ const TOPIC_CONFIG = {
 }
 
 const EFFORT_COLOR = {
-  low:    'text-good bg-good-light',
-  medium: 'text-primary-ink bg-primary-light',
-  high:   'text-vermillion bg-vermillion-light',
+  low:    'good',
+  medium: 'gold',
+  high:   'vermillion',
 }
 
 function SectionContent({ content }) {
@@ -112,43 +113,43 @@ function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
 
   if (style === 'gold') return (
-    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-primary/30">
+    <Card padding="none" className="overflow-hidden !border-primary/30">
       <div className="bg-gradient-to-r from-primary to-primary-dark px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-night text-lg leading-tight">{section.title}</h3>
       </div>
       <div className="px-5 py-4"><SectionContent content={section.content} /></div>
-    </div>
+    </Card>
   )
 
   if (style === 'gem') return (
-    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-mauve/30">
+    <Card padding="none" className="overflow-hidden !border-mauve/30">
       <div className="bg-gradient-to-r from-sage to-mauve px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
       </div>
       <div className="px-5 py-4"><SectionContent content={section.content} /></div>
-    </div>
+    </Card>
   )
 
   if (style === 'gradient') return (
-    <div className="bg-parchment-card rounded-xl shadow-sm overflow-hidden border border-primary/30">
+    <Card padding="none" className="overflow-hidden !border-primary/30">
       <div className="bg-night px-5 py-3 flex items-center gap-2">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary-light text-base">{section.title}</h3>
       </div>
       <div className="px-5 py-4"><SectionContent content={section.content} /></div>
-    </div>
+    </Card>
   )
 
   if (style === 'verdict') return (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border-l-4 border-vermillion border border-vermillion/20">
+    <Card padding="none" className="p-5 border-l-4 !border-vermillion/20 !border-l-vermillion">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-vermillion text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
-    </div>
+    </Card>
   )
 
   if (style === 'tinted') return (
@@ -162,13 +163,13 @@ function SectionCard({ icon, section, style }) {
   )
 
   return (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
+    <Card padding="none" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
-    </div>
+    </Card>
   )
 }
 
@@ -177,7 +178,7 @@ function HighlightCard({ h }) {
   const [open, setOpen] = useState(false)
   const effortCls = EFFORT_COLOR[h.effort_required] ?? EFFORT_COLOR.medium
   return (
-    <div className="bg-parchment-card rounded-xl border border-line shadow-sm overflow-hidden">
+    <Card padding="none" className="overflow-hidden">
       <button onClick={() => setOpen(o => !o)} className="w-full text-left p-4 flex items-start gap-3">
         <div className={`shrink-0 w-8 h-8 rounded-full text-night text-sm font-extrabold flex items-center justify-center ${h.rank === 1 ? 'bg-primary-dark' : 'bg-primary'}`}>
           {h.rank === 1 ? '★' : h.rank}
@@ -185,8 +186,8 @@ function HighlightCard({ h }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{h.title}</span>
-            {h.category && <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{h.category}</span>}
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</span>
+            {h.category && <Badge className="whitespace-normal">{h.category}</Badge>}
+            <Badge tone={effortCls}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</Badge>
           </div>
           {h.timeline && <p className="text-xs text-ink-muted mt-0.5">{h.timeline}</p>}
         </div>
@@ -203,13 +204,13 @@ function HighlightCard({ h }) {
           {h.key_planets?.length > 0 && (
             <div className="flex gap-1 flex-wrap">
               {h.key_planets.map(p => (
-                <span key={p} className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
+                <Badge key={p} tone="gold">{planetName(t, p)}</Badge>
               ))}
             </div>
           )}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -308,12 +309,9 @@ export default function TopicReportTab({ topic, input, active = true }) {
           />
         </div>
       )}
-      <button
-        onClick={() => generate()}
-        className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"
-      >
+      <Button size="lg" onClick={() => generate()}>
         {t(`topic_report_${topic}_generate_button`)}
-      </button>
+      </Button>
       <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
     </div>
   )
@@ -336,12 +334,9 @@ export default function TopicReportTab({ topic, input, active = true }) {
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
-      <button
-        onClick={() => generate()}
-        className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
-      >
+      <Button onClick={() => generate()}>
         {t('topic_report_try_again')}
-      </button>
+      </Button>
     </div>
   )
 
@@ -350,7 +345,7 @@ export default function TopicReportTab({ topic, input, active = true }) {
   return (
     <div className="max-w-2xl mx-auto py-2 space-y-4">
       {hasHighlights && (
-        <div className="bg-parchment-card rounded-xl border border-line shadow-sm p-5">
+        <Card padding="none" className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">🎯</span>
             <h3 className="font-bold text-ink text-base">{t(`topic_report_${topic}_highlights_heading`)}</h3>
@@ -359,7 +354,7 @@ export default function TopicReportTab({ topic, input, active = true }) {
           <div className="space-y-2">
             {report.highlights.map(h => <HighlightCard key={h.rank} h={h} />)}
           </div>
-        </div>
+        </Card>
       )}
 
       {cfg.sections.map(({ key, icon, style }) =>
@@ -382,11 +377,11 @@ export default function TopicReportTab({ topic, input, active = true }) {
       </div>
 
       {report?.llm_provider && (
-        <p className="text-center text-[11px] text-ink-muted pb-1">
+        <p className="text-center text-2xs text-ink-muted pb-1">
           {t('reading_powered_by', { provider: report.llm_provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-4">{t('disclaimer')}</p>
+      <p className="text-center text-2xs text-ink-muted leading-relaxed px-4 pb-4">{t('disclaimer')}</p>
     </div>
   )
 }

@@ -155,7 +155,7 @@ export default function AskPersonaPanel({ userId, input }) {
             <JyotiAvatar />
           </span>
           <div>
-            <h3 className="font-serif font-semibold text-[16.5px] text-primary-light">{personaName}</h3>
+            <h3 className="font-serif font-semibold text-base text-primary-light">{personaName}</h3>
             <p className="text-2xs text-ink-onnightMuted">{t('ask_persona_tagline')}</p>
           </div>
           <button onClick={() => setOpen(false)} aria-label={t('jump_nav_close')} className="ml-auto inline-flex items-center justify-center min-h-11 min-w-11 text-ink-onnightMuted hover:text-ink-onnight text-lg">✕</button>
@@ -164,14 +164,14 @@ export default function AskPersonaPanel({ userId, input }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3.5">
           {messages.length === 0 && (
             // light-surface: the drawer body is parchment
-            <div className="max-w-[92%] bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-2.5 text-[13px] leading-relaxed text-ink-muted">
+            <div className="max-w-[92%] bg-parchment-card border border-line rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm leading-relaxed text-ink-muted">
               {t('ask_persona_welcome')}
             </div>
           )}
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed ${
+              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 m.role === 'user'
                   ? 'self-end bg-primary text-night rounded-br-sm font-medium'
                   : 'self-start bg-parchment-card border border-line text-ink-muted rounded-bl-sm' // light-surface: parchment bubble
@@ -194,7 +194,7 @@ export default function AskPersonaPanel({ userId, input }) {
 
         <div className="px-5 pt-3 border-t border-line bg-parchment-card" style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom,0px))" }}>
           {/* light-surface: parchment composer */}
-          <p className="text-[11px] text-ink-muted mb-2">
+          <p className="text-2xs text-ink-muted mb-2">
             {limitReached
               ? t('ask_limit_reached', { count: MAX_QUESTIONS })
               : t('ask_questions_remaining', { count: remaining })}
@@ -209,7 +209,7 @@ export default function AskPersonaPanel({ userId, input }) {
               rows={1}
               placeholder={t('ask_placeholder')}
               // light-surface: parchment composer
-              className="flex-1 min-h-11 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 min-h-11 resize-none bg-parchment-card border border-line rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <button
               onClick={send}

@@ -23,7 +23,7 @@ export default function ComingUpStrip({ events }) {
             className="bg-white/[0.045] border border-primary/20 rounded-card p-5"
           >
             <p className="text-2xs font-bold uppercase tracking-wide text-primary mb-2">{ev.when}</p>
-            <h4 className="font-serif font-semibold text-[15px] text-primary-light mb-1.5 leading-snug">{ev.title}</h4>
+            <h4 className="font-serif font-semibold text-base text-primary-light mb-1.5 leading-snug">{ev.title}</h4>
             <p className="text-xs text-ink-onnightMuted leading-relaxed">{ev.description}</p>
           </div>
         ))}

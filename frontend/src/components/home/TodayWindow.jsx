@@ -23,6 +23,7 @@ import { computeWindow, minutesToLabel } from '../../utils/muhurtaWindow'
 import { colors } from '../../theme/tokens'
 import { withAlpha } from '../../theme/chartPalette'
 import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
+import { Card } from '../ui'
 
 // Position as % along the sunrise→sunset bar
 function pctOf(mins, sunriseMin, sunsetMin) {
@@ -82,9 +83,12 @@ export default function TodayWindow({ panchang }) {
   const sunsetLabel  = panchang?.sunset  ?? minutesToLabel(sunset)
 
   return (
-    <button
+    <Card
+      as="button"
+      surface="night"
+      padding="none"
       onClick={() => navigate('/panchang')}
-      className="w-full text-left bg-white/[0.045] border border-white/[0.09] rounded-card p-5 hover:border-primary/30 transition"
+      className="w-full text-left p-5 hover:border-primary/30 transition"
     >
       {/* Timeline bar: spans sunrise → sunset */}
       <div className="relative h-3.5 rounded-full bg-white/[0.06] mx-1 mt-2 mb-2">
@@ -177,6 +181,6 @@ export default function TodayWindow({ panchang }) {
       <p className="text-2xs font-bold text-primary mt-4">
         {t('home_window_full_panchang', 'Full panchang →')}
       </p>
-    </button>
+    </Card>
   )
 }

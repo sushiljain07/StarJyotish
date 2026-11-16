@@ -21,6 +21,7 @@ import {
   CHANDRASHTAMA,
   MOON_FAQ,
 } from '../../../config/moonSignContent'
+import Badge from '../../../components/ui/Badge'
 
 function ArticleParagraphs({ paragraphs }) {
   return (
@@ -101,9 +102,9 @@ export default function MoonSignGuide() {
             <Reveal key={m.sign} delay={i * 30} className="bg-parchment-card border border-line rounded-xl px-5 py-4">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="font-semibold text-sm text-ink">{m.sign}</span>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary-light text-primary-ink">
+                <Badge tone="gold">
                   Needs: {m.need}
-                </span>
+                </Badge>
               </div>
               <p className="text-sm text-ink-muted leading-relaxed">
                 <span className="text-ink-muted">Restored by: </span>{m.comfort}

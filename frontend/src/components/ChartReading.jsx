@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { fetchReport, readingBody } from '../api/reportCache'
 import { useLatestRequest } from '../hooks/useLatestRequest'
-import { Button } from './ui'
+import { Button, Card } from './ui'
 import { errorMessage } from '../api/errors'
 import { currentLanguage } from '../i18n/languages'
 import { chartPalette as P, withAlpha } from '../theme/chartPalette'
@@ -188,8 +188,8 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
         const isRelationships = key === 'relationships'
 
         if (isHealth) return (
-          <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-good/30
+          <Card key={key} padding="none"
+               className={`overflow-hidden !border-good/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="bg-good px-5 py-3 flex items-center gap-2">
@@ -199,12 +199,12 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
             <div className="bg-parchment-card px-5 py-4">
               <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
-          </div>
+          </Card>
         )
 
         if (isRelationships) return (
-          <div key={key}
-               className={`rounded-xl overflow-hidden shadow-sm border border-bad/30
+          <Card key={key} padding="none"
+               className={`overflow-hidden !border-bad/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="bg-bad px-5 py-3 flex items-center gap-2">
@@ -214,13 +214,13 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
             <div className="bg-parchment-card px-5 py-4">
               <p className="text-ink text-sm leading-relaxed max-w-prose" style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
             </div>
-          </div>
+          </Card>
         )
 
         // Default section style
         return (
-          <div key={key}
-               className={`rounded-xl p-5 bg-parchment-card border border-primary/30 shadow-sm
+          <Card key={key} padding="none"
+               className={`p-5 !border-primary/30
                           transition-all duration-700
                           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
             <div className="flex items-center gap-2 mb-2">
@@ -229,7 +229,7 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
             </div>
             <p className="text-ink text-sm leading-relaxed max-w-prose"
                style={{ whiteSpace: 'pre-wrap' }}>{content}</p>
-          </div>
+          </Card>
         )
       })}
 
@@ -273,11 +273,11 @@ export default function ChartReading({ input, topic, onOpenRajyogas, active = tr
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {provider && (
-        <p className="text-center text-[11px] text-ink-muted pb-1">
+        <p className="text-center text-2xs text-ink-muted pb-1">
           {t('reading_powered_by', { provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-2">
+      <p className="text-center text-2xs text-ink-muted leading-relaxed px-4 pb-2">
         {t('disclaimer')}
       </p>
     </div>

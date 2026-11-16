@@ -136,7 +136,7 @@ export default function BirthForm({ onSubmit, loading }) {
         </label>
         <PlaceCombobox
           id={`${ids}-place`}
-          required
+          inputProps={{ 'aria-required': 'true' }}
           value={place}
           items={suggestions}
           placeholder={t('form_place_placeholder')}

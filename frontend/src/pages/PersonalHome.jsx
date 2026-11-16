@@ -66,6 +66,7 @@ import DisclaimerBlock from '../components/home/DisclaimerBlock'
 import AskPersonaPanel from '../components/home/AskPersonaPanel'
 import KnowledgeCapsule from '../components/home/KnowledgeCapsule'
 import WeekStrip from '../components/home/WeekStrip'
+import { usePanchangWeek } from '../hooks/usePanchangWeek'
 import LocationPrompt from '../components/home/LocationPrompt'
 import ChartsStrip from '../components/home/ChartsStrip'
 import SkyRemembers from '../components/home/SkyRemembers'
@@ -126,7 +127,8 @@ export default function PersonalHome() {
 
   const { location, status: locationStatus, retryGeolocation, setManualLocation } = useCurrentLocation()
   const panchang = usePanchang(location)
-  const { transit, outlook } = useChartExtras(profile)
+  const { transit, outlook, error: extrasError } = useChartExtras(profile)
+  const week = usePanchangWeek(location)
   const editorLang = currentLanguage()
   const { edition, requestRefresh } = useDailyEditor(profile, panchang.data, editorLang)
   const { summary: journeySummary, recordReaction, cardReactions } = useUserJourney(accessToken)
@@ -201,6 +203,9 @@ export default function PersonalHome() {
   const lifeAreas   = transitPlanets ? computeLifeAreas(chart, transitPlanets, t) : null
   const spotlight   = transitPlanets ? computeSpotlight(chart, transitPlanets, t) : null
   const comingUpEvents = outlook ? buildComingUpEvents(chart, outlook, formatDate, t) : []
+  // Coming up waits on the outlook; once it has loaded with nothing to show
+  // (or failed), the beat is left out rather than kept as an empty heading.
+  const comingUpDone = Boolean(outlook) || extrasError
 
   const patrikaHeadline = edition?.headline ?? edition?.cards?.[0]?.text ?? null
 
@@ -273,10 +278,12 @@ export default function PersonalHome() {
         <TodayWindow panchang={panchang.data} />
       </Beat>
     ),
-    week: (
+    // With a location, the week beat shows only once the week has loaded;
+    // without one it asks for a place.
+    week: (!location || week) && (
       <Beat id="sj-week" title={t('home_week_strip_label')} cta={t('home_week_strip_cta')} onCta={() => navigate('/week-ahead')}>
         {location ? (
-          <WeekStrip location={location} />
+          <WeekStrip week={week} />
         ) : (
           <LocationPrompt
             status={locationStatus}
@@ -287,7 +294,7 @@ export default function PersonalHome() {
         )}
       </Beat>
     ),
-    coming: (
+    coming: (comingUpEvents.length > 0 || !comingUpDone) && (
       <Beat title={t('home_coming_up_label')}>
         {comingUpEvents.length > 0
           ? <ComingUpStrip events={comingUpEvents} />
@@ -296,6 +303,8 @@ export default function PersonalHome() {
       </Beat>
     ),
   }
+  // Rail beats that have something to show; with none, there is no rail.
+  const railBeats = [beats.window, beats.week, beats.coming].filter(Boolean)
 
   return (
     <div className="relative">
@@ -320,13 +329,15 @@ export default function PersonalHome() {
               it is one flat list (DOM order = reading order); from lg the
               beats split into a main column and a sticky rail. */}
           {isLg ? (
-            <div className="relative mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-x-8">
+            <div className={`relative mt-5 ${railBeats.length ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-x-8' : ''}`}>
               <div data-main className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
                 {beats.day}{beats.charts}{beats.reports}{beats.sky}{beats.idea}
               </div>
-              <div data-rail className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
-                {beats.window}{beats.week}{beats.coming}
-              </div>
+              {railBeats.length > 0 && (
+                <div data-rail className="relative before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">
+                  {beats.window}{beats.week}{beats.coming}
+                </div>
+              )}
             </div>
           ) : (
             <div className="relative mt-5 before:content-[''] before:absolute before:left-[3px] before:top-1 before:bottom-6 before:w-px before:bg-gradient-to-b before:from-primary before:to-primary/10 before:opacity-40">

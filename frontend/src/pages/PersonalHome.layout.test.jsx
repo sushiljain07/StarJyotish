@@ -11,8 +11,10 @@ import ChartsStrip from '../components/home/ChartsStrip'
 
 const mq = vi.hoisted(() => ({ lg: false }))
 const gate = vi.hoisted(() => ({ ready: true }))
+const loc = vi.hoisted(() => ({ value: null }))
+const failing = vi.hoisted(() => ({ urls: [] }))
 vi.mock('../hooks/useCurrentLocation', () => ({
-  useCurrentLocation: () => ({ location: null, status: 'denied', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }),
+  useCurrentLocation: () => ({ location: loc.value, status: loc.value ? 'ready' : 'denied', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }),
 }))
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: false, user: null, accessToken: null }),
@@ -38,6 +40,8 @@ beforeEach(async () => {
   const ctx = new Proxy({}, { get: (_t, k) => (k === 'canvas' ? {} : () => ({ addColorStop() {} })), set: () => true })
   mq.lg = false
   gate.ready = true
+  loc.value = null
+  failing.urls = []
   vi.stubGlobal('matchMedia', q => ({
     matches: String(q).includes('min-width: 1024px') ? mq.lg : false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {},
   }))
@@ -45,6 +49,7 @@ beforeEach(async () => {
   Element.prototype.scrollIntoView = () => {}
   vi.stubGlobal('fetch', vi.fn(async url => {
     const u = String(url)
+    if (failing.urls.some(f => u.includes(f))) return { ok: false, status: 500, json: async () => ({}) }
     const body = u.includes('/kundli/transit') ? transit : u.includes('/kundli/outlook') ? outlook
       : u.includes('/api/panchang') ? panchang : {}
     return { ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body) }
@@ -125,6 +130,52 @@ describe('PersonalHome from lg', () => {
     expect(main.querySelector('#sj-your-day')).toBeTruthy()
     expect(main.querySelector('#sj-charts')).toBeTruthy()
     expect(main.querySelector('#sj-window')).toBeNull()
+  })
+})
+
+describe('PersonalHome rail with nothing to show', () => {
+  async function renderEmptyRail() {
+    loc.value = { lat: 28.6, lon: 77.2, label: 'New Delhi' }
+    failing.urls = ['/api/panchang/week', '/kundli/outlook']
+    const r = render(
+      <MemoryRouter initialEntries={['/home']}><Routes><Route path="*" element={<PersonalHome />} /></Routes></MemoryRouter>,
+    )
+    await waitFor(() => expect(r.container.querySelector('#sj-window')).toBeTruthy())
+    await waitFor(() => expect(screen.queryByText(i18n.t('home_coming_up_label'))).toBeNull())
+    await waitFor(() => expect(fetch.mock.calls.some(([u]) => String(u).includes('/api/panchang/week'))).toBe(true))
+    return r.container
+  }
+
+  it('leaves out the week and coming-up beats at lg, keeping only the window in the rail', async () => {
+    mq.lg = true
+    const c = await renderEmptyRail()
+    expect(c.querySelector('#sj-week')).toBeNull()
+    expect(screen.queryByText(i18n.t('home_week_strip_label'))).toBeNull()
+    expect(screen.queryByText(i18n.t('home_week_strip_cta'))).toBeNull()
+    const rail = c.querySelector('[data-rail]')
+    expect([...rail.children].map(n => n.id)).toEqual(['sj-window'])
+    expect([...rail.querySelectorAll('h2')].map(h => h.textContent)).toEqual([i18n.t('home_window_label')])
+  })
+
+  it('leaves them out below lg too', async () => {
+    const c = await renderEmptyRail()
+    expect(c.querySelector('#sj-week')).toBeNull()
+    const titles = [...c.querySelectorAll('h2')].map(h => h.textContent)
+    expect(titles).not.toContain(i18n.t('home_week_strip_label'))
+    expect(titles).not.toContain(i18n.t('home_coming_up_label'))
+  })
+
+  it('shows the week beat once the week loads', async () => {
+    loc.value = { lat: 28.6, lon: 77.2, label: 'New Delhi' }
+    const days = ['2026-11-14', '2026-11-15', '2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20'].map(date => ({ date }))
+    const base = fetch.getMockImplementation()
+    fetch.mockImplementation(async url => (String(url).includes('/api/panchang/week')
+      ? { ok: true, status: 200, json: async () => ({ days }) }
+      : base(url)))
+    const r = render(
+      <MemoryRouter initialEntries={['/home']}><Routes><Route path="*" element={<PersonalHome />} /></Routes></MemoryRouter>,
+    )
+    await waitFor(() => expect(r.container.querySelector('#sj-week svg')).toBeTruthy())
   })
 })
 

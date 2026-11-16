@@ -103,9 +103,9 @@ function reorderSections(careerContext, t) {
 }
 
 const EFFORT_COLOR = {
-  low:    '!text-good !bg-good-light',
-  medium: '!text-primary-ink !bg-primary-light',
-  high:   '!text-vermillion !bg-vermillion-light',
+  low:    'good',
+  medium: 'gold',
+  high:   'vermillion',
 }
 
 const CAREER_CONTEXT_KEY = 'starjyotish_career_context'
@@ -352,8 +352,8 @@ function CareerOptionCard({ opt }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{opt.title}</span>
-            <Badge>{opt.field}</Badge>
-            <Badge tone="sage" className={effortCls}>
+            <Badge className="whitespace-normal">{opt.field}</Badge>
+            <Badge tone={effortCls}>
               {t('report_effort_label', { level: t(`report_effort_${opt.effort_required}`, { defaultValue: opt.effort_required }) })}
             </Badge>
           </div>

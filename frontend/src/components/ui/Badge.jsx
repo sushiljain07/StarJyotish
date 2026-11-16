@@ -12,11 +12,19 @@ const TONES = {
     neutral: 'bg-parchment text-ink-muted border border-line',
     gold: 'bg-primary/10 text-primary-ink border border-primary/30',
     sage: 'bg-sage-light text-sage',
+    good: 'bg-good-light text-good',
+    vermillion: 'bg-vermillion-light text-vermillion',
+    mauve: 'bg-mauve-light text-mauve',
+    muted: 'bg-ink-faint/25 text-ink-muted',
   },
   night: {
     neutral: 'bg-white/[0.08] text-ink-onnight',
     gold: 'bg-primary/10 text-primary-glow border border-primary/20',
     sage: 'bg-white/[0.08] text-ink-onnight',
+    good: 'bg-white/[0.08] text-good-onnight',
+    vermillion: 'bg-white/[0.08] text-bad-onnight',
+    mauve: 'bg-white/[0.08] text-mauve-onnight',
+    muted: 'bg-white/[0.08] text-ink-onnight',
   },
 }
 

@@ -59,11 +59,11 @@ function SummaryChips({ data, collapsed, hidden, id }) {
         {t('kundli_chip_lagna', { sign: signName(t, data.ascendant.sign) })}
       </Badge>
       {moon && (
-        <Badge tone="sage" size="md" className="!bg-mauve-light !text-mauve">
+        <Badge tone="mauve" size="md">
           {t('kundli_chip_rashi', { sign: signName(t, moon.sign) })}
         </Badge>
       )}
-      <Badge tone="sage" size="md" className="!bg-vermillion-light !text-vermillion">
+      <Badge tone="vermillion" size="md">
         {t('kundli_chip_mahadasha', { planet: planetName(t, md.planet) })}
       </Badge>
     </div>

@@ -65,14 +65,14 @@ export default function KundliDownload({ data, input }) {
               {t('kundli_chip_lagna', { sign: signName(t, ascendant.sign) })}
             </Badge>
             {moon && (
-              <Badge tone="sage" size="md" className="!bg-mauve-light !text-mauve">
+              <Badge tone="mauve" size="md">
                 {t('kundli_chip_rashi', { sign: signName(t, moon.sign) })}
               </Badge>
             )}
             <Badge tone="sage" size="md">
               {t('download_chip_nakshatra', { name: nakshatraName(t, ascendant.nakshatra) })}
             </Badge>
-            <Badge tone="sage" size="md" className="!bg-vermillion-light !text-vermillion">
+            <Badge tone="vermillion" size="md">
               {t('download_chip_mahadasha', { planet: planetName(t, md.planet), date: fmtDate(md.end) })}
             </Badge>
           </div>

@@ -84,9 +84,9 @@ const TOPIC_CONFIG = {
 }
 
 const EFFORT_COLOR = {
-  low:    '!text-good !bg-good-light',
-  medium: '!text-primary-ink !bg-primary-light',
-  high:   '!text-vermillion !bg-vermillion-light',
+  low:    'good',
+  medium: 'gold',
+  high:   'vermillion',
 }
 
 function SectionContent({ content }) {
@@ -186,8 +186,8 @@ function HighlightCard({ h }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{h.title}</span>
-            {h.category && <Badge>{h.category}</Badge>}
-            <Badge tone="sage" className={effortCls}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</Badge>
+            {h.category && <Badge className="whitespace-normal">{h.category}</Badge>}
+            <Badge tone={effortCls}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</Badge>
           </div>
           {h.timeline && <p className="text-xs text-ink-muted mt-0.5">{h.timeline}</p>}
         </div>

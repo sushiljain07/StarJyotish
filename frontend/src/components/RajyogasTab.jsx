@@ -68,8 +68,8 @@ function YogaCard({ yoga, defaultOpen }) {
               {yoga.yoga}
             </h3>
             {isPresent
-              ? <Badge tone="sage" className="!bg-good-light !text-good">{t('rajyogas_present')}</Badge>
-              : <Badge tone="sage" className="!bg-ink-faint/25 !text-ink-muted">{t('rajyogas_absent')}</Badge>
+              ? <Badge tone="good">{t('rajyogas_present')}</Badge>
+              : <Badge tone="muted">{t('rajyogas_absent')}</Badge>
             }
           </div>
           <p className={`text-xs mt-1 leading-relaxed text-ink-muted`}>

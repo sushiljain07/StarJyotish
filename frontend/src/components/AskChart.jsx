@@ -110,9 +110,8 @@ export default function AskChart({ input, initialQuestion = null, onInitialQuest
           <div className="text-xs text-ink-muted">{t('ask_subtitle')}</div>
         </div>
         <Badge
-          tone={limitReached || remaining === 1 ? 'sage' : 'gold'}
+          tone={limitReached || remaining === 1 ? 'vermillion' : 'gold'}
           size="md"
-          className={limitReached || remaining === 1 ? '!bg-vermillion-light !text-vermillion' : ''}
         >
           {limitReached ? t('ask_zero_left') : t('ask_questions_remaining', { count: remaining })}
         </Badge>

@@ -60,7 +60,7 @@ describe('RajyogasTab status colours', () => {
     render(<RajyogasTab input={INPUT} />)
     await screen.findByText(i18n.t('rajyogas_title'))
     const badge = screen.getAllByText(i18n.t('rajyogas_present'))[0]
-    expect(badge).toHaveClass('!text-good')
-    expect(badge).toHaveClass('!bg-good-light')
+    expect(badge).toHaveClass('text-good')
+    expect(badge).toHaveClass('bg-good-light')
   })
 })

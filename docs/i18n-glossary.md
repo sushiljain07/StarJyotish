@@ -28,7 +28,7 @@ Every other English word, acronyms included, is written in Devanagari
 |---|---|---|---|
 | chart, birth chart | कुंडली, जन्म कुंडली | Never चार्ट. *(test)* | settled |
 | divisional chart (in general) | वर्ग कुंडली (plural: वर्ग कुंडलियाँ) | For example, `faq_page_a6` and `early_access_item_kundli`. | settled |
-| a named divisional chart | D10 चार्ट, नवांश चार्ट | This is the only place चार्ट is allowed. The keys are listed in `CHART_ALLOWED` in the test: `testimonial_4_text`, `home_this_week_subtext`, `report_career_note`, `report_finance_note`, `report_relationship_note`, `report_health_note`. *(test)* | settled |
+| a named divisional chart | D10 चार्ट, नवांश चार्ट | This is the only place चार्ट is allowed. The keys are listed in `CHART_ALLOWED` in the test: `home_this_week_subtext`, `report_career_note`, `report_finance_note`, `report_relationship_note`, `report_health_note`. *(test)* | settled |
 | Lagna chart | लग्न कुंडली | Used in `home_chart_lagna_label`. | settled |
 | Moon | चंद्र | Not चंद्रमा. This matches the backend `PLANET_NAMES`. *(test)* | settled |
 | Jupiter | गुरु | Not बृहस्पति. This matches the backend `PLANET_NAMES`. *(test)* | settled |

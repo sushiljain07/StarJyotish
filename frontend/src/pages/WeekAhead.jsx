@@ -67,7 +67,7 @@ export default function WeekAhead() {
 
       <div className="relative overflow-hidden bg-night pt-6 pb-8">
         <CelestialBackdrop className="text-primary opacity-40" />
-        <PageContainer className="relative">
+        <PageContainer width="app" className="relative">
           <button
             onClick={() => navigate('/home')}
             className="inline-flex items-center min-h-11 gap-2 text-sm text-ink-onnightMuted hover:text-primary-light transition mb-4"
@@ -86,7 +86,7 @@ export default function WeekAhead() {
         </PageContainer>
       </div>
 
-      <PageContainer className="pt-4">
+      <PageContainer width="app" className="pt-4">
         {!location && (
           <LocationPrompt
             status={status}
@@ -102,7 +102,9 @@ export default function WeekAhead() {
           </p>
         )}
 
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
+        {/* Two columns at lg: dividers move to the top of each card from the
+            second row on, so no card in the last row keeps one underneath. */}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
         {week && week.map((day, i) => {
           const isToday = day.date === todayStr
           const score = weekDayScore(day, i)
@@ -114,7 +116,7 @@ export default function WeekAhead() {
           return (
             <div
               key={day.date}
-              className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
+              className={`flex gap-4 py-4 border-b border-white/[0.08] last:border-b-0 lg:border-b-0 ${i >= 2 ? 'lg:border-t' : ''} ${isToday ? 'bg-primary/[0.06] -mx-4 px-4 rounded-lg' : ''}`}
             >
               <div className="flex-shrink-0 w-12 text-center">
                 <p className="text-2xs font-mono text-ink-onnightMuted">

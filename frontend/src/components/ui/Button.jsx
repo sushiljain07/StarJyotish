@@ -45,6 +45,7 @@ export default function Button({
   size = 'md',
   surface = 'light',
   to = null,
+  href = null,
   className = '',
   children,
   ...rest
@@ -60,6 +61,11 @@ export default function Button({
 
   if (to) {
     return <Link to={to} className={classes} {...rest}>{children}</Link>
+  }
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes} {...rest}>{children}</a>
+    )
   }
   return <button type="button" className={classes} {...rest}>{children}</button>
 }

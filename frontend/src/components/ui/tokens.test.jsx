@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { Link, MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import Button from './Button'
+import Card from './Card'
 import SectionHeading from './SectionHeading'
 import InlineNotice from './InlineNotice'
 
@@ -38,5 +39,23 @@ describe('ui surface tokens (AA)', () => {
     const btn = screen.getByRole('button')
     expect(btn.className).toContain('text-ink-faint')
     expect(btn.getAttribute('aria-label')).toBeTruthy()
+  })
+
+  it('Button href renders an external anchor', () => {
+    render(<MemoryRouter><Button href="https://x.test">Go</Button></MemoryRouter>)
+    const a = screen.getByRole('link')
+    expect(a.getAttribute('href')).toBe('https://x.test')
+    expect(a.getAttribute('target')).toBe('_blank')
+    expect(a.getAttribute('rel')).toContain('noopener')
+  })
+
+  it('Card as={Link} renders a router link', () => {
+    render(<MemoryRouter><Card as={Link} to="/x">c</Card></MemoryRouter>)
+    expect(screen.getByRole('link').getAttribute('href')).toBe('/x')
+  })
+
+  it('Button className can override nowrap', () => {
+    render(<Button className="whitespace-normal">x</Button>)
+    expect(screen.getByRole('button').className).toContain('whitespace-normal')
   })
 })

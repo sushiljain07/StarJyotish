@@ -94,7 +94,7 @@ export default function DashasGuide() {
           ) : null
         }
       >
-        <Button size="lg" href="#vimshottari" target="_self">
+        <Button size="lg" href="#vimshottari">
           Explore the Dasha Sequence
         </Button>
       </Hero>

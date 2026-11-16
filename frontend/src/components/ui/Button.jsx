@@ -11,7 +11,7 @@
 import { Link } from 'react-router-dom'
 
 const SIZES = {
-  sm: 'px-3.5 py-1.5 text-xs min-h-11 md:min-h-0',
+  sm: 'px-3.5 py-1.5 text-xs min-h-11',
   md: 'px-5 py-2.5 text-sm min-h-11',
   lg: 'px-7 py-3 text-base min-h-11',
 }
@@ -46,6 +46,7 @@ export default function Button({
   surface = 'light',
   to = null,
   href = null,
+  wrap = false,
   className = '',
   children,
   ...rest
@@ -53,7 +54,8 @@ export default function Button({
   const classes = [
     'inline-flex items-center justify-center gap-2 font-semibold rounded-full',
     'transition active:scale-[0.98] motion-reduce:active:scale-100',
-    'disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap',
+    'disabled:opacity-50 disabled:pointer-events-none',
+    wrap ? 'whitespace-normal text-center' : 'whitespace-nowrap',
     SIZES[size] ?? SIZES.md,
     (VARIANTS[variant] ?? VARIANTS.primary)[surface === 'night' ? 'night' : 'light'],
     className,
@@ -63,9 +65,9 @@ export default function Button({
     return <Link to={to} className={classes} {...rest}>{children}</Link>
   }
   if (href) {
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes} {...rest}>{children}</a>
-    )
+    const external = /^(https?:)?\/\//.test(href)
+    const ext = external ? { target: '_blank', rel: 'noopener noreferrer' } : {}
+    return <a href={href} {...ext} className={classes} {...rest}>{children}</a>
   }
   return <button type="button" className={classes} {...rest}>{children}</button>
 }

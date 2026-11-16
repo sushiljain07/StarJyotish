@@ -29,7 +29,7 @@ export default function CTA({
       {description && (
         <p className="text-ink-onnight text-sm mb-6 max-w-sm mx-auto">{description}</p>
       )}
-      <Button size="lg" surface="night" to={to} className="whitespace-normal text-center">{buttonLabel}</Button>
+      <Button size="lg" surface="night" to={to} wrap>{buttonLabel}</Button>
     </div>
   )
 }

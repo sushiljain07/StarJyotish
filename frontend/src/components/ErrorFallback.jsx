@@ -34,7 +34,7 @@ export default function ErrorFallback({ resetError }) {
           >
             {t('error_fallback_reload')}
           </Button>
-          <Button variant="outline" href="/" target="_self">
+          <Button variant="outline" href="/">
             {t('error_fallback_home')}
           </Button>
         </div>

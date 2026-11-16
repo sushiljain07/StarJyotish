@@ -11,6 +11,12 @@ describe('Badge', () => {
     expect(el.className).toContain('text-2xs')
     expect(el.className).toContain('bg-parchment')
   })
+  it('wrap swaps nowrap for normal', () => {
+    render(<><Badge wrap>w</Badge><Badge>n</Badge></>)
+    expect(screen.getByText('w').className).toContain('whitespace-normal')
+    expect(screen.getByText('w').className).not.toContain('whitespace-nowrap')
+    expect(screen.getByText('n').className).toContain('whitespace-nowrap')
+  })
   it('night gold uses primary-glow', () => {
     render(<Badge tone="gold" surface="night">x</Badge>)
     expect(screen.getByText('x').className).toContain('text-primary-glow')

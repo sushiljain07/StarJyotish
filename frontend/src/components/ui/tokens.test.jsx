@@ -54,8 +54,30 @@ describe('ui surface tokens (AA)', () => {
     expect(screen.getByRole('link').getAttribute('href')).toBe('/x')
   })
 
-  it('Button className can override nowrap', () => {
-    render(<Button className="whitespace-normal">x</Button>)
-    expect(screen.getByRole('button').className).toContain('whitespace-normal')
+  it('Button wrap swaps nowrap for normal; default is nowrap', () => {
+    render(<><Button wrap>w</Button><Button>n</Button></>)
+    const w = screen.getByText('w').className, n = screen.getByText('n').className
+    expect(w).toContain('whitespace-normal'); expect(w).not.toContain('whitespace-nowrap')
+    expect(n).toContain('whitespace-nowrap'); expect(n).not.toContain('whitespace-normal')
+  })
+
+  it('Button sm keeps a 44px target at every width', () => {
+    render(<Button size="sm">s</Button>)
+    const c = screen.getByRole('button').className
+    expect(c).toContain('min-h-11'); expect(c).not.toContain('md:min-h-0')
+  })
+
+  it('Button internal/hash href has no target; external has _blank + rel; caller target wins', () => {
+    render(<><Button href="#x">h</Button><Button href="//x.com">p</Button><Button href="https://x.com" target="_self">o</Button></>)
+    const h = screen.getByText('h'), p = screen.getByText('p'), o = screen.getByText('o')
+    expect(h.hasAttribute('target')).toBe(false); expect(h.hasAttribute('rel')).toBe(false)
+    expect(p.getAttribute('target')).toBe('_blank'); expect(p.getAttribute('rel')).toContain('noopener')
+    expect(o.getAttribute('target')).toBe('_self')
+  })
+
+  it('Card as button defaults type=button, caller type wins', () => {
+    render(<><Card as="button">a</Card><Card as="button" type="submit">b</Card></>)
+    expect(screen.getByText('a').getAttribute('type')).toBe('button')
+    expect(screen.getByText('b').getAttribute('type')).toBe('submit')
   })
 })

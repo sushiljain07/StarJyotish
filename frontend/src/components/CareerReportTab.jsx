@@ -352,7 +352,7 @@ function CareerOptionCard({ opt }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{opt.title}</span>
-            <Badge className="whitespace-normal">{opt.field}</Badge>
+            <Badge wrap>{opt.field}</Badge>
             <Badge tone={effortCls}>
               {t('report_effort_label', { level: t(`report_effort_${opt.effort_required}`, { defaultValue: opt.effort_required }) })}
             </Badge>
@@ -823,7 +823,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
           </Card>
         )}
       </div>
-      <Button size="lg" onClick={() => setDepth('full')} className="w-full whitespace-normal text-center">
+      <Button size="lg" onClick={() => setDepth('full')} wrap className="w-full">
         {t('career_see_full')}
       </Button>
       {footer}

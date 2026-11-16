@@ -8,7 +8,7 @@ import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
-import { Badge, Card } from '../components/ui'
+import { Badge, Button, Card } from '../components/ui'
 
 const ACCENT_RING = ['ring-primary/30','ring-sage/30','ring-mauve/30','ring-primary/30','ring-sage/30','ring-mauve/30']
 const AVATAR_BG   = ['bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve']
@@ -124,10 +124,9 @@ function SubmitForm() {
 
         <p className="text-xs text-ink-muted">{t('testimonials_consent')}</p>
 
-        <button type="submit" disabled={saving || form.text.length < 20}
-          className="w-full py-3 bg-primary-dark text-night text-sm font-semibold rounded-xl hover:opacity-90 transition disabled:opacity-50">
+        <Button type="submit" disabled={saving || form.text.length < 20} className="w-full">
           {saving ? t('testimonials_submitting') : t('testimonials_submit')}
-        </button>
+        </Button>
       </form>
     </Card>
   )

@@ -92,7 +92,7 @@ export default function HousesGuide() {
           ) : null
         }
       >
-        <Button size="lg" href="#houses" target="_self">
+        <Button size="lg" href="#houses">
           Explore the 12 Houses
         </Button>
       </Hero>

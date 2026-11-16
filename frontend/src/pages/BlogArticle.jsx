@@ -194,7 +194,7 @@ export default function BlogArticle() {
             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Star Jyotish</p>
             <h2 className="font-serif font-semibold text-xl text-primary-light mb-2">{t('blog_article_cta_title')}</h2>
             <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">{t('blog_article_cta_body')}</p>
-            <Button size="lg" onClick={() => navigate('/generate')} className="whitespace-normal text-center">
+            <Button size="lg" onClick={() => navigate('/generate')} wrap>
               {t('learn_cta_button')}
             </Button>
           </div>

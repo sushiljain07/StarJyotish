@@ -109,7 +109,7 @@ export default function DoshasGuide() {
           ) : null
         }
       >
-        <Button size="lg" href="#doshas" target="_self">
+        <Button size="lg" href="#doshas">
           Understand the Major Doshas
         </Button>
       </Hero>

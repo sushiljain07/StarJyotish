@@ -108,7 +108,7 @@ export default function YogasGuide() {
           ) : null
         }
       >
-        <Button size="lg" href="#yogas" target="_self">
+        <Button size="lg" href="#yogas">
           Explore Key Yogas
         </Button>
       </Hero>

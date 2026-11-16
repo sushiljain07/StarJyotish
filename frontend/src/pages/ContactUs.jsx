@@ -117,7 +117,8 @@ export default function ContactUs() {
             <Button
               type="submit"
               disabled={status === 'sending'}
-              className="w-full sm:w-auto whitespace-normal text-center"
+              wrap
+              className="w-full sm:w-auto"
             >
               {status === 'sending' ? t('contact_sending') : t('contact_send')}
             </Button>

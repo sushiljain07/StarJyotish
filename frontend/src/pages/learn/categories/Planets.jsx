@@ -100,7 +100,7 @@ export default function PlanetsGuideHub() {
         }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button size="lg" href="#planets" target="_self">
+          <Button size="lg" href="#planets">
             Meet the Nine Grahas
           </Button>
         </div>

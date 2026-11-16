@@ -32,13 +32,15 @@ export default function Badge({
   tone = 'neutral',
   surface = 'light',
   size = 'sm',
+  wrap = false,
   className = '',
   children,
   ...rest
 }) {
   const tones = TONES[surface === 'night' ? 'night' : 'light']
   const classes = [
-    'inline-flex items-center gap-1 rounded-full font-semibold whitespace-nowrap',
+    'inline-flex items-center gap-1 rounded-full font-semibold',
+    wrap ? 'whitespace-normal' : 'whitespace-nowrap',
     SIZES[size] ?? SIZES.sm,
     tones[tone] ?? tones.neutral,
     className,

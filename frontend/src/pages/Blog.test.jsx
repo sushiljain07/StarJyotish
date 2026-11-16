@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { HelmetProvider } from 'react-helmet-async'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '../i18n'
 import Blog from './Blog'
 
@@ -13,7 +13,7 @@ if (!window.matchMedia) {
   window.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} })
 }
 
-beforeAll(() => {
+beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} })
 })
 afterEach(() => vi.unstubAllGlobals())

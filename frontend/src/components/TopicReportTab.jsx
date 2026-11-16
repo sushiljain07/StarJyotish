@@ -186,7 +186,7 @@ function HighlightCard({ h }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{h.title}</span>
-            {h.category && <Badge className="whitespace-normal">{h.category}</Badge>}
+            {h.category && <Badge wrap>{h.category}</Badge>}
             <Badge tone={effortCls}>{t('report_effort_label', { level: t(`report_effort_${h.effort_required}`, { defaultValue: h.effort_required }) })}</Badge>
           </div>
           {h.timeline && <p className="text-xs text-ink-muted mt-0.5">{h.timeline}</p>}

@@ -118,7 +118,7 @@ export default function NakshatrasGuide() {
         }
       >
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button size="lg" href="#nakshatras" target="_self">
+          <Button size="lg" href="#nakshatras">
             Explore All 27 Nakshatras
           </Button>
         </div>

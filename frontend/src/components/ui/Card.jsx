@@ -41,5 +41,6 @@ export default function Card({
     className,
   ].join(' ')
 
-  return <Tag className={classes} {...rest}>{children}</Tag>
+  const extra = Tag === 'button' ? { type: 'button' } : {}
+  return <Tag className={classes} {...extra} {...rest}>{children}</Tag>
 }

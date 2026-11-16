@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Card } from '../ui'
 
 // The name and blurb text lives in the locale files (home_charts_<code>_name / _blurb).
 const FEATURED = ['D1', 'D10', 'D9', 'D60']
@@ -62,15 +63,18 @@ export default function ChartsStrip({ profile }) {
         disabled={edge.end} className={`${arrow} -right-1.5`}><span aria-hidden="true" className={disc}>›</span></button>
       <div ref={scroller} onScroll={measure} className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
         {FEATURED.map(code => (
-          <button
+          <Card
+            as="button"
             key={code}
+            surface="night"
+            padding="none"
             onClick={openDivisional}
-            className="flex-shrink-0 w-[148px] text-left rounded-xl border border-white/[0.09] bg-white/[0.045] p-3.5 hover:bg-white/[0.07] transition"
+            className="flex-shrink-0 w-[148px] text-left p-3.5 hover:bg-white/[0.07] transition"
           >
             <p className="text-2xs font-mono text-ink-onnightMuted mb-1.5">{code}</p>
             <p className="font-serif text-sm font-medium text-primary-light mb-1 leading-tight">{t(`home_charts_${code}_name`)}</p>
             <p className="text-2xs text-ink-onnightMuted leading-snug">{t(`home_charts_${code}_blurb`)}</p>
-          </button>
+          </Card>
         ))}
       </div>
     </div>

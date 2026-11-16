@@ -22,6 +22,7 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { localDateStr } from '../../utils/localDate'
+import { Card } from '../ui'
 
 function headlineForDate(profileKey, lang, dateStr) {
   if (!profileKey || !dateStr) return null
@@ -116,11 +117,11 @@ export default function SkyRemembers({ profile, lang = 'en', journeySummary }) {
   const memoryLine = useMemoryLine(profile, lang, journeySummary, t)
 
   return (
-    <div className="bg-white/[0.045] border border-white/[0.09] rounded-card px-5 py-4">
+    <Card surface="night" padding="none" className="px-5 py-4">
       {memoryLine && (
         <p className="text-sm text-ink-onnight leading-relaxed mb-4">{memoryLine}</p>
       )}
       <JournalRow t={t} />
-    </div>
+    </Card>
   )
 }

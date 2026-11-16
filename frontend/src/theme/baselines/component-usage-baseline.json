@@ -161,59 +161,23 @@
   },
   "components/home/AskPersonaPanel.jsx": {
     "lightCard": 5,
-    "arbitraryText": 5,
     "roundedXl": 5
   },
-  "components/home/ChartSpotlight.jsx": {
-    "nightCard": 2,
-    "arbitraryText": 4,
-    "roundedXl": 2
-  },
-  "components/home/ChartsStrip.jsx": {
-    "nightCard": 1,
-    "roundedXl": 1
-  },
-  "components/home/ComingUpStrip.jsx": {
-    "arbitraryText": 1
-  },
   "components/home/DailyPatrikaHero.jsx": {
-    "chip": 2,
-    "arbitraryText": 1
-  },
-  "components/home/DoAvoidCards.jsx": {
-    "nightCard": 2,
-    "arbitraryText": 2,
-    "roundedXl": 2
+    "chip": 1
   },
   "components/home/GoDeeperCta.jsx": {
-    "nightCard": 1,
-    "chip": 2,
-    "arbitraryText": 4,
-    "roundedXl": 2,
-    "shadowSml": 1
+    "chip": 2
   },
   "components/home/HomeMasthead.jsx": {
-    "nightCard": 1,
-    "chip": 4
+    "nightCard": 1
   },
   "components/home/KnowledgeCapsule.jsx": {
-    "nightCard": 1,
-    "arbitraryText": 1,
     "roundedXl": 1
   },
-  "components/home/ReportsStrip.jsx": {
-    "chip": 1,
-    "arbitraryText": 2
-  },
   "components/home/SkyRemembers.jsx": {
-    "nightCard": 2,
+    "nightCard": 1,
     "roundedXl": 2
-  },
-  "components/home/TodayWindow.jsx": {
-    "nightCard": 1
-  },
-  "components/home/WeekStrip.jsx": {
-    "nightCard": 1
   },
   "components/knowledge/ArticleCard.jsx": {
     "lightCard": 1,
@@ -342,9 +306,6 @@
     "lightCard": 7,
     "arbitraryText": 14,
     "roundedXl": 18
-  },
-  "pages/PersonalHome.jsx": {
-    "arbitraryText": 1
   },
   "pages/Pricing.jsx": {
     "goldCta": 1

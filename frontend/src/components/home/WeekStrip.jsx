@@ -19,6 +19,7 @@ import { weekDayScore } from '../../utils/weekScore'
 import { localDateStr } from '../../utils/localDate'
 import { formatDate } from '../../utils/format'
 import { useRenderedScale, legibleSize } from '../../hooks/useRenderedScale'
+import { Card } from '../ui'
 
 function shortDayName(dateStr) {
   return formatDate(dateStr, { weekday: 'short' })
@@ -69,7 +70,7 @@ export default function WeekStrip({ week }) {
   const brightest = points.reduce((best, p) => (p.score > best.score ? p : best), points[0])
 
   return (
-    <div className="bg-white/[0.045] border border-white/[0.09] rounded-card p-4 sm:p-5">
+    <Card surface="night">
       <div className="relative">
         <svg ref={svgRef} viewBox="0 0 400 160" className="w-full h-auto block" aria-label={t('home_week_constellation_aria')}>
           <path d={pathD} fill="none" className="stroke-primary-glow" strokeOpacity={0.28} strokeWidth={1} strokeDasharray="3 4" />
@@ -129,6 +130,6 @@ export default function WeekStrip({ week }) {
           day: shortDayName(brightest.day.date),
         })}
       </p>
-    </div>
+    </Card>
   )
 }

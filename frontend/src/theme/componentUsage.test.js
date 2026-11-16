@@ -13,13 +13,16 @@ const BASELINE_PATH = path.join(HERE, 'baselines', 'component-usage-baseline.jso
 
 const COUNTERS = {
   goldCta: /hover:bg-primary-dark/g,
-  lightCard: /bg-parchment-card(?=[^"'`]*border-line)|border-line(?=[^"'`]*bg-parchment-card)/g,
-  nightCard: /bg-white\/\[0\.0[3-6]\d?\](?=[^"'`]*border-white\/)/g,
-  chip: /rounded-full(?=[^"'`]*px-[\d.]+)(?=[^"'`]*text-(?:2xs|3xs|xs)\b)/g,
+  // Order-independent: one match per class string (quote-delimited) holding every part.
+  lightCard: /(?<=["'`])(?=[^"'`]*\bbg-parchment-card\b)(?=[^"'`]*\bborder-line\b)[^"'`]*/g,
+  nightCard: /(?<=["'`])(?=[^"'`]*\bbg-white\/\[0\.0[3-6]\d?\])(?=[^"'`]*\bborder-white\/)[^"'`]*/g,
+  chip: /(?<=["'`])(?=[^"'`]*\brounded-full\b)(?=[^"'`]*\bpx-[\d.]+)(?=[^"'`]*\btext-(?:2xs|3xs|xs)\b)[^"'`]*/g,
   arbitraryText: /text-\[\d+(?:\.\d+)?px\]/g,
   roundedXl: /\brounded-(?:xl|2xl)\b/g,
   shadowSml: /\bshadow-(?:sm|md|lg)\b/g,
 }
+
+const count = (re, text) => (text.match(re) || []).filter(Boolean).length
 
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -35,9 +38,17 @@ const files = walk(SRC)
   .filter(rel => !rel.startsWith('components/ui/'))
   .sort()
 
+it('counters match class strings in any order, once per string', () => {
+  const chipA = '<span className="rounded-full px-2 py-0.5 text-xs">'
+  const chipB = '<span className="text-xs bg-parchment px-2 py-0.5 rounded-full border">'
+  expect(count(COUNTERS.chip, chipA + chipB)).toBe(2)
+  expect(count(COUNTERS.chip, '<b className="rounded-full text-xs">')).toBe(0)
+  expect(count(COUNTERS.lightCard, '"bg-parchment-card p-4 border-line" "border-line bg-parchment-card"')).toBe(2)
+  expect(count(COUNTERS.nightCard, '"bg-white/[0.045] border border-white/[0.09]" "border-white/10 bg-white/[0.04]" "bg-white/[0.045]"')).toBe(2)
+})
+
 it('finds the source files (guards against a broken walk)', () => expect(files.length).toBeGreaterThan(50))
 
-const count = (re, text) => (text.match(re) || []).length
 const current = {}
 for (const rel of files) {
   const text = fs.readFileSync(path.join(SRC, rel), 'utf8')

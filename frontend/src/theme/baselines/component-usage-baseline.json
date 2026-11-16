@@ -14,6 +14,7 @@
   "components/AskChart.jsx": {
     "goldCta": 1,
     "lightCard": 2,
+    "chip": 1,
     "arbitraryText": 1,
     "roundedXl": 5,
     "shadowSml": 1
@@ -21,18 +22,21 @@
   "components/AskPersonaCard.jsx": {
     "goldCta": 1,
     "lightCard": 2,
+    "chip": 1,
     "arbitraryText": 1,
     "roundedXl": 4,
     "shadowSml": 3
   },
   "components/BhavaChalit.jsx": {
     "lightCard": 2,
+    "chip": 1,
     "arbitraryText": 1,
     "roundedXl": 3
   },
   "components/CareerReportTab.jsx": {
     "goldCta": 5,
     "lightCard": 10,
+    "chip": 5,
     "arbitraryText": 2,
     "roundedXl": 18,
     "shadowSml": 14
@@ -80,6 +84,7 @@
   "components/KundliDownload.jsx": {
     "goldCta": 1,
     "lightCard": 2,
+    "chip": 4,
     "roundedXl": 1
   },
   "components/LanguageSwitcher.jsx": {
@@ -101,6 +106,7 @@
   },
   "components/RajyogasTab.jsx": {
     "lightCard": 1,
+    "chip": 2,
     "roundedXl": 4,
     "shadowSml": 3
   },
@@ -123,7 +129,8 @@
     "lightCard": 1
   },
   "components/SiteHeader.jsx": {
-    "goldCta": 1
+    "goldCta": 1,
+    "chip": 2
   },
   "components/SocialButtons.jsx": {
     "lightCard": 1
@@ -136,6 +143,7 @@
   "components/TopicReportTab.jsx": {
     "goldCta": 2,
     "lightCard": 3,
+    "chip": 3,
     "arbitraryText": 2,
     "roundedXl": 8,
     "shadowSml": 9
@@ -162,12 +170,14 @@
     "roundedXl": 2
   },
   "components/home/ChartsStrip.jsx": {
+    "nightCard": 1,
     "roundedXl": 1
   },
   "components/home/ComingUpStrip.jsx": {
     "arbitraryText": 1
   },
   "components/home/DailyPatrikaHero.jsx": {
+    "chip": 2,
     "arbitraryText": 1
   },
   "components/home/DoAvoidCards.jsx": {
@@ -177,12 +187,14 @@
   },
   "components/home/GoDeeperCta.jsx": {
     "nightCard": 1,
+    "chip": 2,
     "arbitraryText": 4,
     "roundedXl": 2,
     "shadowSml": 1
   },
   "components/home/HomeMasthead.jsx": {
-    "nightCard": 1
+    "nightCard": 1,
+    "chip": 4
   },
   "components/home/KnowledgeCapsule.jsx": {
     "nightCard": 1,
@@ -190,6 +202,7 @@
     "roundedXl": 1
   },
   "components/home/ReportsStrip.jsx": {
+    "chip": 1,
     "arbitraryText": 2
   },
   "components/home/SkyRemembers.jsx": {
@@ -214,7 +227,8 @@
     "shadowSml": 2
   },
   "components/knowledge/LearningPath.jsx": {
-    "lightCard": 2
+    "lightCard": 2,
+    "chip": 1
   },
   "components/knowledge/QuickFacts.jsx": {
     "lightCard": 1,
@@ -227,12 +241,17 @@
   },
   "components/knowledge/RelatedArticles.jsx": {
     "lightCard": 2,
+    "chip": 1,
     "arbitraryText": 2,
     "roundedXl": 2,
     "shadowSml": 2
   },
+  "components/knowledge/SignNav.jsx": {
+    "chip": 1
+  },
   "components/knowledge/ZodiacCard.jsx": {
     "lightCard": 1,
+    "chip": 1,
     "roundedXl": 1,
     "shadowSml": 1
   },
@@ -261,15 +280,18 @@
   },
   "pages/AdminDashboard.jsx": {
     "lightCard": 5,
+    "chip": 3,
     "roundedXl": 1
   },
   "pages/AstrologerDashboard.jsx": {
     "lightCard": 2,
+    "chip": 4,
     "roundedXl": 2,
     "shadowSml": 1
   },
   "pages/Blog.jsx": {
     "lightCard": 3,
+    "chip": 1,
     "arbitraryText": 3,
     "roundedXl": 4,
     "shadowSml": 2
@@ -277,6 +299,7 @@
   "pages/BlogArticle.jsx": {
     "goldCta": 1,
     "lightCard": 2,
+    "chip": 2,
     "arbitraryText": 1,
     "roundedXl": 1,
     "shadowSml": 3
@@ -284,6 +307,7 @@
   "pages/ContactUs.jsx": {
     "goldCta": 1,
     "lightCard": 2,
+    "chip": 1,
     "roundedXl": 3
   },
   "pages/Disclaimer.jsx": {
@@ -332,6 +356,7 @@
   "pages/Profile.jsx": {
     "goldCta": 3,
     "lightCard": 5,
+    "chip": 1,
     "roundedXl": 5,
     "shadowSml": 5
   },
@@ -340,6 +365,7 @@
   },
   "pages/Result.jsx": {
     "lightCard": 3,
+    "chip": 3,
     "roundedXl": 4
   },
   "pages/TermsOfUse.jsx": {
@@ -427,6 +453,7 @@
   "pages/learn/categories/Planets.jsx": {
     "goldCta": 1,
     "lightCard": 1,
+    "chip": 1,
     "arbitraryText": 4,
     "roundedXl": 2,
     "shadowSml": 2
@@ -434,6 +461,7 @@
   "pages/learn/categories/Yogas.jsx": {
     "goldCta": 1,
     "lightCard": 1,
+    "chip": 1,
     "arbitraryText": 4,
     "roundedXl": 2,
     "shadowSml": 2
@@ -468,16 +496,19 @@
   },
   "pages/learn/paths/CareerPath.jsx": {
     "lightCard": 2,
+    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },
   "pages/learn/paths/MarriagePath.jsx": {
     "lightCard": 2,
+    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },
   "pages/learn/paths/NewToVedic.jsx": {
     "lightCard": 2,
+    "chip": 2,
     "roundedXl": 3,
     "shadowSml": 1
   },

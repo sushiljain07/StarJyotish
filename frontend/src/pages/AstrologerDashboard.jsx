@@ -1,6 +1,7 @@
 // frontend/src/pages/AstrologerDashboard.jsx
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Badge } from '../components/ui'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -57,20 +58,20 @@ function StatBox({ label, value, sub }) {
 
 function KycBadge({ status }) {
   const map = {
-    verified: { color: 'bg-sage-light text-sage', label: '✓ KYC Verified' },
-    pending:  { color: 'bg-primary-light text-primary-ink', label: '⏳ KYC Pending' },
-    rejected: { color: 'bg-vermillion-light text-vermillion', label: '✗ KYC Rejected' },
+    verified: { color: '!bg-sage-light !text-sage !border-transparent', label: '✓ KYC Verified' },
+    pending:  { color: '!bg-primary-light !text-primary-ink !border-transparent', label: '⏳ KYC Pending' },
+    rejected: { color: '!bg-vermillion-light !text-vermillion !border-transparent', label: '✗ KYC Rejected' },
   }
   const s = map[status] ?? map.pending
-  return <span className={`text-xs font-semibold px-3 py-1 rounded-full ${s.color}`}>{s.label}</span>
+  return <Badge size="md" className={s.color}>{s.label}</Badge>
 }
 
 const STATUS_COLOR = {
-  pending:   'bg-primary-light text-primary-ink',
-  confirmed: 'bg-sage-light text-sage',
-  completed: 'bg-parchment text-ink-muted',
-  cancelled: 'bg-vermillion-light text-vermillion',
-  refunded:  'bg-mauve-light text-mauve',
+  pending:   '!bg-primary-light !text-primary-ink !border-transparent',
+  confirmed: '!bg-sage-light !text-sage !border-transparent',
+  completed: '!bg-parchment !text-ink-muted !border-transparent',
+  cancelled: '!bg-vermillion-light !text-vermillion !border-transparent',
+  refunded:  '!bg-mauve-light !text-mauve !border-transparent',
 }
 
 // ── Overview tab ───────────────────────────────────────────────────────────────
@@ -135,12 +136,12 @@ function OverviewTab({ token }) {
               <div className="text-xs text-ink-muted">{profile.phone_number}</div>
               <div className="flex flex-wrap gap-2 mt-2">
                 <KycBadge status={profile.kyc_status} />
-                <span className="text-xs bg-parchment text-ink-muted px-2 py-0.5 rounded-full border border-line">
+                <Badge>
                   ⭐ {Number(profile.rating_avg).toFixed(1)} ({profile.rating_count} reviews)
-                </span>
-                <span className="text-xs bg-parchment text-ink-muted px-2 py-0.5 rounded-full border border-line">
+                </Badge>
+                <Badge>
                   ₹{profile.price_per_session}/session
-                </span>
+                </Badge>
               </div>
               {profile.specialties?.length > 0 && (
                 <div className="text-xs text-ink-muted mt-2">{profile.specialties.join(' · ')}</div>
@@ -213,9 +214,9 @@ function BookingsTab({ token }) {
                   {b.notes && <div className="text-xs text-ink-muted mt-1 italic">"{b.notes}"</div>}
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOR[b.status] ?? 'bg-parchment text-ink-muted'}`}>
+                  <Badge className={STATUS_COLOR[b.status] ?? '!bg-parchment !text-ink-muted'}>
                     {b.status}
-                  </span>
+                  </Badge>
                   <span className="text-sm font-bold text-ink">₹{Number(b.price).toLocaleString('en-IN')}</span>
                 </div>
               </div>

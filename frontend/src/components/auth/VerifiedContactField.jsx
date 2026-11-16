@@ -14,6 +14,7 @@
 // the outer Profile save.
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '../ui'
 import { useAuth } from '../../contexts/AuthContext'
 
 const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
@@ -113,10 +114,9 @@ export default function VerifiedContactField({ kind = 'phone' }) {
             onChange={e => setPhone(e.target.value)}
             className={inputCls}
           />
-          <button type="submit" disabled={loading}
-                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
+          <Button type="submit" disabled={loading} className="shrink-0">
             {loading ? t('login_sending') : t('login_send_code')}
-          </button>
+          </Button>
           <button type="button" onClick={cancel} className="inline-flex items-center min-h-11 text-ink-muted hover:text-ink text-sm shrink-0">
             {t('profile_cancel')}
           </button>
@@ -139,10 +139,9 @@ export default function VerifiedContactField({ kind = 'phone' }) {
             onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
             className={`${inputCls} tracking-[0.4em] text-center`}
           />
-          <button type="submit" disabled={loading || code.length !== 6}
-                  className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
+          <Button type="submit" disabled={loading || code.length !== 6} className="shrink-0">
             {loading ? t('login_verifying') : t('login_verify')}
-          </button>
+          </Button>
           <button type="button" onClick={cancel} className="inline-flex items-center min-h-11 text-ink-muted hover:text-ink text-sm shrink-0">
             {t('profile_cancel')}
           </button>
@@ -170,10 +169,9 @@ export default function VerifiedContactField({ kind = 'phone' }) {
           </button>
         </>
       ) : (
-        <button type="button" onClick={startFlow}
-                className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-4 py-2 min-h-11 rounded-lg transition whitespace-nowrap">
+        <Button onClick={startFlow} className="shrink-0">
           {isEmail ? t('profile_add_email') : t('profile_add_number')}
-        </button>
+        </Button>
       )}
     </div>
   )

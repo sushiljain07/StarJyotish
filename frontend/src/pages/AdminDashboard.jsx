@@ -1,6 +1,7 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { Badge as UiBadge } from '../components/ui'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -28,15 +29,15 @@ const TABS = [
 
 function Badge({ color, children }) {
   const colors = {
-    green:  'bg-sage-light text-sage',
-    red:    'bg-vermillion-light text-vermillion',
-    yellow: 'bg-primary-light text-primary-ink',
-    gray:   'bg-parchment text-ink-muted',
+    green:  '!bg-sage-light !text-sage !border-transparent',
+    red:    '!bg-vermillion-light !text-vermillion !border-transparent',
+    yellow: '!bg-primary-light !text-primary-ink !border-transparent',
+    gray:   '!bg-parchment !text-ink-muted !border-transparent',
   }
   return (
-    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${colors[color] ?? colors.gray}`}>
+    <UiBadge className={colors[color] ?? colors.gray}>
       {children}
-    </span>
+    </UiBadge>
   )
 }
 
@@ -528,7 +529,7 @@ const BLOG_ARTICLE_TEMPLATE = {
   ],
 }
 
-const STATUS_COLOR = { published: 'bg-sage-light text-sage', draft: 'bg-primary-light text-primary-ink', archived: 'bg-parchment text-ink-muted' }
+const STATUS_COLOR = { published: '!bg-sage-light !text-sage !border-transparent', draft: '!bg-primary-light !text-primary-ink !border-transparent', archived: '!bg-parchment !text-ink-muted !border-transparent' }
 
 function BlogTab({ token }) {
   const [settings, setSettings] = useState({})
@@ -680,7 +681,7 @@ function BlogTab({ token }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOR[status] ?? STATUS_COLOR.draft}`}>{status}</span>
+                      <UiBadge className={STATUS_COLOR[status] ?? STATUS_COLOR.draft}>{status}</UiBadge>
                       {art.category && <span className="text-xs text-ink-muted">{art.category}</span>}
                       {art.featured && <span className="text-xs text-primary-ink font-medium">★ Featured</span>}
                       {inIndex && <span className="text-xs text-ink-muted">#{index.indexOf(slug)+1}</span>}
@@ -714,10 +715,10 @@ function BlogTab({ token }) {
 // ── Testimonials admin tab ─────────────────────────────────────────────────────
 
 const STATUS_LABELS = {
-  pending:  { label: 'Pending',  color: 'bg-primary-light text-primary-ink' },
-  approved: { label: 'Approved', color: 'bg-sage-light text-sage' },
-  featured: { label: 'Featured', color: 'bg-primary text-night' },
-  rejected: { label: 'Rejected', color: 'bg-vermillion-light text-vermillion' },
+  pending:  { label: 'Pending',  color: '!bg-primary-light !text-primary-ink !border-transparent' },
+  approved: { label: 'Approved', color: '!bg-sage-light !text-sage !border-transparent' },
+  featured: { label: 'Featured', color: '!bg-primary !text-night !border-transparent' },
+  rejected: { label: 'Rejected', color: '!bg-vermillion-light !text-vermillion !border-transparent' },
 }
 
 function TestimonialsAdminTab({ token }) {
@@ -767,7 +768,7 @@ function TestimonialsAdminTab({ token }) {
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
+                      <UiBadge className={s.color}>{s.label}</UiBadge>
                       <span className="text-xs font-semibold text-ink">{t.display_name}</span>
                       {t.location && <span className="text-xs text-ink-muted">{t.location}</span>}
                     </div>

@@ -45,8 +45,8 @@ function Anga({ label, value, sub }) {
   return (
     <div className="rounded-xl border border-line bg-parchment-card px-4 py-3.5">
       <p className="text-2xs uppercase tracking-wider text-ink-muted mb-1.5">{label}</p>
-      <p className="font-serif text-[15px] font-semibold text-ink">{value ?? '—'}</p>
-      {sub && <p className="text-[11px] text-ink-muted mt-0.5">{sub}</p>}
+      <p className="font-serif text-base font-semibold text-ink">{value ?? '—'}</p>
+      {sub && <p className="text-2xs text-ink-muted mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -260,25 +260,25 @@ function PanchangTable({ days, highlightToday = true }) {
             <div className="flex flex-col justify-center min-w-0 pr-2">
               <div className="flex items-center gap-1.5">
                 {paksha && <span className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 ${PAKSHA_DOT[paksha] ?? 'bg-ink-faint'}`} />}
-                <span className="font-serif text-[12px] font-medium text-ink truncate">{tithiName}</span>
+                <span className="font-serif text-xs font-medium text-ink truncate">{tithiName}</span>
               </div>
               {tithiEnd && <span className="text-2xs text-ink-muted truncate">{t('panchang_ends', { time: tithiEnd })}</span>}
             </div>
 
             {/* Nakshatra */}
             <div className="flex flex-col justify-center min-w-0 pr-2">
-              <span className="text-[12px] text-ink truncate">{nakName}</span>
+              <span className="text-xs text-ink truncate">{nakName}</span>
               {nakEnd && <span className="text-2xs text-ink-muted truncate">{t('panchang_ends', { time: nakEnd })}</span>}
             </div>
 
             {/* Yoga — hidden on mobile */}
             <div className="hidden sm:flex flex-col justify-center min-w-0 pr-2">
-              <span className="text-[12px] text-ink truncate">{panchangName(t, 'yoga', day.yoga)}</span>
+              <span className="text-xs text-ink truncate">{panchangName(t, 'yoga', day.yoga)}</span>
             </div>
 
             {/* Sunrise */}
             <div className="flex flex-col justify-center text-right">
-              <span className="text-[11px] text-ink-muted tabular-nums">{day.sunrise}</span>
+              <span className="text-2xs text-ink-muted tabular-nums">{day.sunrise}</span>
             </div>
           </div>
         )
@@ -314,7 +314,7 @@ function TodayTab({ location, date, onSetLocation }) {
 
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           <section>
-            <h2 className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_pancha_anga')}</h2>
+            <h2 className="text-2xs uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_pancha_anga')}</h2>
             <div className="grid grid-cols-2 gap-2.5">
               <Anga label={t('panchang_tithi')} value={data.tithi?.name ? panchangName(t, 'tithi', data.tithi.name) : undefined}
                 sub={[
@@ -333,7 +333,7 @@ function TodayTab({ location, date, onSetLocation }) {
 
           <div className="space-y-6">
           <section>
-            <h2 className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_sky_timings')}</h2>
+            <h2 className="text-2xs uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_sky_timings')}</h2>
             <div className="rounded-xl border border-line bg-parchment-card px-4">
               <Row label={`🌅 ${t('panchang_sunrise')}`} value={data.sunrise} />
               <Row label={`🌇 ${t('panchang_sunset')}`} value={data.sunset} />
@@ -344,7 +344,7 @@ function TodayTab({ location, date, onSetLocation }) {
 
           {data.muhurtas && (
             <section>
-              <h2 className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_windows_heading')}</h2>
+              <h2 className="text-2xs uppercase tracking-widest text-primary-ink font-bold mb-3">{t('panchang_windows_heading')}</h2>
               <div className="rounded-xl border border-line bg-parchment-card px-4">
                 {data.muhurtas.abhijit_muhurta && (
                   <Row label={<span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-sage inline-block shrink-0" />{t('panchang_abhijit_muhurta')}</span>}
@@ -363,7 +363,7 @@ function TodayTab({ location, date, onSetLocation }) {
                     value={`${data.muhurtas.gulika_kaal.start} – ${data.muhurtas.gulika_kaal.end}`} />
                 )}
               </div>
-              <p className="text-[11px] text-ink-muted mt-2">
+              <p className="text-2xs text-ink-muted mt-2">
                 <span className="w-2 h-2 rounded-full bg-sage inline-block mr-1 align-middle" />{t('panchang_legend_auspicious')} &nbsp;
                 <span className="w-2 h-2 rounded-full bg-vermillion inline-block mr-1 align-middle" />{t('panchang_legend_avoid')}
               </p>
@@ -374,7 +374,7 @@ function TodayTab({ location, date, onSetLocation }) {
 
           {data.upcoming_eclipse && (
             <div className="rounded-xl border border-primary/25 bg-primary-light px-4 py-3.5">
-              <p className="text-[11px] uppercase tracking-widest text-primary-ink font-bold mb-1">{t('panchang_upcoming_eclipse')}</p>
+              <p className="text-2xs uppercase tracking-widest text-primary-ink font-bold mb-1">{t('panchang_upcoming_eclipse')}</p>
               <p className="text-sm text-ink">
                 {data.upcoming_eclipse.peak_time_local
                   ? t('panchang_eclipse_line_at', { name: eclipseName(t, data.upcoming_eclipse), date: localizeBackendDate(t, data.upcoming_eclipse.date), time: data.upcoming_eclipse.peak_time_local })
@@ -383,7 +383,7 @@ function TodayTab({ location, date, onSetLocation }) {
             </div>
           )}
 
-          <p className="text-[11px] text-ink-muted leading-relaxed">{t('panchang_amrit_note')}</p>
+          <p className="text-2xs text-ink-muted leading-relaxed">{t('panchang_amrit_note')}</p>
         </>
       )}
     </div>
@@ -468,7 +468,7 @@ function HinduMonthTab({ location, onSetLocation }) {
 function PanchangTableLegend() {
   const { t } = useTranslation()
   return (
-    <p className="text-[11px] text-ink-muted">
+    <p className="text-2xs text-ink-muted">
       <span className="inline-flex items-center gap-1 mr-4">
         <span className="inline-block w-2 h-2 rounded-full bg-primary-ink" /> {t('panchang_legend_shukla')}
       </span>
@@ -538,7 +538,7 @@ export default function PanchangDetail() {
       {/* Dark hero */}
       <div className="bg-night pt-8 pb-8">
         <PageContainer width="app">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">{t('panchang_eyebrow')}</p>
+          <p className="text-2xs font-bold uppercase tracking-widest text-primary mb-2">{t('panchang_eyebrow')}</p>
           <h1 className="font-serif text-3xl font-medium text-primary-light leading-snug">{heroTitle}</h1>
           {tab === 'today' && isToday && (
             <p className="text-sm text-ink-onnightMuted mt-1">{formatLong(date)}</p>

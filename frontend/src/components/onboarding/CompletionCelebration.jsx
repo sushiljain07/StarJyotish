@@ -7,6 +7,7 @@
 // Astrology Profile now exists") before handing off, which is what makes
 // the ending feel like an arrival rather than a redirect.
 import HomeIcon from '../home/HomeIcons'
+import { Button } from '../ui'
 
 export default function CompletionCelebration({ t, label, onContinue }) {
   return (
@@ -18,12 +19,9 @@ export default function CompletionCelebration({ t, label, onContinue }) {
       <p className="text-ink-muted text-sm max-w-xs mx-auto mb-8">
         {t('onboarding_complete_body', { name: label })}
       </p>
-      <button
-        onClick={onContinue}
-        className="bg-primary hover:bg-primary-dark text-night font-semibold px-6 py-3 rounded-full transition"
-      >
+      <Button size="lg" onClick={onContinue}>
         {t('onboarding_complete_cta')}
-      </button>
+      </Button>
     </div>
   )
 }

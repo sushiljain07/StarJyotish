@@ -5,6 +5,8 @@
 // renders inside. Keeping title/helper/footer structure identical across
 // steps is what makes the flow feel like one continuous conversation
 // rather than six different forms stitched together.
+import { Button } from '../ui'
+
 export default function QuestionCard({ title, helperText, children, primaryLabel, onPrimary, primaryDisabled, primaryLoading }) {
   return (
     <div className="bg-parchment-card rounded-2xl shadow-md border border-line p-6 sm:p-8">
@@ -14,13 +16,14 @@ export default function QuestionCard({ title, helperText, children, primaryLabel
       <div className={helperText ? '' : 'mt-6'}>{children}</div>
 
       {primaryLabel && (
-        <button
+        <Button
+          size="lg"
           onClick={onPrimary}
           disabled={primaryDisabled}
-          className="w-full mt-7 bg-primary hover:bg-primary-dark disabled:bg-primary/40 disabled:cursor-not-allowed text-night font-semibold py-3 rounded-full transition"
+          className="w-full mt-7"
         >
           {primaryLoading ? '…' : primaryLabel}
-        </button>
+        </Button>
       )}
     </div>
   )

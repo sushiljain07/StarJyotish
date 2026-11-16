@@ -25,6 +25,7 @@ import { fetchReverseGeocode } from '../api/astro'
 import { LANGUAGES, DEFAULT_LANGUAGE, currentLanguage, localeFor } from '../i18n/languages'
 import { markLanguageChosenByUser } from '../i18n'
 import PageContainer from '../components/ui/PageContainer'
+import { Button } from '../components/ui'
 
 const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -250,10 +251,9 @@ export default function Profile() {
           {error && <p className="text-vermillion text-sm">{error}</p>}
 
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={saving}
-                    className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 min-h-11 rounded-full transition">
+            <Button type="submit" disabled={saving}>
               {saving ? t('profile_saving') : t('profile_save')}
-            </button>
+            </Button>
             {savedAt && <span className="text-sage text-sm">{t('profile_saved')}</span>}
           </div>
         </form>
@@ -359,14 +359,14 @@ export default function Profile() {
                     </div>
                   )}
                   <div className="flex gap-2 items-start flex-wrap">
-                    <button
-                      type="button"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={useMyLocationForAstro}
                       disabled={astroLocationStatus === 'requesting'}
-                      className="text-xs font-semibold border border-primary rounded-full px-3.5 py-2 min-h-11 text-primary-ink hover:bg-primary-light/40 transition disabled:opacity-50"
                     >
                       {astroLocationStatus === 'requesting' ? t('profile_current_location_requesting') : t('profile_current_location_use_gps')}
-                    </button>
+                    </Button>
                     <div className="flex-1 min-w-[180px]">
                       <PlaceCombobox
                         id="profile-current-location"
@@ -389,10 +389,9 @@ export default function Profile() {
                 {astroError && <p className="text-vermillion text-sm">{astroError}</p>}
 
                 <div className="flex items-center gap-3">
-                  <button type="submit" disabled={astroSaving}
-                          className="bg-primary hover:bg-primary-dark disabled:bg-primary/40 text-night font-semibold text-sm px-5 py-2.5 min-h-11 rounded-full transition">
+                  <Button type="submit" disabled={astroSaving}>
                     {astroSaving ? t('profile_saving') : t('profile_save')}
-                  </button>
+                  </Button>
                   <button type="button" onClick={() => setEditingAstro(false)} className="inline-flex items-center min-h-11 text-sm text-ink-muted hover:underline">
                     {t('profile_astro_cancel')}
                   </button>
@@ -405,9 +404,9 @@ export default function Profile() {
         {!profileState && (
           <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 text-center">
             <p className="text-ink-muted text-sm mb-3">{t('profile_astro_none')}</p>
-            <Link to="/onboarding" className="inline-flex items-center min-h-11 bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-5 py-2.5 rounded-full transition">
+            <Button to="/onboarding">
               {t('profile_astro_create')}
-            </Link>
+            </Button>
           </div>
         )}
 

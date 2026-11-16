@@ -16,6 +16,8 @@ const BASELINE_PATH = path.join(HERE, 'baselines', 'component-usage-baseline.jso
 // "lower" a count by splitting a class string. goldCta and arbitraryText are plain token counts;
 // Task 6 turns them into hard zero guards. `rounded-full px-N text-xs` also matches pill buttons and
 // avatars: migrate those case by case to Button or Badge.
+// Allow-list (hand-built on purpose, stays in the baseline): components/ScrollToTop.jsx keeps its
+// 44px icon-only floating button (a Button pill does not fit); its goldCta stays at 1.
 const COUNTERS = {
   goldCta: /hover:bg-primary-dark/g,
   // Order-independent: one match per class string (quote-delimited) holding every part.

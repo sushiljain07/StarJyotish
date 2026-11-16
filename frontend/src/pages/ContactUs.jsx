@@ -12,6 +12,7 @@ import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import SocialButtons from '../components/SocialButtons'
 import InlineNotice from '../components/ui/InlineNotice'
+import { Button } from '../components/ui'
 import useTimedNotice from '../components/ui/useTimedNotice'
 import { API_BASE } from '../api/config'
 
@@ -68,13 +69,14 @@ export default function ContactUs() {
               {CONTACT_EMAIL}
             </a>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={waNotice.show}
-            className="bg-sage-light text-sage border border-sage/30 text-xs font-semibold px-3.5 py-2 rounded-full transition hover:bg-sage/20 shrink-0 self-start sm:self-auto"
+            className="!bg-sage-light !text-sage border border-sage/30 hover:!bg-sage/20 shrink-0 self-start sm:self-auto whitespace-normal text-center"
           >
             {t('contact_whatsapp_cta')}
-          </button>
+          </Button>
         </div>
         {waNotice.visible && (
           <InlineNotice onDismiss={waNotice.hide}>{t('contact_whatsapp_alert')}</InlineNotice>
@@ -113,13 +115,13 @@ export default function ContactUs() {
               <textarea required rows={5} disabled={status === 'sending'} value={form.message} onChange={update('message')} className={inputCls} />
             </div>
             {status === 'error' && <p className="text-vermillion text-sm">{errorMsg}</p>}
-            <button
+            <Button
               type="submit"
               disabled={status === 'sending'}
-              className="bg-primary hover:bg-primary-dark disabled:bg-primary/50 text-night font-semibold text-sm px-6 py-2.5 rounded-full shadow transition w-full sm:w-auto"
+              className="w-full sm:w-auto whitespace-normal text-center"
             >
               {status === 'sending' ? t('contact_sending') : t('contact_send')}
-            </button>
+            </Button>
           </form>
         )}
 

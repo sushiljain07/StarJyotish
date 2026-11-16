@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
-import { Button } from '../components/ui'
+import { Button, Badge } from '../components/ui'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import FaqSchema from '../components/FaqSchema'
@@ -183,12 +183,9 @@ export default function Landing() {
             there instead of overflowing or getting cramped). */}
         <div className="relative flex flex-wrap justify-center gap-2 mt-5 max-w-md sm:max-w-3xl mx-auto">
           {BADGES.map(key => (
-            <span
-              key={key}
-              className="bg-primary/10 text-primary text-[11px] font-medium px-3 py-1 rounded-full border border-primary/30"
-            >
+            <Badge key={key} tone="gold" surface="night" size="md">
               {t(key)}
-            </span>
+            </Badge>
           ))}
         </div>
 

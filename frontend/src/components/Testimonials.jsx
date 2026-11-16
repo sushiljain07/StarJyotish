@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { API_BASE } from '../api/config'
 import Reveal from './Reveal'
+import { Badge } from './ui'
 
 const ACCENT_RING = ['ring-primary/30','ring-sage/30','ring-mauve/30','ring-primary/30']
 const AVATAR_BG   = ['bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-ink']
@@ -31,10 +32,10 @@ function TestimonialCard({ t, i }) {
       <blockquote className="text-ink text-sm leading-relaxed flex-1">{t.text}</blockquote>
       {t.detail && (
         <div className="mt-4 mb-4">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-ink bg-primary-light px-2.5 py-1 rounded-full">
+          <Badge tone="gold" size="md">
             <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor" aria-hidden="true"><circle cx="8" cy="8" r="2.5"/></svg>
             {t.detail}
-          </span>
+          </Badge>
         </div>
       )}
       <figcaption className="flex items-center gap-3 pt-4 border-t border-line">

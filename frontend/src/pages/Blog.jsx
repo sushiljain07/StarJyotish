@@ -14,6 +14,7 @@ import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
+import { Badge } from '../components/ui'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
@@ -26,10 +27,10 @@ const CATEGORIES = [
   { value: 'Remedies', key: 'blog_cat_remedies' },
 ]
 const CATEGORY_COLORS = {
-  Basics:   'bg-primary-light text-primary-ink',
-  Timing:   'bg-mauve-light text-mauve',
-  Planets:  'bg-sage-light text-sage',
-  Remedies: 'bg-vermillion-light text-vermillion',
+  Basics:   '!bg-primary-light !text-primary-ink !border-transparent',
+  Timing:   '!bg-mauve-light !text-mauve !border-transparent',
+  Planets:  '!bg-sage-light !text-sage !border-transparent',
+  Remedies: '!bg-vermillion-light !text-vermillion !border-transparent',
 }
 
 function ArticleCard({ article, featured = false, onClick }) {
@@ -39,7 +40,7 @@ function ArticleCard({ article, featured = false, onClick }) {
       <button onClick={onClick} className="w-full text-left bg-night rounded-2xl overflow-hidden hover:opacity-95 transition group">
         <div className="p-7 sm:p-9">
           <div className="flex items-center gap-2.5 mb-4">
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink-muted'}`}>{article.category}</span>
+            <Badge size="md" className={CATEGORY_COLORS[article.category] ?? '!bg-parchment !text-ink-muted'}>{article.category}</Badge>
             <span className="text-ink-onnight text-xs">{t('blog_read_min_long', { n: article.readMin })}</span>
           </div>
           <h2 className="font-serif font-semibold text-xl sm:text-2xl text-primary-light leading-snug group-hover:text-primary transition mb-3">{article.title}</h2>
@@ -55,13 +56,13 @@ function ArticleCard({ article, featured = false, onClick }) {
   return (
     <button onClick={onClick} className="w-full text-left bg-parchment-card rounded-xl border border-line hover:border-primary/30 hover:shadow-md transition group p-5 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-3">
-        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink-muted'}`}>{article.category}</span>
-        <span className="text-ink-muted text-[11px]">{t('blog_read_min_short', { n: article.readMin })}</span>
+        <Badge className={CATEGORY_COLORS[article.category] ?? '!bg-parchment !text-ink-muted'}>{article.category}</Badge>
+        <span className="text-ink-muted text-2xs">{t('blog_read_min_short', { n: article.readMin })}</span>
       </div>
       <h3 className="font-semibold text-sm text-ink leading-snug group-hover:text-primary-ink transition mb-2 flex-1">{article.title}</h3>
       <p className="text-xs text-ink-muted leading-relaxed line-clamp-3 mb-4">{article.excerpt}</p>
       <div className="flex items-center justify-between pt-3 border-t border-line">
-        <span className="text-ink-muted text-[11px]">{article.date}</span>
+        <span className="text-ink-muted text-2xs">{article.date}</span>
         <span className="text-primary-ink text-xs font-medium">{t('blog_read')}</span>
       </div>
     </button>

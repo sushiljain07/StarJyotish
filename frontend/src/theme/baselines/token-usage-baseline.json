@@ -12,7 +12,7 @@
     "faintText": 2
   },
   "components/Footer.jsx": {
-    "goldText": 7
+    "goldText": 6
   },
   "components/RajyogasTab.jsx": {
     "faintText": 1
@@ -106,7 +106,7 @@
     "goldText": 1
   },
   "pages/Landing.jsx": {
-    "goldText": 3
+    "goldText": 2
   },
   "pages/Login.jsx": {
     "goldText": 2

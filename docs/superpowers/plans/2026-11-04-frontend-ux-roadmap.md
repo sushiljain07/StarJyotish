@@ -297,6 +297,30 @@ Browser pass (16 Nov):
 - Codemod the arbitrary text sizes to the 2xs/3xs scale, with nothing below 10px.
 - Add a lint or CI grep that blocks `rounded-xl|2xl` and `shadow-(sm|md|lg)` outside `ui/`.
 
+*5b status (done on `feat/phase5b-components`, plan `2026-11-16-phase5b-components.md`).*
+
+What changed:
+- **Shared components.** `ui/Badge` is new, with tones neutral, gold, sage, good, vermillion, mauve and muted, on light and night surfaces. `Button` gained `href` (opens a new tab only for external URLs) and `wrap` for long Hindi labels. `Card` gained `as`, which defaults to `type="button"`. Small buttons keep 44px at every width.
+- **Adoption.** Gold CTAs went from 40 to 1, the deliberate `ScrollToTop` exception. Arbitrary `text-[Npx]` sizes went from 82 to 0, using the approved map (13/13.5→14, 15/16.5→16, 17→18, 19→20, 9→11, 11→2xs, 12→xs).
+- **Guards.** `theme/componentUsage.test.js` ratchets every pattern per file across `.js` and `.jsx`. The test fails if a count goes up or a stale baseline entry remains. Gold CTAs and arbitrary text sizes have a hard zero.
+
+| Pattern | Before | After |
+|---|---|---|
+| Hand-built gold CTAs | 40 | 1 |
+| `text-[Npx]` | 82 | 0 |
+| Hand-built chips | 55 | 9 |
+| Hand-built light cards | 137 | 74 |
+| Hand-built night cards | 12 | 2 |
+| `rounded-xl` and `rounded-2xl` | 243 | 152 |
+| `shadow-sm/md/lg` | 82 | 22 |
+
+*Left from 5b:*
+- The remaining light cards, `rounded-xl` and shadows (the ratchet only lets these counts go down).
+- `Card` props for tone, accent border and solid night. Callers use `!` overrides for now (Blog featured, the Landing accents).
+- One padding convention for `Card`.
+- The goldCta counter only matches `hover:bg-primary-dark`, so widen it to other gold recipes. The Admin pages still have hand-built gold CTAs.
+- The lightCard, nightCard and chip counters are advisory, since a class can be split to dodge them.
+
 **5c. Icons** (D-8, D-9): one `<Icon>` SVG set built from `HomeIcons.jsx`, replacing the 344 emoji (the report tabs first). Use `currentColor` icons instead of CSS filter chains.
 
 **5d. Performance** (P-M7, P-L4):
@@ -337,5 +361,5 @@ Browser pass (16 Nov):
 | UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done — merged (#168) |
 | UX2 | `feat/ux2-colour` | `2026-11-14-ux2-colour.md` | Done — merged (#169) |
 | UX3 | `feat/ux3-laptop-polish` | `2026-11-15-ux3-laptop-polish.md` | Done — merged (#170, 16 Nov 2026) |
-| 5b | `feat/phase5b-components` | `2026-11-16-phase5b-components.md` | In progress — plan being written |
+| 5b | `feat/phase5b-components` | `2026-11-16-phase5b-components.md` | Done — leftovers in the 5b status above |
 | 5c–g | `feat/phase5-*` | to write per slice | — |

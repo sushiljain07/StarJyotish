@@ -320,6 +320,10 @@ What changed:
 - One padding convention for `Card`.
 - The goldCta counter only matches `hover:bg-primary-dark`, so widen it to other gold recipes. The Admin pages still have hand-built gold CTAs.
 - The lightCard, nightCard and chip counters are advisory, since a class can be split to dodge them.
+- The /panchang "Today" button is 32px tall, below the 44px tap size.
+- The /home "now" marker (`home/TodayWindow.jsx`) fails the contrast check at 1.00. That is probably a false positive (white text over a dark card), but check it.
+
+**Next session:** after #172 merges, the owner picks the next slice: 5c icons, 5d performance, 5e SEO, 5f content or 5g "wow".
 
 **5c. Icons** (D-8, D-9): one `<Icon>` SVG set built from `HomeIcons.jsx`, replacing the 344 emoji (the report tabs first). Use `currentColor` icons instead of CSS filter chains.
 
@@ -361,5 +365,5 @@ What changed:
 | UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done — merged (#168) |
 | UX2 | `feat/ux2-colour` | `2026-11-14-ux2-colour.md` | Done — merged (#169) |
 | UX3 | `feat/ux3-laptop-polish` | `2026-11-15-ux3-laptop-polish.md` | Done — merged (#170, 16 Nov 2026) |
-| 5b | `feat/phase5b-components` | `2026-11-16-phase5b-components.md` | Done — leftovers in the 5b status above |
+| 5b | `feat/phase5b-components` | `2026-11-16-phase5b-components.md` | Done — merged (#171, 16 Nov 2026); the footer 360px fix follows in #172. Leftovers are in the 5b status above |
 | 5c–g | `feat/phase5-*` | to write per slice | — |

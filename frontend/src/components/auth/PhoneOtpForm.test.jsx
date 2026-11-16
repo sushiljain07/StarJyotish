@@ -31,7 +31,7 @@ describe('PhoneOtpForm accessibility', () => {
     expect(otp).toHaveAttribute('aria-describedby', alert.id)
   })
 
-  it('styles the disabled submit button with solid tokens, not a translucent fill', () => {
+  it("disabled submit is disabled and uses Button's disabled styling", () => {
     render(<PhoneOtpForm />)
     const btn = screen.getAllByRole('button').find(b => b.type === 'submit')
     expect(btn).toBeDisabled()

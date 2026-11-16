@@ -43,17 +43,10 @@
   "components/DivisionalCharts.jsx": {
     "roundedXl": 2
   },
-  "components/ErrorFallback.jsx": {
-    "goldCta": 2
-  },
   "components/FAQAccordion.jsx": {
     "lightCard": 1,
     "roundedXl": 1,
     "shadowSml": 1
-  },
-  "components/Footer.jsx": {
-    "goldCta": 1,
-    "arbitraryText": 1
   },
   "components/KPChart.jsx": {
     "roundedXl": 3
@@ -98,17 +91,8 @@
   "components/SegmentedToggle.jsx": {
     "lightCard": 1
   },
-  "components/SiteHeader.jsx": {
-    "goldCta": 1,
-    "chip": 2
-  },
   "components/SocialButtons.jsx": {
     "lightCard": 1
-  },
-  "components/Testimonials.jsx": {
-    "lightCard": 1,
-    "arbitraryText": 1,
-    "roundedXl": 1
   },
   "components/TopicReportTab.jsx": {
     "roundedXl": 1,
@@ -116,12 +100,6 @@
   },
   "components/TransitPanel.jsx": {
     "roundedXl": 1
-  },
-  "components/auth/PhoneOtpForm.jsx": {
-    "goldCta": 1
-  },
-  "components/auth/VerifiedContactField.jsx": {
-    "goldCta": 3
   },
   "components/home/AskPersonaPanel.jsx": {
     "lightCard": 5,
@@ -180,49 +158,25 @@
   "components/onboarding/BirthTimeSelector.jsx": {
     "roundedXl": 1
   },
-  "components/onboarding/CompletionCelebration.jsx": {
-    "goldCta": 1
-  },
   "components/onboarding/ProfileTypeSelector.jsx": {
     "roundedXl": 1
   },
-  "components/onboarding/QuestionCard.jsx": {
-    "goldCta": 1,
+  "pages/AdminDashboard.jsx": {
+    "lightCard": 4,
+    "chip": 1
+  },
+  "pages/AstrologerDashboard.jsx": {
     "lightCard": 1,
     "roundedXl": 1,
     "shadowSml": 1
   },
-  "pages/AdminDashboard.jsx": {
-    "lightCard": 5,
-    "chip": 3,
-    "roundedXl": 1
-  },
-  "pages/AstrologerDashboard.jsx": {
-    "lightCard": 2,
-    "chip": 4,
-    "roundedXl": 2,
+  "pages/Blog.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1,
     "shadowSml": 1
   },
-  "pages/Blog.jsx": {
-    "lightCard": 3,
-    "chip": 1,
-    "arbitraryText": 3,
-    "roundedXl": 4,
-    "shadowSml": 2
-  },
-  "pages/BlogArticle.jsx": {
-    "goldCta": 1,
-    "lightCard": 2,
-    "chip": 2,
-    "arbitraryText": 1,
-    "roundedXl": 1,
-    "shadowSml": 3
-  },
   "pages/ContactUs.jsx": {
-    "goldCta": 1,
-    "lightCard": 2,
-    "chip": 1,
-    "roundedXl": 3
+    "chip": 1
   },
   "pages/Disclaimer.jsx": {
     "roundedXl": 1
@@ -234,16 +188,7 @@
   "pages/Insights.jsx": {
     "lightCard": 1
   },
-  "pages/Landing.jsx": {
-    "lightCard": 2,
-    "arbitraryText": 1,
-    "roundedXl": 2,
-    "shadowSml": 3
-  },
   "pages/Learn.jsx": {
-    "roundedXl": 1
-  },
-  "pages/Login.jsx": {
     "roundedXl": 1
   },
   "pages/NotFound.jsx": {
@@ -253,23 +198,11 @@
     "roundedXl": 5
   },
   "pages/PanchangDetail.jsx": {
-    "lightCard": 7,
-    "arbitraryText": 14,
-    "roundedXl": 18
-  },
-  "pages/Pricing.jsx": {
-    "goldCta": 1
+    "lightCard": 2,
+    "roundedXl": 12
   },
   "pages/PrivacyPolicy.jsx": {
-    "lightCard": 1,
-    "roundedXl": 3
-  },
-  "pages/Profile.jsx": {
-    "goldCta": 3,
-    "lightCard": 5,
-    "chip": 1,
-    "roundedXl": 5,
-    "shadowSml": 5
+    "roundedXl": 2
   },
   "pages/RefundPolicy.jsx": {
     "roundedXl": 1
@@ -279,13 +212,11 @@
     "roundedXl": 2
   },
   "pages/TermsOfUse.jsx": {
-    "lightCard": 1,
-    "roundedXl": 3
+    "roundedXl": 2
   },
   "pages/TestimonialsPage.jsx": {
-    "lightCard": 4,
-    "arbitraryText": 1,
-    "roundedXl": 5
+    "lightCard": 1,
+    "roundedXl": 1
   },
   "pages/learn/Zodiac.jsx": {
     "lightCard": 1,

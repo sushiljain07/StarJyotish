@@ -10,15 +10,15 @@ import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
-import { Button, Badge } from '../components/ui'
+import { Button, Badge, Card } from '../components/ui'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
-const CATEGORY_COLORS = {
-  Basics:   '!bg-primary-light !text-primary-ink !border-transparent',
-  Timing:   '!bg-mauve-light !text-mauve !border-transparent',
-  Planets:  '!bg-sage-light !text-sage !border-transparent',
-  Remedies: '!bg-vermillion-light !text-vermillion !border-transparent',
+const CATEGORY_TONES = {
+  Basics: 'gold',
+  Timing: 'mauve',
+  Planets: 'good',
+  Remedies: 'vermillion',
 }
 
 // ── Section renderers ──────────────────────────────────────────────────────
@@ -160,7 +160,7 @@ export default function BlogArticle() {
                 <div className="flex items-center gap-2.5 mb-5">
                   <Link to="/blog" className="text-ink-onnight hover:text-primary text-xs transition">{t('blog_article_back')}</Link>
                   <span className="text-ink-onnight/40 text-xs">/</span>
-                  <Badge size="md" className={CATEGORY_COLORS[article.category] ?? '!bg-parchment !text-ink'}>{article.category}</Badge>
+                  <Badge size="md" surface="night" tone={CATEGORY_TONES[article.category] ?? 'muted'}>{article.category}</Badge>
                 </div>
                 <h1 className="font-serif font-semibold text-2xl sm:text-3xl text-primary-light leading-snug mb-4">{article.title}</h1>
                 <div className="flex items-center gap-4 text-ink-onnight text-xs">
@@ -205,12 +205,12 @@ export default function BlogArticle() {
               <h3 className="font-semibold text-sm text-ink-muted uppercase tracking-wide mb-5">{t('blog_article_related')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {related.map(rel => (
-                  <Link key={rel.slug} to={`/blog/${rel.slug}`}
-                    className="group bg-parchment-card rounded-xl border border-line p-4 hover:border-primary/30 hover:shadow-md transition">
-                    <Badge className={`mb-2 ${CATEGORY_COLORS[rel.category] ?? ''}`}>{rel.category}</Badge>
+                  <Card as={Link} key={rel.slug} to={`/blog/${rel.slug}`} interactive
+                    className="group hover:border-primary/30">
+                    <Badge tone={CATEGORY_TONES[rel.category] ?? 'muted'} className="mb-2">{rel.category}</Badge>
                     <p className="font-semibold text-sm text-ink group-hover:text-primary-ink transition leading-snug">{rel.title}</p>
                     <p className="text-xs text-ink-muted mt-1">{t('blog_read_min_long', { n: rel.readMin })}</p>
-                  </Link>
+                  </Card>
                 ))}
               </div>
             </section>

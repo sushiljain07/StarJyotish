@@ -7,6 +7,7 @@ import PhoneOtpForm from '../components/auth/PhoneOtpForm'
 import GoogleLoginButton from '../components/auth/GoogleLoginButton'
 import { GOOGLE_ENABLED } from '../config/google'
 import { useAuth } from '../contexts/AuthContext'
+import { Card } from '../components/ui'
 
 // Decides where a signed-in visitor lands. An explicit `next` (set by
 // ProtectedRoute.jsx when a signed-out visitor tried to reach a specific
@@ -82,8 +83,9 @@ export default function Login() {
       </button>
 
       <main id="main" tabIndex={-1} className="relative w-full max-w-sm">
-      <div
-        className="relative w-full max-w-sm bg-parchment-card rounded-2xl shadow-xl p-6 sm:p-8"
+      <Card
+        padding="lg"
+        className="relative w-full max-w-sm"
         onClick={e => e.stopPropagation()}
       >
         <Link to="/" className="block text-center mb-5">
@@ -105,7 +107,7 @@ export default function Login() {
             <GoogleLoginButton onSuccess={handleSuccess} />
           </>
         )}
-      </div>
+      </Card>
       </main>
     </div>
   )

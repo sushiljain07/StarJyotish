@@ -25,7 +25,7 @@ import { fetchReverseGeocode } from '../api/astro'
 import { LANGUAGES, DEFAULT_LANGUAGE, currentLanguage, localeFor } from '../i18n/languages'
 import { markLanguageChosenByUser } from '../i18n'
 import PageContainer from '../components/ui/PageContainer'
-import { Button } from '../components/ui'
+import { Button, Card } from '../components/ui'
 
 const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
 const labelCls = 'block text-sm font-medium text-ink mb-1'
@@ -206,7 +206,7 @@ export default function Profile() {
 
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         {/* Edit Profile */}
-        <form onSubmit={handleSave} className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 space-y-5">
+        <Card as="form" onSubmit={handleSave} className="space-y-5">
           <h2 className="font-serif font-semibold text-lg text-ink">{t('profile_edit_heading')}</h2>
 
           <div>
@@ -256,17 +256,17 @@ export default function Profile() {
             </Button>
             {savedAt && <span className="text-sage text-sm">{t('profile_saved')}</span>}
           </div>
-        </form>
+        </Card>
 
         <div className="space-y-6">
         {/* Subscription / membership — no billing system exists yet
             (pre-revenue, see README's Roadmap), so this is an honest
             placeholder rather than a fake "Free Plan" card implying a
             paid tier already exists. */}
-        <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6">
+        <Card>
           <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('profile_membership_heading')}</h2>
           <p className="text-ink-muted text-sm">{t('profile_membership_body')}</p>
-        </div>
+        </Card>
 
         {/* Your astrology profile — exactly one per account (migration
             0009). View mode shows birth details + current location;
@@ -274,7 +274,7 @@ export default function Profile() {
             uses (services/astrologyProfiles.js's createProfile), so this
             never creates a second row. */}
         {profileState && (
-          <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6">
+          <Card>
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-serif font-semibold text-lg text-ink">{t('profile_astro_heading')}</h2>
               {!editingAstro && (
@@ -398,20 +398,20 @@ export default function Profile() {
                 </div>
               </form>
             )}
-          </div>
+          </Card>
         )}
 
         {!profileState && (
-          <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 text-center">
+          <Card className="text-center">
             <p className="text-ink-muted text-sm mb-3">{t('profile_astro_none')}</p>
             <Button to="/onboarding">
               {t('profile_astro_create')}
             </Button>
-          </div>
+          </Card>
         )}
 
         {/* Privacy & account settings */}
-        <div className="bg-parchment-card rounded-2xl shadow-sm border border-line p-5 sm:p-6 space-y-3">
+        <Card className="space-y-3">
           <h2 className="font-serif font-semibold text-lg text-ink mb-1">{t('profile_privacy_heading')}</h2>
           <a href="/privacy" className="flex items-center min-h-11 text-primary-ink hover:underline text-sm">{t('profile_privacy_link')}</a>
           {/* No account-deletion endpoint exists yet — this is a real,
@@ -421,7 +421,7 @@ export default function Profile() {
              className="flex items-center min-h-11 text-primary-ink hover:underline text-sm">
             {t('profile_delete_account_link')}
           </a>
-        </div>
+        </Card>
         </div>
         </div>
       </PageContainer>

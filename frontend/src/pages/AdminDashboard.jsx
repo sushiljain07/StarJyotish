@@ -1,7 +1,7 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge as UiBadge } from '../components/ui'
+import { Badge as UiBadge, Card as UiCard } from '../components/ui'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -29,13 +29,13 @@ const TABS = [
 
 function Badge({ color, children }) {
   const colors = {
-    green:  '!bg-sage-light !text-sage !border-transparent',
-    red:    '!bg-vermillion-light !text-vermillion !border-transparent',
-    yellow: '!bg-primary-light !text-primary-ink !border-transparent',
-    gray:   '!bg-parchment !text-ink-muted !border-transparent',
+    green:  'good',
+    red:    'vermillion',
+    yellow: 'gold',
+    gray:   'muted',
   }
   return (
-    <UiBadge className={colors[color] ?? colors.gray}>
+    <UiBadge tone={colors[color] ?? colors.gray}>
       {children}
     </UiBadge>
   )
@@ -56,7 +56,7 @@ function ErrorBanner({ msg }) {
 }
 
 function SectionCard({ children }) {
-  return <div className="bg-parchment-card rounded-xl border border-line p-5">{children}</div>
+  return <UiCard>{children}</UiCard>
 }
 
 // ── Users tab ──────────────────────────────────────────────────────────────────
@@ -529,7 +529,7 @@ const BLOG_ARTICLE_TEMPLATE = {
   ],
 }
 
-const STATUS_COLOR = { published: '!bg-sage-light !text-sage !border-transparent', draft: '!bg-primary-light !text-primary-ink !border-transparent', archived: '!bg-parchment !text-ink-muted !border-transparent' }
+const STATUS_COLOR = { published: 'good', draft: 'gold', archived: 'muted' }
 
 function BlogTab({ token }) {
   const [settings, setSettings] = useState({})
@@ -681,7 +681,7 @@ function BlogTab({ token }) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <UiBadge className={STATUS_COLOR[status] ?? STATUS_COLOR.draft}>{status}</UiBadge>
+                      <UiBadge tone={STATUS_COLOR[status] ?? STATUS_COLOR.draft}>{status}</UiBadge>
                       {art.category && <span className="text-xs text-ink-muted">{art.category}</span>}
                       {art.featured && <span className="text-xs text-primary-ink font-medium">★ Featured</span>}
                       {inIndex && <span className="text-xs text-ink-muted">#{index.indexOf(slug)+1}</span>}
@@ -715,10 +715,10 @@ function BlogTab({ token }) {
 // ── Testimonials admin tab ─────────────────────────────────────────────────────
 
 const STATUS_LABELS = {
-  pending:  { label: 'Pending',  color: '!bg-primary-light !text-primary-ink !border-transparent' },
-  approved: { label: 'Approved', color: '!bg-sage-light !text-sage !border-transparent' },
-  featured: { label: 'Featured', color: '!bg-primary !text-night !border-transparent' },
-  rejected: { label: 'Rejected', color: '!bg-vermillion-light !text-vermillion !border-transparent' },
+  pending:  { label: 'Pending',  tone: 'gold' },
+  approved: { label: 'Approved', tone: 'good' },
+  featured: { label: 'Featured', solid: true },
+  rejected: { label: 'Rejected', tone: 'vermillion' },
 }
 
 function TestimonialsAdminTab({ token }) {
@@ -768,7 +768,9 @@ function TestimonialsAdminTab({ token }) {
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <UiBadge className={s.color}>{s.label}</UiBadge>
+                      {s.solid
+                        ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary text-night">{s.label}</span>
+                        : <UiBadge tone={s.tone}>{s.label}</UiBadge>}
                       <span className="text-xs font-semibold text-ink">{t.display_name}</span>
                       {t.location && <span className="text-xs text-ink-muted">{t.location}</span>}
                     </div>

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import LegalLanguageNote from '../components/LegalLanguageNote'
+import { Card } from '../components/ui'
 
 const h2 = 'font-serif font-semibold text-lg text-ink mt-7 mb-2'
 const ul = 'list-disc pl-5 space-y-1.5'
@@ -53,7 +54,7 @@ export default function PrivacyPolicy() {
           difference in meaning.
         </p>
 
-        <nav aria-label="Table of contents" className="bg-parchment-card border border-line rounded-xl p-4 text-sm">
+        <Card as="nav" aria-label="Table of contents" className="text-sm">
           <p className="font-semibold text-ink mb-2">On this page</p>
           <ol className="list-decimal pl-5 space-y-1 text-primary-ink">
             <li><a href="#what-we-collect" className="hover:underline">Information we collect</a></li>
@@ -69,7 +70,7 @@ export default function PrivacyPolicy() {
             <li><a href="#changes" className="hover:underline">Changes to this policy</a></li>
             <li><a href="#contact" className="hover:underline">Grievance officer & contact</a></li>
           </ol>
-        </nav>
+        </Card>
 
         <h2 id="what-we-collect" className={h2}>1. Information we collect</h2>
         <p><strong className="text-ink">Birth & astrological details.</strong> Your full name, date of birth, time of birth,

@@ -1,7 +1,7 @@
 // frontend/src/pages/AstrologerDashboard.jsx
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge } from '../components/ui'
+import { Badge, Card as UiCard } from '../components/ui'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
@@ -40,9 +40,9 @@ function LoadError({ what }) {
 
 function Card({ children, className = '' }) {
   return (
-    <div className={`bg-parchment-card rounded-xl border border-line p-5 ${className}`}>
+    <UiCard className={className}>
       {children}
-    </div>
+    </UiCard>
   )
 }
 
@@ -58,20 +58,20 @@ function StatBox({ label, value, sub }) {
 
 function KycBadge({ status }) {
   const map = {
-    verified: { color: '!bg-sage-light !text-sage !border-transparent', label: '✓ KYC Verified' },
-    pending:  { color: '!bg-primary-light !text-primary-ink !border-transparent', label: '⏳ KYC Pending' },
-    rejected: { color: '!bg-vermillion-light !text-vermillion !border-transparent', label: '✗ KYC Rejected' },
+    verified: { tone: 'good', label: '✓ KYC Verified' },
+    pending:  { tone: 'gold', label: '⏳ KYC Pending' },
+    rejected: { tone: 'vermillion', label: '✗ KYC Rejected' },
   }
   const s = map[status] ?? map.pending
-  return <Badge size="md" className={s.color}>{s.label}</Badge>
+  return <Badge size="md" tone={s.tone}>{s.label}</Badge>
 }
 
 const STATUS_COLOR = {
-  pending:   '!bg-primary-light !text-primary-ink !border-transparent',
-  confirmed: '!bg-sage-light !text-sage !border-transparent',
-  completed: '!bg-parchment !text-ink-muted !border-transparent',
-  cancelled: '!bg-vermillion-light !text-vermillion !border-transparent',
-  refunded:  '!bg-mauve-light !text-mauve !border-transparent',
+  pending:   'gold',
+  confirmed: 'good',
+  completed: 'muted',
+  cancelled: 'vermillion',
+  refunded:  'mauve',
 }
 
 // ── Overview tab ───────────────────────────────────────────────────────────────
@@ -214,7 +214,7 @@ function BookingsTab({ token }) {
                   {b.notes && <div className="text-xs text-ink-muted mt-1 italic">"{b.notes}"</div>}
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <Badge className={STATUS_COLOR[b.status] ?? '!bg-parchment !text-ink-muted'}>
+                  <Badge tone={STATUS_COLOR[b.status] ?? 'muted'}>
                     {b.status}
                   </Badge>
                   <span className="text-sm font-bold text-ink">₹{Number(b.price).toLocaleString('en-IN')}</span>

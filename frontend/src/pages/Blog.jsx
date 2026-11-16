@@ -14,7 +14,7 @@ import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
-import { Badge } from '../components/ui'
+import { Badge, Card } from '../components/ui'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
@@ -26,21 +26,21 @@ const CATEGORIES = [
   { value: 'Timing',   key: 'blog_cat_timing' },
   { value: 'Remedies', key: 'blog_cat_remedies' },
 ]
-const CATEGORY_COLORS = {
-  Basics:   '!bg-primary-light !text-primary-ink !border-transparent',
-  Timing:   '!bg-mauve-light !text-mauve !border-transparent',
-  Planets:  '!bg-sage-light !text-sage !border-transparent',
-  Remedies: '!bg-vermillion-light !text-vermillion !border-transparent',
+const CATEGORY_TONES = {
+  Basics: 'gold',
+  Timing: 'mauve',
+  Planets: 'good',
+  Remedies: 'vermillion',
 }
 
 function ArticleCard({ article, featured = false, onClick }) {
   const { t } = useTranslation()
   if (featured) {
     return (
-      <button onClick={onClick} className="w-full text-left bg-night rounded-2xl overflow-hidden hover:opacity-95 transition group">
+      <Card as="button" surface="night" padding="none" onClick={onClick} className="w-full text-left overflow-hidden hover:opacity-95 transition group">
         <div className="p-7 sm:p-9">
           <div className="flex items-center gap-2.5 mb-4">
-            <Badge size="md" className={CATEGORY_COLORS[article.category] ?? '!bg-parchment !text-ink-muted'}>{article.category}</Badge>
+            <Badge size="md" surface="night" tone={CATEGORY_TONES[article.category] ?? 'muted'}>{article.category}</Badge>
             <span className="text-ink-onnight text-xs">{t('blog_read_min_long', { n: article.readMin })}</span>
           </div>
           <h2 className="font-serif font-semibold text-xl sm:text-2xl text-primary-light leading-snug group-hover:text-primary transition mb-3">{article.title}</h2>
@@ -50,13 +50,13 @@ function ArticleCard({ article, featured = false, onClick }) {
             <span className="text-primary text-sm font-medium group-hover:translate-x-0.5 transition-transform">{t('blog_read_article')}</span>
           </div>
         </div>
-      </button>
+      </Card>
     )
   }
   return (
-    <button onClick={onClick} className="w-full text-left bg-parchment-card rounded-xl border border-line hover:border-primary/30 hover:shadow-md transition group p-5 flex flex-col h-full">
+    <Card as="button" interactive onClick={onClick} className="w-full text-left hover:border-primary/30 group flex flex-col h-full">
       <div className="flex items-center gap-2 mb-3">
-        <Badge className={CATEGORY_COLORS[article.category] ?? '!bg-parchment !text-ink-muted'}>{article.category}</Badge>
+        <Badge tone={CATEGORY_TONES[article.category] ?? 'muted'}>{article.category}</Badge>
         <span className="text-ink-muted text-2xs">{t('blog_read_min_short', { n: article.readMin })}</span>
       </div>
       <h3 className="font-semibold text-sm text-ink leading-snug group-hover:text-primary-ink transition mb-2 flex-1">{article.title}</h3>
@@ -65,19 +65,19 @@ function ArticleCard({ article, featured = false, onClick }) {
         <span className="text-ink-muted text-2xs">{article.date}</span>
         <span className="text-primary-ink text-xs font-medium">{t('blog_read')}</span>
       </div>
-    </button>
+    </Card>
   )
 }
 
 function Skeleton() {
   return (
-    <div className="bg-parchment-card rounded-xl border border-line p-5 motion-safe:animate-pulse">
+    <Card className="motion-safe:animate-pulse">
       <div className="h-3 w-16 bg-line rounded mb-3" />
       <div className="h-4 w-full bg-line rounded mb-2" />
       <div className="h-4 w-3/4 bg-line rounded mb-4" />
       <div className="h-3 w-full bg-line rounded mb-1" />
       <div className="h-3 w-2/3 bg-line rounded" />
-    </div>
+    </Card>
   )
 }
 

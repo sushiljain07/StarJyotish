@@ -12,7 +12,7 @@ import Seo from '../components/Seo'
 import StaticPageLayout from '../components/StaticPageLayout'
 import SocialButtons from '../components/SocialButtons'
 import InlineNotice from '../components/ui/InlineNotice'
-import { Button } from '../components/ui'
+import { Button, Card } from '../components/ui'
 import useTimedNotice from '../components/ui/useTimedNotice'
 import { API_BASE } from '../api/config'
 
@@ -62,28 +62,27 @@ export default function ContactUs() {
       <StaticPageLayout title={t('contact_title')} maxWidth="max-w-2xl">
         <p>{t('contact_intro')}</p>
 
-        <div className="bg-parchment-card border border-line rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <Card className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-wide uppercase text-ink-muted mb-1">{t('contact_email_label')}</p>
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary-ink font-semibold hover:underline break-all">
               {CONTACT_EMAIL}
             </a>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
+          <button
+            type="button"
             onClick={waNotice.show}
-            className="!bg-sage-light !text-sage border border-sage/30 hover:!bg-sage/20 shrink-0 self-start sm:self-auto whitespace-normal text-center"
+            className="bg-sage-light text-sage border border-sage/30 text-xs font-semibold px-3.5 py-2 min-h-11 rounded-full transition hover:bg-sage/20 shrink-0 self-start sm:self-auto"
           >
             {t('contact_whatsapp_cta')}
-          </Button>
-        </div>
+          </button>
+        </Card>
         {waNotice.visible && (
           <InlineNotice onDismiss={waNotice.hide}>{t('contact_whatsapp_alert')}</InlineNotice>
         )}
 
         {status === 'sent' ? (
-          <div className="bg-sage-light border border-sage/30 rounded-2xl p-6 text-center">
+          <Card padding="lg" className="!bg-sage-light !border-sage/30 !shadow-none text-center">
             <p className="text-2xl mb-2">🙏</p>
             <p className="font-serif font-semibold text-ink text-lg mb-1">{t('contact_sent_title')}</p>
             <p className="text-ink-muted text-sm">{t('contact_sent_body')}</p>
@@ -93,9 +92,9 @@ export default function ContactUs() {
             >
               {t('contact_send_another')}
             </button>
-          </div>
+          </Card>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-parchment-card border border-line rounded-2xl p-5 space-y-4">
+          <Card as="form" onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-1">{t('contact_field_name')}</label>
@@ -122,7 +121,7 @@ export default function ContactUs() {
             >
               {status === 'sending' ? t('contact_sending') : t('contact_send')}
             </Button>
-          </form>
+          </Card>
         )}
 
         <div className="text-center pt-2">

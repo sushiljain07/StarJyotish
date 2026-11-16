@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { getPrimaryProfile } from '../services/astrologyProfiles'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
-import { Button, Badge } from '../components/ui'
+import { Button, Badge, Card } from '../components/ui'
 import AskPersonaCard from '../components/AskPersonaCard'
 import FAQAccordion from '../components/FAQAccordion'
 import FaqSchema from '../components/FaqSchema'
@@ -248,9 +248,11 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {TOPICS.map((topic, i) => (
               <Reveal key={topic.id} delay={i * 80}>
-                <button
+                <Card
+                  as="button"
+                  interactive
                   onClick={() => goToTopic(topic.id)}
-                  className="w-full text-left bg-parchment-card rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 border border-line hover:border-primary/40 transition p-5 flex gap-4 items-start"
+                  className="w-full text-left hover:border-primary/40 flex gap-4 items-start"
                 >
                   <span className="w-11 h-11 rounded-full bg-primary-light flex items-center justify-center shrink-0">
                     <TopicIcon id={topic.id} className="w-5 h-5 text-primary-ink" />
@@ -263,7 +265,7 @@ export default function Landing() {
                       {t(`landing_topic_${topic.id}_question`)}
                     </span>
                   </span>
-                </button>
+                </Card>
               </Reveal>
             ))}
           </div>
@@ -326,7 +328,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {INSIDE_ITEMS.map((id, i) => (
               <Reveal key={id} delay={i * 80}>
-                <div className={`bg-parchment-card rounded-lg border-l-4 ${INSIDE_ACCENTS[id].border} p-5 shadow-sm flex gap-3 items-start`}>
+                <Card className={`border-l-4 ${INSIDE_ACCENTS[id].border} flex gap-3 items-start`}>
                   <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${INSIDE_ACCENTS[id].chip}`}>
                     {id === 'kundli'
                       ? <img src="/starjyotish.svg" alt="" className="w-5 h-5" />
@@ -336,7 +338,7 @@ export default function Landing() {
                     <h3 className="font-bold text-sm text-ink mb-1">{t(`landing_inside_${id}_label`)}</h3>
                     <p className="text-xs leading-relaxed text-ink-muted">{t(`landing_inside_${id}_body`)}</p>
                   </span>
-                </div>
+                </Card>
               </Reveal>
             ))}
           </div>
@@ -360,13 +362,13 @@ export default function Landing() {
 
       {/* ───────────────────── Privacy note ───────────────────── */}
       <Reveal as="section" className="px-4 py-6">
-        <div className="max-w-2xl mx-auto flex items-start gap-3 bg-parchment-card border border-line rounded-2xl px-5 py-4">
+        <Card padding="none" className="max-w-2xl mx-auto flex items-start gap-3 px-5 py-4">
           <span className="text-xl shrink-0">🔒</span>
           <div>
             <h3 className="font-semibold text-ink text-sm">{t('landing_privacy_heading')}</h3>
             <p className="text-ink-muted text-xs mt-0.5 leading-relaxed">{t('landing_privacy_body')}</p>
           </div>
-        </div>
+        </Card>
       </Reveal>
 
       <SectionDivider />

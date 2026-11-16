@@ -6,6 +6,7 @@
 import { useTranslation } from 'react-i18next'
 import InlineNotice from './ui/InlineNotice'
 import useTimedNotice from './ui/useTimedNotice'
+import { Button } from './ui'
 
 export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }) {
   const { t } = useTranslation()
@@ -24,15 +25,14 @@ export default function PaywallCard({ icon = '🔒', title, body, bullets = [] }
           ))}
         </ul>
       )}
-      <button
+      <Button
         // TODO: wire to the real checkout flow once Razorpay (Master Plan
         // Phase 4) exists. There's nowhere real to send someone yet — swap
         // in a payment link or a WhatsApp/contact link when ready.
         onClick={notice.show}
-        className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-6 py-2.5 rounded-full shadow transition"
       >
         {t('paywall_unlock_btn')}
-      </button>
+      </Button>
       {notice.visible && (
         <InlineNotice onDismiss={notice.hide} className="mt-4 text-left">
           {t('paywall_checkout_soon')}

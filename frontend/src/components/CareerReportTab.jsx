@@ -8,6 +8,7 @@ import PaywallCard from './PaywallCard'
 import SectionJumpNav from './SectionJumpNav'
 import AskChart from './AskChart'
 import { errorMessage } from '../api/errors'
+import { Badge, Button, Card } from './ui'
 import { currentLanguage } from '../i18n/languages'
 import { planetName, signName } from '../utils/astroNames'
 import { formatDate } from '../utils/format'
@@ -102,9 +103,9 @@ function reorderSections(careerContext, t) {
 }
 
 const EFFORT_COLOR = {
-  low:    'text-good bg-good-light',
-  medium: 'text-primary-ink bg-primary-light',
-  high:   'text-vermillion bg-vermillion-light',
+  low:    '!text-good !bg-good-light',
+  medium: '!text-primary-ink !bg-primary-light',
+  high:   '!text-vermillion !bg-vermillion-light',
 }
 
 const CAREER_CONTEXT_KEY = 'starjyotish_career_context'
@@ -236,10 +237,9 @@ function CareerContextForm({ initial, onDone }) {
           className="text-sm text-ink-muted hover:text-ink transition">
           {t('career_form_skip')}
         </button>
-        <button type="button" onClick={submit}
-          className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
+        <Button onClick={submit}>
           {t('career_form_continue')}
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -270,7 +270,7 @@ function SectionCard({ icon, section, style }) {
   if (!section?.content) return null
 
   if (style === 'gold') return (
-    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-primary/30">
+    <Card padding="none" className="overflow-hidden !border-primary/30">
       <div className="bg-gradient-to-r from-primary to-primary-dark px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-night text-lg leading-tight">{section.title}</h3>
@@ -278,11 +278,11 @@ function SectionCard({ icon, section, style }) {
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
       </div>
-    </div>
+    </Card>
   )
 
   if (style === 'gem') return (
-    <div className="bg-parchment-card rounded-2xl shadow-md overflow-hidden border border-mauve/30">
+    <Card padding="none" className="overflow-hidden !border-mauve/30">
       <div className="bg-gradient-to-r from-sage to-mauve px-5 py-3.5 flex items-center gap-2">
         <span className="text-2xl">{icon}</span>
         <h3 className="font-extrabold text-white text-lg leading-tight">{section.title}</h3>
@@ -290,11 +290,11 @@ function SectionCard({ icon, section, style }) {
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
       </div>
-    </div>
+    </Card>
   )
 
   if (style === 'gradient') return (
-    <div className="bg-parchment-card rounded-xl shadow-sm overflow-hidden border border-primary/30">
+    <Card padding="none" className="overflow-hidden !border-primary/30">
       <div className="bg-night px-5 py-3 flex items-center gap-2">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary-light text-base">{section.title}</h3>
@@ -302,17 +302,17 @@ function SectionCard({ icon, section, style }) {
       <div className="px-5 py-4">
         <SectionContent content={section.content} />
       </div>
-    </div>
+    </Card>
   )
 
   if (style === 'verdict') return (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border-l-4 border-vermillion border border-vermillion/20">
+    <Card padding="none" className="p-5 border-l-4 !border-vermillion/20 !border-l-vermillion">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-vermillion text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
-    </div>
+    </Card>
   )
 
   if (style === 'tinted') return (
@@ -326,13 +326,13 @@ function SectionCard({ icon, section, style }) {
   )
 
   return (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
+    <Card padding="none" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{icon}</span>
         <h3 className="font-bold text-primary-ink text-base">{section.title}</h3>
       </div>
       <SectionContent content={section.content} />
-    </div>
+    </Card>
   )
 }
 
@@ -341,7 +341,7 @@ function CareerOptionCard({ opt }) {
   const [open, setOpen] = useState(false)
   const effortCls = EFFORT_COLOR[opt.effort_required] ?? EFFORT_COLOR.medium
   return (
-    <div className="bg-parchment-card rounded-xl border border-line shadow-sm overflow-hidden">
+    <Card padding="none" className="overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full text-left p-4 flex items-start gap-3"
@@ -352,10 +352,10 @@ function CareerOptionCard({ opt }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-ink text-sm">{opt.title}</span>
-            <span className="text-xs text-ink-muted bg-night/10 px-2 py-0.5 rounded-full">{opt.field}</span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${effortCls}`}>
+            <Badge>{opt.field}</Badge>
+            <Badge tone="sage" className={effortCls}>
               {t('report_effort_label', { level: t(`report_effort_${opt.effort_required}`, { defaultValue: opt.effort_required }) })}
-            </span>
+            </Badge>
           </div>
           {opt.timeline && (
             <p className="text-xs text-ink-muted mt-0.5">{opt.timeline}</p>
@@ -378,7 +378,7 @@ function CareerOptionCard({ opt }) {
                 <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_key_planets')}</p>
                 <div className="flex gap-1 flex-wrap">
                   {opt.key_planets.map(p => (
-                    <span key={p} className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, p)}</span>
+                    <Badge key={p} tone="gold">{planetName(t, p)}</Badge>
                   ))}
                 </div>
               </div>
@@ -386,13 +386,13 @@ function CareerOptionCard({ opt }) {
             {opt.favorable_dasha && (
               <div>
                 <p className="text-xs font-semibold text-ink-muted mb-1">{t('career_best_dasha')}</p>
-                <span className="text-xs bg-primary-light text-primary-ink px-2 py-0.5 rounded-full">{planetName(t, opt.favorable_dasha)}</span>
+                <Badge tone="gold">{planetName(t, opt.favorable_dasha)}</Badge>
               </div>
             )}
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -423,7 +423,7 @@ function AstrologicalEvidenceCard({ evidence }) {
     [t('career_evidence_antardasha'), planetName(t, evidence.current_antardasha)],
   ]
   return (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-line">
+    <Card padding="none" className="p-5">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">🔬</span>
         <h3 className="font-bold text-primary-ink text-base">{t('career_evidence_title')}</h3>
@@ -454,7 +454,7 @@ function AstrologicalEvidenceCard({ evidence }) {
           )}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -495,7 +495,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
   return (
     <div className="space-y-4">
       {horizons.length > 0 && (
-        <div className="bg-parchment-card rounded-xl border border-line shadow-sm overflow-hidden">
+        <Card padding="none" className="overflow-hidden">
           <div className="bg-night px-5 py-3">
             <h3 className="font-bold text-primary-light text-base">{t('career_roadmap_title')}</h3>
           </div>
@@ -507,7 +507,7 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
       {(roadmap.top_actions?.length > 0 || roadmap.top_avoid?.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -538,11 +538,11 @@ function CareerRoadmapCard({ roadmap, onAskQuestion }) {
         </div>
       )}
       {roadmap.next_question && (
-        <button onClick={() => onAskQuestion(roadmap.next_question)}
-          className="w-full text-left bg-parchment-card rounded-xl p-4 border border-line hover:border-primary/50 transition">
+        <Card as="button" padding="none" onClick={() => onAskQuestion(roadmap.next_question)}
+          className="w-full text-left p-4 hover:border-primary/50 transition">
           <p className="text-xs text-ink-muted mb-1">{t('career_roadmap_next_question')}</p>
           <p className="text-sm font-medium text-primary-ink">"{roadmap.next_question}" →</p>
-        </button>
+        </Card>
       )}
     </div>
   )
@@ -557,7 +557,7 @@ function ScenarioAnalysisBox({ onSubmit }) {
     setText('')
   }
   return (
-    <div className="bg-parchment-card rounded-xl p-4 border border-mauve/30 space-y-3">
+    <Card padding="none" className="p-4 !border-mauve/30 space-y-3">
       <div>
         <p className="font-bold text-ink text-sm mb-1">{t('career_scenario_title')}</p>
         <p className="text-xs text-ink-muted">
@@ -571,11 +571,10 @@ function ScenarioAnalysisBox({ onSubmit }) {
         rows={3}
         className="w-full border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
       />
-      <button onClick={submit} disabled={!text.trim()}
-        className="px-5 py-2 bg-primary hover:bg-primary-dark disabled:bg-night/10 disabled:text-ink-faint text-night font-semibold rounded-full text-sm transition">
+      <Button onClick={submit} disabled={!text.trim()}>
         {t('career_scenario_compare')}
-      </button>
-    </div>
+      </Button>
+    </Card>
   )
 }
 
@@ -718,12 +717,9 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       <p className="text-ink-muted text-sm mb-6 max-w-sm">
         {t('career_idle_body')}
       </p>
-      <button
-        onClick={() => (showContextForm ? setWantsReport(true) : generate())}
-        className="px-8 py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md"
-      >
+      <Button size="lg" onClick={() => (showContextForm ? setWantsReport(true) : generate())}>
         {t('career_generate_btn')}
-      </button>
+      </Button>
       <p className="text-xs text-ink-muted mt-3">{t('reading_powered_by_generic')} · {t('topic_report_takes_seconds')}</p>
     </div>
   )
@@ -745,12 +741,9 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="text-4xl mb-4">⚠️</div>
       <p className="text-vermillion font-medium mb-4">{errorMsg}</p>
-      <button
-        onClick={() => generate()}
-        className="px-6 py-2 bg-primary hover:bg-primary-dark text-night rounded-full text-sm transition"
-      >
+      <Button onClick={() => generate()}>
         {t('topic_report_try_again')}
-      </button>
+      </Button>
     </div>
   )
 
@@ -799,11 +792,11 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
 
       {/* ── DISCLAIMER ───────────────────────────────────────────────────── */}
       {report?.llm_provider && (
-        <p className="text-center text-[11px] text-ink-muted pb-1">
+        <p className="text-center text-2xs text-ink-muted pb-1">
           {t('reading_powered_by', { provider: report.llm_provider })}
         </p>
       )}
-      <p className="text-center text-[11px] text-ink-muted leading-relaxed px-4 pb-4">
+      <p className="text-center text-2xs text-ink-muted leading-relaxed px-4 pb-4">
         {t('disclaimer')}
       </p>
     </>
@@ -818,29 +811,28 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
       {renderKeys(['career_destiny_brief'])}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {report.current_phase?.content && (
-          <div className="bg-parchment-card rounded-xl p-4 border border-line">
+          <Card padding="none" className="p-4">
             <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('career_quick_current_phase')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.current_phase.content}</p>
-          </div>
+          </Card>
         )}
         {report.peak_career_window?.content && (
-          <div className="bg-parchment-card rounded-xl p-4 border border-line">
+          <Card padding="none" className="p-4">
             <p className="text-xs font-semibold text-primary-ink uppercase tracking-wide mb-1">{t('career_quick_peak_window')}</p>
             <p className="text-sm text-ink line-clamp-4">{report.peak_career_window.content}</p>
-          </div>
+          </Card>
         )}
       </div>
-      <button onClick={() => setDepth('full')}
-        className="w-full py-3 bg-primary hover:bg-primary-dark text-night font-semibold rounded-full transition shadow-md">
+      <Button size="lg" onClick={() => setDepth('full')} className="w-full whitespace-normal text-center">
         {t('career_see_full')}
-      </button>
+      </Button>
       {footer}
     </div>
   )
 
   // ── FULL REPORT / DEEP ANALYSIS ──────────────────────────────────────────
   const rajYogaTeaser = report?.active_yogas?.length > 0 && (
-    <div className="bg-parchment-card rounded-xl p-5 shadow-sm border border-primary/30">
+    <Card padding="none" className="p-5 !border-primary/30">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">👑</span>
         <h3 className="font-bold text-primary-ink text-base">
@@ -855,11 +847,11 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
         className="text-sm font-semibold text-primary-ink hover:underline">
         {t('reading_see_yogas')}
       </button>
-    </div>
+    </Card>
   )
 
   const careerOptionsBlock = hasOptions && (
-    <div className="bg-parchment-card rounded-xl border border-line shadow-sm p-5">
+    <Card padding="none" className="p-5">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xl">🎯</span>
         <h3 className="font-bold text-ink text-base">{t('career_options_heading')}</h3>
@@ -870,7 +862,7 @@ export default function CareerReportTab({ input, onOpenRajyogas, active = true }
           <CareerOptionCard key={opt.rank} opt={opt} />
         ))}
       </div>
-    </div>
+    </Card>
   )
 
   const SECTION_RENDERERS = {

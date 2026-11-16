@@ -11,6 +11,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
+import { Card } from './ui'
 import ChartHighlight from './ChartHighlight'
 import { fetchReport, chartBody } from '../api/reportCache'
 
@@ -140,7 +141,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       <div>
         {/* Header */}
         <div className="mb-6 pb-4 border-b-2 border-line">
-          <p className="text-[11px] font-semibold uppercase tracking-widest mb-1 text-primary-ink">
+          <p className="text-2xs font-semibold uppercase tracking-widest mb-1 text-primary-ink">
             {t('kundli_div_header')}
           </p>
           <h2 className="font-serif font-bold text-xl text-ink mb-1">
@@ -196,7 +197,7 @@ export default function DivisionalCharts({ input, defaultDivision }) {
       </button>
 
       <div className="pb-4 border-b border-line">
-        <p className="text-[11px] font-semibold uppercase tracking-widest mb-0.5 text-primary-ink">
+        <p className="text-2xs font-semibold uppercase tracking-widest mb-0.5 text-primary-ink">
           {t(`kundli_div_group_${selected.groupId}`)}
         </p>
         <h2 className="font-serif font-bold text-xl text-ink leading-tight">{t(`kundli_div_${selected.code}_area`)}</h2>
@@ -205,12 +206,12 @@ export default function DivisionalCharts({ input, defaultDivision }) {
         </p>
       </div>
 
-      <div className="rounded-xl px-4 py-3.5 bg-parchment-card border border-line">
+      <Card padding="none" className="px-4 py-3.5">
         <p className="text-2xs font-bold uppercase tracking-widest mb-2 text-primary-ink">
           {t('kundli_div_governs_label')}
         </p>
         <p className="text-sm leading-relaxed text-ink">{t(`kundli_div_${selected.code}_governs`)}</p>
-      </div>
+      </Card>
 
       {loading && (
         <div role="status" className="flex flex-col items-center justify-center py-14">

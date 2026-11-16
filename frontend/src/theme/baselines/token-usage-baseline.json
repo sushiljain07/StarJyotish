@@ -1,9 +1,9 @@
 {
   "components/AskChart.jsx": {
-    "faintText": 2
+    "faintText": 1
   },
   "components/CareerReportTab.jsx": {
-    "faintText": 2
+    "faintText": 1
   },
   "components/CompactFooter.jsx": {
     "goldText": 1

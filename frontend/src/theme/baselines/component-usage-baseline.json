@@ -7,57 +7,41 @@
     "shadowSml": 1
   },
   "components/AshtakavargaTable.jsx": {
-    "goldCta": 1,
-    "lightCard": 5,
-    "roundedXl": 4
+    "lightCard": 2,
+    "roundedXl": 1
   },
   "components/AskChart.jsx": {
-    "goldCta": 1,
-    "lightCard": 2,
-    "chip": 1,
-    "arbitraryText": 1,
-    "roundedXl": 5,
-    "shadowSml": 1
-  },
-  "components/AskPersonaCard.jsx": {
-    "goldCta": 1,
-    "lightCard": 2,
-    "chip": 1,
-    "arbitraryText": 1,
-    "roundedXl": 4,
-    "shadowSml": 3
-  },
-  "components/BhavaChalit.jsx": {
-    "lightCard": 2,
-    "chip": 1,
-    "arbitraryText": 1,
+    "lightCard": 1,
     "roundedXl": 3
   },
+  "components/AskPersonaCard.jsx": {
+    "lightCard": 1,
+    "chip": 1,
+    "roundedXl": 3
+  },
+  "components/BhavaChalit.jsx": {
+    "lightCard": 1,
+    "roundedXl": 1
+  },
   "components/CareerReportTab.jsx": {
-    "goldCta": 5,
-    "lightCard": 10,
-    "chip": 5,
-    "arbitraryText": 2,
-    "roundedXl": 18,
-    "shadowSml": 14
+    "lightCard": 2,
+    "chip": 1,
+    "roundedXl": 4,
+    "shadowSml": 1
   },
   "components/ChartHighlight.jsx": {
     "arbitraryText": 1,
     "roundedXl": 2
   },
   "components/ChartReading.jsx": {
-    "arbitraryText": 2,
-    "roundedXl": 4,
-    "shadowSml": 3
+    "roundedXl": 1
   },
   "components/DashaTable.jsx": {
     "lightCard": 1,
     "shadowSml": 1
   },
   "components/DivisionalCharts.jsx": {
-    "lightCard": 1,
-    "arbitraryText": 2,
-    "roundedXl": 3
+    "roundedXl": 2
   },
   "components/ErrorFallback.jsx": {
     "goldCta": 2
@@ -72,9 +56,7 @@
     "arbitraryText": 1
   },
   "components/KPChart.jsx": {
-    "goldCta": 1,
-    "lightCard": 1,
-    "roundedXl": 4
+    "roundedXl": 3
   },
   "components/KundliChart.jsx": {
     "lightCard": 1,
@@ -82,19 +64,13 @@
     "shadowSml": 1
   },
   "components/KundliDownload.jsx": {
-    "goldCta": 1,
-    "lightCard": 2,
-    "chip": 4,
-    "roundedXl": 1
+    "lightCard": 1
   },
   "components/LanguageSwitcher.jsx": {
     "arbitraryText": 1
   },
   "components/LegalLanguageNote.jsx": {
     "roundedXl": 1
-  },
-  "components/PaywallCard.jsx": {
-    "goldCta": 1
   },
   "components/PlaceCombobox.jsx": {
     "lightCard": 1,
@@ -105,17 +81,11 @@
     "roundedXl": 1
   },
   "components/RajyogasTab.jsx": {
-    "lightCard": 1,
-    "chip": 2,
-    "roundedXl": 4,
-    "shadowSml": 3
-  },
-  "components/ReadingTeaser.jsx": {
-    "goldCta": 1
+    "roundedXl": 3,
+    "shadowSml": 2
   },
   "components/SarvatobhadraChakra.jsx": {
-    "lightCard": 1,
-    "roundedXl": 2
+    "roundedXl": 1
   },
   "components/ScrollToTop.jsx": {
     "goldCta": 1,
@@ -141,17 +111,11 @@
     "roundedXl": 1
   },
   "components/TopicReportTab.jsx": {
-    "goldCta": 2,
-    "lightCard": 3,
-    "chip": 3,
-    "arbitraryText": 2,
-    "roundedXl": 8,
-    "shadowSml": 9
+    "roundedXl": 1,
+    "shadowSml": 1
   },
   "components/TransitPanel.jsx": {
-    "goldCta": 1,
-    "lightCard": 1,
-    "roundedXl": 2
+    "roundedXl": 1
   },
   "components/auth/PhoneOtpForm.jsx": {
     "goldCta": 1
@@ -364,9 +328,8 @@
     "roundedXl": 1
   },
   "pages/Result.jsx": {
-    "lightCard": 3,
-    "chip": 3,
-    "roundedXl": 4
+    "lightCard": 1,
+    "roundedXl": 2
   },
   "pages/TermsOfUse.jsx": {
     "lightCard": 1,

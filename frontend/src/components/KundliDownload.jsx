@@ -1,6 +1,7 @@
 // frontend/src/components/KundliDownload.jsx
 import { useTranslation } from 'react-i18next'
 import KundliChart from './KundliChart'
+import { Badge, Button, Card } from './ui'
 import { chartPalette } from '../theme/chartPalette'
 import { formatDate as fmtDate, formatTime as fmtTime } from '../utils/format'
 import { planetName, signName, nakshatraName } from '../utils/astroNames'
@@ -42,16 +43,13 @@ export default function KundliDownload({ data, input }) {
         <p className="text-sm text-ink-muted">
           {t('download_preview')}
         </p>
-        <button
-          onClick={handleDownload}
-          className="bg-primary hover:bg-primary-dark text-night text-sm font-semibold px-5 py-2 rounded-lg shadow transition flex items-center gap-2 whitespace-nowrap"
-        >
+        <Button onClick={handleDownload}>
           <span>⬇</span> {t('download_button')}
-        </button>
+        </Button>
       </div>
 
       {/* ── Printable area ── */}
-      <div id="kundli-print-area" className="bg-parchment-card rounded-xl border border-line p-6 print:p-0 print:border-0 space-y-5">
+      <Card id="kundli-print-area" padding="none" className="p-6 print:p-0 print:border-0 print:shadow-none space-y-5">
 
         {/* Header */}
         <div className="text-center border-b border-line pb-4 print:break-inside-avoid-page">
@@ -63,20 +61,20 @@ export default function KundliDownload({ data, input }) {
             {fmtDate(input.date)} &nbsp;·&nbsp; {fmtTime(input.time)} &nbsp;·&nbsp; {input.place}
           </div>
           <div className="flex flex-wrap gap-2 justify-center mt-2">
-            <span className="bg-primary-light text-primary-ink text-xs font-semibold px-3 py-1 rounded-full">
+            <Badge tone="gold" size="md">
               {t('kundli_chip_lagna', { sign: signName(t, ascendant.sign) })}
-            </span>
+            </Badge>
             {moon && (
-              <span className="bg-mauve-light text-mauve text-xs font-semibold px-3 py-1 rounded-full">
+              <Badge tone="sage" size="md" className="!bg-mauve-light !text-mauve">
                 {t('kundli_chip_rashi', { sign: signName(t, moon.sign) })}
-              </span>
+              </Badge>
             )}
-            <span className="bg-sage-light text-sage text-xs font-semibold px-3 py-1 rounded-full">
+            <Badge tone="sage" size="md">
               {t('download_chip_nakshatra', { name: nakshatraName(t, ascendant.nakshatra) })}
-            </span>
-            <span className="bg-vermillion-light text-vermillion text-xs font-semibold px-3 py-1 rounded-full">
+            </Badge>
+            <Badge tone="sage" size="md" className="!bg-vermillion-light !text-vermillion">
               {t('download_chip_mahadasha', { planet: planetName(t, md.planet), date: fmtDate(md.end) })}
-            </span>
+            </Badge>
           </div>
         </div>
 
@@ -248,7 +246,7 @@ export default function KundliDownload({ data, input }) {
           })}
         </div>
 
-      </div>
+      </Card>
     </div>
   )
 }

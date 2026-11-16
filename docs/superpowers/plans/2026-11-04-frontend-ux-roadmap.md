@@ -270,7 +270,26 @@ Results:
 - `PLANET_COLORS_NIGHT` is ready but nothing consumes it yet.
 - The Admin and Astrologer dashboard tabs are not gold yet.
 
-*UX slice 3, laptop layout and polish:* the audit items L4, X1–X11 and E1, the grid on laptop widths, and a two-column /home.
+*UX slice 3, laptop layout and polish (done on `feat/ux3-laptop-polish`, plan `2026-11-15-ux3-laptop-polish.md`).*
+
+What changed:
+- **One frame.** Every page uses `max-w-5xl` with one gutter (`components/layout/frame.js`: `FRAME`, `GUTTER`, `APP_FRAME`). Header, footer and first content block share edges. Marketing pages moved from 6xl, and Learn `Section` defaults to the frame. Blog has one newsletter form, and /learn uses the full Footer.
+- **App pages fill the frame at `lg`.** /panchang, /week-ahead and /account use two columns from `lg` and keep the `max-w-2xl` column below it. Prose pages stay centred.
+- **Two-column /home from `lg`.** The rail beats are Today's window, This week and Coming up, and a beat with no data is left out. Phones keep the flat DOM order. The charts carousel has 44px arrows.
+- **Flows.** X1: a signed-out reader taps once to see the reading (the autostart flag rides in router state and is cleared after one use). /insights has a back link to the chart, which also works after a reload. Life Areas and Download show the chips toggle. Planets shows the House column second.
+- **Location.** A manual city never expires, and a signed-out city moves to the user key at sign-in; `:anon` is always cleared then. A late geolocation answer never overwrites a city the person just picked. "Use my location" saves a device fix that expires.
+- **Slice 1 and 2 leftovers closed:** the DivisionalCharts `fetchReport` cache with an abort on tab switch; NavBar `raised` and the dead charts removed; chips on every Kundli tab; no `text-[10px]` headings (repo guard); chart numerals ≥11px; gold Admin and Astrologer tabs; translated form errors.
+
+Browser pass (16 Nov):
+- Pages: 1440, 1280 and 1024 plus phones at 390 and 360, en and hi.
+- Results: 0 AA contrast failures, no horizontal scroll, no band under the footer, no clipped Devanagari.
+
+*Left from UX slice 3:*
+- Printed labels are 10px; two charts side by side on A4 can't be larger.
+- Touch tablets at 768px and up get desktop-size pills.
+- The social icons are placeholders until the owner adds links (X3).
+- `getCurrentLocation` writes on read (the anon→user move) under a getter name.
+- `PhoneOtpForm`'s disabled-button test only checks class strings.
 
 **5b. Component adoption** (D-6, D-7):
 - Move the 37 hand-built CTAs onto `<Button>` and the cards onto `<Card>`.

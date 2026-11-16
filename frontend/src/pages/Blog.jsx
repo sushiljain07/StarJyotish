@@ -37,7 +37,7 @@ function ArticleCard({ article, featured = false, onClick }) {
   const { t } = useTranslation()
   if (featured) {
     return (
-      <Card as="button" surface="night" padding="none" onClick={onClick} className="w-full text-left overflow-hidden hover:opacity-95 transition group">
+      <Card as="button" surface="night" padding="none" onClick={onClick} className="!bg-night !border-transparent w-full text-left overflow-hidden hover:opacity-95 transition group">
         <div className="p-7 sm:p-9">
           <div className="flex items-center gap-2.5 mb-4">
             <Badge size="md" surface="night" tone={CATEGORY_TONES[article.category] ?? 'muted'}>{article.category}</Badge>

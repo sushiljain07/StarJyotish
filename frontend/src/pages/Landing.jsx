@@ -32,10 +32,10 @@ const BADGES = ['landing_badge_accuracy', 'landing_badge_free', 'landing_badge_b
 // sage, Insights = mauve, Ask = vermillion), so returning users recognize
 // the colors instead of learning a new palette just for the landing page.
 const INSIDE_ACCENTS = {
-  kundli:   { border: 'border-primary',   chip: 'bg-primary-light text-primary-ink' },
-  advanced: { border: 'border-sage',      chip: 'bg-sage-light text-sage' },
-  insights: { border: 'border-mauve',     chip: 'bg-mauve-light text-mauve' },
-  ask:      { border: 'border-vermillion', chip: 'bg-vermillion-light text-vermillion' },
+  kundli:   { border: '!border-primary',   chip: 'bg-primary-light text-primary-ink' },
+  advanced: { border: '!border-sage',      chip: 'bg-sage-light text-sage' },
+  insights: { border: '!border-mauve',     chip: 'bg-mauve-light text-mauve' },
+  ask:      { border: '!border-vermillion', chip: 'bg-vermillion-light text-vermillion' },
 }
 const INSIDE_ITEMS = ['kundli', 'advanced', 'insights', 'ask']
 
@@ -328,7 +328,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {INSIDE_ITEMS.map((id, i) => (
               <Reveal key={id} delay={i * 80}>
-                <Card className={`border-l-4 ${INSIDE_ACCENTS[id].border} flex gap-3 items-start`}>
+                <Card className={`!border-0 !border-l-4 ${INSIDE_ACCENTS[id].border} flex gap-3 items-start`}>
                   <span className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${INSIDE_ACCENTS[id].chip}`}>
                     {id === 'kundli'
                       ? <img src="/starjyotish.svg" alt="" className="w-5 h-5" />

@@ -49,14 +49,17 @@ export default function ChartsStrip({ profile }) {
     })
   }
 
-  const arrow = 'hidden md:flex absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 items-center justify-center rounded-full border border-white/[0.15] bg-night-deep/90 text-primary-light hover:bg-white/[0.12] transition'
+  // A 44px tap target around the 32px disc, offset so the disc sits where
+  // it did (6px in from each edge).
+  const arrow = 'group hidden md:flex absolute top-1/2 -translate-y-1/2 z-10 min-h-11 min-w-11 items-center justify-center disabled:invisible'
+  const disc = 'w-8 h-8 flex items-center justify-center rounded-full border border-white/[0.15] bg-night-deep/90 text-primary-light group-hover:bg-white/[0.12] transition'
 
   return (
     <div className="relative">
-      <button type="button" aria-label={t('carousel_prev')} onClick={() => scrollByPage(-1)}
-        disabled={edge.start} className={`${arrow} left-0 disabled:invisible`}>‹</button>
-      <button type="button" aria-label={t('carousel_next')} onClick={() => scrollByPage(1)}
-        disabled={edge.end} className={`${arrow} right-0 disabled:invisible`}>›</button>
+      <button type="button" aria-label={t('home_charts_carousel_prev')} onClick={() => scrollByPage(-1)}
+        disabled={edge.start} className={`${arrow} -left-1.5`}><span aria-hidden="true" className={disc}>‹</span></button>
+      <button type="button" aria-label={t('home_charts_carousel_next')} onClick={() => scrollByPage(1)}
+        disabled={edge.end} className={`${arrow} -right-1.5`}><span aria-hidden="true" className={disc}>›</span></button>
       <div ref={scroller} onScroll={measure} className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
         {FEATURED.map(code => (
           <button

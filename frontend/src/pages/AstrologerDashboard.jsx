@@ -1,6 +1,7 @@
 // frontend/src/pages/AstrologerDashboard.jsx
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import Seo from '../components/Seo'
 import AccountMenu from '../components/AccountMenu'
@@ -322,6 +323,7 @@ function ProfileTab({ token }) {
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function AstrologerDashboard() {
+  const { t } = useTranslation()
   const { user, accessToken } = useAuth()
   const [tab, setTab] = useState('overview')
 
@@ -345,7 +347,7 @@ export default function AstrologerDashboard() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 pb-2">
-          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label="Sections"
+          <AnimatedTabRow variant="pill" tabs={TABS} active={tab} onChange={setTab} label={t('dashboard_sections_aria')}
             className="[&_button[aria-selected=false]]:text-ink-onnight [&_button[aria-selected=false]]:border-white/[0.12]" />
         </div>
       </div>

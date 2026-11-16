@@ -17,6 +17,7 @@ import { resolveChartState } from '../services/lastChart'
 import AnimatedTabRow from '../components/AnimatedTabRow'
 import SegmentedToggle from '../components/SegmentedToggle'
 import Seo from '../components/Seo'
+import { FRAME, GUTTER } from '../components/layout/frame'
 import { getTopic } from '../config/topics'
 
 const ChartReading    = lazy(() => import('../components/ChartReading'))
@@ -161,7 +162,7 @@ export default function Insights() {
       <Seo title={t('insights_seo_title')} description={t('insights_seo_description')} path="/insights" noindex />
 
       <div className="bg-parchment-card border-b border-line sticky top-[60px] z-30">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className={`${FRAME} ${GUTTER}`}>
           <div className="pt-1 pb-1 flex items-center gap-3">
             <Link
               to="/kundli"

@@ -14,22 +14,24 @@ export function useChartExtras(profile) {
   const [transit, setTransit] = useState(null)
   const [outlook, setOutlook] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (!profile) return
     let cancelled = false
     const input = { date: profile.birth_date, time: profile.birth_time, place: profile.place }
     setLoading(true)
+    setError(false)
     Promise.all([fetchTransit(input), fetchOutlook(input)])
       .then(([transitRes, outlookRes]) => {
         if (cancelled) return
         setTransit(transitRes)
         setOutlook(outlookRes)
       })
-      .catch(() => { /* sections below handle missing data gracefully */ })
+      .catch(() => { if (!cancelled) setError(true) /* sections handle missing data */ })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [profile?.id, profile?.birth_date, profile?.birth_time, profile?.place])
 
-  return { transit, outlook, loading }
+  return { transit, outlook, loading, error }
 }

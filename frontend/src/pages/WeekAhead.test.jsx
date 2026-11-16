@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import '../i18n'
@@ -11,8 +11,9 @@ vi.mock('../components/CelestialBackdrop', () => ({ default: () => null }))
 vi.mock('../hooks/usePlaceMatches', () => ({
   usePlaceMatches: q => (q ? [{ display_name: 'Pune, India', lat: 18.5, lon: 73.8 }] : []),
 }))
+const week = vi.hoisted(() => ({ days: [{ date: '2026-11-14', tithi: { name: 'Pratipada' }, nakshatra: 'Ashwini' }] }))
 vi.mock('../api/astro', () => ({
-  fetchPanchangWeek: () => Promise.resolve({ days: [{ date: '2026-11-14', tithi: { name: 'Pratipada' }, nakshatra: 'Ashwini' }] }),
+  fetchPanchangWeek: () => Promise.resolve({ days: week.days }),
 }))
 vi.mock('../services/astrologyProfiles', () => ({ getPrimaryProfile: () => ({ place: 'Jaipur, India' }) }))
 
@@ -67,5 +68,37 @@ describe('WeekAhead with a location', () => {
     renderIt()
     await waitFor(() => expect(screen.getByText(/Pratipada/)).toBeTruthy())
     expect(screen.queryByPlaceholderText(/search city/i)).toBeNull()
+  })
+})
+
+describe('WeekAhead layout', () => {
+  const ONE_DAY = week.days
+  afterEach(() => { week.days = ONE_DAY })
+
+  it('keeps the narrow column below lg and widens to the frame at lg', async () => {
+    hook.value = { location: { lat: 1, lon: 2, label: 'Pune' }, status: 'ready', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }
+    const { container } = renderIt()
+    await waitFor(() => expect(screen.getByText(/Pratipada/)).toBeTruthy())
+    const body = screen.getByText(/Pratipada/).closest('.max-w-2xl')
+    expect(body).toBeTruthy()
+    expect(body.classList.contains('lg:max-w-5xl')).toBe(true)
+    expect(container.querySelector('.max-w-5xl')).toBeNull()
+  })
+
+  it('leaves no bottom divider under either card of the last row at lg', async () => {
+    week.days = Array.from({ length: 7 }, (_, i) => ({ date: `2026-11-${14 + i}`, tithi: { name: `T${i}` }, nakshatra: 'Ashwini' }))
+    hook.value = { location: { lat: 1, lon: 2, label: 'Pune' }, status: 'ready', retryGeolocation: vi.fn(), setManualLocation: vi.fn() }
+    const { container } = renderIt()
+    await waitFor(() => expect(screen.getByText(/T6/)).toBeTruthy())
+    const cards = [...container.querySelector('.lg\\:grid-cols-2').children]
+    expect(cards).toHaveLength(7)
+    cards.forEach((card, i) => {
+      // Below lg: one list, divider under every card but the last.
+      expect(card.classList.contains('border-b')).toBe(true)
+      expect(card.classList.contains('last:border-b-0')).toBe(true)
+      // At lg: no bottom dividers; a top divider from the second row on.
+      expect(card.classList.contains('lg:border-b-0')).toBe(true)
+      expect(card.classList.contains('lg:border-t')).toBe(i >= 2)
+    })
   })
 })

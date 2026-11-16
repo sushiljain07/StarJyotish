@@ -91,11 +91,14 @@ describe('PanchangDetail layout and location', () => {
     expect(stored.source).toBe('manual')
   })
 
-  it('hero and content use the frame, not the narrow column', async () => {
+  it('hero and content keep the narrow column below lg and use the frame from lg', async () => {
     const { container } = await renderIt()
-    expect(container.querySelector('.bg-night .max-w-5xl')).toBeTruthy()
-    expect(container.querySelector('.flex-1.max-w-5xl')).toBeTruthy()
-    expect(container.querySelector('.max-w-2xl')).toBeNull()
+    const hero = container.querySelector('.bg-night > .max-w-2xl')
+    const content = container.querySelector('.flex-1.max-w-2xl')
+    for (const el of [hero, content]) {
+      expect(el).toBeTruthy()
+      expect(el.classList.contains('lg:max-w-5xl')).toBe(true)
+    }
   })
 
   it('Today sections sit in two columns at lg', async () => {

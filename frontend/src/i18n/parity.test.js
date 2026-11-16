@@ -64,7 +64,6 @@ describe('hi glossary', () => {
   // चार्ट only where a key names a specific divisional chart (D-number or
   // नवांश); a chart in general is कुंडली / जन्म कुंडली.
   const CHART_ALLOWED = [
-    'testimonial_4_text', // नवांश (D9) chart, in a user quote
     'home_this_week_subtext', // D10, D9, D2/D11 and D6 charts
     'report_career_note', // D10 chart
     'report_finance_note', // D2 and D11 charts

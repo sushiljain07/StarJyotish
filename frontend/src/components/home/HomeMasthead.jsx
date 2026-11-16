@@ -22,7 +22,7 @@ import { localDateStr } from '../../utils/localDate'
 import { formatDate } from '../../utils/format'
 import { chartPalette, withAlpha } from '../../theme/chartPalette'
 import { colors } from '../../theme/tokens'
-import { GUTTER } from '../layout/frame'
+import { APP_FRAME, GUTTER } from '../layout/frame'
 import { nakshatraName, panchangName, planetName } from '../../utils/astroNames'
 
 // "6:08 AM" / "7:20 PM" -> minutes since midnight. Panchang always returns
@@ -340,10 +340,10 @@ export default function HomeMasthead({ profile, location, panchang, dashaTags })
 
   return (
     <div
-      className={`relative overflow-hidden ${GUTTER} pt-5 pb-8 transition-[background] duration-1000`}
+      className="relative overflow-hidden pt-5 pb-8 transition-[background] duration-1000"
       style={{ background: `linear-gradient(180deg, ${sky.sky1} 0%, ${PAGE_BG} 100%)` }}
     >
-      <div className="relative max-w-2xl lg:max-w-5xl mx-auto w-full">
+      <div className={`relative ${APP_FRAME} ${GUTTER}`}>
         {/* Today's date on the left, streak pill on the right — no profile
             name chip here (single-profile app). */}
         <div className="flex items-center justify-between gap-3 mb-4">

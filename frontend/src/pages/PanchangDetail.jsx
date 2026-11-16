@@ -537,7 +537,7 @@ export default function PanchangDetail() {
 
       {/* Dark hero */}
       <div className="bg-night pt-8 pb-8">
-        <PageContainer>
+        <PageContainer width="app">
           <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">{t('panchang_eyebrow')}</p>
           <h1 className="font-serif text-3xl font-medium text-primary-light leading-snug">{heroTitle}</h1>
           {tab === 'today' && isToday && (
@@ -570,7 +570,7 @@ export default function PanchangDetail() {
       </div>
 
       {/* Content */}
-      <PageContainer className="flex-1 pt-8 pb-14">
+      <PageContainer width="app" className="flex-1 pt-8 pb-14">
         {tab === 'today' && <TodayTab location={location} date={date} onSetLocation={handleSetLocation} />}
         {tab === 'week'  && <WeekTab  location={location} onSetLocation={handleSetLocation} />}
         {tab === 'month' && <HinduMonthTab location={location} onSetLocation={handleSetLocation} />}

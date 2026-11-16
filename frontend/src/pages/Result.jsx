@@ -16,7 +16,7 @@ import NavBar          from '../components/NavBar'
 import SegmentedToggle from '../components/SegmentedToggle'
 import AnimatedTabRow  from '../components/AnimatedTabRow'
 import { useScrollDirection } from '../hooks/useScrollDirection'
-import { useBelowMd } from '../hooks/useHideOnScroll'
+import { BELOW_MD, useMediaQuery } from '../hooks/useMediaQuery'
 import { getTopic } from '../config/topics'
 import TabIcon   from '../components/TabIcon'
 import Seo       from '../components/Seo'
@@ -154,7 +154,7 @@ export default function Result() {
   const location  = useLocation()
   const navigate  = useNavigate()
   const scrollDir = useScrollDirection()
-  const belowMd   = useBelowMd()
+  const belowMd   = useMediaQuery(BELOW_MD)
   const [chipsOpen, toggleChips] = useTapToReveal()
   const { isAuthenticated, user, accessToken, loading: authLoading } = useAuth()
   // Router state, else the last chart in this tab, else the saved profile

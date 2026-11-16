@@ -33,6 +33,12 @@ describe('BirthForm', () => {
     expect(screen.getByLabelText(en.form_place).tagName).toBe('INPUT')
   })
 
+  it('marks the place as required the same way as the other fields', () => {
+    const place = screen.getByLabelText(en.form_place)
+    expect(place.getAttribute('aria-required')).toBe('true')
+    expect(place.hasAttribute('required')).toBe(false)
+  })
+
   it('rejects a date that does not exist', () => {
     fillDate('31', '2', '1990')
     fireEvent.click(screen.getByRole('button', { name: en.onboarding_time_unknown }))

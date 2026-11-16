@@ -182,7 +182,7 @@ export default function Profile() {
     <div className="flex-1">
       <Seo title={t('profile_title')} path="/account" noindex />
 
-      <PageContainer className="pt-6 sm:pt-8 pb-16">
+      <PageContainer width="app" className="pt-6 sm:pt-8 pb-16">
         {/* Identity header */}
         <div className="flex items-center gap-4 mb-8">
           {showAvatarImage ? (

@@ -8,6 +8,7 @@ import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
+import { Badge, Card } from '../components/ui'
 
 const ACCENT_RING = ['ring-primary/30','ring-sage/30','ring-mauve/30','ring-primary/30','ring-sage/30','ring-mauve/30']
 const AVATAR_BG   = ['bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve','bg-primary-light text-primary-ink','bg-sage-light text-sage','bg-mauve-light text-mauve']
@@ -15,15 +16,15 @@ const MARKS       = ['✦','✧','✦','✧','✦','✧']
 
 function TestimonialCard({ t, i }) {
   return (
-    <figure className="bg-parchment-card rounded-2xl border border-line p-5 sm:p-6 flex flex-col h-full">
+    <Card as="figure" className="flex flex-col h-full">
       <div className="font-serif text-4xl leading-none text-primary/30 mb-1 select-none" aria-hidden="true">"</div>
       <blockquote className="text-ink text-sm leading-relaxed flex-1">{t.text}</blockquote>
       {t.detail && (
         <div className="mt-4 mb-4">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-ink bg-primary-light px-2.5 py-1 rounded-full">
+          <Badge tone="gold" size="md">
             <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor"><circle cx="8" cy="8" r="2.5"/></svg>
             {t.detail}
-          </span>
+          </Badge>
         </div>
       )}
       <figcaption className="flex items-center gap-3 pt-4 border-t border-line">
@@ -35,7 +36,7 @@ function TestimonialCard({ t, i }) {
           {t.location && <div className="text-xs text-ink-muted">{t.location}</div>}
         </div>
       </figcaption>
-    </figure>
+    </Card>
   )
 }
 
@@ -73,16 +74,16 @@ function SubmitForm() {
 
   if (success) {
     return (
-      <div className="bg-sage-light border border-sage/30 rounded-2xl px-6 py-8 text-center">
+      <Card padding="none" className="!bg-sage-light !border-sage/30 !shadow-none px-6 py-8 text-center">
         <div className="text-3xl mb-3">🙏</div>
         <div className="font-semibold text-ink mb-2">{t('testimonials_thanks_title')}</div>
         <p className="text-sm text-ink-muted">{t('testimonials_thanks_body')}</p>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="bg-parchment-card border border-line rounded-2xl p-6 sm:p-8">
+    <Card padding="lg">
       <h3 className="font-serif font-semibold text-xl text-ink mb-1">{t('testimonials_share_title')}</h3>
       <p className="text-xs text-ink-muted mb-6">{t('testimonials_share_intro')}</p>
 
@@ -128,7 +129,7 @@ function SubmitForm() {
           {saving ? t('testimonials_submitting') : t('testimonials_submit')}
         </button>
       </form>
-    </div>
+    </Card>
   )
 }
 
@@ -182,13 +183,13 @@ export default function TestimonialsPage() {
         {loading && items.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1,2,3,4].map(i => (
-              <div key={i} className="bg-parchment-card rounded-2xl border border-line p-6 motion-safe:animate-pulse">
+              <Card key={i} className="motion-safe:animate-pulse">
                 <div className="h-3 w-8 bg-line rounded mb-3" />
                 <div className="h-3 w-full bg-line rounded mb-2" />
                 <div className="h-3 w-full bg-line rounded mb-2" />
                 <div className="h-3 w-2/3 bg-line rounded mb-6" />
                 <div className="h-3 w-1/3 bg-line rounded" />
-              </div>
+              </Card>
             ))}
           </div>
         ) : items.length === 0 ? (

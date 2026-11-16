@@ -10,14 +10,15 @@ import { API_BASE } from '../api/config'
 import Seo from '../components/Seo'
 import Reveal from '../components/Reveal'
 import SiteHeader from '../components/SiteHeader'
+import { Button, Badge, Card } from '../components/ui'
 import Footer from '../components/Footer'
 import { useScrollProgress } from '../hooks/useScrollProgress'
 
-const CATEGORY_COLORS = {
-  Basics:   'bg-primary-light text-primary-ink',
-  Timing:   'bg-mauve-light text-mauve',
-  Planets:  'bg-sage-light text-sage',
-  Remedies: 'bg-vermillion-light text-vermillion',
+const CATEGORY_TONES = {
+  Basics: 'gold',
+  Timing: 'mauve',
+  Planets: 'good',
+  Remedies: 'vermillion',
 }
 
 // ── Section renderers ──────────────────────────────────────────────────────
@@ -159,7 +160,7 @@ export default function BlogArticle() {
                 <div className="flex items-center gap-2.5 mb-5">
                   <Link to="/blog" className="text-ink-onnight hover:text-primary text-xs transition">{t('blog_article_back')}</Link>
                   <span className="text-ink-onnight/40 text-xs">/</span>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[article.category] ?? 'bg-parchment text-ink'}`}>{article.category}</span>
+                  <Badge size="md" surface="night" tone={CATEGORY_TONES[article.category] ?? 'muted'}>{article.category}</Badge>
                 </div>
                 <h1 className="font-serif font-semibold text-2xl sm:text-3xl text-primary-light leading-snug mb-4">{article.title}</h1>
                 <div className="flex items-center gap-4 text-ink-onnight text-xs">
@@ -182,7 +183,7 @@ export default function BlogArticle() {
             {(article.tags || []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-10 pt-6 border-t border-line">
                 {article.tags.map(tag => (
-                  <span key={tag} className="text-xs bg-parchment-card border border-line px-3 py-1 rounded-full text-ink-muted">{tag}</span>
+                  <Badge key={tag} size="md">{tag}</Badge>
                 ))}
               </div>
             )}
@@ -193,9 +194,9 @@ export default function BlogArticle() {
             <p className="text-primary text-xs font-bold tracking-widest uppercase mb-2">Star Jyotish</p>
             <h2 className="font-serif font-semibold text-xl text-primary-light mb-2">{t('blog_article_cta_title')}</h2>
             <p className="text-ink-onnight text-sm mb-5 max-w-sm mx-auto">{t('blog_article_cta_body')}</p>
-            <button onClick={() => navigate('/generate')} className="bg-primary hover:bg-primary-dark text-night font-semibold text-sm px-7 py-3 rounded-full shadow-md hover:shadow-lg transition">
+            <Button size="lg" onClick={() => navigate('/generate')} className="whitespace-normal text-center">
               {t('learn_cta_button')}
-            </button>
+            </Button>
           </div>
 
           {/* Related articles */}
@@ -204,12 +205,12 @@ export default function BlogArticle() {
               <h3 className="font-semibold text-sm text-ink-muted uppercase tracking-wide mb-5">{t('blog_article_related')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {related.map(rel => (
-                  <Link key={rel.slug} to={`/blog/${rel.slug}`}
-                    className="group bg-parchment-card rounded-xl border border-line p-4 hover:border-primary/30 hover:shadow-md transition">
-                    <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full mb-2 ${CATEGORY_COLORS[rel.category] ?? ''}`}>{rel.category}</span>
+                  <Card as={Link} key={rel.slug} to={`/blog/${rel.slug}`} interactive
+                    className="group hover:border-primary/30">
+                    <Badge tone={CATEGORY_TONES[rel.category] ?? 'muted'} className="mb-2">{rel.category}</Badge>
                     <p className="font-semibold text-sm text-ink group-hover:text-primary-ink transition leading-snug">{rel.title}</p>
                     <p className="text-xs text-ink-muted mt-1">{t('blog_read_min_long', { n: rel.readMin })}</p>
-                  </Link>
+                  </Card>
                 ))}
               </div>
             </section>

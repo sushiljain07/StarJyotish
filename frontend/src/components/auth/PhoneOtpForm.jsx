@@ -13,11 +13,11 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { sendOtp } from '../../api/auth'
 import { useAuth } from '../../contexts/AuthContext'
+import { Button } from '../ui'
 
 const PHONE_LOGIN_ENABLED = false
 
 const inputCls = 'w-full min-h-11 border border-line rounded-lg px-3 py-2 bg-parchment text-ink text-sm focus:outline-none focus:ring-2 focus:ring-primary'
-const buttonCls = 'w-full bg-primary hover:bg-primary-dark disabled:bg-line disabled:text-ink-muted text-night font-semibold py-2.5 rounded-full transition'
 
 const RESEND_COOLDOWN_SECONDS = 30
 
@@ -131,9 +131,9 @@ export default function PhoneOtpForm({ onSuccess }) {
           )}
         </div>
         {error && <p id={errorId} role="alert" className="text-vermillion text-sm">{error}</p>}
-        <button type="submit" disabled={loading || identifier.trim().length < 4} className={buttonCls}>
+        <Button type="submit" disabled={loading || identifier.trim().length < 4} className="w-full">
           {loading ? t('login_sending') : t('login_send_code')}
-        </button>
+        </Button>
         <p className="text-ink-muted text-xs text-center">{t('login_disclaimer')}</p>
       </form>
     )
@@ -164,9 +164,9 @@ export default function PhoneOtpForm({ onSuccess }) {
         />
       </div>
       {error && <p id={errorId} role="alert" className="text-vermillion text-sm">{error}</p>}
-      <button type="submit" disabled={loading || code.length !== 6} className={buttonCls}>
+      <Button type="submit" disabled={loading || code.length !== 6} className="w-full">
         {loading ? t('login_verifying') : t('login_verify')}
-      </button>
+      </Button>
       <div className="flex items-center justify-between text-sm">
         <button type="button"
           onClick={() => { setStep('input'); setCode(''); setError('') }}

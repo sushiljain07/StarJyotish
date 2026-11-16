@@ -11,12 +11,17 @@ const HERE = path.dirname(fileURLToPath(import.meta.url))
 const SRC = path.resolve(HERE, '..')
 const BASELINE_PATH = path.join(HERE, 'baselines', 'component-usage-baseline.json')
 
+// lightCard, nightCard and chip are advisory ratchets: they count per quote-delimited class string
+// (a `${` ends a segment), so classes split across `${}`, cn() or array joins can be missed. Never
+// "lower" a count by splitting a class string. goldCta and arbitraryText are plain token counts;
+// Task 6 turns them into hard zero guards. `rounded-full px-N text-xs` also matches pill buttons and
+// avatars: migrate those case by case to Button or Badge.
 const COUNTERS = {
   goldCta: /hover:bg-primary-dark/g,
   // Order-independent: one match per class string (quote-delimited) holding every part.
-  lightCard: /(?<=["'`])(?=[^"'`]*\bbg-parchment-card\b)(?=[^"'`]*\bborder-line\b)[^"'`]*/g,
-  nightCard: /(?<=["'`])(?=[^"'`]*\bbg-white\/\[0\.0[3-6]\d?\])(?=[^"'`]*\bborder-white\/)[^"'`]*/g,
-  chip: /(?<=["'`])(?=[^"'`]*\brounded-full\b)(?=[^"'`]*\bpx-[\d.]+)(?=[^"'`]*\btext-(?:2xs|3xs|xs)\b)[^"'`]*/g,
+  lightCard: /(?<=["'`])(?=[^"'`$]*\bbg-parchment-card\b)(?=[^"'`$]*\bborder-line\b)[^"'`$]*/g,
+  nightCard: /(?<=["'`])(?=[^"'`$]*\bbg-white\/\[0\.0[3-6]\d?\])(?=[^"'`$]*\bborder-white\/)[^"'`$]*/g,
+  chip: /(?<=["'`])(?=[^"'`$]*\brounded-full\b)(?=[^"'`$]*\bpx-[\d.]+)(?=[^"'`$]*\btext-(?:2xs|3xs|xs)\b)[^"'`$]*/g,
   arbitraryText: /text-\[\d+(?:\.\d+)?px\]/g,
   roundedXl: /\brounded-(?:xl|2xl)\b/g,
   shadowSml: /\bshadow-(?:sm|md|lg)\b/g,
@@ -43,6 +48,8 @@ it('counters match class strings in any order, once per string', () => {
   const chipB = '<span className="text-xs bg-parchment px-2 py-0.5 rounded-full border">'
   expect(count(COUNTERS.chip, chipA + chipB)).toBe(2)
   expect(count(COUNTERS.chip, '<b className="rounded-full text-xs">')).toBe(0)
+  // Known miss: an interpolation splits the string, so this is not counted.
+  expect(count(COUNTERS.chip, '`rounded-full ${x} px-2 text-xs`')).toBe(0)
   expect(count(COUNTERS.lightCard, '"bg-parchment-card p-4 border-line" "border-line bg-parchment-card"')).toBe(2)
   expect(count(COUNTERS.nightCard, '"bg-white/[0.045] border border-white/[0.09]" "border-white/10 bg-white/[0.04]" "bg-white/[0.045]"')).toBe(2)
 })

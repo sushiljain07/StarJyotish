@@ -198,7 +198,7 @@ Phase 4 leftovers:
 - Build `chartPalette` from the Tailwind config for the chart SVGs.
 - Keep the keyframes in one place, and have the focus ring use the token.
 
-*5a status (14 Nov 2026): done on `feat/phase5a-contrast-tokens`, plan `2026-11-14-phase5a-contrast-tokens.md`.*
+*5a status (14 Nov 2026): done on `feat/phase5a-contrast-tokens`, plan `2026-11-14-phase5a-contrast-tokens.md`; merged in #167.*
 - `primary.ink` shipped as `#86621E`. `#8F6A22` measured just under 4.5:1 on parchment.
 - Bare gold text went from 502 uses to 57, and `ink-faint` text from 208 to 21. What remains is on night surfaces or decorative, and a per-file ratchet test (`src/theme/tokenUsage.test.js`) keeps it from growing.
 - Ad-hoc green, amber and red are gone; a test enforces it.
@@ -218,7 +218,7 @@ Phase 4 leftovers:
 
 **UX slices (added 14 Nov 2026).** These follow the UX audit in `docs/superpowers/audits/2026-11-14-ux-audit.md`. The owner chose this order: bugs and mobile first, then colour, then laptop layout and polish.
 
-*UX slice 1, bugs and mobile (done on `feat/ux1-bugs-mobile`, plan `2026-11-14-ux1-bugs-mobile.md`).*
+*UX slice 1, bugs and mobile (done on `feat/ux1-bugs-mobile`, plan `2026-11-14-ux1-bugs-mobile.md`; merged in #168).*
 
 Sign-in sessions:
 - A temporary refresh failure no longer signs the user out. The app retries and shows a "Reconnecting" screen if the server stays unreachable.
@@ -250,7 +250,7 @@ Rest of the app:
 - Printed labels are 10px; two charts side by side on A4 can't be larger.
 - Touch tablets at 768px and up get desktop-size pills.
 
-*UX slice 2, colour (done on `feat/ux2-colour`, plan `2026-11-14-ux2-colour.md`).*
+*UX slice 2, colour (done on `feat/ux2-colour`, plan `2026-11-14-ux2-colour.md`; merged in #169).*
 
 What changed:
 - **One token source.** `src/theme/tokens.js` feeds Tailwind, `chartPalette` and `planetColors`, and the Tailwind config is no longer bundled.
@@ -270,7 +270,7 @@ Results:
 - `PLANET_COLORS_NIGHT` is ready but nothing consumes it yet.
 - The Admin and Astrologer dashboard tabs are not gold yet.
 
-*UX slice 3, laptop layout and polish (done on `feat/ux3-laptop-polish`, plan `2026-11-15-ux3-laptop-polish.md`).*
+*UX slice 3, laptop layout and polish (done on `feat/ux3-laptop-polish`, plan `2026-11-15-ux3-laptop-polish.md`; merged in #170).*
 
 What changed:
 - **One frame.** Every page uses `max-w-5xl` with one gutter (`components/layout/frame.js`: `FRAME`, `GUTTER`, `APP_FRAME`). Header, footer and first content block share edges. Marketing pages moved from 6xl, and Learn `Section` defaults to the frame. Blog has one newsletter form, and /learn uses the full Footer.
@@ -331,10 +331,11 @@ Browser pass (16 Nov):
 | 1 | `fix/phase1-trust-and-cost` | `2026-11-04-phase1-trust-and-cost.md` | Done — merged |
 | 2 | `fix/phase2-core-flows` | `2026-11-04-phase2-core-flows.md` | Done — merged |
 | 3 | `feat/phase3-hindi` | `2026-11-04-phase3-hindi.md` (Tasks 0–7) | Done — merged |
-| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — merged (#164); the glossary rows were settled by the owner on 10 Nov 2026 and applied on `feat/hindi-owner-decisions` |
+| 3B | `feat/phase3b-hindi-followups` | Phase 3 plan Tasks 8–10 + items above | Done — merged (#164); the glossary rows were settled by the owner on 10 Nov 2026 and applied on `feat/hindi-owner-decisions` (#166) |
 | 4 | `feat/phase4-mobile-nav-polish` | `2026-11-10-phase4-mobile-nav.md` | Done — merged (#165); leftovers listed in the Phase 4 section |
-| 5a | `feat/phase5a-contrast-tokens` | `2026-11-14-phase5a-contrast-tokens.md` | Done; PR open. Follow-ups are listed in the 5a status above |
-| UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done; PR open, stacked on 5a |
-| UX2 | `feat/ux2-colour` | `2026-11-14-ux2-colour.md` | Done; PR open |
-| UX3 | `feat/ux3-*` | to write | — |
-| 5b–g | `feat/phase5-*` | to write per slice | — |
+| 5a | `feat/phase5a-contrast-tokens` | `2026-11-14-phase5a-contrast-tokens.md` | Done — merged (#167). Follow-ups are listed in the 5a status above |
+| UX1 | `feat/ux1-bugs-mobile` | `2026-11-14-ux1-bugs-mobile.md` | Done — merged (#168) |
+| UX2 | `feat/ux2-colour` | `2026-11-14-ux2-colour.md` | Done — merged (#169) |
+| UX3 | `feat/ux3-laptop-polish` | `2026-11-15-ux3-laptop-polish.md` | Done — merged (#170, 16 Nov 2026) |
+| 5b | `feat/phase5b-components` | `2026-11-16-phase5b-components.md` | In progress — plan being written |
+| 5c–g | `feat/phase5-*` | to write per slice | — |
